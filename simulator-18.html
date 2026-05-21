@@ -1,0 +1,1619 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="favicon-64.png">
+  <link rel="shortcut icon" href="favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="favicon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Déficit Foncier | Patrimonia.ai</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css?v=19">
+<script src="shared.js?v=2"></script>
+<script src="shared-nav.js?v=8"></script>
+<style>
+/* ═══════════════════════════════════════════════════
+   DÉFICIT FONCIER · PATRIMONIA.AI
+   Préfixe CSS : .df-
+   Personnalité : immobilier patrimonial · rénovation · optimisation IR
+═══════════════════════════════════════════════════ */
+:root {
+  --df-forest:     #1B4332;
+  --df-forest-mid: #2D6A4F;
+  --df-forest-dim: rgba(27,67,50,.08);
+  --df-forest-bd:  rgba(27,67,50,.18);
+  --df-bronze:     #8B6914;
+  --df-bronze-dim: rgba(139,105,20,.08);
+  --df-bronze-mid: rgba(139,105,20,.18);
+  --df-slate:      #4B5563;
+  --df-slate-dim:  rgba(75,85,99,.08);
+}
+
+/* ── LAYOUT ── */
+.df-layout { display:grid; grid-template-columns:360px 1fr; min-height:640px }
+@media(max-width:960px){ .df-layout { grid-template-columns:1fr } }
+
+.df-inp {
+  padding:1.6rem 1.4rem 2rem;
+  background:var(--surface-2);
+  border-right:1px solid var(--border-subtle);
+  overflow-y:auto; max-height:900px;
+}
+@media(max-width:960px){ .df-inp { border-right:none; border-bottom:1px solid var(--border-subtle); max-height:none } }
+
+.df-main { background:var(--surface); display:flex; flex-direction:column; min-width:0 }
+
+/* ── HERO PROPS ── */
+.df-hero-props {
+  display:grid; grid-template-columns:repeat(4,1fr); gap:.8rem;
+  margin:1.2rem 0 1.6rem;
+}
+@media(max-width:900px){ .df-hero-props { grid-template-columns:repeat(2,1fr) } }
+
+.df-hero-prop {
+  display:flex; align-items:flex-start; gap:.6rem;
+  background:var(--surface-2); border:1px solid var(--border-subtle);
+  border-radius:var(--r-sm); padding:.8rem .9rem;
+}
+.df-hero-icon {
+  width:30px; height:30px; border-radius:8px; flex-shrink:0;
+  background:var(--df-forest-dim); display:flex; align-items:center;
+  justify-content:center; color:#2D6A4F;
+}
+.df-hero-icon svg { width:16px; height:16px }
+.df-hero-prop-title { font-size:.71rem; font-weight:700; color:var(--text); letter-spacing:-.01em }
+.df-hero-prop-desc  { font-size:.62rem; color:var(--text-dim); margin-top:.15rem; line-height:1.4 }
+
+/* ── TABS ── */
+.df-tabs-nav {
+  display:flex; border-bottom:1px solid var(--border-subtle);
+  background:var(--surface-2); overflow-x:auto; flex-shrink:0;
+  scrollbar-width:none;
+}
+.df-tabs-nav::-webkit-scrollbar { display:none }
+.df-tab-btn {
+  flex-shrink:0; padding:.8rem 1.05rem;
+  font-family:var(--sans); font-size:.73rem; font-weight:500;
+  color:var(--text-muted); background:none;
+  border:none; border-bottom:2px solid transparent;
+  cursor:pointer; white-space:nowrap; letter-spacing:-.01em;
+  transition:color .18s, border-color .18s, background .18s;
+}
+.df-tab-btn:hover { color:var(--text); background:var(--surface) }
+.df-tab-btn.active { color:#2D6A4F; border-bottom-color:#2D6A4F; font-weight:600 }
+
+/* ── PANELS ── */
+.df-panel { display:none; padding:1.4rem 1.5rem 2rem }
+.df-panel.active { display:block }
+@media(max-width:960px){ .df-panel { padding:1rem 1rem 1.5rem } }
+
+/* ── INPUT SECTION HEADERS ── */
+.df-inp-sec {
+  font-size:.59rem; font-weight:700; color:var(--text-dim);
+  letter-spacing:.08em; text-transform:uppercase;
+  margin:1.3rem 0 .75rem; padding-bottom:.3rem;
+  border-bottom:1px solid var(--border-subtle);
+}
+.df-inp-sec:first-child { margin-top:0 }
+
+.df-range-row { display:flex; align-items:center; gap:.7rem; margin-bottom:.55rem }
+.df-range-lbl { font-size:.7rem; color:var(--text-muted); flex:1; min-width:0 }
+.df-range-inp { flex:1; min-width:0 }
+.df-range-disp {
+  font-family:var(--mono); font-size:.71rem; font-weight:600;
+  color:#2D6A4F; min-width:4rem; text-align:right; flex-shrink:0;
+}
+.df-inp-select {
+  width:100%; font-size:.73rem; padding:.38rem .6rem;
+  border:1px solid var(--border-subtle); border-radius:7px;
+  background:var(--bg); color:var(--text);
+  font-family:var(--sans); cursor:pointer;
+}
+
+/* ── KPI GRID ── */
+.df-kpi-row { display:grid; gap:.7rem; margin-bottom:1rem }
+.df-kpi-3 { grid-template-columns:repeat(3,1fr) }
+.df-kpi-2 { grid-template-columns:repeat(2,1fr) }
+.df-kpi-4 { grid-template-columns:repeat(4,1fr) }
+@media(max-width:700px){ .df-kpi-3,.df-kpi-4 { grid-template-columns:1fr 1fr } }
+@media(max-width:450px){ .df-kpi-3 { grid-template-columns:1fr } }
+
+.df-kpi {
+  background:var(--surface-2); border:1.5px solid var(--border-subtle);
+  border-radius:var(--r-sm); padding:.9rem 1rem .8rem;
+  transition:box-shadow .2s;
+}
+.df-kpi:hover { box-shadow:0 4px 16px rgba(0,0,0,.06) }
+.df-kpi.forest  { border-top:2.5px solid #2D6A4F }
+.df-kpi.bronze  { border-top:2.5px solid #8B6914 }
+.df-kpi.accent  { border-top:2.5px solid var(--accent) }
+.df-kpi.amber   { border-top:2.5px solid var(--amber) }
+.df-kpi.danger  { border-top:2.5px solid var(--danger) }
+.df-kpi.success { border-top:2.5px solid var(--success) }
+.df-kpi.slate   { border-top:2.5px solid var(--df-slate) }
+
+.df-kpi-label {
+  font-size:.57rem; font-weight:700; color:var(--text-dim);
+  letter-spacing:.08em; text-transform:uppercase; margin-bottom:.35rem;
+}
+.df-kpi-val {
+  font-family:var(--sans); font-size:1.05rem; font-weight:700;
+  color:var(--text); letter-spacing:-.03em; line-height:1.1;
+}
+.df-kpi-val.lg     { font-size:1.22rem }
+.df-kpi-val.green  { color:var(--success) }
+.df-kpi-val.forest { color:#2D6A4F }
+.df-kpi-val.bronze { color:#8B6914 }
+.df-kpi-val.red    { color:var(--danger) }
+.df-kpi-val.amber  { color:var(--amber) }
+.df-kpi-sub { font-size:.62rem; color:var(--text-dim); margin-top:.2rem }
+
+/* ── CHART WRAP ── */
+.df-chart-wrap {
+  background:var(--surface-2); border:1px solid var(--border-subtle);
+  border-radius:var(--r); padding:.95rem .95rem .7rem; margin-bottom:1rem;
+}
+.df-chart-hdr {
+  display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:.75rem;
+}
+.df-chart-title {
+  font-size:.58rem; font-weight:700; color:var(--text-dim);
+  letter-spacing:.07em; text-transform:uppercase;
+}
+.df-chart-sub { font-size:.62rem; color:var(--text-dim); margin-top:.1rem }
+.df-chart-badge {
+  font-size:.57rem; font-weight:700; padding:.1rem .45rem;
+  border-radius:100px; background:var(--df-forest-dim); color:#2D6A4F; flex-shrink:0;
+}
+canvas.df-canvas { width:100%; display:block }
+.df-canvas-260 { height:260px }
+.df-canvas-200 { height:200px }
+.df-canvas-180 { height:180px }
+.df-canvas-160 { height:160px }
+
+.df-legend {
+  display:flex; flex-wrap:wrap; gap:.5rem .9rem; margin-top:.6rem;
+}
+.df-legend-item { display:flex; align-items:center; gap:.3rem; font-size:.66rem; color:var(--text-muted) }
+.df-legend-line { width:18px; height:2.5px; border-radius:2px; flex-shrink:0 }
+.df-legend-dot  { width:8px; height:8px; border-radius:50%; flex-shrink:0 }
+
+/* ── WATERFALL ── */
+.df-waterfall { margin-bottom:1rem }
+.df-wf-row {
+  display:grid; grid-template-columns:180px 1fr 90px;
+  align-items:center; gap:.7rem; padding:.4rem 0;
+  border-bottom:1px solid var(--border-subtle);
+}
+.df-wf-row:last-child { border-bottom:none; border-top:2px solid var(--border); padding-top:.55rem; margin-top:.2rem }
+.df-wf-lbl { font-size:.71rem; color:var(--text-muted) }
+.df-wf-lbl.total { font-size:.73rem; font-weight:600; color:var(--text) }
+.df-wf-bar-wrap { height:10px; background:var(--border-subtle); border-radius:3px; overflow:hidden }
+.df-wf-bar { height:100%; border-radius:3px; width:0; transition:width .4s ease }
+.df-wf-val {
+  font-family:var(--mono); font-size:.71rem; font-weight:600;
+  text-align:right; color:var(--text-muted);
+}
+.df-wf-val.pos { color:#2D6A4F }
+.df-wf-val.neg { color:var(--danger) }
+.df-wf-val.eco { color:var(--success) }
+
+/* ── TRAVAUX CARDS ── */
+.df-trav-card {
+  background:var(--surface-2); border:1.5px solid var(--border-subtle);
+  border-radius:var(--r-sm); padding:.9rem 1rem; margin-bottom:.7rem;
+}
+.df-trav-card-hdr {
+  display:flex; justify-content:space-between; align-items:center; margin-bottom:.5rem;
+}
+.df-trav-card-name { font-size:.78rem; font-weight:600; color:var(--text); letter-spacing:-.02em }
+.df-trav-badge {
+  font-size:.56rem; font-weight:700; padding:.1rem .42rem;
+  border-radius:100px; text-transform:uppercase; letter-spacing:.04em;
+}
+.df-trav-badge.ok   { background:var(--df-forest-dim); color:#2D6A4F }
+.df-trav-badge.warn { background:var(--df-bronze-dim); color:#8B6914 }
+.df-trav-badge.no   { background:rgba(220,38,38,.08); color:var(--danger) }
+.df-trav-card-desc { font-size:.63rem; color:var(--text-dim); line-height:1.5; margin-bottom:.65rem }
+.df-trav-jauge-wrap {
+  height:6px; background:var(--border-subtle); border-radius:3px; overflow:hidden;
+}
+.df-trav-jauge-fill { height:100%; border-radius:3px; transition:width .4s }
+.df-trav-card-val {
+  font-family:var(--mono); font-size:.76rem; font-weight:700;
+  color:var(--text); margin-top:.45rem;
+}
+
+/* ── COMPARAISON GRID ── */
+.df-comp-wrap { overflow-x:auto; margin-bottom:1rem }
+.df-comp-grid {
+  min-width:560px;
+  display:grid; grid-template-columns:160px repeat(4,1fr);
+  border:1px solid var(--border-subtle); border-radius:var(--r-sm); overflow:hidden;
+}
+.df-comp-hdr {
+  padding:.6rem .75rem;
+  background:var(--surface-2); border-bottom:2px solid var(--border);
+  font-size:.59rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+  color:var(--text-dim); text-align:center;
+}
+.df-comp-hdr.lbl { text-align:left }
+.df-comp-hdr.win { background:var(--df-forest-dim); color:#2D6A4F; border-bottom-color:rgba(27,67,50,.25) }
+
+.df-comp-cell {
+  padding:.48rem .75rem; border-bottom:1px solid var(--border-subtle);
+  border-left:1px solid var(--border-subtle); text-align:center;
+  font-size:.72rem; font-family:var(--mono); color:var(--text-muted);
+}
+.df-comp-cell.lbl {
+  text-align:left; font-family:var(--sans); font-size:.71rem;
+  font-weight:500; color:var(--text); border-left:none;
+  background:var(--surface-2);
+}
+.df-comp-cell.best { background:var(--df-forest-dim); color:#2D6A4F; font-weight:700 }
+.df-comp-cell.good { color:var(--success) }
+.df-comp-cell.bad  { color:var(--danger) }
+.df-comp-cell.neutral { color:var(--text-dim); font-size:.66rem; font-family:var(--sans) }
+
+/* ── PÉDAGOGIE CARDS ── */
+.df-peda-grid {
+  display:grid; grid-template-columns:repeat(3,1fr); gap:.85rem; margin-bottom:1.2rem;
+}
+@media(max-width:760px){ .df-peda-grid { grid-template-columns:1fr 1fr } }
+@media(max-width:460px){ .df-peda-grid { grid-template-columns:1fr } }
+
+.df-peda-card {
+  background:var(--surface-2); border:1.5px solid var(--border-subtle);
+  border-radius:var(--r-sm); padding:1.1rem;
+  transition:box-shadow .2s, transform .2s;
+}
+.df-peda-card:hover { box-shadow:0 6px 22px rgba(0,0,0,.07); transform:translateY(-2px) }
+.df-peda-icon {
+  width:34px; height:34px; border-radius:9px; margin-bottom:.7rem;
+  background:var(--df-forest-dim); display:flex; align-items:center;
+  justify-content:center; color:#2D6A4F;
+}
+.df-peda-icon svg { width:17px; height:17px }
+.df-peda-title { font-size:.82rem; font-weight:700; color:var(--text); letter-spacing:-.02em; margin-bottom:.45rem }
+.df-peda-body  { font-size:.69rem; color:var(--text-muted); line-height:1.6 }
+.df-peda-tag {
+  display:inline-block; margin-top:.55rem;
+  font-size:.56rem; font-weight:700; letter-spacing:.05em; text-transform:uppercase;
+  padding:.1rem .42rem; border-radius:100px;
+  background:var(--df-forest-dim); color:#2D6A4F;
+}
+
+/* ── MISC UTILITY ── */
+.df-section-lbl {
+  font-size:.59rem; font-weight:700; color:var(--text-dim);
+  letter-spacing:.08em; text-transform:uppercase; margin:0 0 .75rem;
+}
+.df-divider { border:none; border-top:1px solid var(--border-subtle); margin:1rem 0 }
+.df-info-box {
+  background:var(--df-forest-dim); border:1px solid var(--df-forest-bd);
+  border-radius:var(--r-sm); padding:.75rem 1rem; margin-bottom:1rem;
+  font-size:.69rem; color:#2D6A4F; line-height:1.55;
+}
+.df-warn-box {
+  background:var(--df-bronze-dim); border:1px solid var(--df-bronze-mid);
+  border-radius:var(--r-sm); padding:.75rem 1rem; margin-bottom:1rem;
+  font-size:.69rem; color:#8B6914; line-height:1.55;
+}
+.df-two-col { display:grid; grid-template-columns:1fr 1fr; gap:1rem }
+@media(max-width:640px){ .df-two-col { grid-template-columns:1fr } }
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="index.html" class="nav-logo"><img src="logo.png?v=3" alt="Patrimonia.ai" class="nav-logo-img"></a>
+  <div class="nav-right">
+    <a href="index.html" class="nav-back">
+      <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7.5 1.5L3 6l4.5 4.5"/></svg>
+      Accueil
+    </a>
+    <div class="nav-dropdown" id="mainDropdown">
+      <button class="nav-dropdown-btn" aria-expanded="false" aria-haspopup="true">
+        Simulateurs <svg class="nav-chevron" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.8" style="width:13px;height:8px;flex-shrink:0"><path d="M1 1l4 4 4-4"/></svg>
+      </button>
+      <div class="nav-dropdown-menu" id="navMenu" role="menu"></div>
+    </div>
+  </div>
+</nav>
+
+<div class="sim-page">
+
+  <div class="sim-page-header">
+    <span class="sim-num-badge"></span>
+    <div>
+      <div class="sim-eyebrow">Immobilier &amp; Optimisation Fiscale</div>
+      <h1>Déficit <em class="gradient-text">Foncier</em></h1>
+      <p>Stratégie patrimoniale par les travaux — simulation complète de la mécanique fiscale, du cash-flow réel et du rendement long terme.</p>
+    </div>
+  </div>
+
+  <div class="df-hero-props">
+    <div class="df-hero-prop">
+      <div class="df-hero-icon">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+          <path d="M8 2L2 6v8h4v-4h4v4h4V6L8 2z"/>
+        </svg>
+      </div>
+      <div>
+        <div class="df-hero-prop-title">Imputation revenu global</div>
+        <div class="df-hero-prop-desc">Réduction directe de l'IR sur tous vos revenus</div>
+      </div>
+    </div>
+    <div class="df-hero-prop">
+      <div class="df-hero-icon">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+          <rect x="2" y="3" width="12" height="10" rx="1.5"/><path d="M5 3V2M11 3V2M2 7h12"/>
+        </svg>
+      </div>
+      <div>
+        <div class="df-hero-prop-title">Plafond 10 700 €/an</div>
+        <div class="df-hero-prop-desc">Part "travaux" du déficit imputable sur RG</div>
+      </div>
+    </div>
+    <div class="df-hero-prop">
+      <div class="df-hero-icon">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+          <circle cx="8" cy="8" r="5.5"/><path d="M8 4.5v4l2.5 1.5"/>
+        </svg>
+      </div>
+      <div>
+        <div class="df-hero-prop-title">Report sur 10 ans</div>
+        <div class="df-hero-prop-desc">Excédent reportable sur revenus fonciers futurs</div>
+      </div>
+    </div>
+    <div class="df-hero-prop">
+      <div class="df-hero-icon">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+          <path d="M3 12L7 8l3 3 5-6"/><circle cx="13" cy="4" r="1.5"/>
+        </svg>
+      </div>
+      <div>
+        <div class="df-hero-prop-title">Impact TMI direct</div>
+        <div class="df-hero-prop-desc">Économie proportionnelle à votre tranche marginale</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sim-card-wrap">
+    <div class="df-layout">
+
+      <!-- ══════════════════ LEFT PANEL — INPUTS ══════════════════ -->
+      <div class="df-inp">
+
+        <div class="df-inp-sec">Le bien</div>
+
+        <div class="df-range-row">
+          <label class="df-range-lbl" for="rng-prix">Prix d'acquisition</label>
+          <span class="df-range-disp" id="disp-prix">300 000 €</span>
+        </div>
+        <input type="range" id="rng-prix" class="df-range-inp" min="80000" max="1200000" step="10000" value="300000">
+
+        <div class="df-range-row" style="margin-top:.6rem">
+          <label class="df-range-lbl" for="rng-apport">Apport personnel</label>
+          <span class="df-range-disp" id="disp-apport">60 000 €</span>
+        </div>
+        <input type="range" id="rng-apport" class="df-range-inp" min="0" max="500000" step="5000" value="60000">
+
+        <div class="df-inp-sec">Travaux</div>
+
+        <div class="df-range-row">
+          <label class="df-range-lbl" for="rng-tr-entretien">Entretien / réparations</label>
+          <span class="df-range-disp" id="disp-tr-ent">40 000 €</span>
+        </div>
+        <input type="range" id="rng-tr-entretien" class="df-range-inp" min="0" max="200000" step="2500" value="40000">
+
+        <div class="df-range-row" style="margin-top:.5rem">
+          <label class="df-range-lbl" for="rng-tr-amelio">Amélioration (énergie, sécurité…)</label>
+          <span class="df-range-disp" id="disp-tr-ame">30 000 €</span>
+        </div>
+        <input type="range" id="rng-tr-amelio" class="df-range-inp" min="0" max="200000" step="2500" value="30000">
+
+        <div class="df-range-row" style="margin-top:.5rem">
+          <label class="df-range-lbl" for="rng-tr-recons">Reconstruction / agrandissement</label>
+          <span class="df-range-disp" id="disp-tr-rec">0 €</span>
+        </div>
+        <input type="range" id="rng-tr-recons" class="df-range-inp" min="0" max="150000" step="2500" value="0">
+
+        <div class="df-inp-sec">Revenus locatifs</div>
+
+        <div class="df-range-row">
+          <label class="df-range-lbl" for="rng-loyers">Loyers bruts annuels</label>
+          <span class="df-range-disp" id="disp-loyers">12 000 €</span>
+        </div>
+        <input type="range" id="rng-loyers" class="df-range-inp" min="3000" max="40000" step="500" value="12000">
+
+        <div class="df-range-row" style="margin-top:.5rem">
+          <label class="df-range-lbl" for="rng-vacance">Vacance locative</label>
+          <span class="df-range-disp" id="disp-vacance">5,0 %</span>
+        </div>
+        <input type="range" id="rng-vacance" class="df-range-inp" min="0" max="20" step="1" value="5">
+
+        <div class="df-range-row" style="margin-top:.5rem">
+          <label class="df-range-lbl" for="rng-charges">Charges annuelles (hors travaux)</label>
+          <span class="df-range-disp" id="disp-charges">2 000 €</span>
+        </div>
+        <input type="range" id="rng-charges" class="df-range-inp" min="0" max="10000" step="250" value="2000">
+
+        <div class="df-range-row" style="margin-top:.5rem">
+          <label class="df-range-lbl" for="rng-tf">Taxe foncière</label>
+          <span class="df-range-disp" id="disp-tf">1 500 €</span>
+        </div>
+        <input type="range" id="rng-tf" class="df-range-inp" min="0" max="6000" step="100" value="1500">
+
+        <div class="df-inp-sec">Financement</div>
+
+        <div class="df-range-row">
+          <label class="df-range-lbl" for="rng-interets">Intérêts d'emprunt annuels</label>
+          <span class="df-range-disp" id="disp-interets">8 000 €</span>
+        </div>
+        <input type="range" id="rng-interets" class="df-range-inp" min="0" max="25000" step="500" value="8000">
+
+        <div class="df-inp-sec">Paramètres fiscaux &amp; projection</div>
+
+        <div class="df-range-row">
+          <label class="df-range-lbl" for="sel-tmi">Tranche marginale d'imposition</label>
+        </div>
+        <select id="sel-tmi" class="df-inp-select">
+          <option value="0">0 % — Non imposable</option>
+          <option value="11">11 % — TMI 11</option>
+          <option value="30" selected>30 % — TMI 30</option>
+          <option value="41">41 % — TMI 41</option>
+          <option value="45">45 % — TMI 45</option>
+        </select>
+
+        <div class="df-range-row" style="margin-top:.75rem">
+          <label class="df-range-lbl" for="rng-duree">Durée de détention</label>
+          <span class="df-range-disp" id="disp-duree">20 ans</span>
+        </div>
+        <input type="range" id="rng-duree" class="df-range-inp" min="5" max="30" step="1" value="20">
+
+        <div class="df-range-row" style="margin-top:.5rem">
+          <label class="df-range-lbl" for="rng-revalo">Revalorisation annuelle du bien</label>
+          <span class="df-range-disp" id="disp-revalo">2,0 %</span>
+        </div>
+        <input type="range" id="rng-revalo" class="df-range-inp" min="0" max="5" step="0.1" value="2">
+
+      </div><!-- /df-inp -->
+
+      <!-- ══════════════════ RIGHT PANEL ══════════════════ -->
+      <div class="df-main">
+
+        <nav class="df-tabs-nav">
+          <button class="df-tab-btn active" data-tab="global">Vue globale</button>
+          <button class="df-tab-btn" data-tab="fiscalite">Fiscalité</button>
+          <button class="df-tab-btn" data-tab="travaux">Travaux &amp; déficit</button>
+          <button class="df-tab-btn" data-tab="cashflow">Cash-flow</button>
+          <button class="df-tab-btn" data-tab="comparaison">Comparaison</button>
+          <button class="df-tab-btn" data-tab="pedagogie">Pédagogie</button>
+        </nav>
+
+        <!-- ─────── TAB 1 : VUE GLOBALE ─────── -->
+        <div class="df-panel active" data-tab="global">
+
+          <div class="df-kpi-row df-kpi-3">
+            <div class="df-kpi forest">
+              <div class="df-kpi-label">Déficit foncier créé</div>
+              <div class="df-kpi-val lg forest" id="kpi-deficit">—</div>
+              <div class="df-kpi-sub">Montant total généré par les travaux</div>
+            </div>
+            <div class="df-kpi accent">
+              <div class="df-kpi-label">Économie IR immédiate</div>
+              <div class="df-kpi-val green" id="kpi-eco-ir">—</div>
+              <div class="df-kpi-sub">Imputation sur revenu global (TMI)</div>
+            </div>
+            <div class="df-kpi success">
+              <div class="df-kpi-label">Économie IR + PS</div>
+              <div class="df-kpi-val green" id="kpi-eco-total">—</div>
+              <div class="df-kpi-sub">Économie fiscale totale année 1</div>
+            </div>
+          </div>
+
+          <div class="df-kpi-row df-kpi-3">
+            <div class="df-kpi bronze">
+              <div class="df-kpi-label">Report sur 10 ans</div>
+              <div class="df-kpi-val bronze" id="kpi-report">—</div>
+              <div class="df-kpi-sub">Déficit reportable sur revenus fonciers</div>
+            </div>
+            <div class="df-kpi slate">
+              <div class="df-kpi-label">Cash-flow mensuel net</div>
+              <div class="df-kpi-val" id="kpi-cf-mensuel">—</div>
+              <div class="df-kpi-sub">Après charges, intérêts et fiscalité</div>
+            </div>
+            <div class="df-kpi accent">
+              <div class="df-kpi-label">Rendement net-net</div>
+              <div class="df-kpi-val" id="kpi-rend-net">—</div>
+              <div class="df-kpi-sub">Sur total investi (prix + travaux)</div>
+            </div>
+          </div>
+
+          <div class="df-chart-wrap">
+            <div class="df-chart-hdr">
+              <div>
+                <div class="df-chart-title">Projection patrimoniale</div>
+                <div class="df-chart-sub">Valeur du bien et capital propre sur la durée de détention</div>
+              </div>
+              <span class="df-chart-badge" id="badge-gain-proj">—</span>
+            </div>
+            <canvas id="cv-projection" class="df-canvas df-canvas-260"></canvas>
+            <div class="df-legend">
+              <div class="df-legend-item"><div class="df-legend-line" style="background:#2D6A4F"></div>Valeur du bien</div>
+              <div class="df-legend-item"><div class="df-legend-line" style="background:#8B6914;height:2px;border-top:2px dashed #8B6914;background:transparent"></div>Capital propre</div>
+            </div>
+          </div>
+
+          <div class="df-info-box">
+            <strong>Mécanisme clé :</strong> les travaux déductibles créent un déficit foncier qui s'impute d'abord sur vos revenus fonciers, puis — dans la limite de 10 700 €/an — sur votre revenu global. L'excédent est reportable sur les revenus fonciers des 10 années suivantes.
+          </div>
+
+        </div><!-- /global -->
+
+        <!-- ─────── TAB 2 : FISCALITÉ ─────── -->
+        <div class="df-panel" data-tab="fiscalite">
+
+          <div class="df-kpi-row df-kpi-4">
+            <div class="df-kpi forest">
+              <div class="df-kpi-label">RF avant travaux</div>
+              <div class="df-kpi-val" id="kpi-rf-avant">—</div>
+              <div class="df-kpi-sub">Loyers nets − charges − intérêts</div>
+            </div>
+            <div class="df-kpi danger">
+              <div class="df-kpi-label">RF après déficit</div>
+              <div class="df-kpi-val red" id="kpi-rf-apres">—</div>
+              <div class="df-kpi-sub">Après imputation des travaux</div>
+            </div>
+            <div class="df-kpi accent">
+              <div class="df-kpi-label">Imputation RG</div>
+              <div class="df-kpi-val green" id="kpi-imput-rg">—</div>
+              <div class="df-kpi-sub">Plafond 10 700 €/an — réduction IR</div>
+            </div>
+            <div class="df-kpi bronze">
+              <div class="df-kpi-label">Report foncier</div>
+              <div class="df-kpi-val bronze" id="kpi-report-2">—</div>
+              <div class="df-kpi-sub">Sur revenus fonciers 10 ans</div>
+            </div>
+          </div>
+
+          <div class="df-kpi-row df-kpi-3">
+            <div class="df-kpi success">
+              <div class="df-kpi-label">Économie IR</div>
+              <div class="df-kpi-val green" id="kpi-eco-ir-2">—</div>
+              <div class="df-kpi-sub">Imputation × TMI</div>
+            </div>
+            <div class="df-kpi success">
+              <div class="df-kpi-label">Économie PS</div>
+              <div class="df-kpi-val green" id="kpi-eco-ps">—</div>
+              <div class="df-kpi-sub">17,2 % sur RF positif éliminé</div>
+            </div>
+            <div class="df-kpi forest">
+              <div class="df-kpi-label">Économie totale an. 1</div>
+              <div class="df-kpi-val forest" id="kpi-eco-total-2">—</div>
+              <div class="df-kpi-sub">IR + prélèvements sociaux</div>
+            </div>
+          </div>
+
+          <div class="df-chart-wrap">
+            <div class="df-chart-hdr">
+              <div>
+                <div class="df-chart-title">Décomposition fiscale du revenu foncier</div>
+                <div class="df-chart-sub">Du loyer perçu au résultat net imposable</div>
+              </div>
+            </div>
+            <div class="df-waterfall" id="df-waterfall">
+              <div class="df-wf-row">
+                <div class="df-wf-lbl">Loyers perçus nets de vacance</div>
+                <div class="df-wf-bar-wrap"><div class="df-wf-bar" id="wf-loyers"></div></div>
+                <div class="df-wf-val pos" id="wf-v-loyers">—</div>
+              </div>
+              <div class="df-wf-row">
+                <div class="df-wf-lbl">− Charges + taxe foncière</div>
+                <div class="df-wf-bar-wrap"><div class="df-wf-bar" id="wf-charges"></div></div>
+                <div class="df-wf-val neg" id="wf-v-charges">—</div>
+              </div>
+              <div class="df-wf-row">
+                <div class="df-wf-lbl">− Intérêts d'emprunt</div>
+                <div class="df-wf-bar-wrap"><div class="df-wf-bar" id="wf-interets"></div></div>
+                <div class="df-wf-val neg" id="wf-v-interets">—</div>
+              </div>
+              <div class="df-wf-row">
+                <div class="df-wf-lbl">− Travaux déductibles</div>
+                <div class="df-wf-bar-wrap"><div class="df-wf-bar" id="wf-travaux"></div></div>
+                <div class="df-wf-val neg" id="wf-v-travaux">—</div>
+              </div>
+              <div class="df-wf-row">
+                <div class="df-wf-lbl total">= Résultat foncier net</div>
+                <div class="df-wf-bar-wrap"><div class="df-wf-bar" id="wf-rf"></div></div>
+                <div class="df-wf-val" id="wf-v-rf">—</div>
+              </div>
+              <div class="df-wf-row" style="border-top:2px solid var(--border);margin-top:.3rem;padding-top:.5rem">
+                <div class="df-wf-lbl">→ Imputation revenu global</div>
+                <div class="df-wf-bar-wrap"><div class="df-wf-bar" id="wf-imput"></div></div>
+                <div class="df-wf-val eco" id="wf-v-imput">—</div>
+              </div>
+              <div class="df-wf-row">
+                <div class="df-wf-lbl">→ Report 10 ans (revenus fonciers)</div>
+                <div class="df-wf-bar-wrap"><div class="df-wf-bar" id="wf-report"></div></div>
+                <div class="df-wf-val" style="color:#8B6914" id="wf-v-report">—</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="df-chart-wrap">
+            <div class="df-chart-hdr">
+              <div>
+                <div class="df-chart-title">Absorption du report sur 10 ans</div>
+                <div class="df-chart-sub">Utilisation annuelle du déficit reporté sur les revenus fonciers</div>
+              </div>
+            </div>
+            <canvas id="cv-report-timeline" class="df-canvas df-canvas-180"></canvas>
+            <div class="df-legend" style="margin-top:.5rem">
+              <div class="df-legend-item"><div class="df-legend-dot" style="background:rgba(27,67,50,.6)"></div>Report absorbé</div>
+              <div class="df-legend-item"><div class="df-legend-dot" style="background:rgba(27,67,50,.12)"></div>Report restant</div>
+            </div>
+          </div>
+
+          <div class="df-warn-box">
+            <strong>Attention :</strong> la fraction "intérêts d'emprunt" du déficit n'est pas imputable sur le revenu global — elle ne peut s'imputer que sur les revenus fonciers des 10 années suivantes. Si le bien est vendu dans les 3 ans, les déductions peuvent être remises en cause.
+          </div>
+
+        </div><!-- /fiscalite -->
+
+        <!-- ─────── TAB 3 : TRAVAUX & DÉFICIT ─────── -->
+        <div class="df-panel" data-tab="travaux">
+
+          <div class="df-kpi-row df-kpi-3">
+            <div class="df-kpi forest">
+              <div class="df-kpi-label">Travaux déductibles</div>
+              <div class="df-kpi-val forest" id="kpi-tr-deductible">—</div>
+              <div class="df-kpi-sub">Entretien + amélioration</div>
+            </div>
+            <div class="df-kpi danger">
+              <div class="df-kpi-label">Travaux exclus</div>
+              <div class="df-kpi-val red" id="kpi-tr-non-ded">—</div>
+              <div class="df-kpi-sub">Reconstruction / agrandissement</div>
+            </div>
+            <div class="df-kpi accent">
+              <div class="df-kpi-label">Déficit généré</div>
+              <div class="df-kpi-val" id="kpi-deficit-3">—</div>
+              <div class="df-kpi-sub">Impact fiscal sur le revenu</div>
+            </div>
+          </div>
+
+          <div class="df-trav-card">
+            <div class="df-trav-card-hdr">
+              <div class="df-trav-card-name">Entretien &amp; réparations</div>
+              <span class="df-trav-badge ok">100 % déductible</span>
+            </div>
+            <div class="df-trav-card-desc">Réparations courantes, remise en état de toiture, plomberie, électricité, ravalement, remplacement de chaudière, fenêtres… Ces travaux sont déductibles en totalité.</div>
+            <div class="df-trav-card-val" id="trav-val-ent">—</div>
+            <div class="df-trav-jauge-wrap" style="margin-top:.5rem">
+              <div class="df-trav-jauge-fill" id="jauge-ent" style="width:0%;background:#2D6A4F"></div>
+            </div>
+          </div>
+
+          <div class="df-trav-card">
+            <div class="df-trav-card-hdr">
+              <div class="df-trav-card-name">Amélioration (énergie, sécurité…)</div>
+              <span class="df-trav-badge ok">100 % déductible</span>
+            </div>
+            <div class="df-trav-card-desc">Isolation thermique, pompe à chaleur, double vitrage, installation de salle de bains, ascenseur… Déductibles si n'apportent pas d'agrandissement de la surface habitable.</div>
+            <div class="df-trav-card-val" id="trav-val-ame">—</div>
+            <div class="df-trav-jauge-wrap" style="margin-top:.5rem">
+              <div class="df-trav-jauge-fill" id="jauge-ame" style="width:0%;background:#8B6914"></div>
+            </div>
+          </div>
+
+          <div class="df-trav-card">
+            <div class="df-trav-card-hdr">
+              <div class="df-trav-card-name">Reconstruction / agrandissement</div>
+              <span class="df-trav-badge no">Non déductible</span>
+            </div>
+            <div class="df-trav-card-desc">Extension de surface, surélévation, reconstruction complète, création de nouvelles pièces… Ces dépenses sont exclues du déficit foncier et ne sont pas déductibles en revenus fonciers.</div>
+            <div class="df-trav-card-val red" id="trav-val-rec">—</div>
+            <div class="df-trav-jauge-wrap" style="margin-top:.5rem">
+              <div class="df-trav-jauge-fill" id="jauge-rec" style="width:0%;background:var(--danger)"></div>
+            </div>
+          </div>
+
+          <div class="df-chart-wrap">
+            <div class="df-chart-hdr">
+              <div>
+                <div class="df-chart-title">Répartition des travaux</div>
+                <div class="df-chart-sub">Déductibles vs non déductibles</div>
+              </div>
+              <span class="df-chart-badge" id="badge-taux-ded">—</span>
+            </div>
+            <canvas id="cv-travaux" class="df-canvas df-canvas-160"></canvas>
+          </div>
+
+          <div class="df-info-box">
+            <strong>Optimisation :</strong> requalifier certains travaux d'amélioration en travaux d'entretien (selon la doctrine fiscale) peut maximiser la déductibilité. Conservez toujours les factures détaillées par corps de métier pour justifier la nature des travaux en cas de contrôle.
+          </div>
+
+        </div><!-- /travaux -->
+
+        <!-- ─────── TAB 4 : CASH-FLOW & RENDEMENT ─────── -->
+        <div class="df-panel" data-tab="cashflow">
+
+          <div class="df-kpi-row df-kpi-3">
+            <div class="df-kpi slate">
+              <div class="df-kpi-label">Cash-flow brut mensuel</div>
+              <div class="df-kpi-val" id="kpi-cf-brut">—</div>
+              <div class="df-kpi-sub">Loyers nets − charges − intérêts</div>
+            </div>
+            <div class="df-kpi forest">
+              <div class="df-kpi-label">Cash-flow net mensuel</div>
+              <div class="df-kpi-val lg" id="kpi-cf-net">—</div>
+              <div class="df-kpi-sub">Après fiscalité (IR + PS)</div>
+            </div>
+            <div class="df-kpi accent">
+              <div class="df-kpi-label">Effort d'épargne annuel</div>
+              <div class="df-kpi-val" id="kpi-effort">—</div>
+              <div class="df-kpi-sub">Si cash-flow négatif</div>
+            </div>
+          </div>
+
+          <div class="df-kpi-row df-kpi-4">
+            <div class="df-kpi">
+              <div class="df-kpi-label">Rendement brut</div>
+              <div class="df-kpi-val" id="kpi-rend-brut">—</div>
+              <div class="df-kpi-sub">Loyers / investi total</div>
+            </div>
+            <div class="df-kpi">
+              <div class="df-kpi-label">Rendement net</div>
+              <div class="df-kpi-val" id="kpi-rend-net-4">—</div>
+              <div class="df-kpi-sub">Après charges</div>
+            </div>
+            <div class="df-kpi forest">
+              <div class="df-kpi-label">Rendement net-net</div>
+              <div class="df-kpi-val forest" id="kpi-rend-netnet">—</div>
+              <div class="df-kpi-sub">Après fiscalité</div>
+            </div>
+            <div class="df-kpi bronze">
+              <div class="df-kpi-label">TRI simplifié</div>
+              <div class="df-kpi-val bronze" id="kpi-tri">—</div>
+              <div class="df-kpi-sub">CF + éco fisc + plus-value</div>
+            </div>
+          </div>
+
+          <div class="df-chart-wrap">
+            <div class="df-chart-hdr">
+              <div>
+                <div class="df-chart-title">Cash-flow cumulé &amp; économie fiscale</div>
+                <div class="df-chart-sub">Projection sur la durée de détention</div>
+              </div>
+            </div>
+            <canvas id="cv-cashflow" class="df-canvas df-canvas-260"></canvas>
+            <div class="df-legend">
+              <div class="df-legend-item"><div class="df-legend-line" style="background:#2D6A4F"></div>Cash-flow cumulé</div>
+              <div class="df-legend-item"><div class="df-legend-line" style="background:#8B6914;border-top:2px dashed #8B6914;height:0"></div>Économie fiscale cumulée</div>
+            </div>
+          </div>
+
+        </div><!-- /cashflow -->
+
+        <!-- ─────── TAB 5 : COMPARAISON ─────── -->
+        <div class="df-panel" data-tab="comparaison">
+
+          <p style="font-size:.73rem;color:var(--text-dim);margin-bottom:1rem;line-height:1.6">
+            Comparaison des 4 grandes stratégies locatives sur le même bien, à financement identique. Les résultats sont calculés à partir de vos paramètres actuels.
+          </p>
+
+          <div class="df-comp-wrap">
+            <div class="df-comp-grid">
+              <div class="df-comp-hdr lbl">Critère</div>
+              <div class="df-comp-hdr">Location nue</div>
+              <div class="df-comp-hdr win">Déficit foncier</div>
+              <div class="df-comp-hdr">LMNP au réel</div>
+              <div class="df-comp-hdr">SCI IS</div>
+
+              <div class="df-comp-cell lbl">Cash-flow mensuel</div>
+              <div class="df-comp-cell" id="comp-cf-nu">—</div>
+              <div class="df-comp-cell" id="comp-cf-df">—</div>
+              <div class="df-comp-cell" id="comp-cf-lmnp">—</div>
+              <div class="df-comp-cell" id="comp-cf-sci">—</div>
+
+              <div class="df-comp-cell lbl">Rendement net-net</div>
+              <div class="df-comp-cell" id="comp-rend-nu">—</div>
+              <div class="df-comp-cell" id="comp-rend-df">—</div>
+              <div class="df-comp-cell" id="comp-rend-lmnp">—</div>
+              <div class="df-comp-cell" id="comp-rend-sci">—</div>
+
+              <div class="df-comp-cell lbl">Économie fiscale an. 1</div>
+              <div class="df-comp-cell" id="comp-eco-nu">—</div>
+              <div class="df-comp-cell" id="comp-eco-df">—</div>
+              <div class="df-comp-cell" id="comp-eco-lmnp">—</div>
+              <div class="df-comp-cell" id="comp-eco-sci">—</div>
+
+              <div class="df-comp-cell lbl">Fiscalité applicable</div>
+              <div class="df-comp-cell neutral">IR + PS 17,2%</div>
+              <div class="df-comp-cell neutral">IR + PS → report</div>
+              <div class="df-comp-cell neutral">BIC réel (amort.)</div>
+              <div class="df-comp-cell neutral">IS 25% + PFU 30%</div>
+
+              <div class="df-comp-cell lbl">PV à la revente</div>
+              <div class="df-comp-cell neutral">Régime commun</div>
+              <div class="df-comp-cell neutral">Régime commun</div>
+              <div class="df-comp-cell neutral">Recalcul VNC</div>
+              <div class="df-comp-cell neutral">IS + PFU</div>
+
+              <div class="df-comp-cell lbl">Transmission</div>
+              <div class="df-comp-cell neutral">Droits de succession</div>
+              <div class="df-comp-cell neutral">Droits de succession</div>
+              <div class="df-comp-cell neutral">Droits de succession</div>
+              <div class="df-comp-cell neutral">Via parts SCI</div>
+
+              <div class="df-comp-cell lbl">Complexité admin.</div>
+              <div class="df-comp-cell neutral">Faible</div>
+              <div class="df-comp-cell neutral">Faible</div>
+              <div class="df-comp-cell neutral">Modérée</div>
+              <div class="df-comp-cell neutral">Élevée</div>
+            </div>
+          </div>
+
+          <div class="df-chart-wrap">
+            <div class="df-chart-hdr">
+              <div>
+                <div class="df-chart-title">Rendement net-net comparé</div>
+                <div class="df-chart-sub">Après IR, prélèvements sociaux et IS le cas échéant</div>
+              </div>
+            </div>
+            <canvas id="cv-comparaison" class="df-canvas df-canvas-200"></canvas>
+          </div>
+
+          <div class="df-info-box">
+            <strong>Lecture :</strong> le déficit foncier est particulièrement avantageux lors des premières années (travaux = économie immédiate). Le LMNP au réel offre un avantage structurel via les amortissements sur la durée. La SCI IS est pertinente en contexte de réinvestissement des bénéfices sans distribution.
+          </div>
+
+        </div><!-- /comparaison -->
+
+        <!-- ─────── TAB 6 : PÉDAGOGIE ─────── -->
+        <div class="df-panel" data-tab="pedagogie">
+
+          <div class="df-peda-grid">
+
+            <div class="df-peda-card">
+              <div class="df-peda-icon">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M8 2L2 6v8h4v-4h4v4h4V6L8 2z"/>
+                </svg>
+              </div>
+              <div class="df-peda-title">Mécanisme du déficit foncier</div>
+              <div class="df-peda-body">Quand vos charges déductibles (travaux, intérêts, frais) dépassent vos loyers, vous créez un <em>déficit foncier</em>. Ce déficit réduit d'abord vos revenus fonciers, puis s'impute sur votre revenu global dans la limite de <strong>10 700 €</strong> par an.</div>
+              <span class="df-peda-tag">Art. 156 I-3° CGI</span>
+            </div>
+
+            <div class="df-peda-card">
+              <div class="df-peda-icon">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <rect x="2" y="3" width="12" height="10" rx="1.5"/><path d="M2 7h12M6 7v6M10 7v6"/>
+                </svg>
+              </div>
+              <div class="df-peda-title">Plafond de 10 700 €</div>
+              <div class="df-peda-body">Seule la fraction "travaux" (entretien + amélioration) du déficit est imputable sur le revenu global, plafonnée à <strong>10 700 € par an</strong> (13 400 € pour les logements énergivores en rénovation). Les intérêts d'emprunt excédentaires ne sont imputable que sur les revenus fonciers.</div>
+              <span class="df-peda-tag">Plafond annuel</span>
+            </div>
+
+            <div class="df-peda-card">
+              <div class="df-peda-icon">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <circle cx="8" cy="8" r="5.5"/><path d="M8 4.5v4l2.5 1.5"/>
+                </svg>
+              </div>
+              <div class="df-peda-title">Report sur 10 ans</div>
+              <div class="df-peda-body">Le déficit excédant 10 700 € est reportable sur les <strong>revenus fonciers des 10 années suivantes</strong>. Chaque année, il vient réduire vos futurs revenus locatifs imposables, générant une économie fiscale différée sur la durée.</div>
+              <span class="df-peda-tag">10 ans de report</span>
+            </div>
+
+            <div class="df-peda-card">
+              <div class="df-peda-icon">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M3 12L6 9l3 2 5-7"/><path d="M11 4h3v3"/>
+                </svg>
+              </div>
+              <div class="df-peda-title">Travaux déductibles</div>
+              <div class="df-peda-body"><strong>Oui :</strong> entretien, réparation, amélioration énergétique, ravalement, remplacement équipements. <strong>Non :</strong> reconstruction, agrandissement, construction de nouvelles dépendances. La distinction est parfois délicate — conservez toutes les factures détaillées.</div>
+              <span class="df-peda-tag">Nature des travaux</span>
+            </div>
+
+            <div class="df-peda-card">
+              <div class="df-peda-icon">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M8 2a6 6 0 1 0 0 12A6 6 0 0 0 8 2z"/><path d="M8 6v4M8 5v.5"/>
+                </svg>
+              </div>
+              <div class="df-peda-title">Profils investisseurs adaptés</div>
+              <div class="df-peda-body">Le déficit foncier est optimal pour les TMI <strong>30 % et +</strong>. En TMI 11 %, l'économie est modeste. Il est particulièrement adapté aux investisseurs avec des revenus fonciers existants à "éponger", ou souhaitant valoriser un bien ancien avec travaux importants.</div>
+              <span class="df-peda-tag">TMI 30 % minimum</span>
+            </div>
+
+            <div class="df-peda-card">
+              <div class="df-peda-icon">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M2 12V6l6-4 6 4v6"/><path d="M6 12v-3h4v3"/><path d="M4 8h8"/>
+                </svg>
+              </div>
+              <div class="df-peda-title">Stratégie long terme vs LMNP</div>
+              <div class="df-peda-body">Le déficit foncier génère une économie <strong>concentrée sur l'année des travaux</strong>, idéal pour un pic fiscal. Le LMNP au réel offre des amortissements annuels lissés. Les deux ne sont pas exclusifs : déficit foncier pendant la rénovation, puis LMNP selon le régime de location envisagé.</div>
+              <span class="df-peda-tag">Comparaison LMNP</span>
+            </div>
+
+          </div>
+
+          <div class="df-warn-box">
+            <strong>Erreurs fréquentes :</strong> (1) confondre travaux d'agrandissement et d'amélioration — les premiers ne sont pas déductibles, (2) oublier la règle des 3 ans de location post-travaux, (3) négliger les intérêts différés non imputables sur le RG, (4) cumuler déficit foncier avec Pinel ou Denormandie sans vérifier les incompatibilités.
+          </div>
+
+        </div><!-- /pedagogie -->
+
+      </div><!-- /df-main -->
+    </div><!-- /df-layout -->
+  </div><!-- /sim-card-wrap -->
+
+</div><!-- /sim-page -->
+
+<footer>
+  <span>Patrimonia.ai</span> — Simulation indicative à titre informatif uniquement.<br>
+  Déficit foncier : plafond d'imputation RG 10 700 €/an (art. 156 I-3° CGI) — report 10 ans sur revenus fonciers.<br>
+  Barèmes IR 2026. PS : 17,2 %. Résultats non contractuels — consultez un CGP pour votre situation personnelle.
+</footer>
+
+<script>
+'use strict';
+
+/* ─── CONSTANTS ─── */
+const PS_DF     = 0.172;
+const PLAFOND_RG = 10700;
+
+/* ─── STATE ─── */
+let activeTab = 'global';
+
+/* ─── READ INPUTS ─── */
+function readInp() {
+  const v = id => +(document.getElementById(id)?.value ?? 0);
+  return {
+    prix:    v('rng-prix'),
+    apport:  v('rng-apport'),
+    trEnt:   v('rng-tr-entretien'),
+    trAme:   v('rng-tr-amelio'),
+    trRec:   v('rng-tr-recons'),
+    loyers:  v('rng-loyers'),
+    vacance: v('rng-vacance'),
+    charges: v('rng-charges'),
+    tf:      v('rng-tf'),
+    interets:v('rng-interets'),
+    tmi:     v('sel-tmi'),
+    duree:   v('rng-duree'),
+    revalo:  v('rng-revalo')
+  };
+}
+
+/* ─── CORE CALCULATION ─── */
+function calcBase(p) {
+  const loyersNets = p.loyers * (1 - p.vacance / 100);
+  const chargesCourantes = p.charges + p.tf;
+  const chargesHorsTravaux = chargesCourantes + p.interets;
+  const rfAvant = loyersNets - chargesHorsTravaux;
+  const trDeductibles = p.trEnt + p.trAme;
+  const trNonDeductibles = p.trRec;
+  const rfApres = rfAvant - trDeductibles;
+  const totalTravaux = trDeductibles + trNonDeductibles;
+  const totalInvesti = p.prix + totalTravaux;
+
+  let deficitTotal = 0, imputRG = 0, reportFoncier = 0;
+
+  if (rfApres < 0) {
+    deficitTotal = -rfApres;
+    if (rfAvant >= 0) {
+      imputRG = Math.min(deficitTotal, PLAFOND_RG);
+    } else {
+      imputRG = Math.min(trDeductibles, PLAFOND_RG);
+    }
+    imputRG = Math.min(imputRG, deficitTotal);
+    reportFoncier = deficitTotal - imputRG;
+  }
+
+  const ecoIR = imputRG * p.tmi / 100;
+  const rfPositifElim = Math.max(0, Math.min(rfAvant > 0 ? rfAvant : 0, trDeductibles));
+  const ecoPS = rfPositifElim * PS_DF;
+  const ecoTotal = ecoIR + ecoPS;
+
+  const irAnnuel = Math.max(0, rfApres) * (p.tmi / 100 + PS_DF);
+  const cfBrutMensuel = (loyersNets - chargesHorsTravaux) / 12;
+  const cfNetMensuel  = cfBrutMensuel - irAnnuel / 12;
+
+  const rendBrut  = totalInvesti > 0 ? (loyersNets / totalInvesti) * 100 : 0;
+  const rendNet   = totalInvesti > 0 ? ((loyersNets - chargesHorsTravaux) / totalInvesti) * 100 : 0;
+  const rendNetNet= totalInvesti > 0 ? ((loyersNets - chargesHorsTravaux - irAnnuel) / totalInvesti) * 100 : 0;
+
+  return {
+    loyersNets, chargesCourantes, chargesHorsTravaux, rfAvant, rfApres,
+    trDeductibles, trNonDeductibles, totalTravaux, totalInvesti,
+    deficitTotal, imputRG, reportFoncier, ecoIR, ecoPS, ecoTotal,
+    irAnnuel, cfBrutMensuel, cfNetMensuel,
+    rendBrut, rendNet, rendNetNet
+  };
+}
+
+/* ─── PROJECTION ─── */
+function calcProjection(p, res) {
+  const data = [];
+  let valBien = p.prix + res.totalTravaux;
+  const dette0 = Math.max(0, p.prix + res.totalTravaux - p.apport);
+  let report = res.reportFoncier;
+  let ecoFiscCumul = res.ecoTotal;
+  let cfCumul = res.cfNetMensuel * 12;
+
+  data.push({ year: 0, valBien, capital: p.apport, ecoFisc: res.ecoTotal, cfCumul });
+
+  const annuiteCapital = dette0 > 0 && p.duree > 0 ? dette0 / p.duree : 0;
+  let dette = dette0;
+
+  for (let y = 1; y <= p.duree; y++) {
+    valBien *= (1 + p.revalo / 100);
+    dette = Math.max(0, dette - annuiteCapital);
+    const capital = Math.max(0, valBien - dette);
+
+    let ecoY = 0;
+    if (y <= 10 && report > 0 && res.rfAvant > 0) {
+      const absorbed = Math.min(report, res.rfAvant);
+      ecoY = absorbed * (p.tmi / 100 + PS_DF);
+      report = Math.max(0, report - absorbed);
+    }
+    ecoFiscCumul += ecoY;
+    cfCumul += res.cfNetMensuel * 12;
+
+    data.push({ year: y, valBien, capital, ecoFisc: ecoFiscCumul, cfCumul });
+  }
+  return data;
+}
+
+/* ─── COMPARAISON ─── */
+function calcComp(p, res) {
+  const loyers = p.loyers * (1 - p.vacance / 100);
+  const chargesBase = p.charges + p.tf + p.interets;
+  const totalInvesti = res.totalInvesti;
+  const tmiDec = p.tmi / 100;
+
+  // Location nue sans travaux (référence)
+  const rfNu = loyers - chargesBase;
+  const irNu = Math.max(0, rfNu) * (tmiDec + PS_DF);
+  const cfNu = (loyers - chargesBase - irNu) / 12;
+  const rendNu = totalInvesti > 0 ? ((loyers - chargesBase - irNu) / totalInvesti) * 100 : 0;
+
+  // Déficit foncier (calculé)
+  const cfDf   = res.cfNetMensuel;
+  const rendDf = res.rendNetNet;
+  const ecoDf  = res.ecoTotal;
+
+  // LMNP au réel (simplifié)
+  const amortBien   = (p.prix * 0.8) / 25;
+  const amortTravaux = res.totalTravaux > 0 ? res.totalTravaux / 10 : 0;
+  const amortTotal  = amortBien + amortTravaux;
+  const bicLmnp = Math.max(0, loyers - chargesBase - amortTotal);
+  const irLmnp  = bicLmnp * tmiDec;
+  const cfLmnp  = (loyers - chargesBase - irLmnp) / 12;
+  const rendLmnp= totalInvesti > 0 ? ((loyers - chargesBase - irLmnp) / totalInvesti) * 100 : 0;
+  const ecoLmnp = Math.max(0, irNu - irLmnp);
+
+  // SCI IS
+  const amortSci = (p.prix * 0.8) / 30 + (res.totalTravaux > 0 ? res.totalTravaux / 10 : 0);
+  const resSci   = loyers - chargesBase - amortSci;
+  const isSci    = Math.max(0, resSci) * 0.25;
+  const cashSci  = loyers - chargesBase - isSci;
+  const pfuSci   = Math.max(0, cashSci) * 0.30;
+  const cfSci    = (loyers - chargesBase - isSci - pfuSci) / 12;
+  const rendSci  = totalInvesti > 0 ? ((loyers - chargesBase - isSci - pfuSci) / totalInvesti) * 100 : 0;
+  const ecoSci   = 0;
+
+  return {
+    nu:   { cf: cfNu,   rend: rendNu,  eco: 0,      label: 'Location nue' },
+    df:   { cf: cfDf,   rend: rendDf,  eco: ecoDf,  label: 'Déficit foncier' },
+    lmnp: { cf: cfLmnp, rend: rendLmnp,eco: ecoLmnp,label: 'LMNP' },
+    sci:  { cf: cfSci,  rend: rendSci, eco: ecoSci, label: 'SCI IS' }
+  };
+}
+
+/* ─── DISPLAY HELPERS ─── */
+function eur(v) { return SP.fmtEur(Math.round(v)); }
+function pct(v, dec) { return v.toFixed(dec ?? 1) + ' %'; }
+function setText(id, txt) { const e = document.getElementById(id); if (e) e.textContent = txt; }
+
+/* ─── WATERFALL BARS ─── */
+function setWfBar(id, val, max, color) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const w = max > 0 ? Math.min(100, (Math.abs(val) / Math.abs(max)) * 100) : 0;
+  el.style.width = w + '%';
+  el.style.background = color;
+}
+
+/* ─── JAUGE ─── */
+function setJauge(id, pctVal, color) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.style.width = Math.min(100, Math.max(0, pctVal)) + '%';
+  el.style.background = color;
+}
+
+/* ─── BEST CELL ─── */
+function highlightBest(ids, vals) {
+  const max = Math.max(...vals);
+  ids.forEach((id, i) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.toggle('best', vals[i] === max && max > 0);
+    el.classList.remove('good', 'bad');
+    if (vals[i] === max && max > 0) el.classList.add('best');
+  });
+}
+
+/* ─── RENDER TABS ─── */
+function renderGlobal(p, res, proj) {
+  setText('kpi-deficit',    eur(res.deficitTotal));
+  setText('kpi-eco-ir',     eur(res.ecoIR));
+  setText('kpi-eco-total',  eur(res.ecoTotal));
+  setText('kpi-report',     eur(res.reportFoncier));
+  const cfSign = res.cfNetMensuel >= 0 ? '+' : '';
+  setText('kpi-cf-mensuel', cfSign + eur(res.cfNetMensuel) + '/m');
+  setText('kpi-rend-net',   pct(res.rendNetNet));
+
+  const lastPt = proj[proj.length - 1];
+  setText('badge-gain-proj', '+' + eur(lastPt.valBien - (p.prix + res.totalTravaux)));
+
+  drawProjectionChart('cv-projection', proj, p, res);
+}
+
+function renderFiscalite(p, res) {
+  setText('kpi-rf-avant',    eur(res.rfAvant));
+  const rfSign = res.rfApres < 0 ? '−' : '';
+  setText('kpi-rf-apres',    rfSign + eur(Math.abs(res.rfApres)));
+  setText('kpi-imput-rg',    eur(res.imputRG));
+  setText('kpi-report-2',    eur(res.reportFoncier));
+  setText('kpi-eco-ir-2',    eur(res.ecoIR));
+  setText('kpi-eco-ps',      eur(res.ecoPS));
+  setText('kpi-eco-total-2', eur(res.ecoTotal));
+
+  // RF couleur
+  const rfEl = document.getElementById('kpi-rf-apres');
+  if (rfEl) { rfEl.className = 'df-kpi-val ' + (res.rfApres < 0 ? 'red' : 'forest'); }
+
+  const maxWf = Math.max(res.loyersNets, 1);
+  setWfBar('wf-loyers',   res.loyersNets, maxWf, '#2D6A4F');
+  setWfBar('wf-charges',  res.chargesCourantes, maxWf, '#8B6914');
+  setWfBar('wf-interets', res.interets ?? p.interets, maxWf, '#9CA3AF');
+  setWfBar('wf-travaux',  res.trDeductibles, maxWf, '#D97706');
+  setWfBar('wf-rf',       Math.abs(res.rfApres), maxWf, res.rfApres < 0 ? '#DC2626' : '#2D6A4F');
+  setWfBar('wf-imput',    res.imputRG, PLAFOND_RG, '#059669');
+  setWfBar('wf-report',   res.reportFoncier, Math.max(res.deficitTotal, 1), '#8B6914');
+
+  setText('wf-v-loyers',   eur(res.loyersNets));
+  setText('wf-v-charges',  '−' + eur(res.chargesCourantes));
+  setText('wf-v-interets', '−' + eur(p.interets));
+  setText('wf-v-travaux',  '−' + eur(res.trDeductibles));
+  setText('wf-v-rf',       (res.rfApres < 0 ? '−' : '+') + eur(Math.abs(res.rfApres)));
+  setText('wf-v-imput',    eur(res.imputRG));
+  setText('wf-v-report',   eur(res.reportFoncier));
+
+  drawReportTimeline('cv-report-timeline', p, res);
+}
+
+function renderTravaux(p, res) {
+  setText('kpi-tr-deductible', eur(res.trDeductibles));
+  setText('kpi-tr-non-ded',    eur(res.trNonDeductibles));
+  setText('kpi-deficit-3',     eur(res.deficitTotal));
+
+  setText('trav-val-ent', eur(p.trEnt));
+  setText('trav-val-ame', eur(p.trAme));
+  setText('trav-val-rec', eur(p.trRec));
+
+  const total = p.trEnt + p.trAme + p.trRec;
+  if (total > 0) {
+    setJauge('jauge-ent', (p.trEnt / total) * 100, '#2D6A4F');
+    setJauge('jauge-ame', (p.trAme / total) * 100, '#8B6914');
+    setJauge('jauge-rec', (p.trRec / total) * 100, '#DC2626');
+  }
+
+  const pctDed = total > 0 ? (res.trDeductibles / total) * 100 : 0;
+  setText('badge-taux-ded', pct(pctDed, 0) + ' déductible');
+
+  drawTravauxChart('cv-travaux', p, res);
+}
+
+function renderCashflow(p, res, proj) {
+  setText('kpi-cf-brut',    eur(res.cfBrutMensuel) + '/m');
+  const cfSign = res.cfNetMensuel >= 0 ? '+' : '';
+  setText('kpi-cf-net',     cfSign + eur(res.cfNetMensuel) + '/m');
+  const effort = res.cfNetMensuel < 0 ? eur(-res.cfNetMensuel * 12) + '/an' : '0 €';
+  setText('kpi-effort',     effort);
+  setText('kpi-rend-brut',  pct(res.rendBrut));
+  setText('kpi-rend-net-4', pct(res.rendNet));
+  setText('kpi-rend-netnet',pct(res.rendNetNet));
+
+  const tri = estimateTRI(p, res);
+  setText('kpi-tri', pct(tri));
+
+  drawCashflowChart('cv-cashflow', proj, p);
+}
+
+function renderComparaison(p, res) {
+  const comp = calcComp(p, res);
+  const strats = ['nu', 'df', 'lmnp', 'sci'];
+
+  strats.forEach(s => {
+    const cfSign = comp[s].cf >= 0 ? '+' : '';
+    setText('comp-cf-'   + s, cfSign + eur(comp[s].cf) + '/m');
+    setText('comp-rend-' + s, pct(comp[s].rend));
+    setText('comp-eco-'  + s, eur(comp[s].eco));
+  });
+
+  highlightBest(strats.map(s => 'comp-cf-'   + s), strats.map(s => comp[s].cf));
+  highlightBest(strats.map(s => 'comp-rend-' + s), strats.map(s => comp[s].rend));
+  highlightBest(strats.map(s => 'comp-eco-'  + s), strats.map(s => comp[s].eco));
+
+  drawComparaisonChart('cv-comparaison', comp, strats);
+}
+
+function estimateTRI(p, res) {
+  if (p.duree <= 0 || res.totalInvesti <= 0) return 0;
+  const gainRevente = res.totalInvesti * (Math.pow(1 + p.revalo / 100, p.duree) - 1);
+  const totalReturn = res.cfNetMensuel * 12 * p.duree + gainRevente + res.ecoTotal;
+  return Math.max(0, (totalReturn / res.totalInvesti / p.duree) * 100);
+}
+
+/* ─── UPDATE ─── */
+function update() {
+  const p   = readInp();
+  const res = calcBase(p);
+  const proj= calcProjection(p, res);
+
+  renderGlobal(p, res, proj);
+  if (activeTab === 'fiscalite')   renderFiscalite(p, res);
+  if (activeTab === 'travaux')     renderTravaux(p, res);
+  if (activeTab === 'cashflow')    renderCashflow(p, res, proj);
+  if (activeTab === 'comparaison') renderComparaison(p, res);
+}
+
+/* ─── CANVAS HELPERS ─── */
+function setupCV(id) {
+  const cv = document.getElementById(id);
+  if (!cv) return null;
+  const d = Math.min(window.devicePixelRatio || 1, 2);
+  const w = cv.offsetWidth, h = cv.offsetHeight;
+  if (!w || !h) return null;
+  cv.width = w * d; cv.height = h * d;
+  const ctx = cv.getContext('2d');
+  ctx.scale(d, d);
+  return { ctx, w, h };
+}
+
+function fmtK(v) {
+  const a = Math.abs(v);
+  if (a >= 1e6) return (v / 1e6).toFixed(1) + 'M€';
+  if (a >= 1e3) return Math.round(v / 1e3) + 'k€';
+  return Math.round(v) + '€';
+}
+
+/* ─── CHART: PROJECTION PATRIMONIALE ─── */
+function drawProjectionChart(id, proj, p, res) {
+  const c = setupCV(id);
+  if (!c) return;
+  const { ctx, w, h } = c;
+  const pad = { t: 14, r: 14, b: 36, l: 58 };
+  const cw = w - pad.l - pad.r, ch = h - pad.t - pad.b;
+
+  const maxY = Math.max(...proj.map(d => d.valBien)) * 1.06;
+  const scX = y => pad.l + (y / p.duree) * cw;
+  const scY = v => pad.t + ch - (Math.max(0, v) / maxY) * ch;
+
+  ctx.clearRect(0, 0, w, h);
+
+  // Grid lines
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= 4; i++) {
+    const yp = pad.t + (i / 4) * ch;
+    ctx.strokeStyle = 'rgba(0,0,0,.06)';
+    ctx.beginPath(); ctx.moveTo(pad.l, yp); ctx.lineTo(pad.l + cw, yp); ctx.stroke();
+    ctx.fillStyle = 'rgba(0,0,0,.32)';
+    ctx.font = '10px sans-serif'; ctx.textAlign = 'right';
+    ctx.fillText(fmtK(maxY * (1 - i / 4)), pad.l - 6, yp + 3);
+  }
+
+  // Area fill — valeur bien
+  const grd = ctx.createLinearGradient(0, pad.t, 0, pad.t + ch);
+  grd.addColorStop(0, 'rgba(27,67,50,.16)');
+  grd.addColorStop(1, 'rgba(27,67,50,.02)');
+  ctx.beginPath();
+  proj.forEach((d, i) => { i === 0 ? ctx.moveTo(scX(d.year), scY(d.valBien)) : ctx.lineTo(scX(d.year), scY(d.valBien)); });
+  ctx.lineTo(scX(p.duree), scY(0)); ctx.lineTo(scX(0), scY(0));
+  ctx.closePath(); ctx.fillStyle = grd; ctx.fill();
+
+  // Line — valeur bien
+  ctx.beginPath();
+  proj.forEach((d, i) => { i === 0 ? ctx.moveTo(scX(d.year), scY(d.valBien)) : ctx.lineTo(scX(d.year), scY(d.valBien)); });
+  ctx.strokeStyle = '#2D6A4F'; ctx.lineWidth = 2.2; ctx.stroke();
+
+  // Line — capital propre (dashed)
+  ctx.beginPath();
+  proj.forEach((d, i) => { i === 0 ? ctx.moveTo(scX(d.year), scY(d.capital)) : ctx.lineTo(scX(d.year), scY(d.capital)); });
+  ctx.strokeStyle = '#8B6914'; ctx.lineWidth = 1.8;
+  ctx.setLineDash([5, 3]); ctx.stroke(); ctx.setLineDash([]);
+
+  // X labels
+  ctx.fillStyle = 'rgba(0,0,0,.33)'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
+  const xSteps = p.duree <= 15 ? [0, 5, 10, p.duree] : [0, 5, 10, 15, 20, p.duree];
+  xSteps.forEach(y => { if (y <= p.duree) ctx.fillText('A.' + y, scX(y), h - 9); });
+}
+
+/* ─── CHART: REPORT TIMELINE ─── */
+function drawReportTimeline(id, p, res) {
+  const c = setupCV(id);
+  if (!c) return;
+  const { ctx, w, h } = c;
+  const pad = { t: 10, r: 12, b: 30, l: 50 };
+  const cw = w - pad.l - pad.r, ch = h - pad.t - pad.b;
+
+  ctx.clearRect(0, 0, w, h);
+
+  if (res.reportFoncier <= 0) {
+    ctx.fillStyle = 'rgba(0,0,0,.28)'; ctx.font = '11px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('Aucun report — déficit entièrement imputé sur le revenu global', w / 2, h / 2);
+    return;
+  }
+
+  const years = [];
+  let report = res.reportFoncier;
+  for (let y = 1; y <= Math.min(10, p.duree); y++) {
+    const absorbed = res.rfAvant > 0 ? Math.min(report, res.rfAvant) : 0;
+    years.push({ y, absorbed, remaining: report });
+    report = Math.max(0, report - absorbed);
+    if (report <= 0) break;
+  }
+
+  const maxVal = res.reportFoncier;
+  const nBars  = years.length;
+  const barW   = nBars > 0 ? (cw / nBars) * 0.6 : 20;
+  const gap    = nBars > 0 ? (cw / nBars) * 0.4 : 10;
+
+  years.forEach((d, i) => {
+    const x    = pad.l + i * (cw / nBars) + gap / 2;
+    const remH = maxVal > 0 ? (d.remaining / maxVal) * ch : 0;
+    const absH = maxVal > 0 ? (d.absorbed  / maxVal) * ch : 0;
+
+    ctx.fillStyle = 'rgba(27,67,50,.12)';
+    ctx.fillRect(x, pad.t + ch - remH, barW, remH);
+
+    if (absH > 0) {
+      ctx.fillStyle = 'rgba(27,67,50,.62)';
+      ctx.fillRect(x, pad.t + ch - absH, barW, absH);
+    }
+
+    ctx.fillStyle = 'rgba(0,0,0,.38)'; ctx.font = '9px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('A.' + d.y, x + barW / 2, h - 8);
+  });
+
+  ctx.fillStyle = 'rgba(0,0,0,.32)'; ctx.font = '9px sans-serif'; ctx.textAlign = 'right';
+  [0, 0.5, 1].forEach(f => {
+    const yp = pad.t + ch - f * ch;
+    ctx.fillText(fmtK(maxVal * f), pad.l - 5, yp + 3);
+  });
+}
+
+/* ─── CHART: TRAVAUX BREAKDOWN ─── */
+function drawTravauxChart(id, p, res) {
+  const c = setupCV(id);
+  if (!c) return;
+  const { ctx, w, h } = c;
+  const pad = { t: 8, r: 90, b: 8, l: 8 };
+  const cw = w - pad.l - pad.r, ch = h - pad.t - pad.b;
+
+  const cats = [
+    { label: 'Entretien / réparations', val: p.trEnt, color: 'rgba(27,67,50,.72)' },
+    { label: 'Amélioration (énergie…)', val: p.trAme, color: 'rgba(139,105,20,.72)' },
+    { label: 'Reconstruction (exclu)',   val: p.trRec, color: 'rgba(220,38,38,.62)' }
+  ].filter(c => c.val > 0);
+
+  ctx.clearRect(0, 0, w, h);
+
+  if (cats.length === 0) {
+    ctx.fillStyle = 'rgba(0,0,0,.28)'; ctx.font = '11px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('Saisir les montants travaux dans le panneau gauche', w / 2, h / 2);
+    return;
+  }
+
+  const maxVal = Math.max(...cats.map(c => c.val));
+  const spacing = ch / cats.length;
+  const barH   = spacing * 0.5;
+
+  cats.forEach((cat, i) => {
+    const y    = pad.t + i * spacing + (spacing - barH) / 2;
+    const barW = maxVal > 0 ? (cat.val / maxVal) * cw : 0;
+
+    ctx.fillStyle = 'rgba(0,0,0,.05)';
+    ctx.fillRect(pad.l, y, cw, barH);
+    ctx.fillStyle = cat.color;
+    ctx.fillRect(pad.l, y, barW, barH);
+
+    ctx.fillStyle = 'rgba(0,0,0,.45)'; ctx.font = '10px sans-serif'; ctx.textAlign = 'left';
+    ctx.fillText(cat.label, pad.l, y - 2);
+    ctx.textAlign = 'left'; ctx.font = 'bold 10px sans-serif';
+    ctx.fillText(fmtK(cat.val), pad.l + cw + 6, y + barH / 2 + 3);
+  });
+}
+
+/* ─── CHART: CASHFLOW CUMULÉ ─── */
+function drawCashflowChart(id, proj, p) {
+  const c = setupCV(id);
+  if (!c) return;
+  const { ctx, w, h } = c;
+  const pad = { t: 14, r: 14, b: 36, l: 62 };
+  const cw = w - pad.l - pad.r, ch = h - pad.t - pad.b;
+
+  const cfVals  = proj.map(d => d.cfCumul);
+  const ecoVals = proj.map(d => d.ecoFisc);
+  const allVals = [...cfVals, ...ecoVals];
+  const minV = Math.min(...allVals, 0);
+  const maxV = Math.max(...allVals, 1);
+  const range = maxV - minV || 1;
+
+  const scX = y => pad.l + (y / p.duree) * cw;
+  const scY = v => pad.t + ch - ((v - minV) / range) * ch;
+
+  ctx.clearRect(0, 0, w, h);
+
+  // Zero line
+  if (minV < 0) {
+    const y0 = scY(0);
+    ctx.strokeStyle = 'rgba(0,0,0,.1)'; ctx.lineWidth = 1;
+    ctx.setLineDash([4, 3]);
+    ctx.beginPath(); ctx.moveTo(pad.l, y0); ctx.lineTo(pad.l + cw, y0); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // Grid
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= 3; i++) {
+    const v  = minV + (range * i / 3);
+    const yp = scY(v);
+    ctx.strokeStyle = 'rgba(0,0,0,.05)';
+    ctx.beginPath(); ctx.moveTo(pad.l, yp); ctx.lineTo(pad.l + cw, yp); ctx.stroke();
+    ctx.fillStyle = 'rgba(0,0,0,.32)'; ctx.font = '10px sans-serif'; ctx.textAlign = 'right';
+    ctx.fillText(fmtK(v), pad.l - 5, yp + 3);
+  }
+
+  // CF area
+  const grdCF = ctx.createLinearGradient(0, pad.t, 0, pad.t + ch);
+  grdCF.addColorStop(0, 'rgba(27,67,50,.2)');
+  grdCF.addColorStop(1, 'rgba(27,67,50,.02)');
+  ctx.beginPath();
+  proj.forEach((d, i) => { i === 0 ? ctx.moveTo(scX(d.year), scY(d.cfCumul)) : ctx.lineTo(scX(d.year), scY(d.cfCumul)); });
+  ctx.lineTo(scX(p.duree), scY(0)); ctx.lineTo(scX(0), scY(0));
+  ctx.closePath(); ctx.fillStyle = grdCF; ctx.fill();
+
+  // CF line
+  ctx.beginPath();
+  proj.forEach((d, i) => { i === 0 ? ctx.moveTo(scX(d.year), scY(d.cfCumul)) : ctx.lineTo(scX(d.year), scY(d.cfCumul)); });
+  ctx.strokeStyle = '#2D6A4F'; ctx.lineWidth = 2.2; ctx.stroke();
+
+  // Eco fiscale line (dashed)
+  ctx.beginPath();
+  proj.forEach((d, i) => { i === 0 ? ctx.moveTo(scX(d.year), scY(d.ecoFisc)) : ctx.lineTo(scX(d.year), scY(d.ecoFisc)); });
+  ctx.strokeStyle = '#8B6914'; ctx.lineWidth = 1.8;
+  ctx.setLineDash([5, 3]); ctx.stroke(); ctx.setLineDash([]);
+
+  // X labels
+  ctx.fillStyle = 'rgba(0,0,0,.33)'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
+  const xSteps = p.duree <= 15 ? [0, 5, 10, p.duree] : [0, 5, 10, 15, 20, p.duree];
+  xSteps.forEach(y => { if (y <= p.duree) ctx.fillText('A.' + y, scX(y), h - 9); });
+}
+
+/* ─── CHART: COMPARAISON RENDEMENTS ─── */
+function drawComparaisonChart(id, comp, strats) {
+  const c = setupCV(id);
+  if (!c) return;
+  const { ctx, w, h } = c;
+  const pad = { t: 28, r: 12, b: 36, l: 12 };
+  const cw  = w - pad.l - pad.r, ch = h - pad.t - pad.b;
+
+  const rends = strats.map(s => comp[s].rend);
+  const maxR  = Math.max(...rends, 0.1);
+  const colors = ['rgba(156,163,175,.65)', 'rgba(27,67,50,.75)', 'rgba(139,105,20,.68)', 'rgba(99,102,241,.62)'];
+  const labels = strats.map(s => comp[s].label);
+
+  const bW  = (cw / strats.length) * 0.58;
+  const gap = (cw / strats.length) * 0.42;
+
+  ctx.clearRect(0, 0, w, h);
+
+  strats.forEach((s, i) => {
+    const x  = pad.l + i * (cw / strats.length) + gap / 2;
+    const bH = maxR > 0 ? (rends[i] / maxR) * ch : 0;
+    const y  = pad.t + ch - bH;
+
+    ctx.fillStyle = colors[i];
+    ctx.fillRect(x, y, bW, bH);
+
+    // Value above bar
+    ctx.fillStyle = colors[i].replace(/[\d.]+\)$/, '1)');
+    ctx.font = 'bold 11px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText(rends[i].toFixed(1) + '%', x + bW / 2, y - 5);
+
+    // Label below
+    ctx.fillStyle = 'rgba(0,0,0,.4)'; ctx.font = '9px sans-serif';
+    ctx.fillText(labels[i].split(' ')[0], x + bW / 2, h - 9);
+  });
+}
+
+/* ─── TABS ─── */
+function initTabs() {
+  document.querySelectorAll('.df-tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeTab = btn.dataset.tab;
+      document.querySelectorAll('.df-tab-btn').forEach(b => b.classList.toggle('active', b === btn));
+      document.querySelectorAll('.df-panel').forEach(panel => panel.classList.toggle('active', panel.dataset.tab === activeTab));
+
+      const p   = readInp();
+      const res = calcBase(p);
+      const proj= calcProjection(p, res);
+      if (activeTab === 'fiscalite')   renderFiscalite(p, res);
+      if (activeTab === 'travaux')     renderTravaux(p, res);
+      if (activeTab === 'cashflow')    renderCashflow(p, res, proj);
+      if (activeTab === 'comparaison') renderComparaison(p, res);
+    });
+  });
+}
+
+/* ─── INIT ─── */
+document.addEventListener('DOMContentLoaded', () => {
+  SP.initFmt();
+  SP.nav.init();
+
+  const fmtE  = v => SP.fmtEur(+v);
+  const fmtP  = v => (+v).toFixed(1) + ' %';
+  const fmtA  = v => v + ' ans';
+
+  const bindings = [
+    ['rng-prix',           'disp-prix',     fmtE],
+    ['rng-apport',         'disp-apport',   fmtE],
+    ['rng-tr-entretien',   'disp-tr-ent',   fmtE],
+    ['rng-tr-amelio',      'disp-tr-ame',   fmtE],
+    ['rng-tr-recons',      'disp-tr-rec',   fmtE],
+    ['rng-loyers',         'disp-loyers',   fmtE],
+    ['rng-vacance',        'disp-vacance',  fmtP],
+    ['rng-charges',        'disp-charges',  fmtE],
+    ['rng-tf',             'disp-tf',       fmtE],
+    ['rng-interets',       'disp-interets', fmtE],
+    ['rng-duree',          'disp-duree',    fmtA],
+    ['rng-revalo',         'disp-revalo',   fmtP]
+  ];
+
+  bindings.forEach(([id, dispId, fmt]) => {
+    const el   = document.getElementById(id);
+    const disp = document.getElementById(dispId);
+    if (!el || !disp) return;
+    disp.textContent = fmt(el.value);
+    el.addEventListener('input', () => { disp.textContent = fmt(el.value); update(); });
+  });
+
+  document.getElementById('sel-tmi')?.addEventListener('change', update);
+
+  initTabs();
+  update();
+
+  // Resize: redraw visible charts
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(update, 120);
+  });
+});
+</script>
+</body>
+</html>

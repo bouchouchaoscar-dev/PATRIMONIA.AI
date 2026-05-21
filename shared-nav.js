@@ -110,7 +110,11 @@
     { id: 'cc',           num: 17, label: 'Contrat de Capitalisation',        href: 'simulator-17.html',
       cats: ['finance', 'transmission', 'entreprise'],
       desc: 'Capitalisation institutionnelle, fiscalité PP et IS, transmission par donation et démembrement.',
-      keywords: ['capitalisation', 'contrat', 'holding', 'is', 'donation', 'demembrement', 'anteriorite', 'wealth', 'trésorerie', 'structuration'],
+      keywords: ['capitalisation', 'contrat', 'holding', 'is', 'donation', 'demembrement', 'anteriorite', 'wealth', 'trésorerie', 'structuration'] },
+    { id: 'df',           num: 18, label: 'Déficit Foncier',                  href: 'simulator-18.html',
+      cats: ['fiscalite', 'immobilier'],
+      desc: 'Mécanique fiscale complète : travaux déductibles, imputation RG 10 700 €, report 10 ans, cash-flow réel et comparaison stratégies.',
+      keywords: ['deficit', 'foncier', 'travaux', 'deductible', 'imputation', 'report', 'tmi', 'revenus fonciers', 'renovation', 'immobilier', 'optimisation'],
       isNew: true }
   ];
 
