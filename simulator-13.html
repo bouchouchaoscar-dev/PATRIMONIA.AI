@@ -474,6 +474,16 @@ input.no-spinner { -moz-appearance:textfield }
   transition:all .2s; font-family:var(--sans); display:block;
 }
 .av-add-bene-btn:hover { border-color:var(--accent); color:var(--accent); background:var(--accent-dim) }
+
+/* Raccourcis rachat (25 / 50 / 75 / Total) */
+.av-rachat-quick { display:grid; grid-template-columns:repeat(4, 1fr); gap:.3rem; margin-top:.4rem }
+.av-rachat-q-btn {
+  padding:.32rem .25rem; font-size:.68rem; font-family:var(--mono);
+  color:var(--text-muted); background:var(--surface);
+  border:1px solid var(--border-subtle); border-radius:var(--r-sm);
+  cursor:pointer; transition:all .15s ease; letter-spacing:-.01em;
+}
+.av-rachat-q-btn:hover { color:var(--accent); border-color:var(--accent); background:var(--accent-dim) }
 </style>
 </head>
 <body>
@@ -649,8 +659,18 @@ input.no-spinner { -moz-appearance:textfield }
               <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="av-gains" value="25000"><span class="unit">€</span></div>
             </div>
             <div class="field">
-              <div class="field-label"><label for="av-rachat">Montant du rachat</label></div>
+              <div class="field-label">
+                <label for="av-rachat">Montant du rachat</label>
+                <span class="field-hint" id="av-rachat-pct">13 % du contrat</span>
+              </div>
               <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="av-rachat" value="10000"><span class="unit">€</span></div>
+              <input type="range" id="av-rachat-sld" class="range-inp" min="0" max="75000" step="500" value="10000">
+              <div class="av-rachat-quick">
+                <button type="button" class="av-rachat-q-btn" data-pct="25">25 %</button>
+                <button type="button" class="av-rachat-q-btn" data-pct="50">50 %</button>
+                <button type="button" class="av-rachat-q-btn" data-pct="75">75 %</button>
+                <button type="button" class="av-rachat-q-btn" data-pct="100">Total</button>
+              </div>
             </div>
             <div class="field">
               <div class="field-label"><label for="av-opt">Option fiscale</label></div>
@@ -880,7 +900,8 @@ function renderBeneInputs() {
         <div>
           <div class="av-bene-inp-label">Nom / Libellé</div>
           <input class="input-plain" type="text" placeholder="Nom" value="${safeNom}"
-                 oninput="updateBeneProp(${b.id},'nom',this.value)" style="width:100%">
+                 oninput="updateBeneProp(${b.id},'nom',this.value)"
+                 onfocus="this.select()" style="width:100%">
         </div>
         <div>
           <div class="av-bene-inp-label">Lien de parenté</div>
@@ -893,7 +914,7 @@ function renderBeneInputs() {
           <div class="input-wrap">
             <input type="number" class="no-spinner" min="0" max="100" step="1"
                    value="${b.quota}" oninput="updateBeneQuota(${b.id},this.value)"
-                   style="padding-right:1.4rem">
+                   onfocus="this.select()" style="padding-right:1.4rem">
             <span class="unit">%</span>
           </div>
         </div>
@@ -909,8 +930,8 @@ function updateBeneTotals() {
   if (!el) return;
   let cls, txt;
   if (total === 100)      { cls='ok';    txt=`Répartition totale : 100 % ✓`; }
-  else if (total > 100)   { cls='over';  txt=`Répartition totale : ${total} % ⚠ dépassement`; }
-  else                    { cls='under'; txt=`Répartition totale : ${total} % — ${100-total} % non attribués`; }
+  else if (total > 100)   { cls='over';  txt=`Répartition totale : ${total} % ⚠ dépassement de ${total-100} %`; }
+  else                    { cls='under'; txt=`Répartition : ${total} % attribués · ${100-total} % restants à répartir`; }
   el.className = `av-bene-total ${cls}`;
   el.textContent = txt;
 }
@@ -1033,7 +1054,8 @@ function getInputs() {
     // Rachat
     valContrat: n('av-val'),
     totalGains: n('av-gains'),
-    montantRachat: n('av-rachat'),
+    /* Clamp doux : impossible de racheter plus que la valeur du contrat (sécurité moteur) */
+    montantRachat: Math.min(n('av-rachat'), n('av-val')),
     optFisc: s('av-opt'),
     versNets: n('av-vers-nets'),
     // Transmission
@@ -1429,6 +1451,7 @@ function renderFiscalite(r, d) {
     <div class="av-fisc-row total">${row('Fiscalité totale', '− '+eur(r.totalFisc), 'red')}</div>
     ${row('Net perçu', eur(r.netPercu), 'green')}
     ${row('Taux effectif sur gains', pct(r.txEffectif), 'muted')}
+    ${row('Valeur du contrat restante après rachat', eur(Math.max(0, d.valContrat - d.montantRachat)), 'muted')}
   </div>`;
 
   // Comparaison PFU vs barème
@@ -1819,6 +1842,60 @@ document.addEventListener('DOMContentLoaded', () => {
   linkRange('av-fv',   'av-fv-disp',   '%', 1);
   linkRange('av-infl', 'av-infl-disp', '%', 1);
   linkRange('av-fe',   'av-fe-disp',   '%', 0);
+
+  /* ══ SLIDER RACHAT — bornes dynamiques 0 → valeur contrat ══
+     linkSlider gère le va-et-vient input ↔ slider. On ajoute par-dessus :
+     - sld.max recalculé à la volée selon av-val (sans clamp pendant la frappe)
+     - badge "X % du contrat" maintenu à jour
+     - clamp doux du rachat appliqué en blur de av-val + dans le moteur
+       (calcRachat est sûr car protégé via clamp côté getData) */
+  linkSlider('av-rachat', 'av-rachat-sld', null);
+
+  function refreshRachatVisuals() {
+    const sld = document.getElementById('av-rachat-sld');
+    const inp = document.getElementById('av-rachat');
+    const valContrat = Math.max(0, SP.parseNum(document.getElementById('av-val').value));
+    sld.max  = Math.max(valContrat, 1);
+    /* step fixe à 500 — évite que la valeur soit arrondie au changement de borne */
+    const rachat = SP.parseNum(inp.value);
+    const pct = valContrat > 0 ? Math.min(100, (rachat / valContrat) * 100) : 0;
+    sld.style.setProperty('--pct', pct.toFixed(2) + '%');
+    const pctEl = document.getElementById('av-rachat-pct');
+    if (pctEl) pctEl.textContent = pct.toFixed(0) + ' % du contrat';
+  }
+
+  /* Clamp rachat ≤ valContrat seulement quand l'utilisateur finalise av-val (blur) */
+  function clampRachatOnContrat() {
+    const inp = document.getElementById('av-rachat');
+    const valContrat = Math.max(0, SP.parseNum(document.getElementById('av-val').value));
+    if (SP.parseNum(inp.value) > valContrat) {
+      SP.setVal(inp, valContrat);
+      document.getElementById('av-rachat-sld').value = valContrat;
+      refreshRachatVisuals();
+      renderAll();
+    }
+  }
+
+  document.getElementById('av-val').addEventListener('input', refreshRachatVisuals);
+  document.getElementById('av-val').addEventListener('blur',  clampRachatOnContrat);
+  document.getElementById('av-rachat').addEventListener('input', refreshRachatVisuals);
+  document.getElementById('av-rachat-sld').addEventListener('input', refreshRachatVisuals);
+
+  /* Raccourcis 25 / 50 / 75 / Total → fixe le rachat à un % de la valeur contrat */
+  document.querySelectorAll('.av-rachat-q-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const pct = +btn.dataset.pct;
+      const valContrat = Math.max(0, SP.parseNum(document.getElementById('av-val').value));
+      const newRachat = Math.round(valContrat * pct / 100);
+      const inp = document.getElementById('av-rachat');
+      const sld = document.getElementById('av-rachat-sld');
+      SP.setVal(inp, newRachat);
+      sld.value = newRachat;
+      refreshRachatVisuals();
+      renderAll();
+    });
+  });
+  refreshRachatVisuals();
 
   // Écoute tous les champs statiques (hors bénéficiaires gérés via état global)
   document.querySelectorAll('select:not(.bene-select), input[data-fmt], input[type=text]:not(.bene-inp)').forEach(el => {
