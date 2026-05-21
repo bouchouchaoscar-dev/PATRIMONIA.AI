@@ -1,0 +1,1675 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="favicon-64.png">
+  <link rel="shortcut icon" href="favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="favicon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contrat de Capitalisation | Patrimonia.ai</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css?v=19">
+<script src="shared.js?v=2"></script>
+<script src="shared-nav.js?v=7"></script>
+<style>
+/* ═══════════════════════════════════════════════════
+   CONTRAT DE CAPITALISATION · PATRIMONIA.AI
+   Préfixe CSS : .cc-
+   Personnalité : institutionnel · patrimoine · holding
+═══════════════════════════════════════════════════ */
+:root {
+  --cc-slate:     #465775;
+  --cc-slate-dim: rgba(70,87,117,.08);
+  --cc-slate-mid: rgba(70,87,117,.16);
+  --cc-gold:      #8B7355;
+  --cc-gold-dim:  rgba(139,115,85,.08);
+  --cc-gold-mid:  rgba(139,115,85,.18);
+}
+
+/* ── LAYOUT ── */
+.cc-layout { display:grid; grid-template-columns:370px 1fr; min-height:640px }
+@media(max-width:960px){ .cc-layout { grid-template-columns:1fr } }
+
+.cc-inp {
+  padding:1.6rem 1.4rem 2rem;
+  background:var(--surface-2);
+  border-right:1px solid var(--border-subtle);
+  overflow-y:auto;
+}
+@media(max-width:960px){ .cc-inp { border-right:none; border-bottom:1px solid var(--border-subtle) } }
+
+.cc-main { background:var(--surface); display:flex; flex-direction:column; min-width:0 }
+
+/* ── SOUSCRIPTEUR TOGGLE ── */
+.cc-subscr-toggle {
+  display:flex; flex-direction:column; gap:3px;
+  background:var(--surface-3); border-radius:10px; padding:3px; margin-top:.5rem;
+}
+.cc-subscr-btn {
+  flex:1; font-size:.71rem; font-weight:500; letter-spacing:-.01em;
+  color:var(--text-muted); background:transparent;
+  border:none; border-radius:7px;
+  padding:.4rem .6rem; cursor:pointer;
+  transition:all .18s; text-align:left;
+  display:flex; align-items:center; gap:.5rem;
+}
+.cc-subscr-btn.active {
+  background:var(--bg); color:var(--text); font-weight:600;
+  box-shadow:0 1px 5px rgba(0,0,0,.09);
+}
+.cc-subscr-dot {
+  width:7px; height:7px; border-radius:50%; flex-shrink:0;
+  background:var(--cc-slate-mid);
+}
+.cc-subscr-btn.active .cc-subscr-dot { background:var(--cc-slate) }
+
+/* ── TABS ── */
+.cc-tabs-nav {
+  display:flex; border-bottom:1px solid var(--border-subtle);
+  background:var(--surface-2); overflow-x:auto; flex-shrink:0;
+  scrollbar-width:none;
+}
+.cc-tabs-nav::-webkit-scrollbar { display:none }
+.cc-tab-btn {
+  flex-shrink:0; padding:.8rem 1.05rem;
+  font-family:var(--sans); font-size:.73rem; font-weight:500;
+  color:var(--text-muted); background:none;
+  border:none; border-bottom:2px solid transparent;
+  cursor:pointer; white-space:nowrap; letter-spacing:-.01em;
+  transition:color .18s, border-color .18s, background .18s;
+  display:flex; align-items:center; gap:.35rem;
+}
+.cc-tab-btn:hover { color:var(--text); background:var(--surface) }
+.cc-tab-btn.active { color:var(--cc-slate); border-bottom-color:var(--cc-slate); font-weight:600 }
+.cc-tab-icon { width:12px; height:12px; flex-shrink:0; opacity:.45 }
+.cc-tab-btn.active .cc-tab-icon { opacity:1 }
+
+/* ── PANELS ── */
+.cc-panel { display:none; padding:1.4rem 1.5rem 2rem }
+.cc-panel.active { display:block }
+@media(max-width:960px){ .cc-panel { padding:1rem 1rem 1.5rem } }
+
+/* ── INPUTS ── */
+.cc-inp-sec {
+  font-size:.59rem; font-weight:700; color:var(--text-dim);
+  letter-spacing:.08em; text-transform:uppercase;
+  margin:1.3rem 0 .75rem;
+}
+.cc-inp-sec:first-child { margin-top:0 }
+.cc-range-row { display:flex; align-items:center; gap:.7rem }
+.cc-range-inp { flex:1 }
+.cc-range-disp {
+  font-family:var(--mono); font-size:.72rem; font-weight:600;
+  color:var(--cc-slate); min-width:3.4rem; text-align:right; flex-shrink:0;
+}
+.cc-pp-only, .cc-is-only { transition:opacity .2s }
+.cc-pp-only.hidden, .cc-is-only.hidden { display:none }
+
+/* ── KPI GRID ── */
+.cc-kpi-row { display:grid; gap:.7rem; margin-bottom:1rem }
+.cc-kpi-3 { grid-template-columns:repeat(3,1fr) }
+.cc-kpi-2 { grid-template-columns:repeat(2,1fr) }
+.cc-kpi-4 { grid-template-columns:repeat(4,1fr) }
+@media(max-width:700px){ .cc-kpi-3,.cc-kpi-4 { grid-template-columns:1fr 1fr } }
+.cc-kpi {
+  background:var(--surface-2); border:1.5px solid var(--border-subtle);
+  border-radius:var(--r-sm); padding:.9rem 1rem .8rem;
+  transition:box-shadow .2s;
+}
+.cc-kpi:hover { box-shadow:0 4px 16px rgba(0,0,0,.06) }
+.cc-kpi.slate  { border-top:2.5px solid var(--cc-slate) }
+.cc-kpi.gold   { border-top:2.5px solid var(--cc-gold) }
+.cc-kpi.accent { border-top:2.5px solid var(--accent) }
+.cc-kpi.amber  { border-top:2.5px solid var(--amber) }
+.cc-kpi.danger { border-top:2.5px solid var(--danger) }
+.cc-kpi.success{ border-top:2.5px solid var(--success) }
+.cc-kpi-label {
+  font-size:.57rem; font-weight:700; color:var(--text-dim);
+  letter-spacing:.08em; text-transform:uppercase; margin-bottom:.35rem;
+}
+.cc-kpi-val {
+  font-family:var(--sans); font-size:1.05rem; font-weight:700;
+  color:var(--text); letter-spacing:-.03em; line-height:1.1;
+}
+.cc-kpi-val.lg    { font-size:1.22rem }
+.cc-kpi-val.green { color:var(--success) }
+.cc-kpi-val.slate { color:var(--cc-slate) }
+.cc-kpi-val.gold  { color:var(--cc-gold) }
+.cc-kpi-val.red   { color:var(--danger) }
+.cc-kpi-val.amber { color:var(--amber) }
+.cc-kpi-sub { font-size:.62rem; color:var(--text-dim); margin-top:.2rem }
+
+/* ── CHART WRAP ── */
+.cc-chart-wrap {
+  background:var(--surface-2); border:1px solid var(--border-subtle);
+  border-radius:var(--r); padding:.95rem .95rem .7rem; margin-bottom:1rem;
+}
+.cc-chart-hdr {
+  display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:.75rem;
+}
+.cc-chart-title {
+  font-size:.58rem; font-weight:700; color:var(--text-dim);
+  letter-spacing:.07em; text-transform:uppercase;
+}
+.cc-chart-sub { font-size:.62rem; color:var(--text-dim); margin-top:.1rem }
+.cc-chart-badge {
+  font-size:.57rem; font-weight:700; padding:.1rem .4rem;
+  border-radius:100px; background:var(--cc-slate-dim); color:var(--cc-slate); flex-shrink:0;
+}
+canvas.cc-canvas { width:100%; display:block }
+.cc-canvas-260 { height:260px }
+.cc-canvas-200 { height:200px }
+.cc-canvas-160 { height:160px }
+.cc-legend {
+  display:flex; flex-wrap:wrap; gap:.5rem .8rem; margin-top:.5rem;
+}
+.cc-legend-item { display:flex; align-items:center; gap:.3rem; font-size:.66rem; color:var(--text-muted) }
+.cc-legend-line { width:18px; height:2.5px; border-radius:2px; flex-shrink:0 }
+
+/* ── PROJECTION TABLE ── */
+.cc-proj-wrap { overflow-x:auto; border-radius:var(--r-sm); border:1px solid var(--border-subtle); margin-bottom:1rem }
+.cc-proj-tbl { width:100%; border-collapse:collapse; font-size:.72rem; min-width:480px }
+.cc-proj-tbl th {
+  padding:.45rem .75rem; font-size:.56rem; font-weight:700;
+  letter-spacing:.05em; text-transform:uppercase;
+  border-bottom:2px solid var(--border); text-align:right;
+  color:var(--text-dim); background:var(--surface-2);
+}
+.cc-proj-tbl th:first-child { text-align:left }
+.cc-proj-tbl td {
+  padding:.42rem .75rem; border-top:1px solid var(--border-subtle);
+  text-align:right; font-family:var(--mono); font-size:.72rem; color:var(--text-muted);
+}
+.cc-proj-tbl td:first-child { text-align:left; font-family:var(--sans); font-size:.71rem; color:var(--text); font-weight:600 }
+.cc-proj-tbl tr.highlight td { background:var(--cc-slate-dim) }
+.cc-proj-tbl tr.highlight td:first-child { color:var(--cc-slate) }
+.cc-proj-tbl tr:last-child td { font-weight:700; color:var(--text) }
+
+/* ── FISCAL CARDS ── */
+.cc-fisc-grid { display:grid; grid-template-columns:1fr 1fr; gap:.85rem; margin-bottom:1rem }
+@media(max-width:640px){ .cc-fisc-grid { grid-template-columns:1fr } }
+.cc-fisc-card {
+  background:var(--surface-2); border:1.5px solid var(--border-subtle);
+  border-radius:var(--r-sm); padding:1rem;
+}
+.cc-fisc-card.best { border-color:rgba(70,87,117,.28); background:rgba(70,87,117,.03) }
+.cc-fisc-badge {
+  font-size:.57rem; font-weight:700; letter-spacing:.07em; text-transform:uppercase;
+  padding:.1rem .5rem; border-radius:100px; display:inline-block; margin-bottom:.5rem;
+}
+.cc-fisc-badge.pfu   { background:var(--surface-3); color:var(--text-muted) }
+.cc-fisc-badge.opt8  { background:var(--cc-slate-dim); color:var(--cc-slate) }
+.cc-fisc-badge.is    { background:var(--cc-gold-dim); color:var(--cc-gold) }
+.cc-fisc-badge.best  { background:linear-gradient(90deg,var(--cc-slate),var(--accent)); color:#fff }
+.cc-fisc-name { font-size:.82rem; font-weight:700; color:var(--text); letter-spacing:-.02em; margin-bottom:.65rem }
+.cc-fisc-row {
+  display:flex; justify-content:space-between; align-items:baseline;
+  padding:.26rem 0; border-bottom:1px solid var(--border-subtle);
+  font-size:.73rem; color:var(--text-muted);
+}
+.cc-fisc-row:last-child { border-bottom:none }
+.cc-fisc-row.total {
+  font-weight:700; font-size:.79rem; color:var(--text);
+  border-top:2px solid var(--border); border-bottom:none;
+  margin-top:.2rem; padding-top:.38rem;
+}
+.cc-fisc-v { font-family:var(--mono); font-weight:600 }
+.cc-fisc-v.red   { color:var(--danger) }
+.cc-fisc-v.green { color:var(--success) }
+
+/* Advantage callout */
+.cc-advantage {
+  background:linear-gradient(135deg,var(--cc-slate-dim),var(--cc-gold-dim));
+  border:1px solid var(--cc-slate-mid); border-radius:var(--r-sm);
+  padding:.8rem 1rem; display:flex; align-items:center;
+  justify-content:space-between; gap:1rem; margin-bottom:1rem;
+}
+.cc-advantage-title { font-size:.75rem; font-weight:600; color:var(--text) }
+.cc-advantage-sub   { font-size:.63rem; color:var(--text-muted); margin-top:.1rem }
+.cc-advantage-val {
+  font-family:var(--sans); font-size:1.1rem; font-weight:700;
+  color:var(--cc-slate); letter-spacing:-.03em; text-align:right; flex-shrink:0;
+}
+
+/* ── TRANSMISSION ── */
+.cc-trans-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:.8rem; margin-bottom:1rem }
+@media(max-width:760px){ .cc-trans-grid { grid-template-columns:1fr } }
+.cc-trans-card {
+  background:var(--surface-2); border:1.5px solid var(--border-subtle);
+  border-radius:var(--r-sm); overflow:hidden;
+}
+.cc-trans-card.best { border-color:var(--cc-slate-mid) }
+.cc-trans-hdr {
+  padding:.6rem .9rem; border-bottom:1px solid var(--border-subtle);
+  background:var(--surface); display:flex; align-items:center; gap:.5rem;
+}
+.cc-trans-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0 }
+.cc-trans-title { font-size:.74rem; font-weight:700; color:var(--text) }
+.cc-trans-body { padding:.75rem .9rem }
+.cc-trans-row {
+  display:flex; justify-content:space-between; align-items:baseline;
+  padding:.25rem 0; border-bottom:1px solid var(--border-subtle);
+  font-size:.72rem; color:var(--text-muted);
+}
+.cc-trans-row:last-child { border-bottom:none }
+.cc-trans-row.total {
+  font-weight:700; font-size:.79rem; color:var(--text);
+  border-top:2px solid var(--border); border-bottom:none;
+  margin-top:.2rem; padding-top:.4rem;
+}
+.cc-trans-v { font-family:var(--mono); font-weight:600 }
+.cc-trans-v.green { color:var(--success) }
+.cc-trans-v.red   { color:var(--danger) }
+.cc-trans-v.gold  { color:var(--cc-gold) }
+.cc-trans-v.slate { color:var(--cc-slate) }
+
+/* ── ENTREPRISE ── */
+.cc-entrep-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:.8rem; margin-bottom:1rem }
+@media(max-width:700px){ .cc-entrep-grid { grid-template-columns:1fr } }
+.cc-entrep-card {
+  background:var(--surface-2); border:1.5px solid var(--border-subtle);
+  border-radius:var(--r-sm); padding:1rem 1.05rem; text-align:center;
+}
+.cc-entrep-card.winner { border-color:var(--cc-slate-mid); background:var(--cc-slate-dim) }
+.cc-entrep-badge {
+  font-size:.57rem; font-weight:700; letter-spacing:.07em; text-transform:uppercase;
+  padding:.1rem .5rem; border-radius:100px; display:inline-block; margin-bottom:.5rem;
+}
+.cc-entrep-badge.cc    { background:var(--cc-slate-dim); color:var(--cc-slate) }
+.cc-entrep-badge.cat   { background:var(--amber-dim); color:var(--amber) }
+.cc-entrep-badge.cash  { background:var(--danger-dim); color:var(--danger) }
+.cc-entrep-badge.winner{ background:linear-gradient(90deg,var(--cc-slate),var(--accent)); color:#fff }
+.cc-entrep-name { font-size:.8rem; font-weight:700; color:var(--text); margin-bottom:.5rem }
+.cc-entrep-val {
+  font-family:var(--sans); font-size:1.35rem; font-weight:700;
+  letter-spacing:-.03em; line-height:1.1; margin-bottom:.25rem;
+}
+.cc-entrep-val.slate { color:var(--cc-slate) }
+.cc-entrep-val.amber { color:var(--amber) }
+.cc-entrep-val.red   { color:var(--danger) }
+.cc-entrep-sub { font-size:.63rem; color:var(--text-muted) }
+
+/* ── COMPARAISON TABLE ── */
+.cc-cmp-wrap { overflow-x:auto; border-radius:var(--r-sm); border:1px solid var(--border-subtle); margin-bottom:1rem }
+.cc-cmp-tbl { width:100%; border-collapse:collapse; font-size:.73rem; min-width:560px }
+.cc-cmp-tbl th {
+  padding:.48rem .8rem; font-size:.57rem; font-weight:700;
+  text-transform:uppercase; letter-spacing:.06em;
+  color:var(--text-dim); background:var(--surface-2);
+  border-bottom:2px solid var(--border); text-align:center;
+}
+.cc-cmp-tbl th:first-child { text-align:left }
+.cc-cmp-tbl td {
+  padding:.4rem .8rem; border-top:1px solid var(--border-subtle);
+  text-align:center; color:var(--text-muted); font-size:.73rem;
+}
+.cc-cmp-tbl td:first-child { text-align:left; font-weight:600; color:var(--text) }
+.cc-cmp-tbl tr:hover td { background:rgba(0,0,0,.015) }
+.cc-cmp-win  { color:var(--success)!important; font-weight:700!important }
+.cc-cmp-mid  { color:var(--amber)!important }
+.cc-cmp-lose { color:var(--text-dim)!important }
+.cc-badge-w  {
+  display:inline-block; font-size:.57rem; font-weight:700; padding:.08rem .42rem;
+  border-radius:100px; background:var(--accent-dim); color:var(--accent);
+  letter-spacing:.04em; text-transform:uppercase; vertical-align:middle;
+}
+.cc-badge-m  { background:var(--amber-dim); color:var(--amber) }
+.cc-badge-l  { background:var(--surface-3); color:var(--text-dim) }
+
+/* ── HERO PROPS ── */
+.cc-hero-props {
+  display:grid; grid-template-columns:repeat(4,1fr); gap:.7rem; margin-bottom:2rem;
+}
+@media(max-width:760px){ .cc-hero-props { grid-template-columns:1fr 1fr } }
+@media(max-width:480px){ .cc-hero-props { grid-template-columns:1fr } }
+.cc-hero-prop {
+  background:var(--surface); border:1px solid var(--border-subtle);
+  border-radius:var(--r-sm); padding:.8rem .95rem;
+  display:flex; align-items:flex-start; gap:.7rem;
+  transition:box-shadow .2s;
+}
+.cc-hero-prop:hover { box-shadow:0 4px 16px rgba(0,0,0,.06) }
+.cc-hero-icon {
+  width:27px; height:27px; min-width:27px;
+  background:linear-gradient(135deg,var(--cc-slate-dim),var(--cc-gold-dim));
+  border:1px solid var(--cc-slate-mid); border-radius:7px;
+  display:flex; align-items:center; justify-content:center;
+  color:var(--cc-slate);
+}
+.cc-hero-icon svg { width:13px; height:13px }
+.cc-hero-prop-title { font-size:.77rem; font-weight:600; color:var(--text) }
+.cc-hero-prop-desc  { font-size:.66rem; color:var(--text-muted); margin-top:.13rem; line-height:1.5 }
+
+/* ── PÉDAGOGIE ── */
+.cc-peda-grid { display:grid; grid-template-columns:1fr 1fr; gap:.9rem }
+@media(max-width:700px){ .cc-peda-grid { grid-template-columns:1fr } }
+.cc-peda-full { grid-column:1/-1 }
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="index.html" class="nav-logo"><img src="logo.png?v=3" alt="Patrimonia.ai" class="nav-logo-img"></a>
+  <div class="nav-right">
+    <a href="index.html" class="nav-back">
+      <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7.5 1.5L3 6l4.5 4.5"/></svg>
+      Accueil
+    </a>
+    <div class="nav-dropdown" id="mainDropdown">
+      <button class="nav-dropdown-btn" aria-expanded="false" aria-haspopup="true">
+        Simulateurs <svg class="nav-chevron" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.8" style="width:13px;height:8px;flex-shrink:0"><path d="M1 1l4 4 4-4"/></svg>
+      </button>
+      <div class="nav-dropdown-menu" id="navMenu" role="menu"></div>
+    </div>
+  </div>
+</nav>
+
+<div class="sim-page">
+
+  <div class="sim-page-header">
+    <span class="sim-num-badge"></span>
+    <div>
+      <div class="sim-eyebrow">Patrimoine &amp; Structuration</div>
+      <h1>Contrat de <em class="gradient-text">Capitalisation</em></h1>
+      <p>Simulation patrimoniale institutionnelle — capitalisation long terme, optimisation fiscale PP et IS, transmission et trésorerie holding.</p>
+    </div>
+  </div>
+
+  <div class="cc-hero-props">
+    <div class="cc-hero-prop">
+      <div class="cc-hero-icon">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+          <path d="M3 13V7l5-4 5 4v6"/><rect x="6" y="9" width="4" height="4"/>
+        </svg>
+      </div>
+      <div>
+        <div class="cc-hero-prop-title">Antériorité fiscale</div>
+        <div class="cc-hero-prop-desc">Transmissible par donation avec conservation de la séniorité fiscale</div>
+      </div>
+    </div>
+    <div class="cc-hero-prop">
+      <div class="cc-hero-icon">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+          <circle cx="8" cy="8" r="5.5"/><path d="M8 4.5v3.5l2.5 1.5"/>
+        </svg>
+      </div>
+      <div>
+        <div class="cc-hero-prop-title">Fiscalité différée</div>
+        <div class="cc-hero-prop-desc">PFU 30 % ou 7,5 % IR après 8 ans — même régime que l'assurance-vie</div>
+      </div>
+    </div>
+    <div class="cc-hero-prop">
+      <div class="cc-hero-icon">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+          <rect x="2" y="4" width="12" height="9" rx="1.5"/><path d="M5 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1"/>
+        </svg>
+      </div>
+      <div>
+        <div class="cc-hero-prop-title">Trésorerie holding</div>
+        <div class="cc-hero-prop-desc">Valorisation intelligente du cash dormant en IS — sans imposition annuelle</div>
+      </div>
+    </div>
+    <div class="cc-hero-prop">
+      <div class="cc-hero-icon">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+          <path d="M3 13 L8 3 L13 13"/><line x1="5" y1="10" x2="11" y2="10"/>
+        </svg>
+      </div>
+      <div>
+        <div class="cc-hero-prop-title">Démembrement</div>
+        <div class="cc-hero-prop-desc">Usufruit / nue-propriété — structuration successorale optimisée</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sim-card-wrap">
+    <div class="cc-layout">
+
+      <!-- ═══ INPUTS ═══ -->
+      <aside class="cc-inp">
+
+        <div class="cc-inp-sec">Souscripteur</div>
+
+        <div class="field">
+          <div class="field-label"><label>Type de souscripteur</label></div>
+          <div class="cc-subscr-toggle">
+            <button class="cc-subscr-btn active" data-subscr="pp">
+              <span class="cc-subscr-dot"></span>Personne physique (PP)
+            </button>
+            <button class="cc-subscr-btn" data-subscr="is25">
+              <span class="cc-subscr-dot"></span>Holding IS (25 %)
+            </button>
+            <button class="cc-subscr-btn" data-subscr="is15">
+              <span class="cc-subscr-dot"></span>PME / SCI IS (15 %)
+            </button>
+          </div>
+        </div>
+
+        <div class="cc-inp-sec">Portefeuille</div>
+
+        <div class="field">
+          <div class="field-label">
+            <label for="cc-vi">Capital initial</label>
+            <span class="field-val" id="cc-vi-disp">100 000 €</span>
+          </div>
+          <div class="input-wrap">
+            <input type="text" inputmode="decimal" data-fmt id="cc-vi" value="100000">
+            <span class="unit">€</span>
+          </div>
+          <input type="range" id="cc-vi-sld" min="0" max="2000000" step="5000" value="100000">
+        </div>
+
+        <div class="field-grid-2" style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem">
+          <div class="field">
+            <div class="field-label"><label for="cc-vp">Versements</label></div>
+            <div class="input-wrap">
+              <input type="text" inputmode="decimal" data-fmt id="cc-vp" value="2000">
+              <span class="unit">€</span>
+            </div>
+          </div>
+          <div class="field">
+            <div class="field-label"><label for="cc-freq">Fréquence</label></div>
+            <div class="select-wrap">
+              <select id="cc-freq">
+                <option value="12" selected>Mensuel</option>
+                <option value="4">Trimestriel</option>
+                <option value="1">Annuel</option>
+                <option value="0">Aucun</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="cc-inp-sec">Rendement &amp; Durée</div>
+
+        <div class="field">
+          <div class="field-label"><label for="cc-rdt">Rendement annuel brut</label></div>
+          <div class="cc-range-row">
+            <input type="range" id="cc-rdt" class="cc-range-inp" min="1" max="10" step="0.1" value="5">
+            <span class="cc-range-disp" id="cc-rdt-d">5,0 %</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label"><label for="cc-frais">Frais de gestion annuels</label></div>
+          <div class="cc-range-row">
+            <input type="range" id="cc-frais" class="cc-range-inp" min="0" max="2" step="0.05" value="0.6">
+            <span class="cc-range-disp" id="cc-frais-d">0,60 %</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label"><label for="cc-duree">Horizon de capitalisation</label></div>
+          <div class="cc-range-row">
+            <input type="range" id="cc-duree" class="cc-range-inp" min="2" max="30" step="1" value="15">
+            <span class="cc-range-disp" id="cc-duree-d">15 ans</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label"><label for="cc-infl">Inflation (lecture réelle)</label></div>
+          <div class="cc-range-row">
+            <input type="range" id="cc-infl" class="cc-range-inp" min="0" max="5" step="0.1" value="2">
+            <span class="cc-range-disp" id="cc-infl-d">2,0 %</span>
+          </div>
+        </div>
+
+        <div class="cc-inp-sec cc-pp-only">Fiscalité PP</div>
+
+        <div class="field cc-pp-only">
+          <div class="field-label"><label for="cc-tmr">Tranche marginale (TMI)</label></div>
+          <div class="select-wrap">
+            <select id="cc-tmr">
+              <option value="0">0 %</option>
+              <option value="11">11 %</option>
+              <option value="30" selected>30 %</option>
+              <option value="41">41 %</option>
+              <option value="45">45 %</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field cc-pp-only">
+          <div class="field-label"><label for="cc-couple">Situation fiscale</label></div>
+          <div class="select-wrap">
+            <select id="cc-couple">
+              <option value="0">Célibataire (abatt. 4 600 €)</option>
+              <option value="1">Couple (abatt. 9 200 €)</option>
+            </select>
+          </div>
+        </div>
+
+      </aside>
+
+      <!-- ═══ MAIN ═══ -->
+      <section class="cc-main">
+        <nav class="cc-tabs-nav" role="tablist">
+          <button class="cc-tab-btn active" data-tab="capi" role="tab">
+            <svg class="cc-tab-icon" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6">
+              <polyline points="1,10 4,6 7,8 13,2"/>
+            </svg>Capitalisation
+          </button>
+          <button class="cc-tab-btn" data-tab="fisc" role="tab">
+            <svg class="cc-tab-icon" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6">
+              <rect x="2" y="2" width="10" height="10" rx="1.5"/><line x1="4" y1="7" x2="10" y2="7"/>
+            </svg>Fiscalité
+          </button>
+          <button class="cc-tab-btn" data-tab="trans" role="tab">
+            <svg class="cc-tab-icon" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6">
+              <path d="M2 12 L7 3 L12 12"/><line x1="4.5" y1="9" x2="9.5" y2="9"/>
+            </svg>Transmission
+          </button>
+          <button class="cc-tab-btn" data-tab="entrep" role="tab">
+            <svg class="cc-tab-icon" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6">
+              <rect x="4" y="5" width="6" height="7"/><path d="M2 8h2M10 8h2M6 2h2v3H6z"/>
+            </svg>Entreprise
+          </button>
+          <button class="cc-tab-btn" data-tab="cmp" role="tab">
+            <svg class="cc-tab-icon" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6">
+              <rect x="1" y="8" width="3" height="4"/><rect x="5.5" y="5" width="3" height="7"/>
+              <rect x="10" y="2" width="3" height="10"/>
+            </svg>Comparaison
+          </button>
+          <button class="cc-tab-btn" data-tab="peda" role="tab">
+            <svg class="cc-tab-icon" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6">
+              <rect x="2" y="2" width="10" height="10" rx="1.5"/>
+              <line x1="4.5" y1="5" x2="9.5" y2="5"/><line x1="4.5" y1="7.5" x2="9.5" y2="7.5"/>
+              <line x1="4.5" y1="10" x2="7" y2="10"/>
+            </svg>Pédagogie
+          </button>
+        </nav>
+
+        <!-- ── CAPITALISATION ── -->
+        <div class="cc-panel active" id="cc-p-capi">
+          <div class="cc-kpi-row cc-kpi-3">
+            <div class="cc-kpi slate">
+              <div class="cc-kpi-label">Valeur finale</div>
+              <div class="cc-kpi-val lg slate" id="kc-final">—</div>
+              <div class="cc-kpi-sub" id="kc-sub">brut avant fiscalité</div>
+            </div>
+            <div class="cc-kpi accent">
+              <div class="cc-kpi-label">Intérêts cumulés</div>
+              <div class="cc-kpi-val green" id="kc-gains">—</div>
+              <div class="cc-kpi-sub">gains générés</div>
+            </div>
+            <div class="cc-kpi gold">
+              <div class="cc-kpi-label">Capital investi</div>
+              <div class="cc-kpi-val" id="kc-investi">—</div>
+              <div class="cc-kpi-sub">versements cumulés</div>
+            </div>
+          </div>
+
+          <div class="cc-kpi-row cc-kpi-3">
+            <div class="cc-kpi">
+              <div class="cc-kpi-label">Rendement annualisé</div>
+              <div class="cc-kpi-val" id="kc-ann">—</div>
+              <div class="cc-kpi-sub">net de frais</div>
+            </div>
+            <div class="cc-kpi">
+              <div class="cc-kpi-label">Valeur réelle (inflation)</div>
+              <div class="cc-kpi-val" id="kc-reel">—</div>
+              <div class="cc-kpi-sub">pouvoir d'achat constant</div>
+            </div>
+            <div class="cc-kpi danger">
+              <div class="cc-kpi-label">Fiscalité latente estimée</div>
+              <div class="cc-kpi-val red" id="kc-fisc-lat">—</div>
+              <div class="cc-kpi-sub" id="kc-fisc-lat-sub">en cas de rachat total</div>
+            </div>
+          </div>
+
+          <div class="cc-chart-wrap">
+            <div class="cc-chart-hdr">
+              <div>
+                <div class="cc-chart-title">Courbe de capitalisation</div>
+                <div class="cc-chart-sub">Capital investi · Valeur brute · Jalons long terme</div>
+              </div>
+              <span class="cc-chart-badge" id="kc-badge">15 ans</span>
+            </div>
+            <canvas class="cc-canvas cc-canvas-260" id="cc-chart-capi"></canvas>
+            <div class="cc-legend">
+              <div class="cc-legend-item"><div class="cc-legend-line" style="background:var(--amber)"></div>Capital investi</div>
+              <div class="cc-legend-item"><div class="cc-legend-line" style="background:var(--cc-slate)"></div>Valeur brute</div>
+            </div>
+          </div>
+
+          <div class="cc-proj-wrap">
+            <table class="cc-proj-tbl">
+              <thead><tr>
+                <th>Jalon</th><th>Capital investi</th><th>Valeur brute</th>
+                <th>Gains latents</th><th>Fiscalité latente</th>
+              </tr></thead>
+              <tbody id="cc-proj-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ── FISCALITÉ ── -->
+        <div class="cc-panel" id="cc-p-fisc">
+
+          <div class="cc-advantage">
+            <div>
+              <div class="cc-advantage-title" id="fisc-avantage-title">Économie fiscale vs rachat immédiat</div>
+              <div class="cc-advantage-sub" id="fisc-avantage-sub">Grâce à l'ancienneté du contrat après 8 ans</div>
+            </div>
+            <div class="cc-advantage-val" id="fisc-avantage-val">—</div>
+          </div>
+
+          <!-- PP mode -->
+          <div id="fisc-pp-section">
+            <div class="cc-fisc-grid">
+              <div class="cc-fisc-card" id="fisc-pfu-card">
+                <div class="cc-fisc-badge pfu">PFU 30 % (avant 8 ans)</div>
+                <div class="cc-fisc-name">Prélèvement Forfaitaire Unique</div>
+                <div class="cc-fisc-row"><span>Gains imposables</span><span class="cc-fisc-v" id="fp-gains">—</span></div>
+                <div class="cc-fisc-row"><span>IR 12,8 %</span><span class="cc-fisc-v red" id="fp-ir">—</span></div>
+                <div class="cc-fisc-row"><span>PS 17,2 %</span><span class="cc-fisc-v red" id="fp-ps">—</span></div>
+                <div class="cc-fisc-row total"><span>Fiscalité totale</span><span class="cc-fisc-v red" id="fp-total">—</span></div>
+                <div class="cc-fisc-row total"><span>Net perçu</span><span class="cc-fisc-v green" id="fp-net">—</span></div>
+              </div>
+              <div class="cc-fisc-card" id="fisc-8ans-card">
+                <div class="cc-fisc-badge opt8" id="fisc-8ans-badge">Option 7,5 % IR (après 8 ans)</div>
+                <div class="cc-fisc-name">Fiscalité optimisée + abattement</div>
+                <div class="cc-fisc-row"><span>Gains imposables</span><span class="cc-fisc-v" id="f8-gains">—</span></div>
+                <div class="cc-fisc-row"><span>Abattement annuel</span><span class="cc-fisc-v green" id="f8-abatt">—</span></div>
+                <div class="cc-fisc-row"><span>IR 7,5 % sur net</span><span class="cc-fisc-v red" id="f8-ir">—</span></div>
+                <div class="cc-fisc-row"><span>PS 17,2 %</span><span class="cc-fisc-v red" id="f8-ps">—</span></div>
+                <div class="cc-fisc-row total"><span>Fiscalité totale</span><span class="cc-fisc-v red" id="f8-total">—</span></div>
+                <div class="cc-fisc-row total"><span>Net perçu</span><span class="cc-fisc-v green" id="f8-net">—</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- IS mode -->
+          <div id="fisc-is-section" style="display:none">
+            <div class="cc-fisc-grid">
+              <div class="cc-fisc-card">
+                <div class="cc-fisc-badge is" id="fisc-is-badge">IS applicable</div>
+                <div class="cc-fisc-name">Imposition société sur les gains</div>
+                <div class="cc-fisc-row"><span>Gains imposables</span><span class="cc-fisc-v" id="fi-gains">—</span></div>
+                <div class="cc-fisc-row"><span>Taux IS</span><span class="cc-fisc-v" id="fi-taux">—</span></div>
+                <div class="cc-fisc-row"><span>IS dû</span><span class="cc-fisc-v red" id="fi-is">—</span></div>
+                <div class="cc-fisc-row"><span>PS (non applicable)</span><span class="cc-fisc-v" style="color:var(--text-dim)">— €</span></div>
+                <div class="cc-fisc-row total"><span>Fiscalité totale</span><span class="cc-fisc-v red" id="fi-total">—</span></div>
+                <div class="cc-fisc-row total"><span>Net perçu</span><span class="cc-fisc-v green" id="fi-net">—</span></div>
+              </div>
+              <div class="cc-fisc-card best">
+                <div class="cc-fisc-badge best">Avantage CC vs CAT</div>
+                <div class="cc-fisc-name">Capitalisation différée — pas d'IS annuel</div>
+                <div class="cc-fisc-row"><span>Valeur brute CC</span><span class="cc-fisc-v" id="fi-cc-val">—</span></div>
+                <div class="cc-fisc-row"><span>CAT équivalent (IS annuel)</span><span class="cc-fisc-v" id="fi-cat-val">—</span></div>
+                <div class="cc-fisc-row"><span>Gain structurel CC</span><span class="cc-fisc-v green" id="fi-gain-struct">—</span></div>
+                <div class="cc-fisc-row total"><span>Gain net CC</span><span class="cc-fisc-v green" id="fi-net2">—</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="cc-chart-wrap">
+            <div class="cc-chart-hdr">
+              <div>
+                <div class="cc-chart-title" id="fisc-chart-title">Comparaison fiscale PFU vs Option 8 ans</div>
+                <div class="cc-chart-sub" id="fisc-chart-sub">Fiscalité cumulée simulée sur l'horizon</div>
+              </div>
+            </div>
+            <canvas class="cc-canvas cc-canvas-200" id="cc-chart-fisc"></canvas>
+            <div class="cc-legend" id="fisc-legend">
+              <div class="cc-legend-item"><div class="cc-legend-line" style="background:var(--danger)"></div>PFU 30 %</div>
+              <div class="cc-legend-item"><div class="cc-legend-line" style="background:var(--cc-slate)"></div>Option 8 ans</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── TRANSMISSION ── -->
+        <div class="cc-panel" id="cc-p-trans">
+
+          <div class="cc-kpi-row cc-kpi-3">
+            <div class="cc-kpi slate">
+              <div class="cc-kpi-label">Valeur transmise (donation)</div>
+              <div class="cc-kpi-val slate" id="kt-donation">—</div>
+              <div class="cc-kpi-sub">avec antériorité fiscale conservée</div>
+            </div>
+            <div class="cc-kpi accent">
+              <div class="cc-kpi-label">Valeur nette (succession)</div>
+              <div class="cc-kpi-val" id="kt-succession">—</div>
+              <div class="cc-kpi-sub">après droits de succession estimés</div>
+            </div>
+            <div class="cc-kpi gold">
+              <div class="cc-kpi-label">Économie vs succession classique</div>
+              <div class="cc-kpi-val gold" id="kt-economie">—</div>
+              <div class="cc-kpi-sub">avantage structuration</div>
+            </div>
+          </div>
+
+          <div class="cc-trans-grid">
+            <div class="cc-trans-card best">
+              <div class="cc-trans-hdr">
+                <div class="cc-trans-dot" style="background:var(--cc-slate)"></div>
+                <div class="cc-trans-title">Donation du contrat</div>
+              </div>
+              <div class="cc-trans-body">
+                <div class="cc-trans-row"><span>Valeur transmise</span><span class="cc-trans-v" id="tt-don-val">—</span></div>
+                <div class="cc-trans-row"><span>Droits de donation (abatt.)</span><span class="cc-trans-v red" id="tt-don-droits">—</span></div>
+                <div class="cc-trans-row"><span>Antériorité conservée</span><span class="cc-trans-v green">Oui ✓</span></div>
+                <div class="cc-trans-row"><span>Fiscalité rachats donataire</span><span class="cc-trans-v slate">Maintenue</span></div>
+                <div class="cc-trans-row total"><span>Net reçu estimé</span><span class="cc-trans-v slate" id="tt-don-net">—</span></div>
+              </div>
+            </div>
+            <div class="cc-trans-card">
+              <div class="cc-trans-hdr">
+                <div class="cc-trans-dot" style="background:var(--cc-gold)"></div>
+                <div class="cc-trans-title">Démembrement</div>
+              </div>
+              <div class="cc-trans-body">
+                <div class="cc-trans-row"><span>Valeur usufruit (barème)</span><span class="cc-trans-v gold" id="tt-dem-usu">—</span></div>
+                <div class="cc-trans-row"><span>Valeur nue-propriété</span><span class="cc-trans-v" id="tt-dem-np">—</span></div>
+                <div class="cc-trans-row"><span>Droits sur nue-prop.</span><span class="cc-trans-v red" id="tt-dem-droits">—</span></div>
+                <div class="cc-trans-row"><span>Réunion à terme</span><span class="cc-trans-v green">Sans droit ✓</span></div>
+                <div class="cc-trans-row total"><span>Économie nette</span><span class="cc-trans-v green" id="tt-dem-econ">—</span></div>
+              </div>
+            </div>
+            <div class="cc-trans-card">
+              <div class="cc-trans-hdr">
+                <div class="cc-trans-dot" style="background:var(--text-dim)"></div>
+                <div class="cc-trans-title">Succession classique</div>
+              </div>
+              <div class="cc-trans-body">
+                <div class="cc-trans-row"><span>Valeur transmise</span><span class="cc-trans-v" id="tt-succ-val">—</span></div>
+                <div class="cc-trans-row"><span>Droits de succession</span><span class="cc-trans-v red" id="tt-succ-droits">—</span></div>
+                <div class="cc-trans-row"><span>Antériorité fiscale</span><span class="cc-trans-v red">Perdue ✗</span></div>
+                <div class="cc-trans-row"><span>Fiscalité héritiers</span><span class="cc-trans-v red">PFU sur gains</span></div>
+                <div class="cc-trans-row total"><span>Net transmis estimé</span><span class="cc-trans-v" id="tt-succ-net">—</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="cc-advantage">
+            <div>
+              <div class="cc-advantage-title">Contrat de capi vs Assurance-vie — Transmission</div>
+              <div class="cc-advantage-sub">Le CC peut être donné de son vivant (AV non). L'AV échappe à la succession (CC non). Stratégies complémentaires.</div>
+            </div>
+            <div class="cc-advantage-val" style="font-size:.82rem;color:var(--cc-slate)">Complémentaires</div>
+          </div>
+
+          <div class="cc-chart-wrap">
+            <div class="cc-chart-hdr">
+              <div>
+                <div class="cc-chart-title">Comparaison transmission nette</div>
+                <div class="cc-chart-sub">Montant réellement reçu par les bénéficiaires</div>
+              </div>
+            </div>
+            <canvas class="cc-canvas cc-canvas-160" id="cc-chart-trans"></canvas>
+          </div>
+        </div>
+
+        <!-- ── ENTREPRISE / HOLDING ── -->
+        <div class="cc-panel" id="cc-p-entrep">
+
+          <div class="cc-kpi-row cc-kpi-3">
+            <div class="cc-kpi slate">
+              <div class="cc-kpi-label">CC Holding — valeur nette IS</div>
+              <div class="cc-kpi-val lg slate" id="ke-cc-net">—</div>
+              <div class="cc-kpi-sub">capitalisation différée, IS à la sortie</div>
+            </div>
+            <div class="cc-kpi amber">
+              <div class="cc-kpi-label">Compte à terme équivalent</div>
+              <div class="cc-kpi-val amber" id="ke-cat-net">—</div>
+              <div class="cc-kpi-sub">IS annuel sur intérêts</div>
+            </div>
+            <div class="cc-kpi danger">
+              <div class="cc-kpi-label">Cash dormant (coût d'opportunité)</div>
+              <div class="cc-kpi-val red" id="ke-cash-net">—</div>
+              <div class="cc-kpi-sub">manque à gagner cumulé (inflation)</div>
+            </div>
+          </div>
+
+          <div class="cc-advantage" style="margin-bottom:1rem">
+            <div>
+              <div class="cc-advantage-title">Avantage structurel CC vs CAT</div>
+              <div class="cc-advantage-sub">Le CC ne supporte pas l'IS annuellement — la capitalisation s'opère en franchise d'IS sur la durée</div>
+            </div>
+            <div class="cc-advantage-val" id="ke-avantage">—</div>
+          </div>
+
+          <div class="cc-entrep-grid">
+            <div class="cc-entrep-card winner" id="ke-card-cc">
+              <div class="cc-entrep-badge winner">Recommandé</div>
+              <div class="cc-entrep-name">Contrat de Capitalisation</div>
+              <div class="cc-entrep-val slate" id="ke-card-cc-val">—</div>
+              <div class="cc-entrep-sub">net après IS à la sortie</div>
+            </div>
+            <div class="cc-entrep-card">
+              <div class="cc-entrep-badge cat">Alternative</div>
+              <div class="cc-entrep-name">Compte à terme</div>
+              <div class="cc-entrep-val amber" id="ke-card-cat-val">—</div>
+              <div class="cc-entrep-sub">net après IS annuel sur intérêts</div>
+            </div>
+            <div class="cc-entrep-card">
+              <div class="cc-entrep-badge cash">Sous-optimal</div>
+              <div class="cc-entrep-name">Cash compte courant</div>
+              <div class="cc-entrep-val red" id="ke-card-cash-val">—</div>
+              <div class="cc-entrep-sub">valeur nominale non revalorisée</div>
+            </div>
+          </div>
+
+          <div class="cc-chart-wrap">
+            <div class="cc-chart-hdr">
+              <div>
+                <div class="cc-chart-title">Projection trésorerie sur <span id="ke-duree-label">15</span> ans</div>
+                <div class="cc-chart-sub">CC holding · CAT · Cash dormant — valeurs nettes IS</div>
+              </div>
+            </div>
+            <canvas class="cc-canvas cc-canvas-200" id="cc-chart-entrep"></canvas>
+            <div class="cc-legend">
+              <div class="cc-legend-item"><div class="cc-legend-line" style="background:var(--cc-slate)"></div>CC Holding</div>
+              <div class="cc-legend-item"><div class="cc-legend-line" style="background:var(--amber)"></div>Compte à terme</div>
+              <div class="cc-legend-item"><div class="cc-legend-line" style="background:var(--text-dim)"></div>Cash dormant</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── COMPARAISON ── -->
+        <div class="cc-panel" id="cc-p-cmp">
+
+          <div class="cc-kpi-row cc-kpi-4" style="margin-bottom:1rem">
+            <div class="cc-kpi slate">
+              <div class="cc-kpi-label">CC — Valeur nette estimée</div>
+              <div class="cc-kpi-val slate" id="kcmp-cc">—</div>
+              <div class="cc-kpi-sub">après fiscalité rachats</div>
+            </div>
+            <div class="cc-kpi">
+              <div class="cc-kpi-label">Assurance-vie</div>
+              <div class="cc-kpi-val" id="kcmp-av">—</div>
+              <div class="cc-kpi-sub">après fiscalité AV 8 ans</div>
+            </div>
+            <div class="cc-kpi">
+              <div class="cc-kpi-label">CTO</div>
+              <div class="cc-kpi-val" id="kcmp-cto">—</div>
+              <div class="cc-kpi-sub">après PFU 30 % annuel</div>
+            </div>
+            <div class="cc-kpi">
+              <div class="cc-kpi-label">Compte à terme</div>
+              <div class="cc-kpi-val" id="kcmp-cat">—</div>
+              <div class="cc-kpi-sub">après IS / PFU annuel</div>
+            </div>
+          </div>
+
+          <div class="cc-cmp-wrap">
+            <table class="cc-cmp-tbl">
+              <thead>
+                <tr>
+                  <th>Critère</th>
+                  <th>CC</th><th>Assurance-vie</th><th>CTO</th><th>CAT</th><th>Cash</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Fiscalité à la sortie</td>
+                  <td><span class="cc-badge-w">7,5 % IR+PS</span></td>
+                  <td><span class="cc-badge-w">7,5 % IR+PS</span></td>
+                  <td><span class="cc-badge-m">PFU 30 %</span></td>
+                  <td><span class="cc-badge-m">IS / PFU</span></td>
+                  <td><span class="cc-badge-l">Aucun</span></td>
+                </tr>
+                <tr>
+                  <td>Capitalisation différée</td>
+                  <td><span class="cc-badge-w">Oui ✓</span></td>
+                  <td><span class="cc-badge-w">Oui ✓</span></td>
+                  <td><span class="cc-badge-m">Non</span></td>
+                  <td><span class="cc-badge-m">Partiel</span></td>
+                  <td><span class="cc-badge-l">Non</span></td>
+                </tr>
+                <tr>
+                  <td>Donation inter-vivos</td>
+                  <td><span class="cc-badge-w">Oui ✓</span></td>
+                  <td><span class="cc-badge-l">Non ✗</span></td>
+                  <td><span class="cc-badge-w">Oui</span></td>
+                  <td><span class="cc-badge-w">Oui</span></td>
+                  <td><span class="cc-badge-w">Oui</span></td>
+                </tr>
+                <tr>
+                  <td>Antériorité fiscale transférable</td>
+                  <td><span class="cc-badge-w">Oui ✓</span></td>
+                  <td><span class="cc-badge-l">Non ✗</span></td>
+                  <td><span class="cc-badge-l">Non</span></td>
+                  <td><span class="cc-badge-l">Non</span></td>
+                  <td><span class="cc-badge-l">Non</span></td>
+                </tr>
+                <tr>
+                  <td>Hors succession</td>
+                  <td><span class="cc-badge-l">Non ✗</span></td>
+                  <td><span class="cc-badge-w">Oui ✓</span></td>
+                  <td><span class="cc-badge-l">Non</span></td>
+                  <td><span class="cc-badge-l">Non</span></td>
+                  <td><span class="cc-badge-l">Non</span></td>
+                </tr>
+                <tr>
+                  <td>Démembrement possible</td>
+                  <td><span class="cc-badge-w">Oui ✓</span></td>
+                  <td><span class="cc-badge-m">Partiel</span></td>
+                  <td><span class="cc-badge-w">Oui</span></td>
+                  <td><span class="cc-badge-l">Non</span></td>
+                  <td><span class="cc-badge-l">Non</span></td>
+                </tr>
+                <tr>
+                  <td>Usage IS / Holding</td>
+                  <td><span class="cc-badge-w">Optimal ✓</span></td>
+                  <td><span class="cc-badge-l">Non éligible</span></td>
+                  <td><span class="cc-badge-m">Possible</span></td>
+                  <td><span class="cc-badge-m">Possible</span></td>
+                  <td><span class="cc-badge-l">Aucun rendement</span></td>
+                </tr>
+                <tr>
+                  <td>Liquidité</td>
+                  <td><span class="cc-badge-m">Bonne</span></td>
+                  <td><span class="cc-badge-m">Bonne</span></td>
+                  <td><span class="cc-badge-w">Totale</span></td>
+                  <td><span class="cc-badge-l">Limitée</span></td>
+                  <td><span class="cc-badge-w">Totale</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="cc-chart-wrap">
+            <div class="cc-chart-hdr">
+              <div>
+                <div class="cc-chart-title">Valeur nette comparée après <span id="cmp-duree-label">15</span> ans</div>
+                <div class="cc-chart-sub">Simulation à paramètres équivalents — net après fiscalité</div>
+              </div>
+            </div>
+            <canvas class="cc-canvas cc-canvas-200" id="cc-chart-cmp"></canvas>
+            <div class="cc-legend">
+              <div class="cc-legend-item"><div class="cc-legend-line" style="background:var(--cc-slate)"></div>CC</div>
+              <div class="cc-legend-item"><div class="cc-legend-line" style="background:var(--accent)"></div>AV</div>
+              <div class="cc-legend-item"><div class="cc-legend-line" style="background:var(--cto-indigo,#3D5A80)"></div>CTO</div>
+              <div class="cc-legend-item"><div class="cc-legend-line" style="background:var(--amber)"></div>CAT</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── PÉDAGOGIE ── -->
+        <div class="cc-panel" id="cc-p-peda">
+          <div class="cc-peda-grid">
+            <div class="pedago-card">
+              <div class="pedago-card-header"><div class="pedago-card-dot"></div><div class="pedago-card-title">CC vs Assurance-vie — les différences clés</div></div>
+              <div class="pedago-card-body">
+                <p class="pedago-p">Le <strong>contrat de capitalisation</strong> et l'assurance-vie partagent la même mécanique fiscale de rachat (PFU ou 7,5 % IR après 8 ans). Mais ils diffèrent sur deux points majeurs :</p>
+                <p class="pedago-p"><strong>CC :</strong> peut être <em>donné inter-vivos</em> avec transfert de l'antériorité fiscale — avantage patrimonial unique. En revanche, il rentre dans la <em>succession classique</em>.</p>
+                <p class="pedago-p"><strong>AV :</strong> échappe à la succession (clause bénéficiaire, 152 500 € par bénéficiaire). Mais ne peut pas être donné de son vivant.</p>
+                <div class="pedago-tip"><strong>Stratégie :</strong> AV pour la transmission hors succession, CC pour la transmission via donation avec antériorité conservée.</div>
+              </div>
+            </div>
+            <div class="pedago-card">
+              <div class="pedago-card-header"><div class="pedago-card-dot"></div><div class="pedago-card-title">Fonctionnement fiscal — rachats</div></div>
+              <div class="pedago-card-body">
+                <p class="pedago-p">Lors d'un <strong>rachat partiel</strong>, seule la <em>quote-part de gains</em> dans le retrait est imposable (règle de proportionnalité) :</p>
+                <p class="pedago-p"><strong>Gains imposables = Retrait × (Gains totaux / Valeur du contrat)</strong></p>
+                <p class="pedago-p">Avant 8 ans : <em>PFU 30 %</em> (12,8 % IR + 17,2 % PS). Après 8 ans : <em>7,5 % IR</em> + 17,2 % PS avec abattement annuel de 4 600 € (célibataire) ou 9 200 € (couple marié/pacsé).</p>
+                <div class="pedago-tip"><strong>Astuce :</strong> attendre 8 ans avant le premier rachat optimise significativement la fiscalité. Chaque année, l'abattement repart à zéro.</div>
+              </div>
+            </div>
+            <div class="pedago-card">
+              <div class="pedago-card-header"><div class="pedago-card-dot"></div><div class="pedago-card-title">Usage Holding IS — trésorerie intelligente</div></div>
+              <div class="pedago-card-body">
+                <p class="pedago-p">La personne morale (holding, SCI IS) peut souscrire un contrat de capitalisation pour valoriser sa <strong>trésorerie excédentaire</strong>.</p>
+                <p class="pedago-p">Contrairement au compte à terme (intérêts taxés à l'IS chaque année), le CC holding bénéficie d'un <em>différé d'imposition</em> : l'IS n'est dû qu'au moment du rachat.</p>
+                <p class="pedago-p">Les intérêts des fonds en euros sont cependant théoriquement constatés annuellement pour les personnes morales. Les UC permettent d'éviter cette constatation annuelle.</p>
+                <div class="pedago-alert"><strong>Point de vigilance :</strong> les règles de constatation annuelle des produits financiers pour IS varient selon la nature du support (fonds euros vs UC). Vérifier avec un expert-comptable.</div>
+              </div>
+            </div>
+            <div class="pedago-card">
+              <div class="pedago-card-header"><div class="pedago-card-dot"></div><div class="pedago-card-title">Démembrement du contrat</div></div>
+              <div class="pedago-card-body">
+                <p class="pedago-p">Le contrat de capitalisation peut faire l'objet d'un <strong>démembrement de propriété</strong> : le donateur conserve l'<em>usufruit</em> (jouissance, rachats) et transmet la <em>nue-propriété</em> à ses enfants.</p>
+                <p class="pedago-p">Les droits de donation sont calculés sur la <em>valeur de la nue-propriété uniquement</em> (selon le barème fiscal de l'usufruit). À l'extinction de l'usufruit (décès), la pleine propriété se reconstitue sans droit supplémentaire.</p>
+                <div class="pedago-tip"><strong>Avantage :</strong> transmettre maintenant à valeur réduite, consolider la pleine propriété plus tard sans imposition complémentaire. L'antériorité fiscale est maintenue tout au long.</div>
+              </div>
+            </div>
+            <div class="pedago-card cc-peda-full">
+              <div class="pedago-card-header"><div class="pedago-card-dot"></div><div class="pedago-card-title">Profils idéaux — Qui devrait utiliser le Contrat de Capitalisation ?</div></div>
+              <div class="pedago-card-body">
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.8rem">
+                  <div class="pedago-block">
+                    <div class="pedago-block-label">Stratégie de donation</div>
+                    <p class="pedago-block-text">Souscripteur souhaitant <strong>transmettre un capital de son vivant</strong> en conservant la séniorité fiscale acquise. Le CC est l'unique enveloppe permettant cette transmission avec maintien de l'avantage fiscal 8 ans.</p>
+                  </div>
+                  <div class="pedago-block">
+                    <div class="pedago-block-label">Holding / Trésorerie IS</div>
+                    <p class="pedago-block-text">Dirigeant d'entreprise avec du <strong>cash excédentaire en société</strong>. Le CC évite l'érosion du capital par l'IS annuel sur les intérêts — l'entreprise capitalise plus efficacement qu'un CAT classique.</p>
+                  </div>
+                  <div class="pedago-block">
+                    <div class="pedago-block-label">Ingénierie successorale</div>
+                    <p class="pedago-block-text">Famille patrimoniale souhaitant <strong>démembrer un capital</strong> pour optimiser la transmission. Le CC est démembrable, contrairement à l'AV classique — il permet une ingénierie successorale fine et sur-mesure.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <span>Patrimonia.ai</span> — Simulateur Contrat de Capitalisation — Calculs indicatifs 2026. PFU : 30 % (12,8 % IR + 17,2 % PS). Fiscalité 8 ans : 7,5 % IR + 17,2 % PS. Abattements : 4 600 €/9 200 € annuels. IS : 25 % (PME 15 %). Droits de succession : taux indicatifs ligne directe. Les projections ne constituent pas une garantie de performance. Consultez un conseiller en gestion de patrimoine agréé.
+</footer>
+
+<script>
+/* ════════════════════════════════════════════════════
+   CONTRAT DE CAPITALISATION — Moteur JS
+   Préfixe : cc-   État : subscType ('pp'|'is25'|'is15')
+════════════════════════════════════════════════════ */
+'use strict';
+
+/* ── CONSTANTES FISCALES ── */
+const PS = 0.172;
+const PFU = 0.30;
+const IR_PFU = 0.128;
+const IR_8ANS = 0.075;
+const ABATT_SOLO = 4600;
+const ABATT_COUPLE = 9200;
+const IS25 = 0.25;
+const IS15 = 0.15;
+const SUCC_RATE = 0.20; // taux droits succession simplifié ligne directe
+const DON_ABATT = 100000; // abattement donation parent→enfant
+const DON_RATE  = 0.20;   // taux donation simplifié au-delà abattement
+
+/* ── ÉTAT ── */
+let subscType = 'pp';
+
+/* ── HELPERS ── */
+const $ = id => document.getElementById(id);
+const setTxt = (id, v) => { const e = $(id); if (e) e.textContent = v; };
+
+function fmt(v) {
+  if (!isFinite(v) || isNaN(v)) return '—';
+  if (Math.abs(v) >= 1e6) return (v/1e6).toFixed(2).replace('.',',')+' M€';
+  if (Math.abs(v) >= 1e3) return Math.round(v).toLocaleString('fr-FR')+' €';
+  return Math.round(v)+' €';
+}
+function fmtPct(v, d=1) { return (+v).toFixed(d).replace('.',',')+' %'; }
+function fmtX(v) { return '×'+v.toFixed(2).replace('.',','); }
+
+/* ── INPUTS ── */
+function getInputs() {
+  return {
+    initial: SP.parseNum($('cc-vi').value),
+    monthly: SP.parseNum($('cc-vp').value),
+    freq:    +($('cc-freq').value),
+    rdt:     +($('cc-rdt').value),
+    frais:   +($('cc-frais').value),
+    duree:   +($('cc-duree').value),
+    infl:    +($('cc-infl').value),
+    tmr:     +($('cc-tmr').value),
+    couple:  +($('cc-couple').value),
+    subscType
+  };
+}
+
+/* ── CALCUL PORTFOLIO ── */
+function calcPortfolio(inp) {
+  const netRate = (inp.rdt - inp.frais) / 100;
+  const annualInflow = inp.monthly * inp.freq;
+  let portfolio = inp.initial;
+  let invested  = inp.initial;
+  const data = [{ year:0, inv:invested, brut:portfolio, gains:0 }];
+  for (let y = 1; y <= inp.duree; y++) {
+    portfolio = portfolio * (1 + netRate) + annualInflow;
+    invested += annualInflow;
+    data.push({ year:y, inv:invested, brut:Math.max(0,portfolio), gains:Math.max(0,portfolio-invested) });
+  }
+  return { data, gross:data[data.length-1].brut, invested:data[data.length-1].inv,
+           gains:data[data.length-1].gains };
+}
+
+/* ── CALCUL FISCAL SUR RACHAT TOTAL ── */
+function calcFiscalExit(res, inp) {
+  const { gross, gains } = res;
+  const duree = inp.duree;
+  if (inp.subscType === 'pp') {
+    // PFU 30%
+    const pfu_total = gains * PFU;
+    const pfu_net   = gross - pfu_total;
+    // Option 8 ans
+    const abatt = inp.couple ? ABATT_COUPLE : ABATT_SOLO;
+    const taxableGains8 = Math.max(0, gains - abatt);
+    const ir8   = taxableGains8 * IR_8ANS;
+    const ps8   = gains * PS;
+    const f8_total = ir8 + ps8;
+    const f8_net   = gross - f8_total;
+    const best = duree >= 8 ? f8_net : pfu_net;
+    const bestTax = duree >= 8 ? f8_total : pfu_total;
+    return { pfu_total, pfu_net, f8_total, f8_net, ir8, ps8, abatt, taxableGains8, best, bestTax, mode:'pp' };
+  } else {
+    const isRate = inp.subscType === 'is25' ? IS25 : IS15;
+    const is_total = gains * isRate;
+    const is_net   = gross - is_total;
+    // CAT: same amount compounding at netRate but paying IS annually
+    const catRate = (inp.rdt - inp.frais) / 100;
+    const catNetRate = catRate * (1 - isRate);
+    let catV = inp.initial;
+    for (let y = 1; y <= inp.duree; y++) {
+      catV = catV * (1 + catNetRate) + inp.monthly * inp.freq * (1 - isRate);
+    }
+    const gainStruct = (gross - is_total) - catV;
+    return { is_total, is_net, isRate, catV, gainStruct, mode:'is' };
+  }
+}
+
+/* ── RENDER CAPITALISATION ── */
+function renderCapi(inp, res) {
+  const fiscal = calcFiscalExit(res, inp);
+  const ann = inp.duree > 0 ? (Math.pow(res.gross/res.invested,1/inp.duree)-1)*100 : 0;
+  const reel = res.gross / Math.pow(1 + inp.infl/100, inp.duree);
+  const fiscLat = fiscal.mode === 'pp' ? fiscal.bestTax : fiscal.is_total;
+  setTxt('kc-final', fmt(res.gross));
+  setTxt('kc-sub', `sur ${inp.duree} an${inp.duree>1?'s':''} — net de frais`);
+  setTxt('kc-gains', fmt(res.gains));
+  setTxt('kc-investi', fmt(res.invested));
+  setTxt('kc-ann', fmtPct(ann));
+  setTxt('kc-reel', fmt(reel));
+  setTxt('kc-fisc-lat', '−'+fmt(fiscLat));
+  setTxt('kc-fisc-lat-sub', fiscal.mode==='pp'
+    ? (inp.duree>=8?'option 7,5 % + PS après abatt.':'PFU 30 % (< 8 ans)') : 'IS à la sortie');
+  setTxt('kc-badge', inp.duree+' an'+(inp.duree>1?'s':''));
+
+  // Table
+  const tbody = $('cc-proj-body'); if(!tbody) return;
+  tbody.innerHTML = '';
+  const milestones = new Set([1,5,8,10,15,20,25,30].filter(y=>y<=inp.duree));
+  milestones.add(inp.duree);
+  [...milestones].sort((a,b)=>a-b).forEach(y => {
+    const d = res.data[y] || res.data[res.data.length-1];
+    const fLat = fiscal.mode==='pp' ? d.gains*(y>=8?IS15:PFU) : d.gains*(inp.subscType==='is25'?IS25:IS15);
+    const tr = document.createElement('tr');
+    if(y===inp.duree) tr.className='highlight';
+    tr.innerHTML=`<td>${y===inp.duree?'Fin ('+y+' ans)':y+' an'+(y>1?'s':'')+(y===8?' ⭐':'')}</td>
+      <td>${fmt(d.inv)}</td><td>${fmt(d.brut)}</td>
+      <td>${fmt(d.gains)}</td><td>−${fmt(fLat)}</td>`;
+    tbody.appendChild(tr);
+  });
+
+  drawAreaChart($('cc-chart-capi'), res.data);
+}
+
+/* ── RENDER FISCALITÉ ── */
+function renderFisc(inp, res) {
+  const fiscal = calcFiscalExit(res, inp);
+  const { gross, gains, invested } = res;
+  const isIS = inp.subscType !== 'pp';
+
+  $('fisc-pp-section').style.display = isIS ? 'none' : 'block';
+  $('fisc-is-section').style.display = isIS ? 'block' : 'none';
+
+  if (!isIS) {
+    // PFU card
+    setTxt('fp-gains', fmt(gains));
+    setTxt('fp-ir',  '−'+fmt(gains*IR_PFU));
+    setTxt('fp-ps',  '−'+fmt(gains*PS));
+    setTxt('fp-total','−'+fmt(fiscal.pfu_total));
+    setTxt('fp-net',  fmt(fiscal.pfu_net));
+    // 8 ans card
+    const badge8 = $('fisc-8ans-badge');
+    if(badge8) badge8.textContent = inp.duree>=8 ? 'Option 7,5 % IR — DISPONIBLE' : `Option 7,5 % IR — dans ${8-inp.duree} an${8-inp.duree>1?'s':''}`;
+    setTxt('f8-gains', fmt(gains));
+    setTxt('f8-abatt', '−'+fmt(Math.min(gains, inp.couple?ABATT_COUPLE:ABATT_SOLO)));
+    setTxt('f8-ir',  '−'+fmt(fiscal.ir8));
+    setTxt('f8-ps',  '−'+fmt(fiscal.ps8));
+    setTxt('f8-total','−'+fmt(fiscal.f8_total));
+    setTxt('f8-net',  fmt(fiscal.f8_net));
+    // Advantage
+    const saving = fiscal.pfu_total - fiscal.f8_total;
+    setTxt('fisc-avantage-title', inp.duree>=8
+      ? 'Économie fiscale option 8 ans vs PFU'
+      : `Économie si vous attendez 8 ans (dans ${Math.max(0,8-inp.duree)} an${Math.max(0,8-inp.duree)>1?'s':''})`);
+    setTxt('fisc-avantage-sub', saving>0 ? `Option 8 ans vs PFU 30 % sur rachat total` : 'PFU optimal pour votre situation');
+    setTxt('fisc-avantage-val', '+'+fmt(Math.abs(saving)));
+    // Chart
+    setTxt('fisc-chart-title', 'Comparaison fiscale PFU vs Option 8 ans');
+    const pfuLine = res.data.map(d => d.gains * PFU);
+    const f8Line  = res.data.map((d,i) => {
+      const ab = inp.couple?ABATT_COUPLE:ABATT_SOLO;
+      return Math.max(0,d.gains-ab)*IR_8ANS + d.gains*PS;
+    });
+    drawDualLine($('cc-chart-fisc'), pfuLine, f8Line, inp.duree, '#D45A5A', '#465775');
+  } else {
+    const isRate = inp.subscType==='is25' ? IS25 : IS15;
+    setTxt('fisc-is-badge', `IS ${fmtPct(isRate*100,0)} applicable`);
+    setTxt('fi-gains', fmt(gains));
+    setTxt('fi-taux',  fmtPct(isRate*100,0));
+    setTxt('fi-is',   '−'+fmt(fiscal.is_total));
+    setTxt('fi-total','−'+fmt(fiscal.is_total));
+    setTxt('fi-net',   fmt(fiscal.is_net));
+    setTxt('fi-cc-val', fmt(fiscal.is_net));
+    setTxt('fi-cat-val', fmt(fiscal.catV));
+    setTxt('fi-gain-struct', '+'+fmt(Math.max(0,fiscal.gainStruct)));
+    setTxt('fi-net2', fmt(fiscal.is_net));
+    setTxt('fisc-avantage-title', 'Gain structurel CC vs Compte à terme (IS)');
+    setTxt('fisc-avantage-sub', 'Capitalisation différée — IS non dû annuellement sur les gains UC');
+    setTxt('fisc-avantage-val', '+'+fmt(Math.max(0,fiscal.gainStruct)));
+    // Chart: CC net vs CAT over time
+    const isRate2 = isRate;
+    const netR = (inp.rdt-inp.frais)/100;
+    const catNetR = netR*(1-isRate2);
+    let ccLine=[], catLine=[], cc=inp.initial, cat=inp.initial;
+    for(let y=0; y<=inp.duree; y++){
+      const ccG=Math.max(0,cc-inp.initial-(inp.monthly*inp.freq*y));
+      ccLine.push(cc - ccG*isRate2);
+      catLine.push(cat);
+      cc  = cc*(1+netR)+inp.monthly*inp.freq;
+      cat = cat*(1+catNetR)+inp.monthly*inp.freq*(1-isRate2);
+    }
+    drawDualLine($('cc-chart-fisc'), ccLine, catLine, inp.duree, '#465775','#B8860B');
+  }
+}
+
+/* ── RENDER TRANSMISSION ── */
+function renderTrans(inp, res) {
+  const { gross, gains, invested } = res;
+  // Donation: droits sur valeur du contrat après abatt. 100k
+  const donBase = Math.max(0, gross - DON_ABATT);
+  const donDroits = donBase * DON_RATE;
+  const donNet = gross - donDroits;
+  // Démembrement: valeur usufruit selon âge ~ 60 ans = 40% usu
+  const usuFraction = 0.40;
+  const npFraction  = 0.60;
+  const npVal = gross * npFraction;
+  const npDonBase = Math.max(0, npVal - DON_ABATT);
+  const npDroits = npDonBase * DON_RATE;
+  const demEcon = donDroits - npDroits;
+  // Succession classique
+  const succBase = Math.max(0, gross - 100000);
+  const succDroits = succBase * SUCC_RATE;
+  const succGainsFiscal = gains * PFU; // héritiers doivent purger les gains
+  const succNet = gross - succDroits;
+
+  setTxt('kt-donation',  fmt(donNet));
+  setTxt('kt-succession', fmt(succNet - succGainsFiscal));
+  setTxt('kt-economie',  '+'+fmt(Math.max(0, donNet - (succNet - succGainsFiscal))));
+  setTxt('tt-don-val',   fmt(gross));
+  setTxt('tt-don-droits','−'+fmt(donDroits));
+  setTxt('tt-don-net',   fmt(donNet));
+  setTxt('tt-dem-usu',   fmt(gross*usuFraction));
+  setTxt('tt-dem-np',    fmt(npVal));
+  setTxt('tt-dem-droits','−'+fmt(npDroits));
+  setTxt('tt-dem-econ',  '+'+fmt(Math.max(0,demEcon)));
+  setTxt('tt-succ-val',  fmt(gross));
+  setTxt('tt-succ-droits','−'+fmt(succDroits));
+  setTxt('tt-succ-net',  fmt(succNet));
+
+  drawBarChart3($('cc-chart-trans'), [
+    { label:'Donation CC', val:donNet, color:'#465775' },
+    { label:'Démembrement', val:donNet - npDroits + demEcon, color:'#8B7355' },
+    { label:'Succession', val:succNet, color:'#9CA3AF' }
+  ]);
+}
+
+/* ── RENDER ENTREPRISE ── */
+function renderEntreprise(inp, res) {
+  const isRate = inp.subscType==='is15' ? IS15 : IS25;
+  const netR   = (inp.rdt - inp.frais)/100;
+  const catR   = netR * (1 - isRate);
+  const initial = inp.initial;
+  const inflow  = inp.monthly * inp.freq;
+  let cc=initial, cat=initial, cash=initial;
+  const ccLine=[], catLine=[], cashLine=[];
+  for(let y=0; y<=inp.duree; y++){
+    const ccGains = Math.max(0,cc-initial-inflow*y);
+    ccLine.push(cc - ccGains*isRate);  // net IS à la sortie
+    catLine.push(cat);
+    cashLine.push(cash); // no return
+    if(y<inp.duree){
+      cc  = cc*(1+netR)+inflow;
+      cat = cat*(1+catR)+inflow*(1-isRate);
+      // cash = nominal (no return, but loses to inflation)
+    }
+  }
+  const ccFinalNet  = ccLine[ccLine.length-1];
+  const catFinalNet = catLine[catLine.length-1];
+  const cashOpp = initial * (1 - 1/Math.pow(1+inp.infl/100, inp.duree)); // inflation loss
+
+  setTxt('ke-cc-net',  fmt(ccFinalNet));
+  setTxt('ke-cat-net', fmt(catFinalNet));
+  setTxt('ke-cash-net', fmt(cashOpp));
+  setTxt('ke-avantage', '+'+fmt(Math.max(0,ccFinalNet-catFinalNet)));
+  setTxt('ke-card-cc-val',   fmt(ccFinalNet));
+  setTxt('ke-card-cat-val',  fmt(catFinalNet));
+  setTxt('ke-card-cash-val', fmt(initial)); // nominal unchanged
+  setTxt('ke-duree-label', inp.duree);
+
+  drawTripleLines($('cc-chart-entrep'), ccLine, catLine, cashLine, inp.duree);
+}
+
+/* ── RENDER COMPARAISON ── */
+function renderCmp(inp, res) {
+  const { gross, gains, invested } = res;
+  const isIS = inp.subscType !== 'pp';
+  const isRate = inp.subscType==='is25' ? IS25 : IS15;
+  const netR = (inp.rdt - inp.frais)/100;
+  const abatt = inp.couple ? ABATT_COUPLE : ABATT_SOLO;
+
+  // CC net
+  let ccNet, avNet;
+  if(isIS){
+    ccNet = gross - gains * isRate;
+    avNet = ccNet; // AV non éligible PM, use same for display
+  } else {
+    const f8 = inp.duree>=8
+      ? gross - (Math.max(0,gains-abatt)*IR_8ANS + gains*PS)
+      : gross - gains*PFU;
+    ccNet = f8;
+    // AV same fiscal as CC for PP
+    avNet = f8;
+  }
+  // CTO: PFU annuel sur gains réalisés (approximation: gains × PFU)
+  const ctoNet = gross - gains * PFU;
+  // CAT net: compound at netR*(1-isRate) for IS or netR*(1-PFU) for PP
+  const catTax = isIS ? isRate : PFU;
+  let catV = inp.initial;
+  for(let y=0;y<inp.duree;y++) catV = catV*(1+netR*(1-catTax))+inp.monthly*inp.freq*(1-catTax);
+
+  setTxt('kcmp-cc',  fmt(ccNet));
+  setTxt('kcmp-av',  fmt(avNet));
+  setTxt('kcmp-cto', fmt(ctoNet));
+  setTxt('kcmp-cat', fmt(catV));
+  setTxt('cmp-duree-label', inp.duree);
+
+  // Lines for chart
+  const ccLine=[], avLine=[], ctoLine=[], catLine=[];
+  let cc=inp.initial, cto=inp.initial, cat=inp.initial;
+  for(let y=0; y<=inp.duree; y++){
+    const inv = inp.initial + inp.monthly*inp.freq*y;
+    const ccG = Math.max(0,cc-inv);
+    const avG = ccG;
+    const ctoG = Math.max(0,cto-inv);
+    ccLine.push(isIS ? cc-ccG*isRate : inp.duree>=8
+      ? cc-(Math.max(0,ccG-abatt)*IR_8ANS+ccG*PS) : cc-ccG*PFU);
+    avLine.push(ccLine[y]); // same as CC for PP
+    ctoLine.push(cto - ctoG*PFU);
+    catLine.push(cat);
+    if(y<inp.duree){
+      cc = cc*(1+netR)+inp.monthly*inp.freq;
+      cto = cto*(1+netR)+inp.monthly*inp.freq;
+      cat = cat*(1+netR*(1-catTax))+inp.monthly*inp.freq*(1-catTax);
+    }
+  }
+  drawQuadLines($('cc-chart-cmp'), ccLine, avLine, ctoLine, catLine, inp.duree);
+}
+
+/* ════════════════════ CHARTS ════════════════════ */
+
+function drawAreaChart(canvas, data) {
+  if(!canvas) return;
+  const dpr = window.devicePixelRatio||1;
+  const W = canvas.offsetWidth, H = canvas.offsetHeight||260;
+  canvas.width=W*dpr; canvas.height=H*dpr;
+  const ctx=canvas.getContext('2d'); ctx.scale(dpr,dpr);
+  const pad={t:12,r:12,b:32,l:60};
+  const cw=W-pad.l-pad.r, ch=H-pad.t-pad.b;
+  const maxV = Math.max(...data.map(d=>d.brut))*1.05;
+  const n = data.length-1;
+  function px(y,v){ return pad.t+ch*(1-v/maxV); }
+  function py(y,v){ return pad.l+cw*(y/n); }
+  ctx.clearRect(0,0,W,H);
+  // Grid
+  ctx.strokeStyle='rgba(0,0,0,.04)'; ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){
+    const y=pad.t+ch*i/4;
+    ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(pad.l+cw,y); ctx.stroke();
+    const v=maxV*(1-i/4);
+    ctx.fillStyle='#9CA3AF'; ctx.font='10px system-ui'; ctx.textAlign='right';
+    ctx.fillText(v>=1e6?(v/1e6).toFixed(1)+'M':Math.round(v/1e3)+'K', pad.l-5, y+4);
+  }
+  // Invested area fill
+  ctx.beginPath();
+  data.forEach((d,i)=>i===0?ctx.moveTo(py(i),px(i,d.inv)):ctx.lineTo(py(i),px(i,d.inv)));
+  ctx.lineTo(py(n),pad.t+ch); ctx.lineTo(pad.l,pad.t+ch); ctx.closePath();
+  ctx.fillStyle='rgba(184,134,11,.12)'; ctx.fill();
+  // Gross area fill
+  ctx.beginPath();
+  data.forEach((d,i)=>i===0?ctx.moveTo(py(i),px(i,d.brut)):ctx.lineTo(py(i),px(i,d.brut)));
+  ctx.lineTo(py(n),pad.t+ch); ctx.lineTo(pad.l,pad.t+ch); ctx.closePath();
+  ctx.fillStyle='rgba(70,87,117,.10)'; ctx.fill();
+  // Invested line
+  ctx.beginPath(); ctx.strokeStyle='#B8860B'; ctx.lineWidth=1.5; ctx.setLineDash([5,3]);
+  data.forEach((d,i)=>i===0?ctx.moveTo(py(i),px(i,d.inv)):ctx.lineTo(py(i),px(i,d.inv)));
+  ctx.stroke(); ctx.setLineDash([]);
+  // Gross line
+  ctx.beginPath(); ctx.strokeStyle='#465775'; ctx.lineWidth=2.5;
+  data.forEach((d,i)=>i===0?ctx.moveTo(py(i),px(i,d.brut)):ctx.lineTo(py(i),px(i,d.brut)));
+  ctx.stroke();
+  // Milestones
+  [5,8,10,15,20,25].filter(y=>y<=n).forEach(y=>{
+    const d=data[y]; if(!d) return;
+    ctx.beginPath(); ctx.arc(py(y),px(y,d.brut),4,0,Math.PI*2);
+    ctx.fillStyle='#465775'; ctx.fill();
+    ctx.fillStyle='#6B7280'; ctx.font='9px system-ui'; ctx.textAlign='center';
+    const label=y+'a'+(y===8?' ⭐':'');
+    ctx.fillText(label, py(y), px(y,d.brut)-8);
+  });
+  // X axis labels
+  ctx.fillStyle='#9CA3AF'; ctx.font='10px system-ui'; ctx.textAlign='center';
+  [0,Math.round(n/4),Math.round(n/2),Math.round(3*n/4),n].forEach(y=>{
+    ctx.fillText(y+' a', py(y), H-pad.b+14);
+  });
+}
+
+function drawDualLine(canvas, line1, line2, duree, c1, c2) {
+  if(!canvas) return;
+  const dpr=window.devicePixelRatio||1;
+  const W=canvas.offsetWidth, H=canvas.offsetHeight||200;
+  canvas.width=W*dpr; canvas.height=H*dpr;
+  const ctx=canvas.getContext('2d'); ctx.scale(dpr,dpr);
+  const pad={t:12,r:12,b:32,l:60};
+  const cw=W-pad.l-pad.r, ch=H-pad.t-pad.b;
+  const allV=[...line1,...line2];
+  const maxV=Math.max(...allV)*1.05||1;
+  const n=duree;
+  const px=(i,v)=>pad.t+ch*(1-v/maxV);
+  const py=i=>pad.l+cw*(i/n);
+  ctx.clearRect(0,0,W,H);
+  ctx.strokeStyle='rgba(0,0,0,.04)'; ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){
+    const y=pad.t+ch*i/4; ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(pad.l+cw,y); ctx.stroke();
+    const v=maxV*(1-i/4);
+    ctx.fillStyle='#9CA3AF'; ctx.font='10px system-ui'; ctx.textAlign='right';
+    ctx.fillText(v>=1e6?(v/1e6).toFixed(1)+'M':Math.round(v/1e3)+'K', pad.l-5, y+4);
+  }
+  [[line1,c1],[line2,c2]].forEach(([line,color])=>{
+    ctx.beginPath(); ctx.strokeStyle=color; ctx.lineWidth=2;
+    line.forEach((v,i)=>i===0?ctx.moveTo(py(i),px(i,v)):ctx.lineTo(py(i),px(i,v)));
+    ctx.stroke();
+  });
+  ctx.fillStyle='#9CA3AF'; ctx.font='10px system-ui'; ctx.textAlign='center';
+  [0,Math.round(n/4),Math.round(n/2),Math.round(3*n/4),n].forEach(i=>{
+    ctx.fillText(i+'a', py(i), H-pad.b+14);
+  });
+}
+
+function drawTripleLines(canvas, l1, l2, l3, duree) {
+  if(!canvas) return;
+  const dpr=window.devicePixelRatio||1;
+  const W=canvas.offsetWidth, H=canvas.offsetHeight||200;
+  canvas.width=W*dpr; canvas.height=H*dpr;
+  const ctx=canvas.getContext('2d'); ctx.scale(dpr,dpr);
+  const pad={t:12,r:12,b:32,l:60};
+  const cw=W-pad.l-pad.r, ch=H-pad.t-pad.b;
+  const allV=[...l1,...l2,...l3];
+  const maxV=Math.max(...allV)*1.05||1;
+  const n=duree;
+  const px=(i,v)=>pad.t+ch*(1-v/maxV);
+  const py=i=>pad.l+cw*(i/n);
+  ctx.clearRect(0,0,W,H);
+  ctx.strokeStyle='rgba(0,0,0,.04)'; ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){
+    const y=pad.t+ch*i/4; ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(pad.l+cw,y); ctx.stroke();
+    const v=maxV*(1-i/4);
+    ctx.fillStyle='#9CA3AF'; ctx.font='10px system-ui'; ctx.textAlign='right';
+    ctx.fillText(v>=1e6?(v/1e6).toFixed(1)+'M':Math.round(v/1e3)+'K', pad.l-5, y+4);
+  }
+  [[l1,'#465775',2.5],[l2,'#B8860B',2],[l3,'#9CA3AF',1.5]].forEach(([line,color,lw])=>{
+    ctx.beginPath(); ctx.strokeStyle=color; ctx.lineWidth=lw;
+    if(lw===1.5){ ctx.setLineDash([4,3]); }
+    line.forEach((v,i)=>i===0?ctx.moveTo(py(i),px(i,v)):ctx.lineTo(py(i),px(i,v)));
+    ctx.stroke(); ctx.setLineDash([]);
+  });
+  ctx.fillStyle='#9CA3AF'; ctx.font='10px system-ui'; ctx.textAlign='center';
+  [0,Math.round(n/4),Math.round(n/2),Math.round(3*n/4),n].forEach(i=>{
+    ctx.fillText(i+'a', py(i), H-pad.b+14);
+  });
+}
+
+function drawBarChart3(canvas, items) {
+  if(!canvas) return;
+  const dpr=window.devicePixelRatio||1;
+  const W=canvas.offsetWidth, H=canvas.offsetHeight||160;
+  canvas.width=W*dpr; canvas.height=H*dpr;
+  const ctx=canvas.getContext('2d'); ctx.scale(dpr,dpr);
+  const pad={t:12,r:24,b:28,l:16};
+  const cw=W-pad.l-pad.r, ch=H-pad.t-pad.b;
+  const maxV=Math.max(...items.map(i=>i.val))*1.1||1;
+  const bw=Math.min(80, cw/items.length*0.5);
+  const gap=cw/items.length;
+  ctx.clearRect(0,0,W,H);
+  items.forEach((item,i)=>{
+    const x=pad.l+gap*i+gap/2-bw/2;
+    const bh=ch*(item.val/maxV);
+    const y=pad.t+ch-bh;
+    // bar
+    ctx.fillStyle=item.color+'28'; ctx.beginPath();
+    ctx.roundRect?ctx.roundRect(x,y,bw,bh,4):ctx.rect(x,y,bw,bh);
+    ctx.fill();
+    ctx.strokeStyle=item.color; ctx.lineWidth=2; ctx.beginPath();
+    ctx.roundRect?ctx.roundRect(x,y,bw,bh,4):ctx.rect(x,y,bw,bh);
+    ctx.stroke();
+    // value
+    ctx.fillStyle=item.color; ctx.font='700 10px system-ui'; ctx.textAlign='center';
+    const v=item.val;
+    ctx.fillText(v>=1e6?(v/1e6).toFixed(2)+'M€':Math.round(v/1e3)+'K€', x+bw/2, y-5);
+    // label
+    ctx.fillStyle='#6B7280'; ctx.font='9px system-ui';
+    ctx.fillText(item.label, x+bw/2, H-pad.b+14);
+  });
+}
+
+function drawQuadLines(canvas, l1, l2, l3, l4, duree) {
+  if(!canvas) return;
+  const dpr=window.devicePixelRatio||1;
+  const W=canvas.offsetWidth, H=canvas.offsetHeight||200;
+  canvas.width=W*dpr; canvas.height=H*dpr;
+  const ctx=canvas.getContext('2d'); ctx.scale(dpr,dpr);
+  const pad={t:12,r:12,b:32,l:60};
+  const cw=W-pad.l-pad.r, ch=H-pad.t-pad.b;
+  const allV=[...l1,...l2,...l3,...l4];
+  const maxV=Math.max(...allV)*1.05||1;
+  const n=duree;
+  const px=(i,v)=>pad.t+ch*(1-v/maxV);
+  const py=i=>pad.l+cw*(i/n);
+  ctx.clearRect(0,0,W,H);
+  ctx.strokeStyle='rgba(0,0,0,.04)'; ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){
+    const y=pad.t+ch*i/4; ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(pad.l+cw,y); ctx.stroke();
+    const v=maxV*(1-i/4);
+    ctx.fillStyle='#9CA3AF'; ctx.font='10px system-ui'; ctx.textAlign='right';
+    ctx.fillText(v>=1e6?(v/1e6).toFixed(1)+'M':Math.round(v/1e3)+'K', pad.l-5, y+4);
+  }
+  [[l1,'#465775',2.5,'solid'],[l2,'#4F8A78',2,'dash'],[l3,'#3D5A80',2,'dot'],[l4,'#B8860B',1.5,'dot']].forEach(([line,color,lw,dash])=>{
+    ctx.beginPath(); ctx.strokeStyle=color; ctx.lineWidth=lw;
+    if(dash==='dash') ctx.setLineDash([6,3]);
+    else if(dash==='dot') ctx.setLineDash([2,3]);
+    line.forEach((v,i)=>i===0?ctx.moveTo(py(i),px(i,v)):ctx.lineTo(py(i),px(i,v)));
+    ctx.stroke(); ctx.setLineDash([]);
+  });
+  ctx.fillStyle='#9CA3AF'; ctx.font='10px system-ui'; ctx.textAlign='center';
+  [0,Math.round(n/4),Math.round(n/2),Math.round(3*n/4),n].forEach(i=>{
+    ctx.fillText(i+'a', py(i), H-pad.b+14);
+  });
+}
+
+/* ── GLOBAL UPDATE ── */
+function update() {
+  const inp = getInputs();
+  const res = calcPortfolio(inp);
+  renderCapi(inp, res);
+  renderFisc(inp, res);
+  renderTrans(inp, res);
+  renderEntreprise(inp, res);
+  renderCmp(inp, res);
+}
+
+/* ── SLIDER WIRING ── */
+function wireSlider(id, dispId, format) {
+  const sld=$(id), disp=$(dispId); if(!sld) return;
+  const refresh=v=>{
+    sld.style.setProperty('--pct',((v-+sld.min)/(+sld.max-+sld.min)*100)+'%');
+    if(disp) disp.textContent = format==='yr'
+      ? v+' an'+(+v>1?'s':'') : fmtPct(v);
+  };
+  refresh(+sld.value);
+  sld.addEventListener('input',()=>{ refresh(+sld.value); update(); });
+}
+
+/* ── INIT ── */
+document.addEventListener('DOMContentLoaded', () => {
+  wireSlider('cc-rdt',   'cc-rdt-d',   'pct');
+  wireSlider('cc-frais', 'cc-frais-d', 'pct');
+  wireSlider('cc-duree', 'cc-duree-d', 'yr');
+  wireSlider('cc-infl',  'cc-infl-d',  'pct');
+
+  // Capital initial
+  const vi=$('cc-vi'), viSld=$('cc-vi-sld'), viDisp=$('cc-vi-disp');
+  if(vi && viSld){
+    const sync=v=>{ viSld.value=v; viSld.style.setProperty('--pct',((v-+viSld.min)/(+viSld.max-+viSld.min)*100)+'%'); if(viDisp) viDisp.textContent=SP.fmtNum(v)+' €'; };
+    sync(+viSld.value);
+    viSld.addEventListener('input',()=>{ vi.value=SP.fmtNum(+viSld.value); sync(+viSld.value); update(); });
+    vi.addEventListener('input',()=>{ sync(SP.parseNum(vi.value)); update(); });
+    vi.addEventListener('blur',()=>{ vi.value=SP.fmtNum(SP.parseNum(vi.value)); });
+  }
+  $('cc-vp')&&$('cc-vp').addEventListener('input',update);
+  $('cc-vp')&&$('cc-vp').addEventListener('blur',()=>{ const e=$('cc-vp'); e.value=SP.fmtNum(SP.parseNum(e.value)); });
+  $('cc-freq')&&$('cc-freq').addEventListener('change',update);
+  $('cc-tmr')&&$('cc-tmr').addEventListener('change',update);
+  $('cc-couple')&&$('cc-couple').addEventListener('change',update);
+
+  // Souscripteur toggle
+  document.querySelectorAll('.cc-subscr-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      document.querySelectorAll('.cc-subscr-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      subscType = btn.dataset.subscr;
+      // Show/hide PP-only fields
+      const isIS = subscType!=='pp';
+      document.querySelectorAll('.cc-pp-only').forEach(el=>el.classList.toggle('hidden',isIS));
+      update();
+    });
+  });
+
+  // Tabs
+  document.querySelectorAll('.cc-tab-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      document.querySelectorAll('.cc-tab-btn').forEach(b=>b.classList.remove('active'));
+      document.querySelectorAll('.cc-panel').forEach(p=>p.classList.remove('active'));
+      btn.classList.add('active');
+      const p=$('cc-p-'+btn.dataset.tab);
+      if(p) p.classList.add('active');
+      setTimeout(update,10);
+    });
+  });
+
+  SP.initFmt && SP.initFmt(document.body);
+  SP.nav.init();
+  update();
+});
+
+window.addEventListener('resize',()=>{
+  clearTimeout(window._ccRT);
+  window._ccRT = setTimeout(update,120);
+});
+</script>
+</body>
+</html>

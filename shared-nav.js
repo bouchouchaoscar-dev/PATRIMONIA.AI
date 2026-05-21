@@ -106,7 +106,11 @@
     { id: 'cto',          num: 16, label: 'CTO — Compte-Titres Ordinaire',   href: 'simulator-16.html',
       cats: ['finance'],
       desc: 'Capitalisation multi-actifs, fiscalité PFU vs Barème, dividendes passifs et comparaison PEA.',
-      keywords: ['cto', 'compte titres', 'actions', 'pfu', 'bareme', 'dividendes', 'portefeuille', 'arbitrage', 'flat tax'],
+      keywords: ['cto', 'compte titres', 'actions', 'pfu', 'bareme', 'dividendes', 'portefeuille', 'arbitrage', 'flat tax'] },
+    { id: 'cc',           num: 17, label: 'Contrat de Capitalisation',        href: 'simulator-17.html',
+      cats: ['finance', 'transmission', 'entreprise'],
+      desc: 'Capitalisation institutionnelle, fiscalité PP et IS, transmission par donation et démembrement.',
+      keywords: ['capitalisation', 'contrat', 'holding', 'is', 'donation', 'demembrement', 'anteriorite', 'wealth', 'trésorerie', 'structuration'],
       isNew: true }
   ];
 
