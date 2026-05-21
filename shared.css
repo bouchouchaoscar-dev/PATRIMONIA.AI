@@ -350,9 +350,7 @@ body {
   border-bottom: 1px solid var(--border-subtle);
 }
 .sim-num-badge {
-  display: block; width: 12px; height: 12px;
-  border-radius: 50%; background: var(--accent);
-  flex-shrink: 0; font-size: 0;
+  display: none;
 }
 .sim-page-header h1 {
   font-family: var(--sans); font-size: 1.5rem; font-weight: 700;
