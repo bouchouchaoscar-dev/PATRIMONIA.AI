@@ -304,6 +304,92 @@ canvas.df-canvas { width:100%; display:block }
 }
 .df-two-col { display:grid; grid-template-columns:1fr 1fr; gap:1rem }
 @media(max-width:640px){ .df-two-col { grid-template-columns:1fr } }
+
+/* ── RANGE SLIDER — TRACK FILL ── */
+.df-range-inp {
+  --pct: 0%;
+  -webkit-appearance: none; appearance: none;
+  height: 4px; border-radius: 2px; cursor: pointer; outline: none; width: 100%;
+  background: linear-gradient(to right, #2D6A4F var(--pct), rgba(0,0,0,.1) var(--pct));
+}
+.df-range-inp::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: #2D6A4F; border: 2.5px solid white;
+  box-shadow: 0 1px 5px rgba(0,0,0,.22); cursor: pointer;
+  transition: transform .12s;
+}
+.df-range-inp::-webkit-slider-thumb:hover { transform: scale(1.12) }
+.df-range-inp::-moz-range-thumb {
+  width: 14px; height: 14px; border-radius: 50%;
+  background: #2D6A4F; border: 2.5px solid white;
+  box-shadow: 0 1px 5px rgba(0,0,0,.22); cursor: pointer;
+}
+.df-range-inp::-webkit-slider-runnable-track { background: transparent }
+.df-range-inp::-moz-range-track { background: transparent; height: 4px; border-radius: 2px }
+
+/* ── AVANT / APRÈS STRIP ── */
+.df-avap-strip {
+  display: grid; grid-template-columns: 1fr 22px 1fr; gap: .5rem;
+  background: var(--surface-2); border: 1px solid var(--border-subtle);
+  border-radius: var(--r-sm); padding: .85rem; margin-bottom: 1rem; align-items: center;
+}
+.df-avap-col { min-width: 0 }
+.df-avap-badge {
+  font-size: .57rem; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+  padding: .1rem .4rem; border-radius: 100px; display: inline-block; margin-bottom: .45rem;
+}
+.df-avap-avant .df-avap-badge { background: rgba(220,38,38,.08); color: var(--danger) }
+.df-avap-apres .df-avap-badge { background: var(--df-forest-dim); color: #2D6A4F }
+.df-avap-row {
+  display: flex; justify-content: space-between; align-items: baseline;
+  font-size: .69rem; color: var(--text-muted); padding: .2rem 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.df-avap-row:last-child { border-bottom: none }
+.df-avap-v { font-family: var(--mono); font-weight: 600; font-size: .7rem; color: var(--text) }
+.df-avap-v.eco { color: #2D6A4F; font-weight: 700 }
+.df-avap-v.neg { color: var(--danger) }
+.df-avap-arrow { text-align: center; font-size: 1rem; color: #2D6A4F; opacity: .45 }
+
+/* ── PROJET SUMMARY (panneau gauche) ── */
+.df-proj-sum {
+  margin-top: 1.2rem; background: var(--df-forest-dim);
+  border: 1px solid var(--df-forest-bd); border-radius: var(--r-sm); padding: .75rem .9rem;
+}
+.df-proj-sum-title {
+  font-size: .57rem; font-weight: 700; color: #2D6A4F;
+  letter-spacing: .07em; text-transform: uppercase; margin-bottom: .5rem;
+}
+.df-proj-row {
+  display: flex; justify-content: space-between; align-items: baseline;
+  font-size: .7rem; color: var(--text-muted); padding: .22rem 0;
+  border-bottom: 1px solid rgba(27,67,50,.1);
+}
+.df-proj-row:last-child { border-bottom: none }
+.df-proj-v { font-family: var(--mono); font-weight: 600; font-size: .7rem; color: var(--text) }
+.df-proj-v.forest { color: #2D6A4F }
+
+/* ── OPTIMISATION POTENTIAL (Tab 3) ── */
+.df-optim-card {
+  background: var(--surface-2); border: 1.5px solid var(--border-subtle);
+  border-radius: var(--r-sm); padding: .95rem 1rem; margin-top: .8rem;
+}
+.df-optim-title {
+  font-size: .59rem; font-weight: 700; color: var(--text-dim);
+  letter-spacing: .07em; text-transform: uppercase; margin-bottom: .65rem;
+}
+.df-optim-row {
+  display: flex; justify-content: space-between; align-items: baseline;
+  font-size: .71rem; color: var(--text-muted); padding: .25rem 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.df-optim-row:last-child { border-bottom: none }
+.df-optim-row.hl { font-weight: 600; color: var(--text) }
+.df-optim-v { font-family: var(--mono); font-weight: 600; color: var(--text) }
+.df-optim-v.forest { color: #2D6A4F }
+.df-optim-v.amber  { color: var(--amber) }
+.df-optim-v.bronze { color: #8B6914 }
 </style>
 </head>
 <body>
@@ -481,6 +567,26 @@ canvas.df-canvas { width:100%; display:block }
         </div>
         <input type="range" id="rng-revalo" class="df-range-inp" min="0" max="5" step="0.1" value="2">
 
+        <div class="df-proj-sum">
+          <div class="df-proj-sum-title">Synthèse du projet</div>
+          <div class="df-proj-row">
+            <span>Investissement total</span>
+            <span class="df-proj-v" id="proj-total">—</span>
+          </div>
+          <div class="df-proj-row">
+            <span>Dont travaux déductibles</span>
+            <span class="df-proj-v forest" id="proj-ded">—</span>
+          </div>
+          <div class="df-proj-row">
+            <span>Rendement brut</span>
+            <span class="df-proj-v" id="proj-rend">—</span>
+          </div>
+          <div class="df-proj-row">
+            <span>Effort d'épargne</span>
+            <span class="df-proj-v" id="proj-effort-sum">—</span>
+          </div>
+        </div>
+
       </div><!-- /df-inp -->
 
       <!-- ══════════════════ RIGHT PANEL ══════════════════ -->
@@ -546,6 +652,22 @@ canvas.df-canvas { width:100%; display:block }
             <div class="df-legend">
               <div class="df-legend-item"><div class="df-legend-line" style="background:#2D6A4F"></div>Valeur du bien</div>
               <div class="df-legend-item"><div class="df-legend-line" style="background:#8B6914;height:2px;border-top:2px dashed #8B6914;background:transparent"></div>Capital propre</div>
+            </div>
+          </div>
+
+          <div class="df-avap-strip">
+            <div class="df-avap-col df-avap-avant">
+              <span class="df-avap-badge">Sans optimisation</span>
+              <div class="df-avap-row"><span>Revenu foncier net</span><span class="df-avap-v" id="avap-rf-avant">—</span></div>
+              <div class="df-avap-row"><span>IR + PS annuels</span><span class="df-avap-v neg" id="avap-ir-avant">—</span></div>
+              <div class="df-avap-row"><span>Net encaissé/an</span><span class="df-avap-v" id="avap-net-avant">—</span></div>
+            </div>
+            <div class="df-avap-arrow">→</div>
+            <div class="df-avap-col df-avap-apres">
+              <span class="df-avap-badge">Avec déficit foncier</span>
+              <div class="df-avap-row"><span>Revenu foncier net</span><span class="df-avap-v" id="avap-rf-apres">—</span></div>
+              <div class="df-avap-row"><span>IR + PS annuels</span><span class="df-avap-v eco" id="avap-ir-apres">—</span></div>
+              <div class="df-avap-row"><span>Économie fiscale</span><span class="df-avap-v eco" id="avap-eco">—</span></div>
             </div>
           </div>
 
@@ -735,6 +857,30 @@ canvas.df-canvas { width:100%; display:block }
 
           <div class="df-info-box">
             <strong>Optimisation :</strong> requalifier certains travaux d'amélioration en travaux d'entretien (selon la doctrine fiscale) peut maximiser la déductibilité. Conservez toujours les factures détaillées par corps de métier pour justifier la nature des travaux en cas de contrôle.
+          </div>
+
+          <div class="df-optim-card">
+            <div class="df-optim-title">Analyse du potentiel fiscal</div>
+            <div class="df-optim-row">
+              <span>Revenus fonciers (base imposable avant travaux)</span>
+              <span class="df-optim-v" id="opt-rf-base">—</span>
+            </div>
+            <div class="df-optim-row">
+              <span>Travaux déductibles déclarés</span>
+              <span class="df-optim-v forest" id="opt-tr-ded">—</span>
+            </div>
+            <div class="df-optim-row hl">
+              <span>Déficit foncier généré</span>
+              <span class="df-optim-v forest" id="opt-deficit">—</span>
+            </div>
+            <div class="df-optim-row">
+              <span>→ Imputable revenu global (plafond 10 700 €/an)</span>
+              <span class="df-optim-v amber" id="opt-imput">—</span>
+            </div>
+            <div class="df-optim-row">
+              <span>→ Report sur revenus fonciers (10 ans)</span>
+              <span class="df-optim-v bronze" id="opt-report">—</span>
+            </div>
           </div>
 
         </div><!-- /travaux -->
@@ -1156,6 +1302,27 @@ function highlightBest(ids, vals) {
 }
 
 /* ─── RENDER TABS ─── */
+function renderAvAp(p, res) {
+  const irAvant = Math.max(0, res.rfAvant) * (p.tmi / 100 + PS_DF);
+  const netAvant = res.loyersNets - res.chargesHorsTravaux - irAvant;
+  setText('avap-rf-avant',  res.rfAvant >= 0 ? eur(res.rfAvant) : '−' + eur(-res.rfAvant));
+  setText('avap-ir-avant',  eur(irAvant));
+  const netSign = netAvant >= 0 ? '+' : '−';
+  setText('avap-net-avant', netSign + eur(Math.abs(netAvant)) + '/an');
+  const irApres = Math.max(0, res.rfApres) * (p.tmi / 100 + PS_DF);
+  setText('avap-rf-apres',  res.rfApres < 0 ? '−' + eur(-res.rfApres) : eur(res.rfApres));
+  setText('avap-ir-apres',  eur(irApres));
+  setText('avap-eco',       eur(res.ecoTotal));
+}
+
+function renderProjSum(p, res) {
+  setText('proj-total',      eur(res.totalInvesti));
+  setText('proj-ded',        eur(res.trDeductibles));
+  setText('proj-rend',       pct(res.rendBrut));
+  const eff = res.cfNetMensuel < 0 ? eur(-res.cfNetMensuel * 12) + '/an' : 'Positif';
+  setText('proj-effort-sum', eff);
+}
+
 function renderGlobal(p, res, proj) {
   setText('kpi-deficit',    eur(res.deficitTotal));
   setText('kpi-eco-ir',     eur(res.ecoIR));
@@ -1168,6 +1335,7 @@ function renderGlobal(p, res, proj) {
   const lastPt = proj[proj.length - 1];
   setText('badge-gain-proj', '+' + eur(lastPt.valBien - (p.prix + res.totalTravaux)));
 
+  renderAvAp(p, res);
   drawProjectionChart('cv-projection', proj, p, res);
 }
 
@@ -1224,6 +1392,12 @@ function renderTravaux(p, res) {
   const pctDed = total > 0 ? (res.trDeductibles / total) * 100 : 0;
   setText('badge-taux-ded', pct(pctDed, 0) + ' déductible');
 
+  setText('opt-rf-base',  res.rfAvant >= 0 ? eur(res.rfAvant) : '−' + eur(-res.rfAvant));
+  setText('opt-tr-ded',   eur(res.trDeductibles));
+  setText('opt-deficit',  eur(res.deficitTotal));
+  setText('opt-imput',    eur(res.imputRG));
+  setText('opt-report',   eur(res.reportFoncier));
+
   drawTravauxChart('cv-travaux', p, res);
 }
 
@@ -1275,10 +1449,11 @@ function update() {
   const proj= calcProjection(p, res);
 
   renderGlobal(p, res, proj);
-  if (activeTab === 'fiscalite')   renderFiscalite(p, res);
-  if (activeTab === 'travaux')     renderTravaux(p, res);
-  if (activeTab === 'cashflow')    renderCashflow(p, res, proj);
-  if (activeTab === 'comparaison') renderComparaison(p, res);
+  renderFiscalite(p, res);
+  renderTravaux(p, res);
+  renderCashflow(p, res, proj);
+  renderComparaison(p, res);
+  renderProjSum(p, res);
 }
 
 /* ─── CANVAS HELPERS ─── */
@@ -1551,6 +1726,13 @@ function drawComparaisonChart(id, comp, strats) {
   });
 }
 
+/* ─── SLIDER SYNC ─── */
+function syncSlider(el) {
+  const min = +el.min || 0, max = +el.max || 100, val = +el.value;
+  const p = max > min ? ((val - min) / (max - min)) * 100 : 0;
+  el.style.setProperty('--pct', p.toFixed(2) + '%');
+}
+
 /* ─── TABS ─── */
 function initTabs() {
   document.querySelectorAll('.df-tab-btn').forEach(btn => {
@@ -1599,7 +1781,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const disp = document.getElementById(dispId);
     if (!el || !disp) return;
     disp.textContent = fmt(el.value);
-    el.addEventListener('input', () => { disp.textContent = fmt(el.value); update(); });
+    if (el.type === 'range') syncSlider(el);
+    el.addEventListener('input', () => {
+      disp.textContent = fmt(el.value);
+      if (el.type === 'range') syncSlider(el);
+      update();
+    });
   });
 
   document.getElementById('sel-tmi')?.addEventListener('change', update);
