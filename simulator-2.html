@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="favicon-64.png">
+  <link rel="shortcut icon" href="favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="favicon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Impôt sur le Revenu 2026 — PATRIMONIA.AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css?v=19">
+<script src="shared.js?v=2"></script>
+  <script src="shared-nav.js?v=6"></script>
+<style>
+
+/* IR simulator */
+.ir-group-label{font-size:.62rem;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:.09em;margin:1.1rem 0 .4rem;padding-bottom:.3rem;border-bottom:1px solid var(--border-subtle)}
+.ir-section{border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:.38rem}
+.ir-section>summary{list-style:none;padding:.58rem .9rem;cursor:pointer;font-size:.74rem;font-weight:600;color:var(--text-muted);display:flex;align-items:center;gap:.5rem;user-select:none;transition:background .15s}
+.ir-section>summary:hover{background:var(--surface);color:var(--text)}
+.ir-section>summary::-webkit-details-marker{display:none}
+.ir-section>summary .ir-chevron{margin-left:auto;width:11px;height:6px;flex-shrink:0;opacity:.4;transition:transform .2s}
+.ir-section[open]>summary .ir-chevron{transform:rotate(180deg)}
+.ir-section[open]>summary{border-bottom:1px solid var(--border-subtle);color:var(--accent)}
+.ir-body{padding:.7rem .9rem 1rem;display:flex;flex-direction:column;gap:.65rem}
+.ir-field{display:flex;flex-direction:column;gap:.28rem}
+.ir-field label{font-size:.71rem;font-weight:500;color:var(--text-muted);letter-spacing:-.01em}
+.ir-hint{font-size:.63rem;color:var(--text-dim);font-family:var(--mono);line-height:1.5;opacity:.85}
+.ir-computed{font-size:.67rem;font-family:var(--mono);color:var(--accent);background:var(--accent-dim);border-radius:6px;padding:.18rem .55rem;display:inline-block;margin-top:.1rem}
+.ir-sublabel{font-size:.68rem;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;margin:.35rem 0 .05rem;padding-top:.35rem;border-top:1px solid var(--border-subtle)}
+.ir-sublabel:first-child{border-top:none;padding-top:0;margin-top:0}
+.ir-option-row{display:flex;gap:.35rem;flex-wrap:wrap;margin-top:.15rem}
+.ir-opt{display:flex;align-items:center;gap:.3rem;font-size:.69rem;font-family:var(--mono);color:var(--text-muted);cursor:pointer;padding:.18rem .65rem;border:1px solid var(--border);border-radius:100px;transition:all .15s;user-select:none}
+.ir-opt input{display:none}
+.ir-opt:has(input:checked){background:var(--accent-dim);border-color:var(--accent);color:var(--accent);font-weight:600}
+.ir-hidden{display:none}
+
+/* Results extras */
+.ir-flatps-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.1rem}
+.ir-flatps-item{background:var(--surface-2);border:1px solid var(--border-subtle);border-radius:var(--r-sm);padding:.7rem .9rem}
+.ir-flatps-label{font-size:.61rem;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.18rem}
+.ir-flatps-val{font-family:var(--mono);font-size:.92rem;font-weight:700;color:var(--text)}
+.ir-flatps-val.blue{color:var(--blue)}
+.ir-flatps-val.amber{color:var(--amber)}
+.ir-total-row{background:var(--accent-dim);border:1px solid rgba(79,138,120,.15);border-radius:var(--r-sm);padding:.8rem 1rem;display:flex;justify-content:space-between;align-items:center;margin-bottom:.1rem}
+.ir-total-label{font-size:.71rem;font-weight:600;color:var(--text-muted)}
+.ir-total-val{font-family:var(--mono);font-size:1rem;font-weight:700;color:var(--accent)}
+.rev-summary{background:var(--surface-2);border:1px solid var(--border-subtle);border-radius:var(--r-sm);overflow:hidden}
+.rev-summary-title{font-size:.62rem;font-weight:600;color:var(--text-muted);letter-spacing:.06em;text-transform:uppercase;padding:.62rem 1rem;border-bottom:1px solid var(--border-subtle);background:var(--surface)}
+.rev-line{display:flex;justify-content:space-between;align-items:center;padding:.42rem 1rem;border-bottom:1px solid var(--border-subtle);font-size:.74rem}
+.rev-line:last-child{border-bottom:none}
+.rev-line-label{color:var(--text-muted)}
+.rev-line-val{font-family:var(--mono);font-weight:600;color:var(--text)}
+.rev-line-val.neg{color:var(--blue)}
+.rev-line-val.dim{color:var(--text-dim);font-weight:400}
+.rev-line.total-line{background:var(--surface)}
+.rev-line.total-line .rev-line-label{color:var(--text);font-weight:600}
+.rev-line.total-line .rev-line-val{color:var(--accent)}
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="index.html" class="nav-logo"><img src="logo.png?v=3" alt="PATRIMONIA.AI" class="nav-logo-img"></a>
+  <div class="nav-right">
+    <a href="index.html" class="nav-back">
+      <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7.5 1.5L3 6l4.5 4.5"/></svg>
+      Accueil
+    </a>
+    <div class="nav-dropdown" id="mainDropdown">
+      <button class="nav-dropdown-btn" aria-expanded="false" aria-haspopup="true">
+        Simulateurs <svg class="nav-chevron" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.8" style="width:13px;height:8px;flex-shrink:0"><path d="M1 1l4 4 4-4"/></svg>
+      </button>
+      <div class="nav-dropdown-menu" id="navMenu" role="menu"></div>
+    </div>
+  </div>
+</nav>
+
+<div class="sim-page">
+  <div class="sim-page-header">
+    <span class="sim-num-badge">02</span>
+    <div>
+      <div class="sim-eyebrow">Fiscalité</div><h1>Impôt sur le <em class="gradient-text">Revenu 2026</em></h1>
+      <p>Revenus 2025 · Toutes catégories · Réductions &amp; crédits · Prélèvements sociaux</p>
+    </div>
+  </div>
+
+  <div class="sim-card-wrap">
+    <div class="sim-body">
+
+      <!-- ═══ INPUTS ═══ -->
+      <div class="inputs-panel">
+
+        <div class="ir-field">
+          <label for="ir-parts">Nombre de parts fiscales</label>
+          <div class="select-wrap">
+            <select id="ir-parts">
+              <option value="1" data-couple="0">1 part — Célibataire / Divorcé / Veuf</option>
+              <option value="1.5" data-couple="0">1,5 parts — Personne seule avec majoration</option>
+              <option value="2" data-couple="1" selected>2 parts — Couple marié ou pacsé, sans enfant</option>
+              <option value="2.5" data-couple="1">2,5 parts — Couple + 1 enfant</option>
+              <option value="3" data-couple="1">3 parts — Couple + 2 enfants</option>
+              <option value="3.5" data-couple="1">3,5 parts — Couple + 2 enfants avec majoration</option>
+              <option value="4" data-couple="1">4 parts — Couple + 3 enfants</option>
+              <option value="5" data-couple="1">5 parts — Couple + 4 enfants</option>
+              <option value="6" data-couple="1">6 parts — Couple + 5 enfants</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="ir-field" style="margin-top:.7rem">
+          <label>Options supplémentaires</label>
+          <div class="checks" style="margin-top:.2rem">
+            <label class="check-item"><input type="checkbox" id="ir-isole"> Parent isolé (+0,5 part)</label>
+            <label class="check-item"><input type="checkbox" id="ir-handicap"> Enfant en situation de handicap (+0,5 part)</label>
+          </div>
+        </div>
+
+        <div class="section-sep"></div>
+
+        <!-- ── REVENUS ── -->
+        <div class="ir-group-label">Revenus</div>
+
+        <!-- Traitements & Salaires -->
+        <details class="ir-section" open>
+          <summary>
+            Traitements &amp; salaires
+            <svg class="ir-chevron" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l4 4 4-4"/></svg>
+          </summary>
+          <div class="ir-body">
+            <div class="ir-field">
+              <label for="ir-ts">Salaires &amp; traitements bruts du foyer</label>
+              <div class="input-wrap"><input type="number" id="ir-ts" value="0" min="0" step="100"><span class="unit">€</span></div>
+              <div class="ir-hint">Montant brut figurant sur les bulletins de salaire. Abattement 10 % appliqué automatiquement (min 495 €/déclarant, max 14 171 €/déclarant).</div>
+            </div>
+            <div class="ir-field">
+              <label class="check-item" style="font-size:.71rem"><input type="checkbox" id="ir-frais-reels"> Option frais réels (remplace l'abattement 10 %)</label>
+              <div class="ir-hidden" id="frais-reels-wrap" style="margin-top:.3rem">
+                <div class="ir-field">
+                  <label for="ir-frais-reels-amt">Frais réels professionnels justifiés</label>
+                  <div class="input-wrap"><input type="number" id="ir-frais-reels-amt" value="0" min="0" step="100"><span class="unit">€</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </details>
+
+        <!-- Pensions -->
+        <details class="ir-section">
+          <summary>
+            Pensions, retraites &amp; rentes
+            <svg class="ir-chevron" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l4 4 4-4"/></svg>
+          </summary>
+          <div class="ir-body">
+            <div class="ir-field">
+              <label for="ir-pensions">Pensions &amp; retraites brutes du foyer</label>
+              <div class="input-wrap"><input type="number" id="ir-pensions" value="0" min="0" step="100"><span class="unit">€</span></div>
+            </div>
+            <div class="ir-field">
+              <label for="ir-nb-pensionnes">Nombre de pensionnés dans le foyer</label>
+              <div class="select-wrap">
+                <select id="ir-nb-pensionnes">
+                  <option value="1" selected>1 pensionné</option>
+                  <option value="2">2 pensionnés</option>
+                </select>
+              </div>
+              <div class="ir-hint">Abattement 10 % — min 426 €/pensionné, max 4 160 €/pensionné (barème 2026).</div>
+            </div>
+          </div>
+        </details>
+
+        <!-- Activité indépendante -->
+        <details class="ir-section">
+          <summary>
+            Revenus d'activité indépendante
+            <svg class="ir-chevron" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l4 4 4-4"/></svg>
+          </summary>
+          <div class="ir-body">
+            <div class="ir-sublabel">BIC — Bénéfices industriels &amp; commerciaux</div>
+            <div class="ir-field">
+              <label for="ir-bic">BIC nets imposables</label>
+              <div class="input-wrap"><input type="number" id="ir-bic" value="0" min="0" step="100"><span class="unit">€</span></div>
+              <div class="ir-hint">Régime réel ou micro-BIC (après abattement forfaitaire micro). Bénéfice net après charges professionnelles.</div>
+            </div>
+            <div class="ir-sublabel">BNC — Bénéfices non commerciaux</div>
+            <div class="ir-field">
+              <label for="ir-bnc">BNC nets imposables</label>
+              <div class="input-wrap"><input type="number" id="ir-bnc" value="0" min="0" step="100"><span class="unit">€</span></div>
+              <div class="ir-hint">Professions libérales, officiers ministériels, droits d'auteur. Net après charges ou abattement micro-BNC 34 %.</div>
+            </div>
+            <div class="ir-sublabel">BA — Bénéfices agricoles</div>
+            <div class="ir-field">
+              <label for="ir-ba">BA nets imposables</label>
+              <div class="input-wrap"><input type="number" id="ir-ba" value="0" min="0" step="100"><span class="unit">€</span></div>
+            </div>
+            <div class="ir-sublabel">Art. 62 CGI — Gérance &amp; associés</div>
+            <div class="ir-field">
+              <label for="ir-art62">Rémunération de gérance brute</label>
+              <div class="input-wrap"><input type="number" id="ir-art62" value="0" min="0" step="100"><span class="unit">€</span></div>
+              <div class="ir-hint">Gérants majoritaires SARL, gérants de SNC, associés de société de personnes. Abattement 10 % (min 495 €, max 14 171 €).</div>
+            </div>
+          </div>
+        </details>
+
+        <!-- Revenus fonciers -->
+        <details class="ir-section">
+          <summary>
+            Revenus fonciers
+            <svg class="ir-chevron" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l4 4 4-4"/></svg>
+          </summary>
+          <div class="ir-body">
+            <div class="ir-field">
+              <label for="ir-rf">Revenus fonciers nets (après charges déductibles)</label>
+              <div class="input-wrap"><input type="number" id="ir-rf" value="0" step="100"><span class="unit">€</span></div>
+              <div class="ir-hint">Loyers perçus moins intérêts d'emprunt, travaux déductibles, frais de gestion, taxe foncière, assurances. Valeur négative = déficit foncier.</div>
+            </div>
+            <div class="ir-hint" id="ir-deficit-info" style="display:none;color:var(--blue);opacity:1">Déficit foncier : part déductible du revenu global limitée à 10 700 €. L'excédent s'impute sur les revenus fonciers des 10 exercices suivants.</div>
+          </div>
+        </details>
+
+        <!-- RCM -->
+        <details class="ir-section">
+          <summary>
+            Revenus de capitaux mobiliers (RCM)
+            <svg class="ir-chevron" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l4 4 4-4"/></svg>
+          </summary>
+          <div class="ir-body">
+            <div class="ir-field">
+              <label for="ir-div">Dividendes bruts</label>
+              <div class="input-wrap"><input type="number" id="ir-div" value="0" min="0" step="100"><span class="unit">€</span></div>
+              <div class="ir-hint">Distributions d'actions, parts sociales, SARL, SAS. Montant brut avant prélèvement à la source.</div>
+            </div>
+            <div class="ir-field">
+              <label for="ir-int">Intérêts &amp; produits de placement</label>
+              <div class="input-wrap"><input type="number" id="ir-int" value="0" min="0" step="100"><span class="unit">€</span></div>
+              <div class="ir-hint">Obligations, comptes à terme, livrets fiscalisés, coupons. Hors livrets réglementés exonérés (Livret A, LDDS...).</div>
+            </div>
+            <div class="ir-sublabel">Option d'imposition</div>
+            <div class="ir-option-row">
+              <label class="ir-opt"><input type="radio" name="ir-rcm-option" value="pfu" checked> PFU 30 % (flat tax)</label>
+              <label class="ir-opt"><input type="radio" name="ir-rcm-option" value="bareme"> Barème progressif</label>
+            </div>
+            <div class="ir-hint">PFU = 12,8 % IR + 17,2 % PS. Barème : abattement 40 % sur dividendes, CSG 6,8 % déductible. Avantageux si TMI &lt; 30 %.</div>
+          </div>
+        </details>
+
+        <!-- Plus-values mobilières -->
+        <details class="ir-section">
+          <summary>
+            Plus-values mobilières
+            <svg class="ir-chevron" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l4 4 4-4"/></svg>
+          </summary>
+          <div class="ir-body">
+            <div class="ir-field">
+              <label for="ir-pvm">Plus-values mobilières nettes imposables</label>
+              <div class="input-wrap"><input type="number" id="ir-pvm" value="0" min="0" step="100"><span class="unit">€</span></div>
+              <div class="ir-hint">Cessions de valeurs mobilières et parts sociales. Net après compensation des moins-values de même nature.</div>
+            </div>
+            <div class="ir-sublabel">Option d'imposition</div>
+            <div class="ir-option-row">
+              <label class="ir-opt"><input type="radio" name="ir-pvm-option" value="pfu" checked> PFU 30 % (flat tax)</label>
+              <label class="ir-opt"><input type="radio" name="ir-pvm-option" value="bareme"> Barème progressif</label>
+            </div>
+            <div class="ir-hint">PFU par défaut depuis 2018. Barème peut être avantageux avec abattements pour durée de détention (titres acquis avant 2018).</div>
+          </div>
+        </details>
+
+        <div class="section-sep"></div>
+
+        <!-- ── DÉDUCTIONS ── -->
+        <div class="ir-group-label">Déductions du revenu global</div>
+
+        <details class="ir-section">
+          <summary>
+            Épargne retraite (PER)
+            <svg class="ir-chevron" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l4 4 4-4"/></svg>
+          </summary>
+          <div class="ir-body">
+            <div class="ir-field">
+              <label for="ir-per">Versements PER de l'année</label>
+              <div class="input-wrap"><input type="number" id="ir-per" value="0" min="0" step="100"><span class="unit">€</span></div>
+              <div class="ir-hint">Montant total versé sur votre PER individuel (ou collectif déductible) durant l'année.</div>
+            </div>
+            <div class="ir-sublabel" style="margin-top:.5rem">Plafonds de déduction disponibles</div>
+            <div class="ir-hint" style="margin-bottom:.2rem">Consultez votre dernier avis d'imposition (rubrique « Plafonds épargne retraite »). Plafond annuel = 10 % des revenus professionnels N-1, min 4 114 €, max 35 194 €.</div>
+            <div class="ir-field">
+              <label for="ir-per-pn">Plafond annuel courant (N)</label>
+              <div class="input-wrap"><input type="number" id="ir-per-pn" value="0" min="0" step="100"><span class="unit">€</span></div>
+            </div>
+            <div class="ir-field">
+              <label for="ir-per-r1">Plafond non utilisé N-1</label>
+              <div class="input-wrap"><input type="number" id="ir-per-r1" value="0" min="0" step="100"><span class="unit">€</span></div>
+            </div>
+            <div class="ir-field">
+              <label for="ir-per-r2">Plafond non utilisé N-2</label>
+              <div class="input-wrap"><input type="number" id="ir-per-r2" value="0" min="0" step="100"><span class="unit">€</span></div>
+            </div>
+            <div class="ir-field">
+              <label for="ir-per-r3">Plafond non utilisé N-3</label>
+              <div class="input-wrap"><input type="number" id="ir-per-r3" value="0" min="0" step="100"><span class="unit">€</span></div>
+            </div>
+            <div class="ir-computed" id="ir-per-recap" style="display:none;flex-direction:column;gap:.25rem;background:var(--accent-dim);border-radius:8px;padding:.5rem .7rem;font-size:.66rem;font-family:var(--mono)"></div>
+          </div>
+        </details>
+
+        <details class="ir-section">
+          <summary>
+            Autres déductions
+            <svg class="ir-chevron" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l4 4 4-4"/></svg>
+          </summary>
+          <div class="ir-body">
+            <div class="ir-field">
+              <label for="ir-pension-alim">Pensions alimentaires versées</label>
+              <div class="input-wrap"><input type="number" id="ir-pension-alim" value="0" min="0" step="100"><span class="unit">€</span></div>
+              <div class="ir-hint">Pensions versées à un enfant majeur, à un ex-conjoint ou à un ascendant dans le besoin (art. 156 CGI).</div>
+            </div>
+            <div class="ir-field">
+              <label for="ir-deficit-ant">Déficit foncier antérieur reporté</label>
+              <div class="input-wrap"><input type="number" id="ir-deficit-ant" value="0" min="0" step="100"><span class="unit">€</span></div>
+              <div class="ir-hint">Part du déficit des années précédentes imputable sur les revenus fonciers de l'exercice.</div>
+            </div>
+          </div>
+        </details>
+
+        <div class="section-sep"></div>
+
+        <!-- ── RÉDUCTIONS & CRÉDITS ── -->
+        <div class="ir-group-label">Réductions &amp; crédits d'impôt</div>
+
+        <details class="ir-section">
+          <summary>
+            Dons aux associations
+            <svg class="ir-chevron" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l4 4 4-4"/></svg>
+          </summary>
+          <div class="ir-body">
+            <div class="ir-field">
+              <label for="ir-dons-urgence">Dons — aide aux personnes en difficulté</label>
+              <div class="input-wrap"><input type="number" id="ir-dons-urgence" value="0" min="0" step="10"><span class="unit">€</span></div>
+              <div class="ir-hint">Restos du Cœur, Croix-Rouge, Secours populaire, organismes d'aide aux sans-abri. Réduction 75 % jusqu'à 1 000 €, puis 66 %.</div>
+            </div>
+            <div class="ir-field">
+              <label for="ir-dons-autres">Dons — autres associations &amp; fondations</label>
+              <div class="input-wrap"><input type="number" id="ir-dons-autres" value="0" min="0" step="10"><span class="unit">€</span></div>
+              <div class="ir-hint">Associations d'intérêt général, culturelles, éducatives, partis politiques. Réduction 66 %, plafonnée à 20 % du revenu net global.</div>
+            </div>
+          </div>
+        </details>
+
+        <details class="ir-section">
+          <summary>
+            Emploi à domicile &amp; garde d'enfants
+            <svg class="ir-chevron" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l4 4 4-4"/></svg>
+          </summary>
+          <div class="ir-body">
+            <div class="ir-sublabel">Emploi à domicile</div>
+            <div class="ir-field">
+              <label for="ir-emploi-dom">Dépenses d'emploi à domicile</label>
+              <div class="input-wrap"><input type="number" id="ir-emploi-dom" value="0" min="0" step="100"><span class="unit">€</span></div>
+              <div class="ir-hint">Ménage, jardinage, assistance, soutien scolaire, assistance aux personnes âgées. Réduction 50 %, plafond base 12 000 € (+1 500 €/enfant à charge, max 15 000 €).</div>
+            </div>
+            <div class="ir-sublabel">Garde d'enfants hors domicile (&lt; 6 ans)</div>
+            <div class="ir-field">
+              <label for="ir-garde">Dépenses de garde (crèche, assistante maternelle)</label>
+              <div class="input-wrap"><input type="number" id="ir-garde" value="0" min="0" step="100"><span class="unit">€</span></div>
+            </div>
+            <div class="ir-field">
+              <label for="ir-nb-garde">Nombre d'enfants concernés</label>
+              <div class="input-wrap"><input type="number" id="ir-nb-garde" value="1" min="1" max="10" step="1"><span class="unit">enf.</span></div>
+              <div class="ir-hint">Crédit d'impôt 50 %, plafond 3 500 € par enfant (soit 1 750 € de crédit max par enfant). Remboursable si impôt insuffisant.</div>
+            </div>
+          </div>
+        </details>
+
+        <details class="ir-section">
+          <summary>
+            Investissements défiscalisants
+            <svg class="ir-chevron" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l4 4 4-4"/></svg>
+          </summary>
+          <div class="ir-body">
+            <div class="ir-sublabel">Immobilier locatif (Pinel / Denormandie / Malraux)</div>
+            <div class="ir-field">
+              <label for="ir-pinel">Montant annuel de la réduction (déjà calculé)</label>
+              <div class="input-wrap"><input type="number" id="ir-pinel" value="0" min="0" step="100"><span class="unit">€</span></div>
+              <div class="ir-hint">Pinel : 5,5 % à 12 % du prix selon durée. Denormandie : mêmes taux. Saisir directement la fraction annuelle de réduction.</div>
+            </div>
+            <div class="ir-sublabel">FCPI / FIP</div>
+            <div class="ir-field">
+              <label for="ir-fcpi">Montant souscrit en FCPI ou FIP</label>
+              <div class="input-wrap"><input type="number" id="ir-fcpi" value="0" min="0" step="100"><span class="unit">€</span></div>
+              <div class="ir-hint">Réduction 18 %. Plafond investissement 12 000 € (célibataire) ou 24 000 € (couple).</div>
+            </div>
+            <div class="ir-sublabel">PME — Souscription directe au capital</div>
+            <div class="ir-field">
+              <label for="ir-pme">Montant souscrit (art. 199 terdecies-0 A CGI)</label>
+              <div class="input-wrap"><input type="number" id="ir-pme" value="0" min="0" step="100"><span class="unit">€</span></div>
+              <div class="ir-hint">Réduction 25 % (taux prorogé 2025). Plafond 50 000 € (célibataire) ou 100 000 € (couple). Conditions d'éligibilité de la PME requises.</div>
+            </div>
+          </div>
+        </details>
+
+        <details class="ir-section">
+          <summary>
+            Réduction scolarité des enfants
+            <svg class="ir-chevron" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l4 4 4-4"/></svg>
+          </summary>
+          <div class="ir-body">
+            <div class="ir-field">
+              <label for="ir-college">Enfants au collège</label>
+              <div class="input-wrap"><input type="number" id="ir-college" value="0" min="0" max="20" step="1"><span class="unit">enf.</span></div>
+              <div class="ir-hint">61 € par enfant à charge.</div>
+            </div>
+            <div class="ir-field">
+              <label for="ir-lycee">Enfants au lycée</label>
+              <div class="input-wrap"><input type="number" id="ir-lycee" value="0" min="0" max="20" step="1"><span class="unit">enf.</span></div>
+              <div class="ir-hint">153 € par enfant à charge.</div>
+            </div>
+            <div class="ir-field">
+              <label for="ir-sup">Enfants dans l'enseignement supérieur</label>
+              <div class="input-wrap"><input type="number" id="ir-sup" value="0" min="0" max="20" step="1"><span class="unit">enf.</span></div>
+              <div class="ir-hint">183 € par enfant à charge.</div>
+            </div>
+          </div>
+        </details>
+
+        <div style="font-size:.61rem;color:var(--text-dim);line-height:1.7;font-family:var(--mono);margin-top:1.1rem;opacity:.7">
+          <div>Barème IR 2026 (revenus 2025) · Indexation +0,9 %</div>
+          <div>Sources : CGI art. 156, 197, 199 · BOFIP · Loi n°2025-1991</div>
+          <div>Simulation indicative · Non contractuelle</div>
+        </div>
+
+      </div><!-- /inputs-panel -->
+
+      <!-- ═══ RESULTS ═══ -->
+      <div class="results-panel" id="ir-results"></div>
+
+    </div><!-- /sim-body -->
+  </div><!-- /sim-card-wrap -->
+</div><!-- /sim-page -->
+
+<footer>
+  <span>PATRIMONIA.AI</span> — Simulation indicative à titre informatif uniquement.<br>
+  Barème IR 2026 · Abattements, décote, plafonnement QF · Prélèvements sociaux 17,2 % · Résultats non contractuels.
+</footer>
+
+<script>
+const fmtNum = (v, d=0) => new Intl.NumberFormat('fr-FR',{minimumFractionDigits:d,maximumFractionDigits:d}).format(v).replace(/[\u202F\u00A0]/g, '\u0020');
+const fmtEur = (v, d=0) => fmtNum(v, d) + ' €';
+
+const IR_BRACKETS = [
+  {from:0,       to:11600,   rate:0},
+  {from:11600,   to:29579,   rate:0.11},
+  {from:29579,   to:84577,   rate:0.30},
+  {from:84577,   to:181917,  rate:0.41},
+  {from:181917,  to:Infinity,rate:0.45}
+];
+
+function applyBrackets(amount, brackets) {
+  let tax = 0; const details = [];
+  for (const b of brackets) {
+    if (amount <= b.from) break;
+    const taxable = Math.min(amount, b.to) - b.from;
+    const t = taxable * b.rate;
+    details.push({from:b.from, to:b.to===Infinity?null:b.to, rate:b.rate, taxable, tax:t});
+    tax += t;
+  }
+  return {tax, details};
+}
+
+function v(id) { return SP.parseNum(document.getElementById(id).value); }
+// init currency formatting for all € fields
+document.addEventListener('DOMContentLoaded', function() {
+  ['ir-ts','ir-frais-reels-amt','ir-pensions','ir-bic','ir-bnc','ir-ba','ir-art62',
+   'ir-rf','ir-div','ir-int','ir-pvm','ir-per','ir-per-pn','ir-per-r1','ir-per-r2',
+   'ir-per-r3','ir-pension-alim','ir-deficit-ant','ir-dons-urgence','ir-dons-autres',
+   'ir-emploi-dom','ir-garde','ir-pinel','ir-fcpi','ir-pme'].forEach(function(id) {
+    SP.attachFmt(document.getElementById(id));
+  });
+});
+function vi(id) { return parseInt(document.getElementById(id).value) || 0; }
+function chk(id) { return document.getElementById(id).checked; }
+function radio(name) { return document.querySelector(`input[name="${name}"]:checked`)?.value || ''; }
+
+function calcIR() {
+  // SITUATION
+  const isMarie  = parseInt(document.getElementById('ir-parts').selectedOptions[0]?.dataset?.couple || '0') === 1;
+  let   parts    = parseFloat(document.getElementById('ir-parts').value) || 1;
+  if (chk('ir-isole'))   parts += 0.5;
+  if (chk('ir-handicap')) parts += 0.5;
+  const nbDecl = isMarie ? 2 : 1;
+
+  // SALAIRES
+  const tsBruts = v('ir-ts');
+  const fraisReels = chk('ir-frais-reels');
+  const fraisReelsAmt = v('ir-frais-reels-amt');
+  document.getElementById('frais-reels-wrap').classList.toggle('ir-hidden', !fraisReels);
+  let tsAbatt = 0;
+  if (tsBruts > 0) {
+    if (fraisReels) {
+      tsAbatt = fraisReelsAmt;
+    } else {
+      const raw = tsBruts * 0.10;
+      tsAbatt = Math.min(14171 * nbDecl, Math.max(495 * nbDecl, raw));
+    }
+  }
+  const tsNet = Math.max(0, tsBruts - tsAbatt);
+
+  // PENSIONS
+  const pensionBruts  = v('ir-pensions');
+  const nbPensionnes  = vi('ir-nb-pensionnes') || 1;
+  let pensAbatt = 0;
+  if (pensionBruts > 0) {
+    const raw = pensionBruts * 0.10;
+    pensAbatt = Math.min(4160 * nbPensionnes, Math.max(426 * nbPensionnes, raw));
+  }
+  const pensNet = Math.max(0, pensionBruts - pensAbatt);
+
+  // INDÉPENDANT
+  const bic        = v('ir-bic');
+  const bnc        = v('ir-bnc');
+  const ba         = v('ir-ba');
+  const art62Bruts = v('ir-art62');
+  let art62Abatt = 0;
+  if (art62Bruts > 0) art62Abatt = Math.min(14171, Math.max(495, art62Bruts * 0.10));
+  const art62Net = Math.max(0, art62Bruts - art62Abatt);
+
+  // FONCIER
+  const rfNets     = v('ir-rf') || 0;
+  // allow negative — read raw
+  const rfRaw      = parseFloat(document.getElementById('ir-rf').value) || 0;
+  const isDeficit  = rfRaw < 0;
+  const rfDeductible = isDeficit ? Math.min(10700, -rfRaw) : 0;
+  document.getElementById('ir-deficit-info').style.display = isDeficit ? 'block' : 'none';
+
+  // RCM
+  const dividendes = v('ir-div');
+  const interets   = v('ir-int');
+  const rcmPFU     = radio('ir-rcm-option') !== 'bareme';
+
+  // PV MOB
+  const pvMob  = v('ir-pvm');
+  const pvmPFU = radio('ir-pvm-option') !== 'bareme';
+
+  // PER — plafonds saisis par l'utilisateur (art. 163 quatervicies CGI)
+  const perSaisi    = v('ir-per');
+  const perPN       = v('ir-per-pn');
+  const perR1       = v('ir-per-r1');
+  const perR2       = v('ir-per-r2');
+  const perR3       = v('ir-per-r3');
+  const perDispo    = perPN + perR1 + perR2 + perR3;
+  const perEffectif = perDispo > 0 ? Math.min(perSaisi, perDispo) : perSaisi;
+  const perNonDeduit = Math.max(0, perSaisi - perEffectif);
+  const perRestant   = Math.max(0, perDispo - perEffectif);
+  const recapEl = document.getElementById('ir-per-recap');
+  if (perSaisi > 0 || perDispo > 0) {
+    recapEl.style.display = 'flex';
+    recapEl.innerHTML =
+      `<div>Plafond total disponible&nbsp;&nbsp;<strong style="color:var(--accent)">${fmtEur(perDispo)}</strong></div>` +
+      `<div>Déduction retenue&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong style="color:var(--accent)">−${fmtEur(perEffectif)}</strong></div>` +
+      (perNonDeduit > 0 ? `<div style="color:var(--amber)">Montant non déduit (hors plafond)&nbsp;&nbsp;${fmtEur(perNonDeduit)}</div>` : '') +
+      (perDispo > 0 ? `<div style="opacity:.7">Plafond restant après déduction&nbsp;&nbsp;${fmtEur(perRestant)}</div>` : '');
+  } else {
+    recapEl.style.display = 'none';
+  }
+
+  const pensionAlim = v('ir-pension-alim');
+  const deficitAnt  = v('ir-deficit-ant');
+
+  // ── REVENU BRUT GLOBAL (barème) ──
+  let rbg = tsNet + pensNet + art62Net + bic + bnc + ba;
+  if (rfRaw >= 0) rbg += rfRaw;
+  else rbg -= rfDeductible;
+
+  let rcmAbatt40 = 0, rcmBaremeNet = 0;
+  if (!rcmPFU && (dividendes + interets) > 0) {
+    rcmAbatt40    = dividendes * 0.40;
+    rcmBaremeNet  = Math.max(0, dividendes - rcmAbatt40) + interets;
+    rbg          += rcmBaremeNet;
+  }
+  if (!pvmPFU && pvMob > 0) rbg += pvMob;
+
+  // CSG déductible (6,8 % sur revenus du patrimoine soumis aux PS — option barème)
+  let assietteCsg = 0;
+  if (rfRaw > 0) assietteCsg += rfRaw;
+  if (!rcmPFU && (dividendes + interets) > 0) assietteCsg += (dividendes + interets);
+  if (!pvmPFU && pvMob > 0) assietteCsg += pvMob;
+  const csgDed = assietteCsg * 0.068;
+
+  // ── REVENU NET GLOBAL ──
+  const totalDed = perEffectif + pensionAlim + csgDed + deficitAnt;
+  const rng = Math.max(0, rbg - totalDed);
+
+  // ── BARÈME + QUOTIENT FAMILIAL ──
+  const q = parts > 0 ? rng / parts : 0;
+  const { tax: taxQ, details: bracketDetails } = applyBrackets(q, IR_BRACKETS);
+  let impotBrut = taxQ * parts;
+
+  // Plafonnement QF : max 1 759 € de réduction par demi-part additionnelle
+  const baseParts = nbDecl;
+  if (parts > baseParts) {
+    const { tax: taxBase } = applyBrackets(rng / baseParts, IR_BRACKETS);
+    const impotBase    = taxBase * baseParts;
+    const extraHP      = (parts - baseParts) * 2;
+    const maxReductQF  = extraHP * 1759;
+    const reductQF     = impotBase - impotBrut;
+    if (reductQF > maxReductQF) impotBrut = impotBase - maxReductQF;
+  }
+
+  // ── DÉCOTE ──
+  let decote = 0;
+  if (!isMarie && impotBrut > 0 && impotBrut < 1929) decote = Math.max(0, 0.75 * (1929 - impotBrut));
+  if ( isMarie && impotBrut > 0 && impotBrut < 3191) decote = Math.max(0, 0.75 * (3191 - impotBrut));
+  const impotApresDecote = Math.max(0, impotBrut - decote);
+
+  // ── RÉDUCTIONS D'IMPÔT ──
+  const donsUrg  = v('ir-dons-urgence');
+  const donsAut  = v('ir-dons-autres');
+  const rdDonsUrg = Math.min(donsUrg, 1000) * 0.75 + Math.max(0, donsUrg - 1000) * 0.66;
+  const rdDonsAut = rng > 0 ? Math.min(donsAut * 0.66, rng * 0.20 * 0.66) : 0;
+  const rdDons    = rdDonsUrg + rdDonsAut;
+
+  const emploiDom  = v('ir-emploi-dom');
+  const rdEmploiDom = Math.min(emploiDom, 12000) * 0.50;
+
+  const pinelAmt = v('ir-pinel');
+  const fcpiAmt  = v('ir-fcpi');
+  const pmeAmt   = v('ir-pme');
+  const rdFcpi   = Math.min(fcpiAmt, isMarie ? 24000 : 12000) * 0.18;
+  const rdPme    = Math.min(pmeAmt,  isMarie ? 100000 : 50000) * 0.25;
+
+  const nbCol  = vi('ir-college');
+  const nbLyc  = vi('ir-lycee');
+  const nbSup  = vi('ir-sup');
+  const rdScol = nbCol * 61 + nbLyc * 153 + nbSup * 183;
+
+  const totalRd     = rdDons + rdEmploiDom + pinelAmt + rdFcpi + rdPme + rdScol;
+  const impotApresRd = Math.max(0, impotApresDecote - totalRd);
+
+  // ── CRÉDITS D'IMPÔT ──
+  const gardeAmt = v('ir-garde');
+  const nbGarde  = vi('ir-nb-garde') || 1;
+  const ciGarde  = Math.min(gardeAmt, 3500 * nbGarde) * 0.50;
+  const totalCi  = ciGarde;
+
+  const irBareméNet     = impotApresRd - totalCi;
+  const remboursement   = Math.max(0, -irBareméNet);
+  const irBareméPositif = Math.max(0, irBareméNet);
+
+  // ── FLAT TAX (IR portion PFU) ──
+  let irFlatTax = 0;
+  if (rcmPFU && (dividendes + interets) > 0) irFlatTax += (dividendes + interets) * 0.128;
+  if (pvmPFU && pvMob > 0)                   irFlatTax += pvMob * 0.128;
+
+  // ── PRÉLÈVEMENTS SOCIAUX 17,2 % ──
+  const psRF  = rfRaw > 0 ? rfRaw * 0.172 : 0;
+  const psRCM = (dividendes + interets) * 0.172;
+  const psPV  = pvMob > 0 ? pvMob * 0.172 : 0;
+  const totalPS = psRF + psRCM + psPV;
+
+  // ── TOTAUX ──
+  const irTotal         = irBareméPositif + irFlatTax;
+  const impositionTotale = irTotal + totalPS;
+
+  // TMI & taux moyen
+  let tmi = 0;
+  for (const b of IR_BRACKETS) { if (q > b.from) tmi = b.rate; }
+  const tauxMoyen = rng > 0 ? irBareméPositif / rng : 0;
+
+  // ── REVENUE SUMMARY ROWS ──
+  const revRows = [];
+  if (tsBruts > 0)       revRows.push({label:'Salaires bruts', val:tsBruts, abatt:tsAbatt, net:tsNet});
+  if (pensionBruts > 0)  revRows.push({label:'Pensions brutes', val:pensionBruts, abatt:pensAbatt, net:pensNet});
+  if (art62Bruts > 0)    revRows.push({label:'Gérance art. 62 brut', val:art62Bruts, abatt:art62Abatt, net:art62Net});
+  if (bic > 0)           revRows.push({label:'BIC nets imposables', val:bic});
+  if (bnc > 0)           revRows.push({label:'BNC nets imposables', val:bnc});
+  if (ba > 0)            revRows.push({label:'BA nets imposables', val:ba});
+  if (rfRaw > 0)         revRows.push({label:'Revenus fonciers nets', val:rfRaw});
+  if (rfRaw < 0)         revRows.push({label:'Déficit foncier déduit RBG', val:-rfDeductible, neg:true});
+  if (!rcmPFU && (dividendes+interets)>0) revRows.push({label:`RCM barème (div. après abatt. 40% + intérêts)`, val:rcmBaremeNet});
+  if (rcmPFU  && (dividendes+interets)>0) revRows.push({label:'RCM — PFU 30 % (hors barème)', val:dividendes+interets, flat:true});
+  if (!pvmPFU && pvMob > 0) revRows.push({label:'Plus-values mobilières (barème)', val:pvMob});
+  if ( pvmPFU && pvMob > 0) revRows.push({label:'Plus-values mobilières — PFU 30 % (hors barème)', val:pvMob, flat:true});
+
+  // ── RENDER ──
+  const hasFlatOrPS = irFlatTax > 0 || totalPS > 0;
+  const hasRdCi     = totalRd > 0 || totalCi > 0;
+
+  const el = document.getElementById('ir-results');
+  el.innerHTML = `
+    <div class="key-result animate">
+      <div class="key-result-label">Impôt sur le Revenu (barème)</div>
+      <div class="key-result-val">${fmtEur(irBareméPositif)}</div>
+      <div class="key-result-sub">${remboursement > 0
+        ? `Crédit remboursé : +${fmtEur(remboursement)}`
+        : `soit ${fmtEur(irBareméPositif/12)} / mois · TMI ${fmtNum(tmi*100,0)} %`
+      }</div>
+    </div>
+
+    ${hasFlatOrPS ? `
+    <div class="ir-flatps-grid animate">
+      <div class="ir-flatps-item">
+        <div class="ir-flatps-label">IR flat tax PFU</div>
+        <div class="ir-flatps-val blue">${fmtEur(irFlatTax)}</div>
+      </div>
+      <div class="ir-flatps-item">
+        <div class="ir-flatps-label">Prélèvements sociaux</div>
+        <div class="ir-flatps-val amber">${fmtEur(totalPS)}</div>
+      </div>
+    </div>
+    <div class="ir-total-row animate">
+      <span class="ir-total-label">Imposition totale (IR barème + IR PFU + PS)</span>
+      <span class="ir-total-val">${fmtEur(impositionTotale)}</span>
+    </div>
+    ` : ''}
+
+    <div class="metrics-grid animate">
+      <div class="metric"><div class="metric-label">TMI</div><div class="metric-val accent">${fmtNum(tmi*100,0)} %</div></div>
+      <div class="metric"><div class="metric-label">Taux moyen IR</div><div class="metric-val amber">${fmtNum(tauxMoyen*100,2)} %</div></div>
+      <div class="metric"><div class="metric-label">Parts fiscales</div><div class="metric-val">${fmtNum(parts,1)}</div></div>
+      <div class="metric"><div class="metric-label">Revenu net global</div><div class="metric-val">${fmtEur(rng)}</div></div>
+    </div>
+
+    ${revRows.length > 0 ? `
+    <div class="rev-summary animate">
+      <div class="rev-summary-title">Composition des revenus</div>
+      ${revRows.map(r => `
+        <div class="rev-line${r.flat?' zero':''}">
+          <span class="rev-line-label">${r.label}</span>
+          <span class="rev-line-val${r.neg?' neg':r.flat?' dim':''}">${r.neg?'−':''}${fmtEur(Math.abs(r.val))}</span>
+        </div>
+        ${r.abatt ? `<div class="rev-line" style="opacity:.65"><span class="rev-line-label" style="padding-left:.8rem;font-size:.69rem">└ abattement déduit</span><span class="rev-line-val neg" style="font-size:.69rem">−${fmtEur(r.abatt)}</span></div>` : ''}
+      `).join('')}
+      <div class="rev-line total-line">
+        <span class="rev-line-label">Revenu brut global (barème)</span>
+        <span class="rev-line-val">${fmtEur(Math.max(0, rbg))}</span>
+      </div>
+    </div>
+    ` : ''}
+
+    ${buildPedagoText({
+      // situation
+      parts, isMarie, isole: chk('ir-isole'), handicap: chk('ir-handicap'),
+      // salaires
+      tsBruts, tsAbatt, tsNet, fraisReels,
+      // pensions
+      pensionBruts, pensAbatt, pensNet,
+      // indépendant
+      bic, bnc, ba, art62Bruts, art62Abatt,
+      // foncier
+      rfRaw, rfDeductible,
+      // RCM / PV
+      dividendes, interets, rcmPFU, pvMob, pvmPFU,
+      // PER
+      perEffectif, perNonDeduit,
+      // déductions
+      pensionAlim, csgDed, deficitAnt,
+      // calcul
+      rbg, rng, q, tmi, tauxMoyen,
+      impotApresDecote,
+      decote,
+      // réductions / crédits
+      totalRd, totalCi, pinelAmt, ciGarde,
+      // résultats
+      irBareméPositif, irFlatTax, totalPS, impositionTotale, psRF,
+      // utils
+      fmtEur, fmtNum
+    })}
+
+    <div class="bracket-detail animate">
+      <div class="bracket-title">Calcul barème — quotient ${fmtEur(q,0)} / part (${fmtNum(parts,1)} part${parts>1?'s':''})</div>
+      ${perEffectif > 0 ? `<div class="bracket-row zero"><span class="rate-badge" style="background:var(--surface-3);color:var(--text-dim)">PER</span><span class="tranche">Versements PER déduits</span><span class="tax" style="color:var(--blue)">−${fmtEur(perEffectif)}</span></div>` : ''}
+      ${pensionAlim > 0 ? `<div class="bracket-row zero"><span class="rate-badge" style="background:var(--surface-3);color:var(--text-dim)">Alim.</span><span class="tranche">Pension alimentaire versée</span><span class="tax" style="color:var(--blue)">−${fmtEur(pensionAlim)}</span></div>` : ''}
+      ${csgDed > 0 ? `<div class="bracket-row zero"><span class="rate-badge" style="background:var(--surface-3);color:var(--text-dim)">CSG</span><span class="tranche">CSG déductible 6,8 %</span><span class="tax" style="color:var(--blue)">−${fmtEur(csgDed,2)}</span></div>` : ''}
+      ${deficitAnt > 0 ? `<div class="bracket-row zero"><span class="rate-badge" style="background:var(--surface-3);color:var(--text-dim)">Déf.</span><span class="tranche">Déficit foncier antérieur</span><span class="tax" style="color:var(--blue)">−${fmtEur(deficitAnt)}</span></div>` : ''}
+      ${bracketDetails.map(b => {
+        const toLabel = b.to ? fmtEur(b.to * parts) : '∞';
+        const taxTotal = b.tax * parts;
+        return `<div class="bracket-row${b.rate===0?' zero':''}">
+          <span class="rate-badge">${fmtNum(b.rate*100,0)} %</span>
+          <span class="tranche">${fmtEur(b.from*parts)} → ${toLabel}</span>
+          <span class="tax">${b.rate===0?'—':fmtEur(taxTotal,2)}</span>
+        </div>`;
+      }).join('')}
+      ${decote > 0 ? `<div class="bracket-row"><span class="rate-badge" style="background:rgba(96,165,250,.1);color:var(--blue)">Décote</span><span class="tranche">Décote ${isMarie?'couple':'célibataire'}</span><span class="tax" style="color:var(--blue)">−${fmtEur(decote)}</span></div>` : ''}
+      ${totalRd > 0 ? `<div class="bracket-row"><span class="rate-badge" style="background:rgba(59,140,90,.12);color:var(--success)">Réd.</span><span class="tranche">Total réductions d'impôt</span><span class="tax" style="color:var(--success)">−${fmtEur(totalRd)}</span></div>` : ''}
+      ${totalCi > 0 ? `<div class="bracket-row"><span class="rate-badge" style="background:rgba(59,140,90,.12);color:var(--success)">CI</span><span class="tranche">Total crédits d'impôt</span><span class="tax" style="color:var(--success)">−${fmtEur(totalCi)}</span></div>` : ''}
+      <div class="bracket-row" style="background:var(--accent-dim)">
+        <span class="rate-badge">NET</span>
+        <span class="tranche" style="font-weight:600;color:var(--text)">IR net barème</span>
+        <span class="tax" style="color:var(--accent);font-size:.88rem">${fmtEur(irBareméPositif)}${remboursement>0?` (+${fmtEur(remboursement)} remb.)`:''}</span>
+      </div>
+    </div>
+
+    ${hasFlatOrPS ? `
+    <div class="bracket-detail animate">
+      <div class="bracket-title">Prélèvements hors barème</div>
+      ${irFlatTax > 0 ? `<div class="bracket-row"><span class="rate-badge">IR 12,8 %</span><span class="tranche">IR flat tax PFU (RCM + PV)</span><span class="tax">${fmtEur(irFlatTax)}</span></div>` : ''}
+      ${psRF > 0  ? `<div class="bracket-row"><span class="rate-badge" style="background:var(--amber-dim);color:var(--amber)">PS 17,2 %</span><span class="tranche">Prél. sociaux sur revenus fonciers</span><span class="tax" style="color:var(--amber)">${fmtEur(psRF)}</span></div>` : ''}
+      ${psRCM > 0 ? `<div class="bracket-row"><span class="rate-badge" style="background:var(--amber-dim);color:var(--amber)">PS 17,2 %</span><span class="tranche">Prél. sociaux sur RCM</span><span class="tax" style="color:var(--amber)">${fmtEur(psRCM)}</span></div>` : ''}
+      ${psPV > 0  ? `<div class="bracket-row"><span class="rate-badge" style="background:var(--amber-dim);color:var(--amber)">PS 17,2 %</span><span class="tranche">Prél. sociaux sur plus-values</span><span class="tax" style="color:var(--amber)">${fmtEur(psPV)}</span></div>` : ''}
+      <div class="bracket-row" style="background:var(--amber-dim)">
+        <span class="rate-badge" style="background:var(--amber-dim);color:var(--amber)">TOTAL</span>
+        <span class="tranche" style="font-weight:600;color:var(--text)">Imposition totale (IR + PS)</span>
+        <span class="tax" style="color:var(--amber);font-size:.88rem">${fmtEur(impositionTotale)}</span>
+      </div>
+    </div>
+    ` : ''}
+
+    ${hasRdCi ? `
+    <div class="bracket-detail animate">
+      <div class="bracket-title">Détail réductions &amp; crédits d'impôt</div>
+      ${rdDons > 0      ? `<div class="bracket-row"><span class="rate-badge" style="background:rgba(59,140,90,.12);color:var(--success)">66/75 %</span><span class="tranche">Dons aux associations</span><span class="tax" style="color:var(--success)">−${fmtEur(rdDons)}</span></div>` : ''}
+      ${rdEmploiDom > 0 ? `<div class="bracket-row"><span class="rate-badge" style="background:rgba(59,140,90,.12);color:var(--success)">50 %</span><span class="tranche">Emploi à domicile</span><span class="tax" style="color:var(--success)">−${fmtEur(rdEmploiDom)}</span></div>` : ''}
+      ${pinelAmt > 0    ? `<div class="bracket-row"><span class="rate-badge" style="background:rgba(59,140,90,.12);color:var(--success)">Pinel</span><span class="tranche">Réduction Pinel / Denormandie</span><span class="tax" style="color:var(--success)">−${fmtEur(pinelAmt)}</span></div>` : ''}
+      ${rdFcpi > 0      ? `<div class="bracket-row"><span class="rate-badge" style="background:rgba(59,140,90,.12);color:var(--success)">18 %</span><span class="tranche">Réduction FCPI / FIP</span><span class="tax" style="color:var(--success)">−${fmtEur(rdFcpi)}</span></div>` : ''}
+      ${rdPme > 0       ? `<div class="bracket-row"><span class="rate-badge" style="background:rgba(59,140,90,.12);color:var(--success)">25 %</span><span class="tranche">Réduction PME (souscription directe)</span><span class="tax" style="color:var(--success)">−${fmtEur(rdPme)}</span></div>` : ''}
+      ${rdScol > 0      ? `<div class="bracket-row"><span class="rate-badge" style="background:rgba(59,140,90,.12);color:var(--success)">Scol.</span><span class="tranche">Réduction scolarité (${nbCol>0?nbCol+' collège ':''}${nbLyc>0?nbLyc+' lycée ':''}${nbSup>0?nbSup+' supérieur':''})</span><span class="tax" style="color:var(--success)">−${fmtEur(rdScol)}</span></div>` : ''}
+      ${ciGarde > 0     ? `<div class="bracket-row"><span class="rate-badge" style="background:rgba(59,140,90,.12);color:var(--success)">CI 50 %</span><span class="tranche">Crédit d'impôt garde d'enfants</span><span class="tax" style="color:var(--success)">−${fmtEur(ciGarde)}</span></div>` : ''}
+    </div>
+    ` : ''}
+  `;
+}
+
+// ═══ TEXTE PÉDAGOGIQUE ═══
+function buildPedagoText(d) {
+  // ── Situation familiale ──
+  const partLabel = (() => {
+    const el = document.getElementById('ir-parts');
+    return el.selectedOptions[0]?.text || '';
+  })();
+  let situTxt = '';
+  const qLabel = d.q > 0 ? ` — quotient familial <strong>${d.fmtEur(d.q, 0)}</strong>` : '';
+  const qPhrase = d.q > 0 ? ` Votre quotient familial est de <strong>${d.fmtEur(d.q, 0)}</strong>.` : '';
+  if (d.parts === 1) {
+    situTxt = `En tant que <strong>contribuable célibataire (1 part fiscale)</strong>${qLabel}, c'est sur cette base que le barème progressif s'applique.`;
+  } else if (d.parts === 1.5) {
+    situTxt = `Avec <strong>1,5 parts fiscales</strong> (majoration applicable à votre situation)${qLabel}, la base imposable est réduite par rapport à un célibataire ordinaire.`;
+  } else if (d.parts === 2 && !d.isMarie) {
+    situTxt = `Votre foyer bénéficie de <strong>2 parts fiscales</strong>.${qPhrase}`;
+  } else if (d.parts === 2 && d.isMarie) {
+    situTxt = `En tant que <strong>couple marié ou pacsé sans enfant (2 parts fiscales)</strong>${qLabel}, le barème progressif s'applique sur cette base, puis l'impôt est multiplié par 2.`;
+  } else if (d.parts >= 2.5 && d.parts <= 3) {
+    const nbEnf = d.parts === 2.5 ? 1 : 2;
+    situTxt = `Votre foyer compte <strong>${nbEnf} enfant${nbEnf > 1 ? 's' : ''} à charge (${d.fmtNum(d.parts, 1)} parts fiscales)</strong>. Chaque demi-part supplémentaire génère une réduction d'impôt plafonnée à 1 759 € par demi-part.${qPhrase}`;
+  } else if (d.parts >= 3.5) {
+    situTxt = `Avec <strong>${d.fmtNum(d.parts, 1)} parts fiscales</strong> (famille nombreuse), votre foyer bénéficie d'un avantage fiscal significatif${d.q > 0 ? ` — le quotient familial tombe à <strong>${d.fmtEur(d.q, 0)}</strong>, bien en dessous du revenu net imposable brut, ce qui fait glisser une partie de vos revenus dans des tranches plus basses` : ''}.`;
+  } else {
+    situTxt = `Votre foyer dispose de <strong>${d.fmtNum(d.parts, 1)} parts fiscales</strong>${qLabel}.`;
+  }
+  if (d.isole) situTxt += ` La majoration <em>parent isolé</em> (+0,5 part) a été appliquée.`;
+  if (d.handicap) situTxt += ` La majoration <em>enfant handicapé</em> (+0,5 part) a été prise en compte.`;
+
+  // ── Revenus & abattements ──
+  let revTxt = '';
+  const hasTS  = d.tsBruts > 0;
+  const hasPens = d.pensionBruts > 0;
+  const hasBiz  = d.bic + d.bnc + d.ba + d.art62Bruts > 0;
+  const hasRF   = d.rfRaw !== 0;
+  const hasRCM  = d.dividendes + d.interets > 0;
+  const hasPV   = d.pvMob > 0;
+
+  if (d.rng === 0 && d.rbg === 0) {
+    revTxt = `Aucun revenu n'a été saisi. Modifiez les champs ci-contre pour obtenir une simulation personnalisée.`;
+  } else {
+    const parts_rev = [];
+    if (hasTS) {
+      if (d.fraisReels) {
+        parts_rev.push(`vos salaires bruts de <strong>${d.fmtEur(d.tsBruts)}</strong> ont été réduits de <strong>${d.fmtEur(d.tsAbatt)}</strong> de frais réels, soit un net imposable de <strong>${d.fmtEur(d.tsNet)}</strong>`);
+      } else {
+        parts_rev.push(`vos salaires bruts de <strong>${d.fmtEur(d.tsBruts)}</strong> bénéficient de l'abattement légal de 10 % (soit <strong>${d.fmtEur(d.tsAbatt)}</strong>), ramenant le net imposable à <strong>${d.fmtEur(d.tsNet)}</strong>`);
+      }
+    }
+    if (hasPens) {
+      parts_rev.push(`vos pensions brutes de <strong>${d.fmtEur(d.pensionBruts)}</strong> profitent de l'abattement 10 % plafonné (soit <strong>${d.fmtEur(d.pensAbatt)}</strong> déduits), pour un net imposable de <strong>${d.fmtEur(d.pensNet)}</strong>`);
+    }
+    if (hasBiz) {
+      const tot = d.bic + d.bnc + d.ba + (d.art62Bruts - d.art62Abatt);
+      parts_rev.push(`vos revenus d'activité indépendante (BIC/BNC/BA/gérance) représentent <strong>${d.fmtEur(tot)}</strong> nets imposables`);
+    }
+    if (hasRF && d.rfRaw > 0) {
+      parts_rev.push(`vos revenus fonciers nets s'élèvent à <strong>${d.fmtEur(d.rfRaw)}</strong>`);
+    }
+    if (hasRF && d.rfRaw < 0) {
+      parts_rev.push(`vous avez déclaré un <strong>déficit foncier de ${d.fmtEur(-d.rfRaw)}</strong>, dont <strong>${d.fmtEur(d.rfDeductible)}</strong> sont imputés sur votre revenu global (plafond 10 700 €)`);
+    }
+    if (hasRCM && d.rcmPFU) {
+      parts_rev.push(`vos revenus de capitaux mobiliers de <strong>${d.fmtEur(d.dividendes + d.interets)}</strong> sont soumis au PFU 30 % (flat tax) et restent hors barème progressif`);
+    } else if (hasRCM && !d.rcmPFU) {
+      parts_rev.push(`vos revenus de capitaux mobiliers de <strong>${d.fmtEur(d.dividendes + d.interets)}</strong> sont intégrés au barème progressif (abattement 40 % sur dividendes appliqué)`);
+    }
+    if (hasPV && d.pvmPFU) {
+      parts_rev.push(`vos plus-values mobilières de <strong>${d.fmtEur(d.pvMob)}</strong> sont taxées au PFU 30 %`);
+    } else if (hasPV && !d.pvmPFU) {
+      parts_rev.push(`vos plus-values mobilières de <strong>${d.fmtEur(d.pvMob)}</strong> sont intégrées au barème`);
+    }
+
+    if (parts_rev.length === 0) {
+      revTxt = `Votre revenu brut global soumis au barème est de <strong>${d.fmtEur(Math.max(0, d.rbg))}</strong>.`;
+    } else if (parts_rev.length === 1) {
+      revTxt = `Du côté des revenus, ${parts_rev[0]}. Le revenu brut global soumis au barème s'établit à <strong>${d.fmtEur(Math.max(0, d.rbg))}</strong>.`;
+    } else {
+      const last = parts_rev.pop();
+      revTxt = `Du côté des revenus&nbsp;: ${parts_rev.join(', ')} et ${last}. Le revenu brut global soumis au barème s'établit à <strong>${d.fmtEur(Math.max(0, d.rbg))}</strong>.`;
+    }
+
+    // Déductions RNG
+    const deducTxt_parts = [];
+    if (d.perEffectif > 0) deducTxt_parts.push(`versements PER de <strong>${d.fmtEur(d.perEffectif)}</strong>`);
+    if (d.pensionAlim > 0) deducTxt_parts.push(`pension alimentaire de <strong>${d.fmtEur(d.pensionAlim)}</strong>`);
+    if (d.csgDed > 0)      deducTxt_parts.push(`CSG déductible de <strong>${d.fmtEur(d.csgDed, 0)}</strong>`);
+    if (d.deficitAnt > 0)  deducTxt_parts.push(`déficit foncier antérieur de <strong>${d.fmtEur(d.deficitAnt)}</strong>`);
+    if (deducTxt_parts.length > 0) {
+      revTxt += ` Après déduction des ${deducTxt_parts.join(', ')}, votre <strong>revenu net imposable (RNI) est de ${d.fmtEur(d.rng)}</strong>.`;
+    } else {
+      revTxt += ` Votre <strong>revenu net imposable est de ${d.fmtEur(d.rng)}</strong>.`;
+    }
+  }
+
+  // ── PER spécifique ──
+  let perTxt = '';
+  if (d.perEffectif > 0 && d.rng > 0) {
+    const ecoPer = Math.round(d.perEffectif * d.tmi);
+    if (d.tmi > 0) {
+      perTxt = `Votre versement PER de <strong>${d.fmtEur(d.perEffectif)}</strong> réduit directement votre revenu net imposable. À votre TMI de <strong>${d.fmtNum(d.tmi * 100, 0)} %</strong>, cela génère une <strong>économie fiscale estimée à ${d.fmtEur(ecoPer)}</strong> sur votre impôt barème cette année — un levier d'optimisation particulièrement efficace à cette tranche.`;
+    } else {
+      perTxt = `Votre versement PER de <strong>${d.fmtEur(d.perEffectif)}</strong> réduit votre revenu net imposable, mais votre TMI étant à 0 %, il ne génère pas d'économie fiscale immédiate sur le barème. Il peut cependant rester pertinent pour préparer la retraite.`;
+    }
+    if (d.perNonDeduit > 0) {
+      perTxt += ` Attention&nbsp;: <strong>${d.fmtEur(d.perNonDeduit)}</strong> de vos versements PER dépassent le plafond disponible et ne sont donc <em>pas déductibles</em> cette année.`;
+    }
+  }
+
+  // ── Revenus fonciers + PS ──
+  let foncierTxt = '';
+  if (d.rfRaw > 0 && d.psRF > 0) {
+    foncierTxt = `Vos revenus fonciers de <strong>${d.fmtEur(d.rfRaw)}</strong> sont soumis aux <strong>prélèvements sociaux à 17,2 %</strong>, soit <strong>${d.fmtEur(d.psRF)}</strong> en plus de l'impôt barème. C'est un point souvent sous-estimé dans la gestion locative.`;
+  } else if (d.rfRaw < 0) {
+    foncierTxt = `Votre <strong>déficit foncier de ${d.fmtEur(-d.rfRaw)}</strong> constitue un avantage fiscal&nbsp;: jusqu'à 10 700 € sont déductibles du revenu global, le surplus étant reportable sur vos revenus fonciers des 10 années suivantes.`;
+  }
+
+  // ── TMI + impôt final ──
+  let tmiTxt = '';
+  if (d.rng === 0 && d.rbg === 0) {
+    tmiTxt = '';
+  } else if (d.irBareméPositif === 0 && d.irFlatTax === 0 && d.totalPS === 0) {
+    // Pas d'impôt
+    let reason = '';
+    if (d.rng === 0) reason = 'votre revenu net imposable est nul après déductions';
+    else if (d.decote > 0 && d.totalRd + d.totalCi >= d.impotApresDecote) reason = `la décote et les réductions d'impôt couvrent intégralement votre cotisation`;
+    else if (d.decote > 0) reason = `la décote (${d.fmtEur(d.decote)}) absorbe la totalité de votre impôt brut`;
+    else if (d.q <= 11600) reason = `votre quotient familial (${d.fmtEur(d.q, 0)}) reste sous le seuil de la première tranche imposable (11 600 €)`;
+    else reason = `les réductions et crédits d'impôt ramènent votre impôt à zéro`;
+    tmiTxt = `Votre foyer n'est <strong>pas redevable de l'impôt sur le revenu</strong> cette année — ${reason}. C'est une situation avantageuse, mais gardez en tête que les prélèvements sociaux, eux, peuvent s'appliquer indépendamment.`;
+  } else {
+    const tmiLabel = (() => {
+      if (d.tmi === 0)    return '0 % — vous êtes exonéré de la tranche de base';
+      if (d.tmi === 0.11) return '11 % — première tranche progressive, correspondant à des revenus modérés à intermédiaires';
+      if (d.tmi === 0.30) return '30 % — tranche intermédiaire, la plus courante pour les foyers à revenus confortables';
+      if (d.tmi === 0.41) return '41 % — tranche haute, réservée aux contribuables aisés';
+      if (d.tmi === 0.45) return '45 % — tranche maximale, applicable aux très hauts revenus';
+      return `${d.fmtNum(d.tmi * 100, 0)} %`;
+    })();
+
+    tmiTxt = `Votre <strong>tranche marginale d'imposition (TMI) est de ${d.fmtNum(d.tmi * 100, 0)} %</strong> — ${tmiLabel}. Cela signifie que chaque euro supplémentaire de revenu imposable serait taxé à ce taux.`;
+
+    if (d.decote > 0) {
+      tmiTxt += ` La <strong>décote de ${d.fmtEur(d.decote)}</strong> (applicable aux foyers à impôt modéré) a réduit votre cotisation.`;
+    }
+
+    if (d.totalRd > 0 || d.totalCi > 0) {
+      const totalAvantages = d.totalRd + d.totalCi;
+      tmiTxt += ` Les réductions et crédits d'impôt vous ont fait économiser <strong>${d.fmtEur(totalAvantages)}</strong>.`;
+      if (d.pinelAmt > 0) tmiTxt += ` La réduction Pinel/Denormandie de <strong>${d.fmtEur(d.pinelAmt)}</strong> contribue significativement à cet allégement.`;
+      if (d.ciGarde > 0) tmiTxt += ` Le crédit d'impôt garde d'enfants de <strong>${d.fmtEur(d.ciGarde)}</strong> est remboursable si votre impôt est insuffisant.`;
+    }
+
+    tmiTxt += ` Votre <strong>taux moyen effectif d'imposition est de ${d.fmtNum(d.tauxMoyen * 100, 2)} %</strong> — c'est le rapport entre votre impôt barème (${d.fmtEur(d.irBareméPositif)}) et votre revenu net imposable (${d.fmtEur(d.rng)}). Ce taux moyen est toujours inférieur à la TMI, car le barème est progressif et ne s'applique qu'à la fraction de revenu dans chaque tranche.`;
+
+    if (d.irFlatTax > 0 || d.totalPS > 0) {
+      tmiTxt += ` En ajoutant la flat tax PFU (${d.fmtEur(d.irFlatTax)}) et les prélèvements sociaux (${d.fmtEur(d.totalPS)}), votre <strong>imposition totale s'élève à ${d.fmtEur(d.impositionTotale)}</strong>.`;
+    }
+  }
+
+  // ── Pension alimentaire ──
+  let alimTxt = '';
+  if (d.pensionAlim > 0 && d.tmi > 0) {
+    const ecoAlim = Math.round(d.pensionAlim * d.tmi);
+    alimTxt = `La pension alimentaire versée de <strong>${d.fmtEur(d.pensionAlim)}</strong> est déductible de votre revenu global. À votre TMI de ${d.fmtNum(d.tmi * 100, 0)} %, elle vous permet d'économiser environ <strong>${d.fmtEur(ecoAlim)}</strong> d'impôt.`;
+  }
+
+  // ── Assemblage ──
+  const p = (txt) => `<p class="pedago-p">${txt}</p>`;
+
+  let bodyContent = '';
+  if (situTxt)    bodyContent += p(situTxt);
+  if (revTxt)     bodyContent += p(revTxt);
+
+  if (perTxt) {
+    bodyContent += `<div class="pedago-block">
+      <div class="pedago-block-label">Plan d'épargne retraite (PER)</div>
+      <div class="pedago-block-text">${perTxt}</div>
+    </div>`;
+  }
+
+  if (foncierTxt) {
+    bodyContent += `<div class="pedago-block">
+      <div class="pedago-block-label">Revenus fonciers &amp; prélèvements sociaux</div>
+      <div class="pedago-block-text">${foncierTxt}</div>
+    </div>`;
+  }
+
+  if (alimTxt) {
+    bodyContent += `<div class="pedago-tip">${alimTxt}</div>`;
+  }
+
+  if (tmiTxt)     bodyContent += p(tmiTxt);
+
+  const dimNote = `Barème IR 2026 (revenus 2025) · Simulation indicative, non contractuelle · Sources&nbsp;: CGI art.&nbsp;156, 197, 199 · BOFIP`;
+
+  const html = `<div class="pedago-card animate">
+  <div class="pedago-card-header">
+    <div class="pedago-card-dot"></div>
+    <div class="pedago-card-title">Analyse de votre situation fiscale</div>
+  </div>
+  <div class="pedago-card-body">
+    ${bodyContent}
+    <p class="pedago-dim">${dimNote}</p>
+  </div>
+</div>`;
+
+  return html;
+}
+
+// Event wiring
+const inputs = [
+  'ir-parts','ir-isole','ir-handicap',
+  'ir-ts','ir-frais-reels','ir-frais-reels-amt',
+  'ir-pensions','ir-nb-pensionnes',
+  'ir-bic','ir-bnc','ir-ba','ir-art62',
+  'ir-rf','ir-div','ir-int','ir-pvm',
+  'ir-per','ir-per-pn','ir-per-r1','ir-per-r2','ir-per-r3',
+  'ir-pension-alim','ir-deficit-ant',
+  'ir-dons-urgence','ir-dons-autres',
+  'ir-emploi-dom','ir-garde','ir-nb-garde',
+  'ir-pinel','ir-fcpi','ir-pme',
+  'ir-college','ir-lycee','ir-sup'
+];
+inputs.forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('input', calcIR);
+  if (el) el.addEventListener('change', calcIR);
+});
+document.querySelectorAll('input[name="ir-rcm-option"], input[name="ir-pvm-option"]')
+  .forEach(r => r.addEventListener('change', calcIR));
+
+calcIR();
+
+// Dropdown
+/* Menu déroulant catégorisé — voir shared-nav.js */
+SP.nav.init();
+</script>
+</body>
+</html>

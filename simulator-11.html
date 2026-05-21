@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="favicon-64.png">
+  <link rel="shortcut icon" href="favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="favicon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LMNP au réel — PATRIMONIA.AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css?v=19">
+<script src="shared.js?v=2"></script>
+  <script src="shared-nav.js?v=6"></script>
+<style>
+
+/* ── LAYOUT ── */
+.lmnp-body {
+  display: grid;
+  grid-template-columns: 400px 1fr;
+}
+@media(max-width:900px){ .lmnp-body { grid-template-columns: 1fr } }
+
+/* ── PANELS ── */
+.lmnp-inputs-panel {
+  padding: 1.75rem 1.75rem 2rem;
+  background: var(--surface-2);
+  border-right: 1px solid var(--border-subtle);
+}
+@media(max-width:900px){
+  .lmnp-inputs-panel { border-right:none; border-bottom:1px solid var(--border-subtle) }
+}
+.lmnp-results-panel {
+  padding: 1.5rem 1.5rem 2rem;
+  background: var(--surface);
+  overflow-x: auto;
+}
+
+/* ── INPUT SECTION TITLES ── */
+.inp-sec {
+  font-size:.6rem; font-weight:700; color:var(--text-dim);
+  letter-spacing:.08em; text-transform:uppercase;
+  margin:1.4rem 0 .85rem;
+}
+.inp-sec:first-child { margin-top:0 }
+
+/* ── TABS ── */
+.lmnp-tabs {
+  display:flex; gap:.32rem; margin-bottom:1.25rem; flex-wrap:wrap;
+}
+.lmnp-tab {
+  font-family:var(--sans); font-size:.74rem; font-weight:500;
+  color:var(--text-muted); background:var(--surface-2);
+  border:1.5px solid var(--border); border-radius:100px;
+  padding:.33rem 1rem; cursor:pointer;
+  transition:all .18s; user-select:none;
+}
+.lmnp-tab:hover { color:var(--accent); border-color:rgba(79,138,120,.3); background:var(--accent-dim) }
+.lmnp-tab.active { background:var(--accent); border-color:var(--accent); color:#fff; font-weight:600 }
+.lmnp-panel { display:none }
+.lmnp-panel.active { display:block }
+
+/* ── KPI CARDS ── */
+.lmnp-kpi-row {
+  display:grid; grid-template-columns:1fr 1fr 1fr; gap:.7rem;
+  margin-bottom:1.2rem;
+}
+.lmnp-kpi-row-2 {
+  display:grid; grid-template-columns:1fr 1fr; gap:.7rem;
+  margin-bottom:1.2rem;
+}
+.lmnp-kpi {
+  background:var(--surface-2); border:1.5px solid var(--border-subtle);
+  border-radius:var(--r-sm); padding:.95rem 1rem; text-align:center;
+}
+.lmnp-kpi.accent { border-color:rgba(79,138,120,.3) }
+.lmnp-kpi.amber  { border-color:rgba(255,159,10,.3) }
+.lmnp-kpi.green  { border-color:rgba(59,140,90,.3) }
+.lmnp-kpi.red    { border-color:rgba(155,90,58,.3) }
+.lmnp-kpi-badge {
+  font-size:.58rem; font-weight:700; letter-spacing:.07em;
+  text-transform:uppercase; margin-bottom:.45rem; display:block;
+  color:var(--text-dim);
+}
+.lmnp-kpi.accent .lmnp-kpi-badge { color:var(--accent) }
+.lmnp-kpi.amber  .lmnp-kpi-badge { color:var(--amber) }
+.lmnp-kpi.green  .lmnp-kpi-badge { color:var(--success) }
+.lmnp-kpi.red    .lmnp-kpi-badge { color:#9B5A3A }
+.lmnp-kpi-val {
+  font-size:1.25rem; font-weight:700; letter-spacing:-.04em; line-height:1;
+  color:var(--text);
+}
+.lmnp-kpi.accent .lmnp-kpi-val { color:var(--accent) }
+.lmnp-kpi.amber  .lmnp-kpi-val { color:var(--amber) }
+.lmnp-kpi.green  .lmnp-kpi-val { color:var(--success) }
+.lmnp-kpi.red    .lmnp-kpi-val { color:#9B5A3A }
+.lmnp-kpi-sub { font-size:.63rem; color:var(--text-dim); margin-top:.3rem; line-height:1.4 }
+
+/* ── CHART BAR ── */
+.lmnp-chart-wrap {
+  background:var(--surface-2); border:1px solid var(--border-subtle);
+  border-radius:var(--r-sm); padding:1.1rem 1.25rem;
+  margin-bottom:1.1rem;
+}
+.lmnp-chart-title {
+  font-size:.6rem; font-weight:700; color:var(--text-dim);
+  letter-spacing:.07em; text-transform:uppercase; margin-bottom:.9rem;
+}
+.lmnp-chart-row { display:flex; align-items:center; gap:.7rem; margin-bottom:.6rem }
+.lmnp-chart-lbl { font-size:.71rem; color:var(--text-muted); width:130px; text-align:right; flex-shrink:0; letter-spacing:-.01em }
+.lmnp-chart-bar-bg { flex:1; height:14px; border-radius:4px; background:var(--surface-3); overflow:hidden }
+.lmnp-chart-bar { height:100%; border-radius:4px; transition:width .55s cubic-bezier(.4,0,.2,1); min-width:4px; max-width:100% }
+.lmnp-chart-bar.blue   { background:var(--accent) }
+.lmnp-chart-bar.amber  { background:var(--amber) }
+.lmnp-chart-bar.green  { background:var(--success) }
+.lmnp-chart-bar.red    { background:#9B5A3A }
+.lmnp-chart-val { font-family:var(--mono); font-size:.7rem; font-weight:600; color:var(--text-muted); width:90px; flex-shrink:0 }
+
+/* ── AMORT STACKED BAR ── */
+.lmnp-amort-stack-wrap {
+  background:var(--surface-2); border:1px solid var(--border-subtle);
+  border-radius:var(--r-sm); padding:1rem 1.25rem; margin-bottom:1.1rem;
+}
+.lmnp-amort-stack-title {
+  font-size:.6rem; font-weight:700; color:var(--text-dim);
+  letter-spacing:.07em; text-transform:uppercase; margin-bottom:.75rem;
+}
+.lmnp-amort-stack {
+  height:20px; border-radius:6px; overflow:hidden;
+  display:flex; gap:2px; margin-bottom:.75rem;
+}
+.lmnp-amort-seg { height:100%; transition:flex .55s cubic-bezier(.4,0,.2,1); min-width:4px }
+.lmnp-amort-seg.bati   { background:var(--accent) }
+.lmnp-amort-seg.trav   { background:var(--amber) }
+.lmnp-amort-seg.mob    { background:var(--success) }
+.lmnp-amort-legend { display:flex; flex-wrap:wrap; gap:.85rem }
+.lmnp-amort-legend-item { display:flex; align-items:center; gap:.4rem; font-size:.72rem; color:var(--text-muted) }
+.lmnp-amort-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0 }
+
+/* ── TABLE ── */
+.lmnp-tbl-wrap {
+  overflow-x:auto; border-radius:var(--r-sm);
+  border:1px solid var(--border-subtle); margin-bottom:1.1rem;
+}
+.lmnp-tbl {
+  width:100%; border-collapse:collapse; font-size:.77rem; min-width:340px;
+}
+.lmnp-tbl th {
+  padding:.65rem .9rem; font-size:.62rem; font-weight:700;
+  letter-spacing:.05em; text-transform:uppercase;
+  border-bottom:2px solid var(--border); text-align:right;
+  color:var(--text-dim);
+}
+.lmnp-tbl th:first-child { text-align:left }
+.lmnp-tbl th.h-blue  { color:var(--accent);  background:rgba(79,138,120,.06) }
+.lmnp-tbl th.h-amber { color:var(--amber);   background:rgba(255,159,10,.06) }
+.lmnp-tbl td {
+  padding:.52rem .9rem; border-top:1px solid var(--border-subtle);
+  text-align:right; font-family:var(--mono); font-size:.77rem; color:var(--text-muted);
+}
+.lmnp-tbl td:first-child {
+  text-align:left; font-family:var(--sans); font-size:.75rem;
+  color:var(--text-muted); font-weight:400;
+}
+.lmnp-tbl tr.sect-head td {
+  background:var(--surface); font-family:var(--sans); font-size:.6rem;
+  font-weight:700; color:var(--text-dim); letter-spacing:.07em;
+  text-transform:uppercase; padding:.45rem .9rem;
+  border-top:2px solid var(--border-subtle);
+}
+.lmnp-tbl tr:hover td { background:rgba(0,0,0,.018) }
+.lmnp-tbl tr.sect-head:hover td { background:var(--surface) }
+.lmnp-tbl td.c-blue  { background:rgba(79,138,120,.04) }
+.lmnp-tbl td.c-amber { background:rgba(255,159,10,.04) }
+.val-pos { color:var(--success); font-weight:600 }
+.val-neg { color:#9B5A3A; font-weight:600 }
+.val-acc { color:var(--accent); font-weight:700 }
+.val-amb { color:var(--amber); font-weight:600 }
+.val-dim { color:var(--text-dim) }
+.lmnp-tbl td.txt { font-family:var(--sans); font-size:.73rem; color:var(--text-muted) }
+
+/* ── ADVANCED OPTIONS ── */
+details.adv-opts {
+  margin-top:1.4rem;
+  border-top:1px solid var(--border-subtle);
+  padding-top:1.2rem;
+}
+details.adv-opts summary {
+  list-style:none;
+  display:flex; align-items:center; gap:.5rem;
+  font-size:.75rem; font-weight:500; color:var(--text-muted);
+  cursor:pointer; padding:.4rem .65rem;
+  border-radius:var(--r-sm); transition:all .2s; user-select:none;
+  letter-spacing:-.01em;
+}
+details.adv-opts summary:hover { color:var(--accent); background:var(--accent-dim) }
+details.adv-opts summary::before { content:'▼'; font-size:.55rem; color:var(--accent); transition:transform .25s }
+details.adv-opts[open] summary::before { transform:rotate(180deg) }
+details.adv-opts summary::-webkit-details-marker { display:none }
+.adv-inner { padding-top:.75rem }
+
+/* ── FIELD GRID ── */
+.field-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:.75rem }
+@media(max-width:480px){ .field-grid-2 { grid-template-columns:1fr } }
+
+/* ── ALERTS ── */
+.lmnp-alert {
+  background:rgba(155,90,58,.07); border:1px solid rgba(155,90,58,.2);
+  border-radius:var(--r-sm); padding:.8rem 1rem .8rem 2.1rem;
+  font-size:.78rem; line-height:1.75; color:var(--text-muted);
+  position:relative; margin-bottom:1rem;
+}
+.lmnp-alert::before {
+  content:'!'; color:#9B5A3A; font-weight:700;
+  position:absolute; left:.8rem; top:.82rem;
+}
+.lmnp-alert strong { color:#9B5A3A; font-weight:600 }
+.lmnp-info {
+  background:var(--accent-dim); border:1px solid rgba(79,138,120,.15);
+  border-radius:var(--r-sm); padding:.8rem 1rem .8rem 2.1rem;
+  font-size:.78rem; line-height:1.75; color:var(--text-muted);
+  position:relative; margin-bottom:1rem;
+}
+.lmnp-info::before {
+  content:'→'; color:var(--accent); font-weight:700;
+  position:absolute; left:.75rem; top:.82rem;
+}
+.lmnp-info strong { color:var(--accent); font-weight:600 }
+
+/* ── DISCLAIMER ── */
+.lmnp-disclaimer {
+  font-size:.67rem; color:var(--text-dim); line-height:1.75;
+  font-family:var(--mono); opacity:.8; margin-top:1rem;
+}
+
+/* ── HINT ── */
+.field-hint { font-size:.62rem; color:var(--text-dim); font-family:var(--mono); margin-top:.3rem }
+
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="index.html" class="nav-logo"><img src="logo.png?v=3" alt="PATRIMONIA.AI" class="nav-logo-img"></a>
+  <div class="nav-right">
+    <a href="index.html" class="nav-back">
+      <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7.5 1.5L3 6l4.5 4.5"/></svg>
+      Accueil
+    </a>
+    <div class="nav-dropdown" id="mainDropdown">
+      <button class="nav-dropdown-btn" aria-expanded="false" aria-haspopup="true">
+        Simulateurs <svg class="nav-chevron" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.8" style="width:13px;height:8px;flex-shrink:0"><path d="M1 1l4 4 4-4"/></svg>
+      </button>
+      <div class="nav-dropdown-menu" id="navMenu" role="menu"></div>
+    </div>
+  </div>
+</nav>
+
+<div class="sim-page">
+  <div class="sim-page-header">
+    <span class="sim-num-badge">11</span>
+    <div>
+      <div class="sim-eyebrow">Fiscalité · Immobilier</div><h1>LMNP <em class="gradient-text">au réel</em></h1>
+      <p>Amortissements, résultat fiscal BIC, comparatif micro-BIC, cash-flow et fiscalité à la revente</p>
+    </div>
+  </div>
+
+  <div class="sim-card-wrap">
+    <div class="lmnp-body">
+
+      <!-- ══════════════════════════════
+           PANNEAU INPUTS
+      ══════════════════════════════ -->
+      <div class="lmnp-inputs-panel">
+
+        <!-- A. Bien -->
+        <div class="inp-sec">Bien immobilier</div>
+
+        <div class="field">
+          <div class="field-label"><label for="l-prix">Prix d'achat</label><span class="field-val" id="l-prix-disp">200 000 €</span></div>
+          <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="l-prix" value="200000"><span class="unit">€</span></div>
+          <input type="range" id="l-prix-sld" min="30000" max="2000000" step="5000" value="200000">
+        </div>
+
+        <div class="field">
+          <div class="field-label"><label for="l-notaire">Frais de notaire</label></div>
+          <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="l-notaire" value="15600"><span class="unit">€</span></div>
+          <div class="field-hint">Calculés automatiquement à 7,8 % du prix</div>
+        </div>
+
+        <div class="field-grid-2">
+          <div class="field">
+            <div class="field-label"><label for="l-travaux">Travaux</label></div>
+            <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="l-travaux" value="0"><span class="unit">€</span></div>
+          </div>
+          <div class="field">
+            <div class="field-label"><label for="l-mobilier">Mobilier</label></div>
+            <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="l-mobilier" value="5000"><span class="unit">€</span></div>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label"><label for="l-terrain">Quote-part terrain (non amortissable)</label></div>
+          <div class="select-wrap">
+            <select id="l-terrain">
+              <option value="10">10 %</option>
+              <option value="15" selected>15 %</option>
+              <option value="20">20 %</option>
+              <option value="25">25 %</option>
+              <option value="30">30 %</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="section-sep"></div>
+
+        <!-- B. Revenus -->
+        <div class="inp-sec">Revenus locatifs</div>
+
+        <div class="field">
+          <div class="field-label"><label for="l-loyer">Loyer mensuel HC</label><span class="field-val" id="l-loyer-disp">900 €</span></div>
+          <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="l-loyer" value="900"><span class="unit">€/mois</span></div>
+          <input type="range" id="l-loyer-sld" min="200" max="10000" step="50" value="900">
+        </div>
+
+        <div class="field">
+          <div class="field-label"><label for="l-vacance">Vacance locative</label></div>
+          <div class="select-wrap">
+            <select id="l-vacance">
+              <option value="0">Aucune</option>
+              <option value="0.5" selected>0,5 mois/an</option>
+              <option value="1">1 mois/an</option>
+              <option value="2">2 mois/an</option>
+              <option value="3">3 mois/an</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="section-sep"></div>
+
+        <!-- C. Charges -->
+        <div class="inp-sec">Charges déductibles</div>
+
+        <div class="field-grid-2">
+          <div class="field">
+            <div class="field-label"><label for="l-tf">Taxe foncière</label></div>
+            <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="l-tf" value="900"><span class="unit">€/an</span></div>
+          </div>
+          <div class="field">
+            <div class="field-label"><label for="l-copro">Charges copro</label></div>
+            <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="l-copro" value="600"><span class="unit">€/an</span></div>
+          </div>
+          <div class="field">
+            <div class="field-label"><label for="l-pno">Assurance PNO</label></div>
+            <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="l-pno" value="150"><span class="unit">€/an</span></div>
+          </div>
+          <div class="field">
+            <div class="field-label"><label for="l-gestion">Gestion locative</label></div>
+            <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="l-gestion" value="0"><span class="unit">€/an</span></div>
+          </div>
+          <div class="field">
+            <div class="field-label"><label for="l-entretien">Entretien</label></div>
+            <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="l-entretien" value="300"><span class="unit">€/an</span></div>
+          </div>
+          <div class="field">
+            <div class="field-label"><label for="l-autres-chg">Autres charges</label></div>
+            <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="l-autres-chg" value="0"><span class="unit">€/an</span></div>
+          </div>
+        </div>
+
+        <div class="section-sep"></div>
+
+        <!-- D. Financement -->
+        <div class="inp-sec">Financement</div>
+
+        <div class="field">
+          <div class="field-label"><label for="l-emprunt">Montant emprunté</label><span class="field-val" id="l-emprunt-disp">180 000 €</span></div>
+          <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="l-emprunt" value="180000"><span class="unit">€</span></div>
+          <input type="range" id="l-emprunt-sld" min="0" max="1500000" step="5000" value="180000">
+        </div>
+
+        <div class="field-grid-2">
+          <div class="field">
+            <div class="field-label"><label for="l-taux-cr">Taux</label></div>
+            <div class="input-wrap"><input type="number" id="l-taux-cr" value="3.5" min="0" max="10" step="0.05"><span class="unit">%</span></div>
+          </div>
+          <div class="field">
+            <div class="field-label"><label for="l-duree-cr">Durée</label></div>
+            <div class="select-wrap">
+              <select id="l-duree-cr">
+                <option value="10">10 ans</option>
+                <option value="15">15 ans</option>
+                <option value="20" selected>20 ans</option>
+                <option value="25">25 ans</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-sep"></div>
+
+        <!-- E. Fiscalité -->
+        <div class="inp-sec">Fiscalité personnelle</div>
+
+        <div class="field">
+          <div class="field-label"><label for="l-tmi">Tranche marginale d'imposition (TMI)</label></div>
+          <div class="select-wrap">
+            <select id="l-tmi">
+              <option value="0">0 %</option>
+              <option value="11">11 %</option>
+              <option value="30" selected>30 %</option>
+              <option value="41">41 %</option>
+              <option value="45">45 %</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- OPTIONS AVANCÉES -->
+        <details class="adv-opts">
+          <summary>Options avancées</summary>
+          <div class="adv-inner">
+
+            <div class="inp-sec" style="margin-top:.2rem">Acquisition (avancé)</div>
+
+            <div class="field-grid-2">
+              <div class="field">
+                <div class="field-label"><label for="l-agence">Frais d'agence</label></div>
+                <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="l-agence" value="0"><span class="unit">€</span></div>
+              </div>
+              <div class="field">
+                <div class="field-label"><label for="l-frais-dossier">Frais de dossier</label></div>
+                <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="l-frais-dossier" value="0"><span class="unit">€</span></div>
+              </div>
+            </div>
+
+            <div class="field">
+              <div class="field-label"><label for="l-type-trav">Nature des travaux</label></div>
+              <div class="select-wrap">
+                <select id="l-type-trav">
+                  <option value="amort" selected>Amortissables (amélioration, construction)</option>
+                  <option value="deductible">Déductibles immédiatement (réparation, entretien)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="inp-sec">Charges (avancé)</div>
+
+            <div class="field-grid-2">
+              <div class="field">
+                <div class="field-label"><label for="l-gli">GLI</label></div>
+                <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="l-gli" value="0"><span class="unit">€/an</span></div>
+              </div>
+              <div class="field">
+                <div class="field-label"><label for="l-compta">Comptable</label></div>
+                <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="l-compta" value="800"><span class="unit">€/an</span></div>
+              </div>
+              <div class="field">
+                <div class="field-label"><label for="l-cfe">CFE</label></div>
+                <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="l-cfe" value="200"><span class="unit">€/an</span></div>
+              </div>
+              <div class="field">
+                <div class="field-label"><label for="l-assur-empr">Assurance emprunteur</label></div>
+                <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="l-assur-empr" value="50"><span class="unit">€/mois</span></div>
+              </div>
+            </div>
+
+            <div class="inp-sec">Amortissements (avancé)</div>
+
+            <div class="field-grid-2">
+              <div class="field">
+                <div class="field-label"><label for="l-amort-bati" style="font-size:.68rem">Bâti</label></div>
+                <div class="select-wrap">
+                  <select id="l-amort-bati">
+                    <option value="20">20 ans</option>
+                    <option value="25">25 ans</option>
+                    <option value="30" selected>30 ans</option>
+                    <option value="35">35 ans</option>
+                    <option value="40">40 ans</option>
+                  </select>
+                </div>
+              </div>
+              <div class="field">
+                <div class="field-label"><label for="l-amort-trav" style="font-size:.68rem">Travaux</label></div>
+                <div class="select-wrap">
+                  <select id="l-amort-trav">
+                    <option value="5">5 ans</option>
+                    <option value="10" selected>10 ans</option>
+                    <option value="15">15 ans</option>
+                  </select>
+                </div>
+              </div>
+              <div class="field">
+                <div class="field-label"><label for="l-amort-mob" style="font-size:.68rem">Mobilier</label></div>
+                <div class="select-wrap">
+                  <select id="l-amort-mob">
+                    <option value="5">5 ans</option>
+                    <option value="7" selected>7 ans</option>
+                    <option value="10">10 ans</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="inp-sec">Micro-BIC (avancé)</div>
+
+            <div class="field">
+              <div class="field-label"><label for="l-type-meuble">Type de meublé</label></div>
+              <div class="select-wrap">
+                <select id="l-type-meuble">
+                  <option value="standard" selected>Standard (abattement 50 %, seuil 77 700 €)</option>
+                  <option value="classe">Classé / chambre d'hôtes (abattement 71 %, seuil 188 700 €)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="inp-sec">Revente (avancé)</div>
+
+            <div class="field">
+              <div class="field-label"><label for="l-duree-det">Durée de détention prévue</label></div>
+              <div class="select-wrap">
+                <select id="l-duree-det">
+                  <option value="5">5 ans</option>
+                  <option value="10">10 ans</option>
+                  <option value="15" selected>15 ans</option>
+                  <option value="20">20 ans</option>
+                  <option value="25">25 ans</option>
+                  <option value="30">30 ans</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field">
+              <div class="field-label"><label for="l-prix-revente">Prix de revente estimé</label><span class="field-val" id="l-revente-disp">260 000 €</span></div>
+              <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="l-prix-revente" value="260000"><span class="unit">€</span></div>
+              <input type="range" id="l-revente-sld" min="30000" max="3000000" step="5000" value="260000">
+            </div>
+
+          </div><!-- /adv-inner -->
+        </details>
+
+      </div><!-- /lmnp-inputs-panel -->
+
+      <!-- ══════════════════════════════
+           PANNEAU RÉSULTATS
+      ══════════════════════════════ -->
+      <div class="lmnp-results-panel">
+
+        <div class="lmnp-tabs">
+          <button class="lmnp-tab active" data-tab="exploit">Exploitation</button>
+          <button class="lmnp-tab" data-tab="amort">Amortissements</button>
+          <button class="lmnp-tab" data-tab="micro">Micro-BIC vs Réel</button>
+          <button class="lmnp-tab" data-tab="revente">Revente</button>
+          <button class="lmnp-tab" data-tab="pedago">Pédagogie</button>
+        </div>
+
+        <!-- ── TAB : EXPLOITATION ── -->
+        <div class="lmnp-panel active" id="panel-exploit">
+          <div class="lmnp-kpi-row" id="kpi-exploit"></div>
+
+          <div class="lmnp-chart-wrap">
+            <div class="lmnp-chart-title">Répartition annuelle des flux</div>
+            <div id="chart-exploit"></div>
+          </div>
+
+          <div class="lmnp-tbl-wrap">
+            <table class="lmnp-tbl" id="tbl-exploit"></table>
+          </div>
+
+          <div id="alert-deficit"></div>
+        </div>
+
+        <!-- ── TAB : AMORTISSEMENTS ── -->
+        <div class="lmnp-panel" id="panel-amort">
+          <div class="lmnp-kpi-row" id="kpi-amort"></div>
+
+          <div class="lmnp-amort-stack-wrap" id="amort-stack-wrap"></div>
+
+          <div class="lmnp-tbl-wrap">
+            <table class="lmnp-tbl" id="tbl-amort"></table>
+          </div>
+
+          <div id="alert-amort-diff"></div>
+        </div>
+
+        <!-- ── TAB : MICRO-BIC vs RÉEL ── -->
+        <div class="lmnp-panel" id="panel-micro">
+          <div class="lmnp-kpi-row" id="kpi-micro"></div>
+
+          <div class="lmnp-chart-wrap">
+            <div class="lmnp-chart-title">Fiscalité comparée</div>
+            <div id="chart-micro"></div>
+          </div>
+
+          <div class="lmnp-tbl-wrap">
+            <table class="lmnp-tbl" id="tbl-micro"></table>
+          </div>
+
+          <div id="alert-micro"></div>
+        </div>
+
+        <!-- ── TAB : REVENTE ── -->
+        <div class="lmnp-panel" id="panel-revente">
+          <div class="lmnp-kpi-row" id="kpi-revente"></div>
+
+          <div class="lmnp-chart-wrap">
+            <div class="lmnp-chart-title">Abattements et fiscalité à la revente</div>
+            <div id="chart-revente"></div>
+          </div>
+
+          <div class="lmnp-tbl-wrap">
+            <table class="lmnp-tbl" id="tbl-revente"></table>
+          </div>
+
+          <div id="alert-revente"></div>
+        </div>
+
+        <!-- ── TAB : PÉDAGOGIE ── -->
+        <div class="lmnp-panel" id="panel-pedago">
+          <div id="pedago-full"></div>
+        </div>
+
+        <div class="lmnp-disclaimer" id="disclaimer-txt"></div>
+
+      </div><!-- /lmnp-results-panel -->
+
+    </div><!-- /lmnp-body -->
+  </div><!-- /sim-card-wrap -->
+</div><!-- /sim-page -->
+
+<footer>
+  <span>PATRIMONIA.AI</span> — Simulation indicative et pédagogique.<br>
+  LMNP réel : BIC — CGI art. 35 et s. Amortissements plafonnés : CGI art. 39 C II. Micro-BIC : abattement 50 % (CGI art. 50-0). PV particuliers : CGI art. 150 U à 150 VH. Abattements durée : CGI art. 150 VC. PS 17,2 % : CSS art. L136-7.<br>
+  Résultats non contractuels. Un expert-comptable spécialisé LMNP est recommandé avant toute décision.
+</footer>
+
+<script>
+'use strict';
+
+/* ══════════════════════════════════════
+   UTILITAIRES
+══════════════════════════════════════ */
+const fmtN = (v,d=0) => new Intl.NumberFormat('fr-FR',{minimumFractionDigits:d,maximumFractionDigits:d}).format(+v||0).replace(/[  ]/g,' ');
+const eur  = (v,d=0) => fmtN(v,d) + ' €';
+const pct  = (v,d=1) => fmtN(v,d) + ' %';
+const gv   = id => { const e=document.getElementById(id); return e ? e.value : '' };
+const pN   = id => SP.parseNum(document.getElementById(id)?.value ?? '0');
+
+function signEur(v) {
+  const s = v >= 0 ? '+' : '';
+  const cls = v > 0 ? 'val-pos' : v < 0 ? 'val-neg' : '';
+  return `<span class="${cls}">${s}${eur(v)}</span>`;
+}
+
+/* ══════════════════════════════════════
+   FONCTIONS FINANCIÈRES
+══════════════════════════════════════ */
+function calcMens(montant, taux, duree) {
+  if (!montant || !taux || !duree) return 0;
+  const r = taux / 100 / 12;
+  const n = duree * 12;
+  return montant * r * Math.pow(1+r,n) / (Math.pow(1+r,n) - 1);
+}
+
+function calcInterets1(montant, taux, duree) {
+  if (!montant || !taux || !duree) return 0;
+  const r = taux / 100 / 12;
+  const mens = calcMens(montant, taux, duree);
+  let solde = montant, total = 0;
+  for (let m = 0; m < 12; m++) {
+    const im = solde * r;
+    total += im;
+    solde -= (mens - im);
+    if (solde < 0) break;
+  }
+  return total;
+}
+
+/* Abattements PV particuliers — CGI art. 150 VC */
+function calcAbattements(duree) {
+  let abIR = 0, abPS = 0;
+  for (let y = 6; y <= duree; y++) {
+    if (y <= 21) abIR += 6;
+    else if (y === 22) abIR += 4;
+    if (y <= 11)      abPS += 1.65;
+    else if (y === 12) abPS += 1.60;
+    else               abPS += 9;
+  }
+  return { abIR: Math.min(abIR, 100), abPS: Math.min(abPS, 100) };
+}
+
+/* Surtaxe PV — CGI art. 1609 nonies G */
+function calcSurtaxe(pvNet) {
+  if (pvNet <= 50000) return 0;
+  let taux = 0;
+  if      (pvNet <= 100000) taux = 0.02;
+  else if (pvNet <= 150000) taux = 0.03;
+  else if (pvNet <= 200000) taux = 0.04;
+  else if (pvNet <= 250000) taux = 0.05;
+  else                      taux = 0.06;
+  return pvNet * taux;
+}
+
+/* ══════════════════════════════════════
+   INPUTS
+══════════════════════════════════════ */
+function getInputs() {
+  return {
+    prix:         pN('l-prix'),
+    notaire:      pN('l-notaire'),
+    agence:       pN('l-agence'),
+    fraisDossier: pN('l-frais-dossier'),
+    travaux:      pN('l-travaux'),
+    typeTrav:     gv('l-type-trav') || 'amort',
+    mobilier:     pN('l-mobilier'),
+    terrain:      parseFloat(gv('l-terrain')) || 15,
+
+    loyer:        pN('l-loyer'),
+    vacance:      parseFloat(gv('l-vacance')) || 0,
+
+    tf:           pN('l-tf'),
+    copro:        pN('l-copro'),
+    pno:          pN('l-pno'),
+    gli:          pN('l-gli'),
+    gestion:      pN('l-gestion'),
+    compta:       pN('l-compta'),
+    cfe:          pN('l-cfe'),
+    entretien:    pN('l-entretien'),
+    autresChg:    pN('l-autres-chg'),
+
+    emprunt:      pN('l-emprunt'),
+    tauxCr:       parseFloat(gv('l-taux-cr')) || 0,
+    dureeCr:      parseInt(gv('l-duree-cr')) || 20,
+    assurEmpr:    pN('l-assur-empr'),
+
+    tmi:          parseInt(gv('l-tmi')) || 0,
+
+    dureeAmortBati: parseInt(gv('l-amort-bati')) || 30,
+    dureeAmortTrav: parseInt(gv('l-amort-trav')) || 10,
+    dureeAmortMob:  parseInt(gv('l-amort-mob'))  || 7,
+
+    typeMeuble:     gv('l-type-meuble') || 'standard',
+    dureeDetention: parseInt(gv('l-duree-det')) || 15,
+    prixRevente:    pN('l-prix-revente'),
+  };
+}
+
+/* ══════════════════════════════════════
+   CALCUL PRINCIPAL
+══════════════════════════════════════ */
+function calcAll() {
+  const i = getInputs();
+  const PS_RATE = 0.172;
+
+  /* ── Revenus ── */
+  const loyersAnnuels = i.loyer * (12 - i.vacance);
+
+  /* ── Base amortissable ──
+     frais d'acquisition (notaire + agence) inclus dans la base bâti
+     selon la doctrine comptable LMNP la plus répandue */
+  const coutAcquis = i.prix + i.notaire + i.agence;
+  const valBati    = coutAcquis * (1 - i.terrain / 100);
+  const valTerrain = coutAcquis * (i.terrain / 100);
+
+  const travauxAmort = i.typeTrav === 'amort' ? i.travaux : 0;
+  const travauxDed   = i.typeTrav === 'deductible' ? i.travaux : 0;
+
+  /* ── Amortissements annuels ── */
+  const amortBati = valBati > 0 ? valBati / i.dureeAmortBati : 0;
+  const amortTrav = travauxAmort > 0 ? travauxAmort / i.dureeAmortTrav : 0;
+  const amortMob  = i.mobilier > 0 ? i.mobilier / i.dureeAmortMob : 0;
+  const amortTotal = amortBati + amortTrav + amortMob;
+
+  /* ── Crédit ── */
+  const mensCapInt   = calcMens(i.emprunt, i.tauxCr, i.dureeCr);
+  const interets1    = calcInterets1(i.emprunt, i.tauxCr, i.dureeCr);
+  const assurEmprAnn = i.assurEmpr * 12;
+
+  /* ── Charges BIC déductibles hors amortissement ── */
+  const chargesExploit = i.tf + i.copro + i.pno + i.gli + i.gestion +
+                         i.compta + i.cfe + i.entretien + i.autresChg + travauxDed;
+  const chargesFin     = interets1 + assurEmprAnn;
+  const totalChargesHorsAmort = chargesExploit + chargesFin;
+
+  /* ── Résultat avant amortissement ── */
+  const resultAvantAmort = loyersAnnuels - totalChargesHorsAmort;
+
+  /* ── Plafonnement amortissement LMNP (CGI art. 39 C II) ──
+     L'amortissement ne peut ni créer ni aggraver un déficit BIC.
+     L'excédent est reporté sans limitation de durée. */
+  let amortUtilise, amortDiffere, resultFiscal, deficitExploit = 0;
+  if (resultAvantAmort <= 0) {
+    deficitExploit = Math.abs(resultAvantAmort);
+    amortUtilise   = 0;
+    amortDiffere   = amortTotal;
+    resultFiscal   = 0;
+  } else {
+    amortUtilise = Math.min(amortTotal, resultAvantAmort);
+    amortDiffere = Math.max(0, amortTotal - amortUtilise);
+    resultFiscal = resultAvantAmort - amortUtilise;
+  }
+
+  /* ── Fiscalité LMNP réel (IR + PS) ── */
+  const irReel        = resultFiscal * i.tmi / 100;
+  const psReel        = resultFiscal * PS_RATE;
+  const fiscaliteReel = irReel + psReel;
+  const tauxEffectif  = resultFiscal > 0 ? fiscaliteReel / loyersAnnuels * 100 : 0;
+
+  /* ── Micro-BIC ── */
+  const abattMicro   = i.typeMeuble === 'classe' ? 0.71 : 0.50;
+  const seuilMicro   = i.typeMeuble === 'classe' ? 188700 : 77700;
+  const microOK      = loyersAnnuels <= seuilMicro;
+  const revenuMicro  = loyersAnnuels * (1 - abattMicro);
+  const irMicro      = revenuMicro * i.tmi / 100;
+  const psMicro      = revenuMicro * PS_RATE;
+  const fiscMicro    = irMicro + psMicro;
+  const economieFisc = fiscMicro - fiscaliteReel; // >0 = réel avantageux
+
+  /* ── Cash-flow ──
+     Décaissements réels : charges + mensualité crédit (cap+int) + assurance emprunt + fiscalité
+     Note : travaux amortissables sont une dépense d'acquisition, pas annuelle */
+  const cfBrut    = loyersAnnuels - chargesExploit - mensCapInt * 12 - assurEmprAnn;
+  const cfNetReel = cfBrut - fiscaliteReel;
+  const cfNetMicro= cfBrut - fiscMicro;
+  const cfMensuel = cfNetReel / 12;
+
+  /* ── Rentabilité ── */
+  const investTotal    = coutAcquis + travauxAmort + i.mobilier;
+  const rentBrute      = investTotal > 0 ? loyersAnnuels / investTotal * 100 : 0;
+  const rentNette      = investTotal > 0 ? (loyersAnnuels - chargesExploit) / investTotal * 100 : 0;
+  const rentNetteNette = investTotal > 0 ? (loyersAnnuels - chargesExploit - fiscaliteReel) / investTotal * 100 : 0;
+
+  /* ── Plus-value à la revente ──
+     LMNP reste au régime des PV des particuliers (CGI art. 150 U).
+     Amortissements NON réintégrés dans la PV — avantage majeur vs SCI IS. */
+  const { abIR, abPS } = calcAbattements(i.dureeDetention);
+  const prixAcqCorrige = i.prix + i.notaire + i.agence + i.travaux;
+  const pvBrute  = Math.max(0, i.prixRevente - prixAcqCorrige);
+  const pvNeg    = Math.min(0, i.prixRevente - prixAcqCorrige);
+  const pvNetIR  = pvBrute * (1 - abIR / 100);
+  const pvNetPS  = pvBrute * (1 - abPS / 100);
+  const irPV     = pvNetIR * 0.19;
+  const psPV     = pvNetPS * PS_RATE;
+  const surtaxe  = calcSurtaxe(pvNetIR);
+  const fiscPV   = irPV + psPV + surtaxe;
+  const netRevente = i.prixRevente - fiscPV + pvNeg;
+
+  return {
+    i, loyersAnnuels, coutAcquis, valBati, valTerrain, travauxAmort, travauxDed,
+    chargesExploit, chargesFin, interets1, assurEmprAnn, totalChargesHorsAmort,
+    resultAvantAmort, deficitExploit,
+    amortBati, amortTrav, amortMob, amortTotal, amortUtilise, amortDiffere, resultFiscal,
+    irReel, psReel, fiscaliteReel, tauxEffectif,
+    abattMicro, seuilMicro, microOK, revenuMicro, irMicro, psMicro, fiscMicro, economieFisc,
+    mensCapInt, cfBrut, cfNetReel, cfNetMicro, cfMensuel,
+    investTotal, rentBrute, rentNette, rentNetteNette,
+    abIR, abPS, pvBrute, pvNeg, pvNetIR, pvNetPS, irPV, psPV, surtaxe, fiscPV, netRevente
+  };
+}
+
+/* ══════════════════════════════════════
+   RENDU — BAR CHART
+══════════════════════════════════════ */
+function renderBarChart(containerId, rows) {
+  const maxAbs = Math.max(...rows.map(r => Math.abs(r.val)), 1);
+  const html = rows.map(r => {
+    const w   = Math.max(0, Math.min(100, Math.abs(r.val) / maxAbs * 100)).toFixed(1);
+    const col = r.val < 0 ? 'background:#9B5A3A' : '';
+    const sign= r.val >= 0 ? '+' : '−';
+    return `
+      <div class="lmnp-chart-row">
+        <div class="lmnp-chart-lbl">${r.lbl}</div>
+        <div class="lmnp-chart-bar-bg">
+          <div class="lmnp-chart-bar ${r.cls}" style="width:${w}%;${col}"></div>
+        </div>
+        <div class="lmnp-chart-val" style="color:${r.val<0?'#9B5A3A':'var(--text-muted)'}">${sign}${eur(Math.abs(r.val))}</div>
+      </div>`;
+  }).join('');
+  document.getElementById(containerId).innerHTML = html;
+}
+
+/* ══════════════════════════════════════
+   RENDU — TAB EXPLOITATION
+══════════════════════════════════════ */
+function renderExploit(d) {
+  const { i, loyersAnnuels, chargesExploit, chargesFin, interets1, assurEmprAnn,
+          totalChargesHorsAmort, resultAvantAmort, deficitExploit,
+          amortTotal, amortUtilise, amortDiffere, resultFiscal,
+          irReel, psReel, fiscaliteReel, tauxEffectif,
+          mensCapInt, cfBrut, cfNetReel, cfMensuel,
+          rentBrute, rentNette, rentNetteNette } = d;
+
+  document.getElementById('kpi-exploit').innerHTML = `
+    <div class="lmnp-kpi accent">
+      <span class="lmnp-kpi-badge">Résultat fiscal BIC</span>
+      <div class="lmnp-kpi-val">${eur(resultFiscal)}</div>
+      <div class="lmnp-kpi-sub">Après ${amortUtilise>0?'amort. '+eur(amortUtilise)+' utilisé':'aucun amort. utilisé'}</div>
+    </div>
+    <div class="lmnp-kpi ${fiscaliteReel===0?'green':'red'}">
+      <span class="lmnp-kpi-badge">IR + PS</span>
+      <div class="lmnp-kpi-val">${eur(fiscaliteReel)}</div>
+      <div class="lmnp-kpi-sub">${i.tmi>0?'IR '+eur(irReel)+' · PS '+eur(psReel):'Taux 0 % · PS '+eur(psReel)}</div>
+    </div>
+    <div class="lmnp-kpi ${cfNetReel>=0?'green':'red'}">
+      <span class="lmnp-kpi-badge">Cash-flow net/mois</span>
+      <div class="lmnp-kpi-val">${eur(cfMensuel,0)}</div>
+      <div class="lmnp-kpi-sub">Annuel : ${cfNetReel>=0?'+':''}${eur(cfNetReel)} · Rdt net net ${fmtN(rentNetteNette,2)} %</div>
+    </div>`;
+
+  renderBarChart('chart-exploit', [
+    { lbl:'Loyers encaissés',      val:loyersAnnuels,            cls:'blue' },
+    { lbl:'Charges exploitation',  val:-chargesExploit,          cls:'red' },
+    { lbl:'Intérêts + assurance',  val:-(interets1+assurEmprAnn),cls:'red' },
+    { lbl:'Amort. utilisé',        val:-amortUtilise,            cls:'amber' },
+    { lbl:'Mensualité crédit',     val:-mensCapInt*12,           cls:'red' },
+    { lbl:'Fiscalité (IR+PS)',     val:-fiscaliteReel,           cls:'red' },
+    { lbl:'Cash-flow net',         val:cfNetReel,                cls:'blue' },
+  ]);
+
+  document.getElementById('tbl-exploit').innerHTML = `
+    <thead><tr>
+      <th>Indicateur</th>
+      <th style="text-align:right">Montant / an</th>
+      <th style="text-align:right">Note</th>
+    </tr></thead>
+    <tbody>
+      <tr class="sect-head"><td colspan="3">Revenus</td></tr>
+      <tr><td>Loyer mensuel HC</td><td>${eur(i.loyer)}/mois</td><td class="val-dim">${i.vacance>0?i.vacance+' mois vacance':'Plein exercice'}</td></tr>
+      <tr><td>Loyers annuels encaissés</td><td class="val-pos">+${eur(loyersAnnuels)}</td><td class="val-dim">${i.loyer} × ${12-i.vacance} mois</td></tr>
+      <tr class="sect-head"><td colspan="3">Charges BIC déductibles (hors amortissement)</td></tr>
+      <tr><td>Charges d'exploitation</td><td class="val-neg">−${eur(chargesExploit)}</td><td class="val-dim">TF, copro, PNO, gestion…</td></tr>
+      <tr><td>Intérêts d'emprunt (an 1)</td><td class="val-neg">−${eur(interets1)}</td><td class="val-dim">Déductibles BIC</td></tr>
+      <tr><td>Assurance emprunteur</td><td class="val-neg">−${eur(assurEmprAnn)}</td><td class="val-dim">Déductible BIC</td></tr>
+      <tr><td>Total charges hors amort.</td><td class="val-neg">−${eur(totalChargesHorsAmort)}</td><td></td></tr>
+      <tr class="sect-head"><td colspan="3">Résultat et amortissement</td></tr>
+      <tr><td>Résultat avant amortissement</td>
+        <td class="${resultAvantAmort>=0?'val-pos':'val-neg'}">${resultAvantAmort>=0?'+':''}${eur(resultAvantAmort)}</td>
+        <td class="val-dim">${resultAvantAmort<0?'Déficit BIC (reportable 10 ans)':''}</td>
+      </tr>
+      <tr><td>Amortissement utilisé</td>
+        <td class="val-amb">−${eur(amortUtilise)}</td>
+        <td class="val-dim">Sur ${eur(amortTotal)} disponibles</td>
+      </tr>
+      ${amortDiffere>0?`<tr><td>Amortissement différé (reporté)</td><td class="val-dim">${eur(amortDiffere)}</td><td class="val-dim">Stock reportable années suivantes</td></tr>`:''}
+      <tr class="sect-head"><td colspan="3">Fiscalité</td></tr>
+      <tr><td>Résultat fiscal BIC</td><td class="val-acc">${eur(resultFiscal)}</td><td class="val-dim">Base imposable</td></tr>
+      <tr><td>IR (TMI ${i.tmi} %)</td><td class="val-neg">−${eur(irReel)}</td><td></td></tr>
+      <tr><td>Prélèvements sociaux (17,2 %)</td><td class="val-neg">−${eur(psReel)}</td><td></td></tr>
+      <tr><td>Fiscalité totale</td><td class="val-neg">−${eur(fiscaliteReel)}</td><td class="val-dim">Taux effectif / loyers : ${fmtN(tauxEffectif,1)} %</td></tr>
+      <tr class="sect-head"><td colspan="3">Cash-flow réel</td></tr>
+      <tr><td>Mensualité crédit (capital + intérêts)</td><td class="val-neg">−${eur(mensCapInt*12)}</td><td class="val-dim">${eur(mensCapInt,0)}/mois</td></tr>
+      <tr><td>Cash-flow avant impôt</td><td class="${cfBrut>=0?'val-pos':'val-neg'}">${cfBrut>=0?'+':''}${eur(cfBrut)}</td><td></td></tr>
+      <tr><td><strong>Cash-flow net après impôt</strong></td><td class="${cfNetReel>=0?'val-pos':'val-neg'}">${cfNetReel>=0?'+':''}${eur(cfNetReel)}</td><td class="val-dim">${eur(cfMensuel,0)}/mois</td></tr>
+      <tr class="sect-head"><td colspan="3">Rentabilité</td></tr>
+      <tr><td>Rendement brut</td><td>${pct(rentBrute,2)}</td><td class="val-dim">Loyers / investissement total</td></tr>
+      <tr><td>Rendement net de charges</td><td>${pct(rentNette,2)}</td><td></td></tr>
+      <tr><td>Rendement net nette d'impôts</td><td class="val-acc">${pct(rentNetteNette,2)}</td><td></td></tr>
+    </tbody>`;
+
+  const el = document.getElementById('alert-deficit');
+  if (deficitExploit > 0) {
+    el.innerHTML = `<div class="lmnp-alert" style="margin-top:.75rem">
+      <strong>Déficit BIC de ${eur(deficitExploit)} :</strong> les charges déductibles dépassent les loyers, même avant amortissements.
+      Ce déficit est reportable sur les revenus BIC meublé des <strong>10 années suivantes</strong> (CGI art. 156 I 1°).
+      Il n'est pas imputable sur le revenu global du foyer en LMNP non professionnel.
+    </div>`;
+  } else if (amortUtilise > 0) {
+    const econFisc = amortUtilise * (i.tmi / 100 + 0.172);
+    const baseAvant = resultAvantAmort > 0 ? eur(resultAvantAmort) : '0 €';
+    el.innerHTML = `<div class="lmnp-info" style="margin-top:.75rem">
+      <strong>Bouclier fiscal LMNP actif.</strong>
+      Les amortissements de <strong>${eur(amortUtilise)}/an</strong> ramènent votre base imposable de <em>${baseAvant}</em> à <strong>${eur(resultFiscal)}</strong>.
+      Économie fiscale générée : <strong>+${eur(econFisc)}/an</strong> (IR + PS à TMI ${i.tmi}%).
+      ${amortDiffere > 0 ? `<br>En outre, <strong>${eur(amortDiffere)}</strong> sont différés et stockés pour les exercices futurs.` : ''}
+    </div>`;
+  } else {
+    el.innerHTML = '';
+  }
+}
+
+/* ══════════════════════════════════════
+   RENDU — TAB AMORTISSEMENTS
+══════════════════════════════════════ */
+function renderAmort(d) {
+  const { amortBati, amortTrav, amortMob, amortTotal, amortUtilise, amortDiffere,
+          valBati, valTerrain, travauxAmort, i, resultAvantAmort, loyersAnnuels } = d;
+
+  document.getElementById('kpi-amort').innerHTML = `
+    <div class="lmnp-kpi amber">
+      <span class="lmnp-kpi-badge">Amortissement total/an</span>
+      <div class="lmnp-kpi-val">${eur(amortTotal)}</div>
+      <div class="lmnp-kpi-sub">Charge comptable non décaissée</div>
+    </div>
+    <div class="lmnp-kpi accent">
+      <span class="lmnp-kpi-badge">Amort. utilisé/an</span>
+      <div class="lmnp-kpi-val">${eur(amortUtilise)}</div>
+      <div class="lmnp-kpi-sub">Déduit du résultat fiscal</div>
+    </div>
+    <div class="lmnp-kpi ${amortDiffere>0?'red':'green'}">
+      <span class="lmnp-kpi-badge">Amort. différé/an</span>
+      <div class="lmnp-kpi-val">${eur(amortDiffere)}</div>
+      <div class="lmnp-kpi-sub">${amortDiffere>0?'Reporté aux exercices suivants':'Tout utilisé'}</div>
+    </div>`;
+
+  /* Stacked bar */
+  const total = amortTotal || 1;
+  const flexB = (amortBati / total * 100).toFixed(1);
+  const flexT = (amortTrav / total * 100).toFixed(1);
+  const flexM = (amortMob  / total * 100).toFixed(1);
+  document.getElementById('amort-stack-wrap').innerHTML = `
+    <div class="lmnp-amort-stack-title">Composition de l'amortissement annuel</div>
+    <div class="lmnp-amort-stack">
+      ${amortBati>0?`<div class="lmnp-amort-seg bati" style="flex:${flexB}" title="Bâti ${eur(amortBati)}/an"></div>`:''}
+      ${amortTrav>0?`<div class="lmnp-amort-seg trav" style="flex:${flexT}" title="Travaux ${eur(amortTrav)}/an"></div>`:''}
+      ${amortMob>0 ?`<div class="lmnp-amort-seg mob"  style="flex:${flexM}" title="Mobilier ${eur(amortMob)}/an"></div>`:''}
+    </div>
+    <div class="lmnp-amort-legend">
+      ${amortBati>0?`<div class="lmnp-amort-legend-item"><div class="lmnp-amort-dot" style="background:var(--accent)"></div>Bâti ${eur(amortBati)}/an</div>`:''}
+      ${amortTrav>0?`<div class="lmnp-amort-legend-item"><div class="lmnp-amort-dot" style="background:var(--amber)"></div>Travaux ${eur(amortTrav)}/an</div>`:''}
+      ${amortMob>0 ?`<div class="lmnp-amort-legend-item"><div class="lmnp-amort-dot" style="background:var(--success)"></div>Mobilier ${eur(amortMob)}/an</div>`:''}
+    </div>`;
+
+  document.getElementById('tbl-amort').innerHTML = `
+    <thead><tr>
+      <th>Composante</th>
+      <th>Base amortissable</th>
+      <th>Durée</th>
+      <th>Amort. / an</th>
+    </tr></thead>
+    <tbody>
+      <tr class="sect-head"><td colspan="4">Base d'acquisition</td></tr>
+      <tr><td>Coût total acquisition</td><td>${eur(d.coutAcquis)}</td><td class="val-dim">—</td><td class="val-dim">—</td></tr>
+      <tr><td>Part terrain (non amortissable)</td><td class="val-neg">−${eur(valTerrain)}</td><td class="val-dim">${i.terrain} %</td><td class="val-dim">0</td></tr>
+      <tr><td>Part bâti (amortissable)</td><td class="val-acc">${eur(valBati)}</td><td>${i.dureeAmortBati} ans</td><td class="val-amb">${eur(amortBati)}/an</td></tr>
+      ${travauxAmort>0?`
+      <tr><td>Travaux amortissables</td><td class="val-acc">${eur(travauxAmort)}</td><td>${i.dureeAmortTrav} ans</td><td class="val-amb">${eur(amortTrav)}/an</td></tr>`:''}
+      ${i.mobilier>0?`
+      <tr><td>Mobilier</td><td class="val-acc">${eur(i.mobilier)}</td><td>${i.dureeAmortMob} ans</td><td class="val-amb">${eur(amortMob)}/an</td></tr>`:''}
+      <tr class="sect-head"><td colspan="4">Synthèse amortissement</td></tr>
+      <tr><td>Amortissement total disponible</td><td></td><td></td><td class="val-amb">${eur(amortTotal)}/an</td></tr>
+      <tr><td>Résultat avant amort.</td><td></td><td></td><td class="${resultAvantAmort>=0?'val-pos':'val-neg'}">${resultAvantAmort>=0?'+':''}${eur(resultAvantAmort)}</td></tr>
+      <tr><td>Amortissement utilisé</td><td></td><td></td><td class="val-acc">${eur(amortUtilise)}/an</td></tr>
+      <tr><td>Amortissement différé (stock)</td><td></td><td></td><td class="${amortDiffere>0?'val-neg':'val-dim'}">${amortDiffere>0?eur(amortDiffere)+'/an (reporté)':'0'}</td></tr>
+      <tr><td><strong>Résultat fiscal BIC</strong></td><td></td><td></td><td class="val-acc">${eur(d.resultFiscal)}</td></tr>
+      ${amortTotal>0?`
+      <tr class="sect-head"><td colspan="4">Économie fiscale générée par l'amortissement</td></tr>
+      <tr><td>Économie IR grâce à l'amort. utilisé</td><td></td><td></td><td class="val-pos">+${eur(amortUtilise * i.tmi / 100)}</td></tr>
+      <tr><td>Économie PS grâce à l'amort. utilisé</td><td></td><td></td><td class="val-pos">+${eur(amortUtilise * 0.172)}</td></tr>
+      <tr><td>Économie fiscale totale / an</td><td></td><td></td><td class="val-pos">+${eur(amortUtilise * (i.tmi / 100 + 0.172))}</td></tr>`:''}
+    </tbody>`;
+
+  const el = document.getElementById('alert-amort-diff');
+  if (amortDiffere > 0 && amortTotal > 0) {
+    const pctDiff = (amortDiffere / amortTotal * 100).toFixed(0);
+    el.innerHTML = `<div class="lmnp-info" style="margin-top:.75rem">
+      <strong>Amortissements différés (${pctDiff} %) :</strong> les amortissements dépassent le résultat avant amortissement.
+      L'excédent de <strong>${eur(amortDiffere)}/an</strong> est "stocké" et reporté sans limitation de durée sur les exercices futurs.
+      Ces amortissements différés viendront réduire la fiscalité des années où le résultat sera positif.
+      C'est un avantage : votre stock fiscal s'accumule pour les années rentables.
+    </div>`;
+  } else {
+    el.innerHTML = '';
+  }
+}
+
+/* ══════════════════════════════════════
+   RENDU — TAB MICRO-BIC vs RÉEL
+══════════════════════════════════════ */
+function renderMicro(d) {
+  const { i, loyersAnnuels, abattMicro, seuilMicro, microOK,
+          revenuMicro, irMicro, psMicro, fiscMicro,
+          irReel, psReel, fiscaliteReel, economieFisc,
+          cfNetReel, cfNetMicro,
+          chargesExploit, chargesFin, totalChargesHorsAmort,
+          amortUtilise, resultFiscal } = d;
+
+  const reel_better = economieFisc > 0;
+
+  document.getElementById('kpi-micro').innerHTML = `
+    <div class="lmnp-kpi amber">
+      <span class="lmnp-kpi-badge">Micro-BIC</span>
+      <div class="lmnp-kpi-val">${eur(fiscMicro)}</div>
+      <div class="lmnp-kpi-sub">Abattement ${pct(abattMicro*100,0)} — Base ${eur(revenuMicro)}</div>
+    </div>
+    <div class="lmnp-kpi accent">
+      <span class="lmnp-kpi-badge">LMNP réel</span>
+      <div class="lmnp-kpi-val">${eur(fiscaliteReel)}</div>
+      <div class="lmnp-kpi-sub">Base imposable ${eur(resultFiscal)}</div>
+    </div>
+    <div class="lmnp-kpi ${reel_better?'green':'red'}">
+      <span class="lmnp-kpi-badge">${reel_better?'Économie (réel)':'Surcoût (réel)'}</span>
+      <div class="lmnp-kpi-val">${reel_better?'+':''}${eur(Math.abs(economieFisc))}</div>
+      <div class="lmnp-kpi-sub">${reel_better?'Le réel est plus avantageux':'Le micro-BIC est plus avantageux'}</div>
+    </div>`;
+
+  renderBarChart('chart-micro', [
+    { lbl:'Fiscalité micro-BIC',  val:fiscMicro,       cls:'amber' },
+    { lbl:'Fiscalité LMNP réel',  val:fiscaliteReel,   cls:'blue'  },
+    { lbl:'Économie réel vs micro',val:economieFisc>0?economieFisc:0, cls:'green' },
+  ]);
+
+  document.getElementById('tbl-micro').innerHTML = `
+    <thead><tr>
+      <th>Indicateur</th>
+      <th class="h-amber">Micro-BIC</th>
+      <th class="h-blue">LMNP réel</th>
+    </tr></thead>
+    <tbody>
+      <tr class="sect-head"><td colspan="3">Revenus</td></tr>
+      <tr>
+        <td>Loyers annuels</td>
+        <td class="c-amber">${eur(loyersAnnuels)}</td>
+        <td class="c-blue">${eur(loyersAnnuels)}</td>
+      </tr>
+      <tr class="sect-head"><td colspan="3">Déductions</td></tr>
+      <tr>
+        <td>Abattement / charges déductibles</td>
+        <td class="c-amber val-amb">−${eur(loyersAnnuels*abattMicro)} (${pct(abattMicro*100,0)})</td>
+        <td class="c-blue val-acc">−${eur(totalChargesHorsAmort)} charges + ${eur(amortUtilise)} amort.</td>
+      </tr>
+      <tr>
+        <td>Base imposable</td>
+        <td class="c-amber">${eur(revenuMicro)}</td>
+        <td class="c-blue">${eur(resultFiscal)}</td>
+      </tr>
+      <tr class="sect-head"><td colspan="3">Fiscalité</td></tr>
+      <tr>
+        <td>IR (TMI ${i.tmi} %)</td>
+        <td class="c-amber val-neg">−${eur(irMicro)}</td>
+        <td class="c-blue val-neg">−${eur(irReel)}</td>
+      </tr>
+      <tr>
+        <td>Prélèvements sociaux (17,2 %)</td>
+        <td class="c-amber val-neg">−${eur(psMicro)}</td>
+        <td class="c-blue val-neg">−${eur(psReel)}</td>
+      </tr>
+      <tr>
+        <td><strong>Fiscalité totale</strong></td>
+        <td class="c-amber val-neg"><strong>−${eur(fiscMicro)}</strong></td>
+        <td class="c-blue val-neg"><strong>−${eur(fiscaliteReel)}</strong></td>
+      </tr>
+      <tr class="sect-head"><td colspan="3">Cash-flow net après impôt</td></tr>
+      <tr>
+        <td>Cash-flow net annuel</td>
+        <td class="c-amber ${cfNetMicro>=0?'val-pos':'val-neg'}">${cfNetMicro>=0?'+':''}${eur(cfNetMicro)}</td>
+        <td class="c-blue ${cfNetReel>=0?'val-pos':'val-neg'}">${cfNetReel>=0?'+':''}${eur(cfNetReel)}</td>
+      </tr>
+      <tr>
+        <td><strong>Avantage LMNP réel</strong></td>
+        <td class="c-amber"></td>
+        <td class="c-blue ${reel_better?'val-pos':'val-neg'}"><strong>${reel_better?'+':''}${eur(economieFisc)}/an</strong></td>
+      </tr>
+    </tbody>`;
+
+  const el = document.getElementById('alert-micro');
+  if (!microOK) {
+    el.innerHTML = `<div class="lmnp-alert">
+      <strong>Seuil micro-BIC dépassé :</strong> vos loyers annuels (${eur(loyersAnnuels)}) dépassent le seuil micro-BIC
+      de <strong>${eur(seuilMicro)}</strong> pour ce type de meublé. Le régime micro-BIC n'est pas applicable.
+      Le LMNP réel est obligatoire.
+    </div>`;
+  } else if (!reel_better) {
+    el.innerHTML = `<div class="lmnp-alert" style="margin-top:.75rem">
+      <strong>Micro-BIC plus avantageux ici :</strong> avec vos paramètres, les charges déductibles + amortissements
+      (${eur(totalChargesHorsAmort+amortUtilise)}) sont inférieures à l'abattement micro-BIC
+      (${eur(loyersAnnuels*abattMicro)}). Le micro-BIC donne une fiscalité plus faible de ${eur(Math.abs(economieFisc))}.
+      Le réel devient intéressant si vous avez des charges importantes ou des travaux amortissables conséquents.
+    </div>`;
+  } else {
+    el.innerHTML = `<div class="lmnp-info" style="margin-top:.75rem">
+      <strong>LMNP réel plus avantageux ici :</strong> vos charges réelles + amortissements (${eur(totalChargesHorsAmort+amortUtilise)})
+      dépassent l'abattement micro-BIC (${eur(loyersAnnuels*abattMicro)}), ce qui rend le régime réel
+      fiscalement plus efficace de <strong>${eur(economieFisc)}/an</strong>.
+    </div>`;
+  }
+}
+
+/* ══════════════════════════════════════
+   RENDU — TAB REVENTE
+══════════════════════════════════════ */
+function renderRevente(d) {
+  const { i, pvBrute, pvNeg, pvNetIR, pvNetPS, irPV, psPV,
+          surtaxe, fiscPV, netRevente, abIR, abPS } = d;
+  const prixAcqCorrige = i.prix + i.notaire + i.agence + i.travaux;
+  const exoIR = abIR >= 100;
+  const exoPS = abPS >= 100;
+
+  document.getElementById('kpi-revente').innerHTML = `
+    <div class="lmnp-kpi ${pvBrute>0?'accent':'green'}">
+      <span class="lmnp-kpi-badge">Plus-value brute</span>
+      <div class="lmnp-kpi-val">${eur(pvBrute)}</div>
+      <div class="lmnp-kpi-sub">${i.prixRevente>0?'Prix revente '+eur(i.prixRevente)+' − Prix revient '+eur(prixAcqCorrige):'Renseignez un prix de revente'}</div>
+    </div>
+    <div class="lmnp-kpi red">
+      <span class="lmnp-kpi-badge">Fiscalité PV</span>
+      <div class="lmnp-kpi-val">${eur(fiscPV)}</div>
+      <div class="lmnp-kpi-sub">IR ${eur(irPV)} · PS ${eur(psPV)}${surtaxe>0?' · Surtaxe '+eur(surtaxe):''}</div>
+    </div>
+    <div class="lmnp-kpi green">
+      <span class="lmnp-kpi-badge">Net récupéré</span>
+      <div class="lmnp-kpi-val">${eur(netRevente)}</div>
+      <div class="lmnp-kpi-sub">Après fiscalité · Détention ${i.dureeDetention} ans</div>
+    </div>`;
+
+  renderBarChart('chart-revente', [
+    { lbl:'Prix de revente',          val:i.prixRevente,    cls:'blue' },
+    { lbl:'Prix de revient corrigé',  val:prixAcqCorrige,   cls:'amber' },
+    { lbl:'PV brute',                 val:pvBrute,          cls:'blue' },
+    { lbl:'PV nette IR (après abatt.)',val:pvNetIR,         cls:'amber' },
+    { lbl:'IR sur PV (19 %)',         val:irPV,             cls:'red' },
+    { lbl:'PS sur PV (17,2 %)',       val:psPV,             cls:'red' },
+    { lbl:'Net récupéré',             val:netRevente,       cls:'green' },
+  ]);
+
+  document.getElementById('tbl-revente').innerHTML = `
+    <thead><tr>
+      <th>Indicateur</th>
+      <th style="text-align:right">Valeur</th>
+      <th style="text-align:right">Détail</th>
+    </tr></thead>
+    <tbody>
+      <tr class="sect-head"><td colspan="3">Calcul de la plus-value</td></tr>
+      <tr><td>Prix de revente</td><td class="val-pos">+${eur(i.prixRevente)}</td><td></td></tr>
+      <tr><td>Prix de revient corrigé</td><td class="val-neg">−${eur(prixAcqCorrige)}</td><td class="val-dim">Prix + notaire + agence + travaux</td></tr>
+      <tr><td>Plus-value brute</td><td class="${pvBrute>0?'val-acc val-pos':'val-dim'}">${pvBrute>0?'+':''}${eur(pvBrute)}</td>
+        <td class="val-dim">${pvNeg<0?'Moins-value : '+eur(pvNeg):'Imposable sous abattements'}</td>
+      </tr>
+      <tr class="sect-head"><td colspan="3">Abattements pour durée de détention — ${i.dureeDetention} ans (CGI art. 150 VC)</td></tr>
+      <tr><td>Abattement IR</td>
+        <td class="${exoIR?'val-pos':'val-amb'}">${exoIR?'100 % — Exonération totale':pct(abIR)}</td>
+        <td class="val-dim">${i.dureeDetention<6?'Aucun abattement avant 6 ans':exoIR?'Exonéré à partir de 22 ans':'6 %/an de la 6e à la 21e, 4 % à la 22e'}</td>
+      </tr>
+      <tr><td>Abattement PS</td>
+        <td class="${exoPS?'val-pos':'val-amb'}">${exoPS?'100 % — Exonération totale':pct(abPS)}</td>
+        <td class="val-dim">${exoPS?'Exonéré à partir de 30 ans':'1,65 %/an (6-11), 1,60 % (12e), 9 %/an (13-30)'}</td>
+      </tr>
+      <tr><td>PV nette imposable à l'IR</td><td>${eur(pvNetIR)}</td><td></td></tr>
+      <tr><td>PV nette imposable aux PS</td><td>${eur(pvNetPS)}</td><td></td></tr>
+      <tr class="sect-head"><td colspan="3">Fiscalité de la plus-value</td></tr>
+      <tr><td>IR sur plus-value (19 %)</td><td class="${irPV>0?'val-neg':'val-dim'}">−${eur(irPV)}</td><td class="val-dim">${exoIR?'Exonéré':''}</td></tr>
+      <tr><td>Prélèvements sociaux (17,2 %)</td><td class="${psPV>0?'val-neg':'val-dim'}">−${eur(psPV)}</td><td class="val-dim">${exoPS?'Exonéré':''}</td></tr>
+      ${surtaxe>0?`<tr><td>Surtaxe (CGI art. 1609 nonies G)</td><td class="val-neg">−${eur(surtaxe)}</td><td class="val-dim">PV nette &gt; 50 000 €</td></tr>`:''}
+      <tr><td>Fiscalité totale revente</td><td class="val-neg">−${eur(fiscPV)}</td><td></td></tr>
+      <tr><td><strong>Net récupéré à la revente</strong></td><td class="val-pos"><strong>+${eur(netRevente)}</strong></td><td class="val-dim">Avantage LMNP : amort. non réintégrés</td></tr>
+    </tbody>`;
+
+  const el = document.getElementById('alert-revente');
+  el.innerHTML = `<div class="lmnp-info" style="margin-top:.75rem">
+    <strong>Avantage clé LMNP vs SCI IS :</strong> en LMNP, les amortissements pratiqués pendant la détention
+    ne sont <strong>pas réintégrés</strong> dans la base de la plus-value à la revente. Vous bénéficiez du régime des
+    plus-values des particuliers (CGI art. 150 U), avec ses abattements progressifs. En SCI IS, la plus-value
+    professionnelle est calculée sur la VNC (valeur comptable après amortissements), sans aucun abattement — c'est
+    l'effet ciseau. Pour les détentions longues, le LMNP est souvent bien plus efficace fiscalement à la sortie.
+  </div>`;
+}
+
+/* ══════════════════════════════════════
+   RENDU — PÉDAGOGIE
+══════════════════════════════════════ */
+function buildPedago(d) {
+  const { i, loyersAnnuels, totalChargesHorsAmort, resultAvantAmort, amortTotal,
+          amortUtilise, amortDiffere, resultFiscal, fiscaliteReel, irReel, psReel,
+          fiscMicro, economieFisc, cfNetReel, cfMensuel,
+          abIR, abPS, pvBrute, fiscPV, microOK, abattMicro } = d;
+
+  const tmiNote = i.tmi >= 41
+    ? `<div class="pedago-alert">Avec une <strong>TMI de ${i.tmi} %</strong>, votre taux marginal effectif sur les BIC est de <strong>${i.tmi + 17.2} %</strong> (IR + PS). L'amortissement LMNP est d'autant plus précieux : chaque euro d'amortissement utilisé vous économise <strong>${fmtN((i.tmi/100+0.172)*100,1)} centimes d'impôt</strong>.</div>`
+    : i.tmi >= 30
+      ? `<p class="pedago-p">À <strong>TMI ${i.tmi} %</strong>, votre taux effectif sur les revenus BIC est de <strong>${i.tmi + 17.2} %</strong>. L'amortissement permet de ramener le résultat fiscal à <strong>${eur(resultFiscal)}</strong>, soit une économie de <strong>${eur(amortUtilise*(i.tmi/100+0.172))}/an</strong> grâce aux seuls amortissements utilisés.</p>`
+      : `<p class="pedago-p">Avec une <strong>TMI de ${i.tmi} %</strong>, la pression fiscale reste modérée. Le LMNP réel conserve un intérêt si vos charges réelles dépassent l'abattement micro-BIC de ${pct(abattMicro*100,0)}. Ici l'économie est de <strong>${eur(Math.abs(economieFisc))}/an</strong> ${economieFisc>0?'en faveur du réel':'en faveur du micro-BIC'}.</p>`;
+
+  const amortNote = amortTotal > 0
+    ? `<p class="pedago-p">Votre amortissement annuel total est de <strong>${eur(amortTotal)}</strong> — dont ${eur(d.amortBati)}/an pour le bâti sur ${i.dureeAmortBati} ans${d.amortTrav>0?', '+eur(d.amortTrav)+'/an pour les travaux sur '+i.dureeAmortTrav+' ans':''}${d.amortMob>0?', '+eur(d.amortMob)+'/an pour le mobilier sur '+i.dureeAmortMob+' ans':''}. C'est une charge <em>comptable non décaissée</em> : elle réduit votre résultat imposable sans impacter votre trésorerie réelle. C'est le mécanisme central du LMNP réel.</p>`
+    : `<p class="pedago-p">Sans mobilier ni travaux amortissables conséquents, l'amortissement se limite au bâti. Ajoutez du mobilier ou des travaux d'amélioration pour augmenter votre base amortissable et optimiser la fiscalité.</p>`;
+
+  const diffNote = amortDiffere > 0
+    ? `<div class="pedago-tip"><strong>Amortissements différés (${eur(amortDiffere)}/an) :</strong> votre résultat avant amortissement ne permet pas d'utiliser la totalité des amortissements disponibles. L'excédent est "stocké" et reporté sans limitation de durée. Lors des années où votre résultat sera plus élevé (loyer en hausse, fin d'emprunt, moins de charges), ce stock viendra réduire votre fiscalité. Plus votre stock est important, plus votre "bouclier fiscal" pour l'avenir est puissant.</div>`
+    : '';
+
+  const cfNote = cfNetReel >= 0
+    ? `<p class="pedago-p">Votre cash-flow net mensuel est de <strong>+${eur(cfMensuel,0)}/mois</strong>. La location vous génère un excédent de trésorerie après toutes les charges et l'impôt — c'est un investissement auto-finançant qui "rapporte" chaque mois.</p>`
+    : `<p class="pedago-p">Votre cash-flow net mensuel est de <strong>${eur(cfMensuel,0)}/mois</strong>. Vous "complétez" la mensualité de ${eur(Math.abs(cfMensuel),0)}/mois. Ce n'est pas forcément mauvais : vous constituez du patrimoine immobilier pour un "effort d'épargne" maîtrisé, tout en bénéficiant d'une fiscalité réduite grâce aux amortissements.</p>`;
+
+  const microNote = economieFisc > 0
+    ? `<p class="pedago-p">Avec vos paramètres, le LMNP réel est <strong>meilleur que le micro-BIC de ${eur(economieFisc)}/an</strong>. Vos charges + amortissements (${eur(totalChargesHorsAmort+amortUtilise)}) dépassent l'abattement micro-BIC (${eur(loyersAnnuels*abattMicro)}). Le réel est clairement recommandé.</p>`
+    : `<p class="pedago-p">Avec ces paramètres, le micro-BIC est légèrement plus avantageux de ${eur(Math.abs(economieFisc))}/an. Si vous ajoutez des travaux amortissables ou des charges supplémentaires, le réel deviendra plus intéressant. Le seuil de basculement est le moment où charges + amortissements dépassent ${pct(abattMicro*100,0)} des loyers.</p>`;
+
+  const reventeNote = i.dureeDetention >= 22
+    ? `<p class="pedago-p">Avec <strong>${i.dureeDetention} ans de détention</strong>, la plus-value est <em>totalement exonérée d'IR</em> et bénéficie d'un abattement maximal sur les PS. La revente LMNP est fiscalement très avantageuse à long terme — et les amortissements pratiqués n'ont pas alourdi la fiscalité de sortie, contrairement à la SCI IS.</p>`
+    : i.dureeDetention >= 6
+      ? `<p class="pedago-p">Après <strong>${i.dureeDetention} ans</strong>, les abattements PV atteignent <strong>IR : ${pct(abIR)}</strong> et <strong>PS : ${pct(abPS)}</strong>. Votre fiscalité à la revente est de ${eur(fiscPV)} sur une plus-value brute de ${eur(pvBrute)}. Ces abattements s'améliorent chaque année jusqu'à exonération complète à 22 ans (IR) et 30 ans (PS).</p>`
+      : `<div class="pedago-alert">Avec <strong>seulement ${i.dureeDetention} ans de détention</strong>, les abattements PV sont nuls (applicables à partir de la 6e année). La plus-value de ${eur(pvBrute)} est pleinement imposable. Allongez la durée de détention pour bénéficier des abattements progressifs.</div>`;
+
+  return `
+    <div class="pedago-card animate">
+      <div class="pedago-card-header">
+        <div class="pedago-card-dot"></div>
+        <div class="pedago-card-title">Comment fonctionne le LMNP réel</div>
+      </div>
+      <div class="pedago-card-body">
+        <p class="pedago-p">Le <strong>LMNP au réel</strong> (Location Meublée Non Professionnelle au régime réel simplifié) permet de déduire l'ensemble des charges réelles — taxe foncière, intérêts d'emprunt, assurances, gestion, comptable — auxquelles s'ajoutent les <em>amortissements</em> du bien, des travaux et du mobilier. Ces amortissements sont une charge comptable non décaissée qui réduit le résultat fiscal BIC sans impacter la trésorerie.</p>
+        <p class="pedago-p">Ici, vos loyers encaissés sont de <strong>${eur(loyersAnnuels)}/an</strong>. Après déduction des charges (${eur(totalChargesHorsAmort)}) et des amortissements utilisés (${eur(amortUtilise)}), votre résultat fiscal BIC est de <strong>${eur(resultFiscal)}</strong>. Vous payez <strong>${eur(fiscaliteReel)}</strong> d'impôt sur un encaissement réel de ${eur(loyersAnnuels)} — soit un taux effectif de ${fmtN(loyersAnnuels>0?fiscaliteReel/loyersAnnuels*100:0,1)} % sur vos loyers.</p>
+        ${tmiNote}
+      </div>
+    </div>
+
+    <div class="pedago-card animate" style="margin-top:1rem">
+      <div class="pedago-card-header">
+        <div class="pedago-card-dot" style="background:var(--amber)"></div>
+        <div class="pedago-card-title" style="color:var(--amber)">Les amortissements — le coeur du dispositif</div>
+      </div>
+      <div class="pedago-card-body">
+        ${amortNote}
+        <p class="pedago-p"><strong>Règle clé (CGI art. 39 C II) :</strong> en LMNP, l'amortissement ne peut ni créer ni aggraver un déficit BIC. Si vos charges sans amortissement génèrent déjà un déficit, les amortissements ne s'ajoutent pas — ils sont intégralement reportés. Si vos charges laissent un résultat positif, les amortissements viennent l'effacer (jusqu'à zéro), et l'excédent est différé.</p>
+        ${diffNote}
+        <div class="pedago-dim"><strong>Différence fondamentale entre comptabilité et cash :</strong> un résultat fiscal de 0 € ne signifie pas 0 € de trésorerie. Vous pouvez avoir un cash-flow positif de <strong>${eur(cfNetReel)}</strong> tout en ne payant aucun impôt. L'amortissement "absorbe" comptablement le résultat sans coûter quoi que ce soit.</div>
+      </div>
+    </div>
+
+    <div class="pedago-card animate" style="margin-top:1rem">
+      <div class="pedago-card-header">
+        <div class="pedago-card-dot" style="background:var(--success)"></div>
+        <div class="pedago-card-title" style="color:var(--success)">Cash-flow et trésorerie réelle</div>
+      </div>
+      <div class="pedago-card-body">
+        ${cfNote}
+        <p class="pedago-p">Distinction essentielle : le <strong>résultat comptable</strong> (${eur(resultFiscal)}) est la base de l'impôt. Le <strong>cash-flow</strong> (${cfNetReel>=0?'+':''}${eur(cfNetReel)}) est ce qui reste dans votre poche après toutes les charges décaissées et l'impôt. La différence entre les deux, c'est le remboursement de capital du crédit (non déductible mais cash-flow réel) et l'amortissement (déductible mais non décaissé).</p>
+      </div>
+    </div>
+
+    <div class="pedago-card animate" style="margin-top:1rem">
+      <div class="pedago-card-header">
+        <div class="pedago-card-dot" style="background:var(--amber)"></div>
+        <div class="pedago-card-title" style="color:var(--amber)">Micro-BIC vs LMNP réel</div>
+      </div>
+      <div class="pedago-card-body">
+        <p class="pedago-p">Le <strong>micro-BIC</strong> est plus simple : un abattement forfaitaire de <strong>${pct(abattMicro*100,0)}</strong> est appliqué sur les loyers bruts, censé couvrir toutes les charges et amortissements. Aucune comptabilité détaillée n'est requise. Le résultat imposable est ${eur(d.revenuMicro)}, l'impôt est de ${eur(fiscMicro)}.</p>
+        ${microNote}
+        <div class="pedago-dim"><strong>Quand choisir le réel ?</strong> Dès que vos charges réelles + amortissements dépassent ${pct(abattMicro*100,0)} des loyers — ce qui est presque toujours le cas avec un crédit et un bien ancien nécessitant des travaux. Le réel implique une comptabilité (expert-comptable recommandé) mais l'économie fiscale justifie souvent largement le coût.</div>
+      </div>
+    </div>
+
+    <div class="pedago-card animate" style="margin-top:1rem">
+      <div class="pedago-card-header">
+        <div class="pedago-card-dot" style="background:var(--success)"></div>
+        <div class="pedago-card-title" style="color:var(--success)">La revente en LMNP — un avantage décisif</div>
+      </div>
+      <div class="pedago-card-body">
+        ${reventeNote}
+        <p class="pedago-p"><strong>Point essentiel :</strong> contrairement à la SCI à l'IS, les amortissements pratiqués en LMNP ne viennent pas "recharger" la plus-value à la revente. Vous restez soumis au régime des <em>plus-values des particuliers</em> (CGI art. 150 U), calculé sur la différence entre le prix de revente et le prix d'acquisition initial (corrigé des frais réels). Les amortissements que vous avez déduits pendant la détention ne sont jamais réintégrés — c'est l'un des avantages fiscaux les plus puissants du LMNP.</p>
+        <div class="pedago-alert"><strong>Limite importante :</strong> si vos recettes LMNP annuelles dépassent 23 000 € ET représentent plus de 50 % de vos revenus professionnels du foyer, vous basculez en LMP (Location Meublée Professionnelle). Le LMP change les règles : déficit imputable sur le revenu global, exonération PV sous conditions, mais aussi cotisations sociales. Ce simulateur traite exclusivement du régime LMNP.</div>
+      </div>
+    </div>`;
+}
+
+/* ══════════════════════════════════════
+   SLIDERS
+══════════════════════════════════════ */
+function syncSld(numId, sldId, dispId, fmt) {
+  const num  = document.getElementById(numId);
+  const sld  = document.getElementById(sldId);
+  const disp = dispId ? document.getElementById(dispId) : null;
+  if (!num || !sld) return;
+
+  function setPct() {
+    const mn = parseFloat(sld.min)||0, mx = parseFloat(sld.max)||100;
+    const v  = Math.min(Math.max(parseFloat(sld.value)||0, mn), mx);
+    sld.style.setProperty('--pct', ((v-mn)/(mx-mn)*100).toFixed(1)+'%');
+  }
+  function onNum() {
+    const v = SP.parseNum(num.value);
+    sld.value = Math.min(Math.max(v, parseFloat(sld.min)||0), parseFloat(sld.max)||100);
+    setPct();
+    if (disp) disp.textContent = fmt(v);
+  }
+  function onSld() {
+    SP.setVal(num, parseFloat(sld.value)||0);
+    if (disp) disp.textContent = fmt(parseFloat(sld.value)||0);
+    setPct();
+  }
+  num.addEventListener('input', onNum);
+  sld.addEventListener('input', onSld);
+  setPct();
+  if (disp) disp.textContent = fmt(SP.parseNum(num.value)||0);
+}
+
+/* ══════════════════════════════════════
+   INIT & LISTENERS
+══════════════════════════════════════ */
+function calc() {
+  try {
+    const d = calcAll();
+    renderExploit(d);
+    renderAmort(d);
+    renderMicro(d);
+    renderRevente(d);
+    document.getElementById('pedago-full').innerHTML = buildPedago(d);
+    document.getElementById('disclaimer-txt').textContent =
+      `Simulation basée sur l'an 1 pour les intérêts. Amortissement bâti sur ${d.i.dureeAmortBati} ans, travaux ${d.i.dureeAmortTrav} ans, mobilier ${d.i.dureeAmortMob} ans. ` +
+      `Micro-BIC : abattement ${(d.abattMicro*100).toFixed(0)} % / seuil ${eur(d.seuilMicro)}. ` +
+      `PV particuliers (CGI art. 150 U) : IR 19 %, PS 17,2 %, abattements CGI art. 150 VC. ` +
+      `Plafonnement amortissement : CGI art. 39 C II. Sources : BOFiP, CGI, impots.gouv.fr, service-public.fr. ` +
+      `Résultats indicatifs. Un expert-comptable spécialisé LMNP est recommandé.`;
+  } catch(e) { console.error(e) }
+}
+
+const fmtEur = v => new Intl.NumberFormat('fr-FR',{maximumFractionDigits:0}).format(Math.round(+v||0)).replace(/[  ]/g,' ') + ' €';
+
+syncSld('l-prix',         'l-prix-sld',    'l-prix-disp',    fmtEur);
+syncSld('l-loyer',        'l-loyer-sld',   'l-loyer-disp',   fmtEur);
+syncSld('l-emprunt',      'l-emprunt-sld', 'l-emprunt-disp', fmtEur);
+syncSld('l-prix-revente', 'l-revente-sld', 'l-revente-disp', fmtEur);
+
+/* Auto-compute frais notaire */
+['l-prix', 'l-prix-sld'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('input', function() {
+    const prix = id.endsWith('-sld') ? parseFloat(this.value)||0 : SP.parseNum(this.value);
+    const not  = document.getElementById('l-notaire');
+    if (not) SP.setVal(not, Math.round(prix * 0.078 / 100) * 100);
+    calc();
+  });
+});
+
+/* All listeners */
+const allIds = [
+  'l-prix','l-loyer','l-emprunt','l-prix-revente',
+  'l-prix-sld','l-loyer-sld','l-emprunt-sld','l-revente-sld',
+  'l-notaire','l-agence','l-frais-dossier','l-travaux','l-mobilier',
+  'l-terrain','l-vacance','l-type-trav','l-type-meuble',
+  'l-tf','l-copro','l-pno','l-gli','l-gestion','l-compta','l-cfe','l-entretien','l-autres-chg',
+  'l-taux-cr','l-duree-cr','l-assur-empr',
+  'l-tmi','l-duree-det',
+  'l-amort-bati','l-amort-trav','l-amort-mob',
+];
+allIds.forEach(id => {
+  const el = document.getElementById(id);
+  if (!el) return;
+  /* prix slider already bound above */
+  if (id === 'l-prix' || id === 'l-prix-sld') return;
+  el.addEventListener('input', calc);
+  if (el.tagName === 'SELECT') el.addEventListener('change', calc);
+});
+
+/* Tabs */
+document.querySelectorAll('.lmnp-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.lmnp-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.lmnp-panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+  });
+});
+
+/* Calcul initial pour afficher la structure complète des résultats au chargement */
+calc();
+
+/* Nav dropdown */
+/* Menu déroulant catégorisé — voir shared-nav.js */
+SP.nav.init();
+</script>
+</body>
+</html>

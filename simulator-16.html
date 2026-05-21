@@ -1,0 +1,1712 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="favicon-64.png">
+  <link rel="shortcut icon" href="favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="favicon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CTO — Compte-Titres Ordinaire — PATRIMONIA.AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css?v=19">
+<script src="shared.js?v=2"></script>
+<script src="shared-nav.js?v=6"></script>
+<style>
+/* ═══════════════════════════════════════════════════
+   CTO — Compte-Titres Ordinaire · PATRIMONIA.AI
+   Préfixe CSS : .cto-
+   Personnalité : marchés globaux · revenus · liberté
+═══════════════════════════════════════════════════ */
+:root {
+  --cto-indigo:     #3D5A80;
+  --cto-indigo-dim: rgba(61,90,128,.08);
+  --cto-indigo-mid: rgba(61,90,128,.18);
+  --cto-teal:       #2D7D6F;
+  --cto-teal-dim:   rgba(45,125,111,.08);
+}
+
+/* ── LAYOUT ── */
+.cto-layout { display:grid; grid-template-columns:370px 1fr; min-height:620px }
+@media(max-width:960px){ .cto-layout { grid-template-columns:1fr } }
+
+.cto-inp {
+  padding:1.6rem 1.4rem 2rem;
+  background:var(--surface-2);
+  border-right:1px solid var(--border-subtle);
+  overflow-y:auto;
+}
+@media(max-width:960px){ .cto-inp { border-right:none; border-bottom:1px solid var(--border-subtle) } }
+
+.cto-main { background:var(--surface); display:flex; flex-direction:column; min-width:0 }
+
+/* ── TABS ── */
+.cto-tabs-nav {
+  display:flex; border-bottom:1px solid var(--border-subtle);
+  background:var(--surface-2); overflow-x:auto; flex-shrink:0;
+  scrollbar-width:none;
+}
+.cto-tabs-nav::-webkit-scrollbar { display:none }
+.cto-tab-btn {
+  flex-shrink:0; padding:.8rem 1.05rem;
+  font-family:var(--sans); font-size:.73rem; font-weight:500;
+  color:var(--text-muted); background:none;
+  border:none; border-bottom:2px solid transparent;
+  cursor:pointer; white-space:nowrap; letter-spacing:-.01em;
+  transition:color .18s, border-color .18s, background .18s;
+  display:flex; align-items:center; gap:.35rem;
+}
+.cto-tab-btn:hover { color:var(--text); background:var(--surface) }
+.cto-tab-btn.active { color:var(--accent); border-bottom-color:var(--accent); font-weight:600 }
+.cto-tab-icon { width:12px; height:12px; flex-shrink:0; opacity:.5 }
+.cto-tab-btn.active .cto-tab-icon { opacity:1 }
+
+/* ── PANELS ── */
+.cto-panel { display:none; flex:1; padding:1.4rem 1.5rem 2rem }
+.cto-panel.active { display:block }
+@media(max-width:960px){ .cto-panel { padding:1rem 1rem 1.5rem } }
+
+/* ── INPUTS ── */
+.inp-sec {
+  font-size:.59rem; font-weight:700; color:var(--text-dim);
+  letter-spacing:.08em; text-transform:uppercase;
+  margin:1.3rem 0 .75rem;
+}
+.inp-sec:first-child { margin-top:0 }
+.field-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:.6rem }
+.range-row { display:flex; align-items:center; gap:.7rem }
+.range-inp { flex:1 }
+.range-disp {
+  font-family:var(--mono); font-size:.72rem; font-weight:600;
+  color:var(--accent); min-width:3.2rem; text-align:right; flex-shrink:0;
+}
+
+/* Fiscal regime toggle */
+.cto-regime-toggle {
+  display:flex; background:var(--surface-3);
+  border-radius:8px; padding:2px; gap:2px; margin-top:.5rem;
+}
+.cto-regime-btn {
+  flex:1; font-size:.7rem; font-weight:500;
+  color:var(--text-muted); background:transparent;
+  border:none; border-radius:6px;
+  padding:.35rem .5rem; cursor:pointer;
+  transition:all .18s; letter-spacing:-.01em; text-align:center;
+}
+.cto-regime-btn.active {
+  background:var(--bg); color:var(--text); font-weight:600;
+  box-shadow:0 1px 5px rgba(0,0,0,.1);
+}
+
+/* ── KPI GRID ── */
+.cto-kpi-row { display:grid; gap:.7rem; margin-bottom:1rem }
+.cto-kpi-3 { grid-template-columns:repeat(3,1fr) }
+.cto-kpi-2 { grid-template-columns:repeat(2,1fr) }
+.cto-kpi-4 { grid-template-columns:repeat(4,1fr) }
+@media(max-width:700px){
+  .cto-kpi-3,.cto-kpi-4 { grid-template-columns:1fr 1fr }
+}
+.cto-kpi {
+  background:var(--surface-2); border:1.5px solid var(--border-subtle);
+  border-radius:var(--r-sm); padding:.9rem 1rem .8rem;
+  transition:box-shadow .2s, transform .2s;
+}
+.cto-kpi:hover { box-shadow:0 4px 16px rgba(0,0,0,.07); transform:translateY(-1px) }
+.cto-kpi.accent { border-top:2px solid var(--accent) }
+.cto-kpi.amber  { border-top:2px solid var(--amber) }
+.cto-kpi.danger { border-top:2px solid var(--danger) }
+.cto-kpi.slate  { border-top:2px solid var(--slate) }
+.cto-kpi.indigo { border-top:2px solid var(--cto-indigo) }
+.cto-kpi.success{ border-top:2px solid var(--success) }
+.cto-kpi-label {
+  font-size:.57rem; font-weight:700; color:var(--text-dim);
+  letter-spacing:.08em; text-transform:uppercase; margin-bottom:.35rem;
+}
+.cto-kpi-val {
+  font-family:var(--sans); font-size:1.05rem; font-weight:700;
+  color:var(--text); letter-spacing:-.03em; line-height:1.1;
+}
+.cto-kpi-val.lg    { font-size:1.22rem }
+.cto-kpi-val.green { color:var(--success) }
+.cto-kpi-val.amber { color:var(--amber) }
+.cto-kpi-val.red   { color:var(--danger) }
+.cto-kpi-val.indigo{ color:var(--cto-indigo) }
+.cto-kpi-sub { font-size:.62rem; color:var(--text-dim); margin-top:.2rem }
+
+/* ── CHART WRAP ── */
+.cto-chart-wrap {
+  background:var(--surface-2); border:1px solid var(--border-subtle);
+  border-radius:var(--r); padding:.95rem .95rem .7rem; margin-bottom:1rem;
+}
+.cto-chart-hdr {
+  display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:.75rem;
+}
+.cto-chart-title {
+  font-size:.58rem; font-weight:700; color:var(--text-dim);
+  letter-spacing:.07em; text-transform:uppercase;
+}
+.cto-chart-sub { font-size:.62rem; color:var(--text-dim); margin-top:.1rem }
+.cto-chart-badge {
+  font-size:.57rem; font-weight:700; padding:.1rem .4rem;
+  border-radius:100px; background:var(--accent-dim); color:var(--accent); flex-shrink:0;
+}
+canvas.cto-canvas { width:100%; display:block }
+.cto-canvas-240 { height:240px }
+.cto-canvas-200 { height:200px }
+.cto-canvas-160 { height:160px }
+.cto-legend {
+  display:flex; flex-wrap:wrap; gap:.5rem .8rem; margin-top:.5rem;
+}
+.cto-legend-item { display:flex; align-items:center; gap:.3rem; font-size:.66rem; color:var(--text-muted) }
+.cto-legend-line { width:18px; height:2.5px; border-radius:2px; flex-shrink:0 }
+.cto-legend-dash { width:18px; height:0; border-top:2px dashed; flex-shrink:0; opacity:.6 }
+
+/* ── FISCAL BREAKDOWN ── */
+.cto-pfu-grid { display:grid; grid-template-columns:1fr 1fr; gap:.85rem; margin-bottom:1rem }
+@media(max-width:640px){ .cto-pfu-grid { grid-template-columns:1fr } }
+.cto-pfu-card {
+  background:var(--surface-2); border:1.5px solid var(--border-subtle);
+  border-radius:var(--r-sm); padding:1rem;
+}
+.cto-pfu-card.best { border-color:rgba(79,138,120,.28); background:rgba(79,138,120,.03) }
+.cto-pfu-badge {
+  font-size:.57rem; font-weight:700; letter-spacing:.07em; text-transform:uppercase;
+  padding:.1rem .5rem; border-radius:100px; display:inline-block; margin-bottom:.5rem;
+}
+.cto-pfu-badge.pfu    { background:var(--cto-indigo-dim); color:var(--cto-indigo) }
+.cto-pfu-badge.bareme { background:var(--accent-dim); color:var(--accent) }
+.cto-pfu-badge.best   { background:linear-gradient(90deg,var(--accent),var(--amber)); color:#fff }
+.cto-pfu-name { font-size:.82rem; font-weight:700; color:var(--text); letter-spacing:-.02em; margin-bottom:.65rem }
+.cto-pfu-row {
+  display:flex; justify-content:space-between; align-items:baseline;
+  padding:.26rem 0; border-bottom:1px solid var(--border-subtle);
+  font-size:.73rem; color:var(--text-muted);
+}
+.cto-pfu-row:last-child { border-bottom:none }
+.cto-pfu-row.total {
+  font-weight:700; font-size:.8rem; color:var(--text);
+  border-top:2px solid var(--border-subtle); border-bottom:none;
+  margin-top:.2rem; padding-top:.38rem;
+}
+.cto-pfu-v { font-family:var(--mono); font-weight:600 }
+.cto-pfu-v.red   { color:var(--danger) }
+.cto-pfu-v.green { color:var(--success) }
+.cto-pfu-v.muted { color:var(--text-muted) }
+
+/* Waterfall bar */
+.cto-wf-bar { height:16px; border-radius:4px; overflow:hidden; display:flex; gap:2px; margin:.5rem 0 }
+.cto-wf-seg { height:100%; transition:flex .5s; min-width:3px }
+.cto-wf-legend { display:flex; gap:.55rem; flex-wrap:wrap }
+.cto-wf-li { display:flex; align-items:center; gap:.3rem; font-size:.63rem; color:var(--text-muted) }
+.cto-wf-dot { width:7px; height:7px; border-radius:1px; flex-shrink:0 }
+
+/* Fiscal drag callout */
+.cto-drag-box {
+  background:rgba(155,90,58,.06); border:1px solid rgba(155,90,58,.18);
+  border-radius:var(--r-sm); padding:.8rem 1rem;
+  display:flex; align-items:center; justify-content:space-between;
+  gap:1rem; margin-bottom:1rem;
+}
+.cto-drag-title { font-size:.75rem; font-weight:600; color:var(--text) }
+.cto-drag-sub   { font-size:.63rem; color:var(--text-muted); margin-top:.12rem }
+.cto-drag-val {
+  font-family:var(--sans); font-size:1.1rem; font-weight:700;
+  color:var(--danger); letter-spacing:-.03em; text-align:right; flex-shrink:0;
+}
+
+/* Advantage callout */
+.cto-advantage {
+  background:linear-gradient(135deg,rgba(79,138,120,.07),rgba(184,134,11,.05));
+  border:1px solid rgba(79,138,120,.2); border-radius:var(--r-sm);
+  padding:.8rem 1rem; display:flex; align-items:center;
+  justify-content:space-between; gap:1rem; margin-bottom:1rem;
+}
+.cto-advantage-title { font-size:.75rem; font-weight:600; color:var(--text) }
+.cto-advantage-sub   { font-size:.63rem; color:var(--text-muted); margin-top:.12rem }
+.cto-advantage-val {
+  font-family:var(--sans); font-size:1.1rem; font-weight:700;
+  color:var(--accent); letter-spacing:-.03em; text-align:right; flex-shrink:0;
+}
+
+/* ── DIVIDENDES ── */
+.cto-div-toggle { display:flex; gap:.6rem; margin-bottom:1rem }
+.cto-div-opt {
+  flex:1; text-align:center; padding:.5rem .75rem;
+  background:var(--surface-3); border:1.5px solid transparent;
+  border-radius:var(--r-sm); cursor:pointer;
+  font-size:.72rem; font-weight:500; color:var(--text-muted);
+  transition:all .18s;
+}
+.cto-div-opt.active {
+  background:var(--accent-dim); border-color:rgba(79,138,120,.25);
+  color:var(--accent); font-weight:600;
+}
+
+/* ── COMPARAISON TABLEAU ── */
+.cto-cmp-table {
+  width:100%; border-collapse:collapse;
+  background:var(--surface-2);
+  border:1px solid var(--border-subtle); border-radius:var(--r-sm);
+  overflow:hidden; margin-bottom:1rem; font-size:.75rem;
+}
+.cto-cmp-table th {
+  padding:.5rem .85rem; font-size:.58rem; font-weight:700;
+  text-transform:uppercase; letter-spacing:.06em;
+  color:var(--text-dim); background:var(--surface);
+  border-bottom:2px solid var(--border); text-align:left;
+}
+.cto-cmp-table th:not(:first-child) { text-align:center }
+.cto-cmp-table td {
+  padding:.42rem .85rem; border-top:1px solid var(--border-subtle);
+  color:var(--text-muted);
+}
+.cto-cmp-table td:not(:first-child) { text-align:center; font-family:var(--mono); font-size:.73rem }
+.cto-cmp-table td:first-child { font-weight:500; color:var(--text) }
+.cto-cmp-table tr:hover td { background:rgba(0,0,0,.015) }
+.cto-cmp-win  { color:var(--success)!important; font-weight:700!important }
+.cto-cmp-lose { color:var(--danger)!important }
+.cto-cmp-eq   { color:var(--text-muted)!important }
+
+/* Qualitative comparison cards */
+.cto-qual-grid { display:grid; grid-template-columns:1fr 1fr; gap:.65rem; margin-bottom:1rem }
+@media(max-width:640px){ .cto-qual-grid { grid-template-columns:1fr } }
+.cto-qual-card {
+  background:var(--surface-2); border:1px solid var(--border-subtle);
+  border-radius:var(--r-sm); padding:.85rem .95rem;
+}
+.cto-qual-label {
+  font-size:.58rem; font-weight:700; text-transform:uppercase; letter-spacing:.07em;
+  color:var(--text-dim); margin-bottom:.45rem;
+}
+.cto-qual-row {
+  display:flex; align-items:center; gap:.6rem;
+  font-size:.73rem; color:var(--text-muted); padding:.2rem 0;
+}
+.cto-qual-badge {
+  font-size:.57rem; font-weight:700; padding:.08rem .4rem; border-radius:100px; flex-shrink:0;
+}
+.cto-qual-badge.win  { background:var(--accent-dim); color:var(--accent) }
+.cto-qual-badge.lose { background:var(--danger-dim); color:var(--danger) }
+.cto-qual-badge.eq   { background:var(--surface-3); color:var(--text-dim) }
+
+/* ── ALLOCATION ── */
+.cto-profile-pills { display:flex; flex-wrap:wrap; gap:.4rem; margin-bottom:1.1rem }
+.cto-profile-pill {
+  font-size:.71rem; font-weight:500; padding:.33rem .8rem;
+  border-radius:100px; background:var(--surface-3);
+  color:var(--text-muted); border:1.5px solid transparent;
+  cursor:pointer; transition:all .18s;
+}
+.cto-profile-pill:hover { background:var(--surface); color:var(--text) }
+.cto-profile-pill.active {
+  background:var(--cto-indigo-dim); color:var(--cto-indigo);
+  border-color:rgba(61,90,128,.25); font-weight:600;
+}
+.cto-alloc-layout { display:grid; grid-template-columns:1fr 200px; gap:1.1rem; align-items:start }
+@media(max-width:700px){ .cto-alloc-layout { grid-template-columns:1fr } }
+.cto-alloc-card {
+  background:var(--surface-2); border:1px solid var(--border-subtle);
+  border-radius:var(--r-sm); padding:1.05rem;
+}
+.cto-alloc-name { font-size:.95rem; font-weight:700; color:var(--text); letter-spacing:-.03em; margin-bottom:.2rem }
+.cto-alloc-desc { font-size:.72rem; color:var(--text-muted); margin-bottom:.85rem; line-height:1.55 }
+.cto-alloc-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:.5rem; margin-bottom:.85rem }
+@media(max-width:700px){ .cto-alloc-stats { grid-template-columns:repeat(2,1fr) } }
+.cto-alloc-stat {
+  text-align:center; padding:.55rem .4rem;
+  background:var(--surface); border-radius:var(--r-sm); border:1px solid var(--border-subtle);
+}
+.cto-alloc-stat-val { font-family:var(--mono); font-size:.87rem; font-weight:700; color:var(--text) }
+.cto-alloc-stat-lbl { font-size:.56rem; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:var(--text-dim); margin-top:.18rem }
+.cto-alloc-list { display:flex; flex-direction:column; gap:.48rem }
+.cto-alloc-item { display:flex; align-items:center; gap:.55rem; font-size:.72rem; color:var(--text-muted) }
+.cto-alloc-item-name { min-width:130px; font-size:.71rem }
+.cto-alloc-bar-wrap { flex:1; height:5px; background:var(--surface-3); border-radius:3px; overflow:hidden }
+.cto-alloc-bar-fill { height:100%; border-radius:3px; transition:width .4s cubic-bezier(.4,0,.2,1) }
+.cto-alloc-pct { font-family:var(--mono); font-size:.68rem; font-weight:600; color:var(--text-muted); min-width:2.5rem; text-align:right }
+.cto-donut-wrap {
+  background:var(--surface-2); border:1px solid var(--border-subtle);
+  border-radius:var(--r-sm); padding:1rem;
+  display:flex; flex-direction:column; align-items:center; gap:.65rem;
+}
+.cto-donut-canvas { width:155px; height:155px; display:block }
+
+/* ── TRANSMISSION ── */
+.cto-trans-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:.85rem; margin-bottom:1rem }
+@media(max-width:760px){ .cto-trans-grid { grid-template-columns:1fr } }
+.cto-trans-card {
+  background:var(--surface-2); border:1.5px solid var(--border-subtle);
+  border-radius:var(--r-sm); overflow:hidden;
+}
+.cto-trans-card.best { border-color:rgba(79,138,120,.28) }
+.cto-trans-hdr {
+  padding:.65rem .9rem; border-bottom:1px solid var(--border-subtle);
+  display:flex; align-items:center; gap:.5rem; background:var(--surface);
+}
+.cto-trans-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0 }
+.cto-trans-title { font-size:.75rem; font-weight:700; color:var(--text) }
+.cto-trans-body { padding:.75rem .9rem }
+.cto-trans-row {
+  display:flex; justify-content:space-between; align-items:baseline;
+  padding:.26rem 0; border-bottom:1px solid var(--border-subtle);
+  font-size:.72rem; color:var(--text-muted);
+}
+.cto-trans-row:last-child { border-bottom:none }
+.cto-trans-row.total {
+  font-weight:700; font-size:.79rem; color:var(--text);
+  border-top:2px solid var(--border); border-bottom:none;
+  margin-top:.2rem; padding-top:.42rem;
+}
+.cto-trans-v { font-family:var(--mono); font-weight:600 }
+.cto-trans-v.green { color:var(--success) }
+.cto-trans-v.red   { color:var(--danger) }
+.cto-trans-v.amber { color:var(--amber) }
+
+/* ── PROJECTION TABLE ── */
+.cto-proj-wrap { overflow-x:auto; border-radius:var(--r-sm); border:1px solid var(--border-subtle); margin-bottom:1rem }
+.cto-proj-tbl { width:100%; border-collapse:collapse; font-size:.72rem; min-width:460px }
+.cto-proj-tbl th {
+  padding:.45rem .75rem; font-size:.56rem; font-weight:700;
+  letter-spacing:.05em; text-transform:uppercase;
+  border-bottom:2px solid var(--border); text-align:right;
+  color:var(--text-dim); background:var(--surface-2);
+}
+.cto-proj-tbl th:first-child { text-align:left }
+.cto-proj-tbl td {
+  padding:.42rem .75rem; border-top:1px solid var(--border-subtle);
+  text-align:right; font-family:var(--mono); font-size:.72rem; color:var(--text-muted);
+}
+.cto-proj-tbl td:first-child { text-align:left; font-family:var(--sans); font-size:.71rem; color:var(--text); font-weight:600 }
+.cto-proj-tbl tr.highlight td { background:var(--accent-dim) }
+.cto-proj-tbl tr.highlight td:first-child { color:var(--accent) }
+.cto-proj-tbl tr:last-child td { font-weight:700; color:var(--text) }
+
+/* ── HERO PROPS ── */
+.cto-hero-props {
+  display:grid; grid-template-columns:repeat(4,1fr); gap:.7rem; margin-bottom:2rem;
+}
+@media(max-width:760px){ .cto-hero-props { grid-template-columns:1fr 1fr } }
+@media(max-width:480px){ .cto-hero-props { grid-template-columns:1fr } }
+.cto-hero-prop {
+  background:var(--surface); border:1px solid var(--border-subtle);
+  border-radius:var(--r-sm); padding:.8rem .95rem;
+  display:flex; align-items:flex-start; gap:.7rem;
+  transition:box-shadow .2s, transform .2s;
+}
+.cto-hero-prop:hover { box-shadow:0 4px 16px rgba(0,0,0,.06); transform:translateY(-1px) }
+.cto-hero-icon {
+  width:27px; height:27px; min-width:27px;
+  background:linear-gradient(135deg,var(--cto-indigo-dim),rgba(184,134,11,.08));
+  border:1px solid rgba(61,90,128,.12); border-radius:7px;
+  display:flex; align-items:center; justify-content:center;
+  color:var(--cto-indigo);
+}
+.cto-hero-icon svg { width:13px; height:13px }
+.cto-hero-prop-title { font-size:.77rem; font-weight:600; color:var(--text) }
+.cto-hero-prop-desc  { font-size:.66rem; color:var(--text-muted); margin-top:.13rem; line-height:1.5 }
+
+/* ── PÉDAGOGIE GRID ── */
+.cto-peda-grid { display:grid; grid-template-columns:1fr 1fr; gap:.9rem }
+@media(max-width:700px){ .cto-peda-grid { grid-template-columns:1fr } }
+.cto-peda-full { grid-column:1/-1 }
+</style>
+</head>
+<body>
+<div id="sp-nav-root"></div>
+
+<div class="sim-page">
+
+  <div class="sim-page-header">
+    <span class="sim-num-badge" style="background:linear-gradient(135deg,var(--cto-indigo),var(--accent));width:10px;height:10px"></span>
+    <div>
+      <div class="sim-eyebrow">Finance &amp; Gestion Patrimoniale</div>
+      <h1>Compte-Titres <em class="gradient-text">Ordinaire</em></h1>
+      <p>Simulation patrimoniale complète — capitalisation multi-actifs, fiscalité PFU, revenus de dividendes, comparaison PEA et transmission successorale.</p>
+    </div>
+  </div>
+
+  <div class="cto-hero-props">
+    <div class="cto-hero-prop">
+      <div class="cto-hero-icon">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+          <circle cx="8" cy="8" r="6"/><line x1="8" y1="2" x2="8" y2="14"/><line x1="2" y1="8" x2="14" y2="8"/>
+        </svg>
+      </div>
+      <div>
+        <div class="cto-hero-prop-title">Liberté totale</div>
+        <div class="cto-hero-prop-desc">Toutes classes d'actifs, sans plafond ni restriction géographique</div>
+      </div>
+    </div>
+    <div class="cto-hero-prop">
+      <div class="cto-hero-icon">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+          <rect x="2" y="4" width="12" height="8" rx="1.5"/><line x1="5" y1="9" x2="5" y2="11"/><line x1="8" y1="7" x2="8" y2="11"/><line x1="11" y1="5" x2="11" y2="11"/>
+        </svg>
+      </div>
+      <div>
+        <div class="cto-hero-prop-title">PFU 30 % maîtrisé</div>
+        <div class="cto-hero-prop-desc">Flat tax optimisée ou option barème selon votre TMI</div>
+      </div>
+    </div>
+    <div class="cto-hero-prop">
+      <div class="cto-hero-icon">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+          <polyline points="2,12 6,8 9,10 14,4"/><circle cx="14" cy="4" r="1.5" fill="currentColor"/>
+        </svg>
+      </div>
+      <div>
+        <div class="cto-hero-prop-title">Revenus passifs</div>
+        <div class="cto-hero-prop-desc">Dividendes récurrents, rente et flux de revenus simulés</div>
+      </div>
+    </div>
+    <div class="cto-hero-prop">
+      <div class="cto-hero-icon">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+          <path d="M3 13 L8 3 L13 13"/><line x1="5" y1="10" x2="11" y2="10"/>
+        </svg>
+      </div>
+      <div>
+        <div class="cto-hero-prop-title">Purge à la succession</div>
+        <div class="cto-hero-prop-desc">Effacement des plus-values latentes au décès du titulaire</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sim-card-wrap">
+    <div class="cto-layout">
+
+      <!-- ═══ INPUTS ═══ -->
+      <aside class="cto-inp">
+
+        <div class="inp-sec">Portefeuille</div>
+
+        <div class="field">
+          <div class="field-label">
+            <label for="cto-vi">Capital initial</label>
+            <span class="field-val" id="cto-vi-disp">20 000 €</span>
+          </div>
+          <div class="input-wrap">
+            <input type="text" inputmode="decimal" data-fmt id="cto-vi" value="20000">
+            <span class="unit">€</span>
+          </div>
+          <input type="range" id="cto-vi-sld" min="0" max="500000" step="1000" value="20000">
+        </div>
+
+        <div class="field-grid-2">
+          <div class="field">
+            <div class="field-label"><label for="cto-vp">Versements réguliers</label></div>
+            <div class="input-wrap">
+              <input type="text" inputmode="decimal" data-fmt id="cto-vp" value="500">
+              <span class="unit">€</span>
+            </div>
+          </div>
+          <div class="field">
+            <div class="field-label"><label for="cto-freq">Fréquence</label></div>
+            <div class="select-wrap">
+              <select id="cto-freq">
+                <option value="12" selected>Mensuel</option>
+                <option value="4">Trimestriel</option>
+                <option value="1">Annuel</option>
+                <option value="0">Aucun</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="inp-sec">Rendement &amp; Durée</div>
+
+        <div class="field">
+          <div class="field-label"><label for="cto-rdt">Rendement total annuel</label></div>
+          <div class="range-row">
+            <input type="range" id="cto-rdt" class="range-inp" min="1" max="15" step="0.1" value="7">
+            <span class="range-disp" id="cto-rdt-d">7,0 %</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label"><label for="cto-div">Dont dividendes</label></div>
+          <div class="range-row">
+            <input type="range" id="cto-div" class="range-inp" min="0" max="8" step="0.1" value="2.5">
+            <span class="range-disp" id="cto-div-d">2,5 %</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label"><label for="cto-duree">Horizon de placement</label></div>
+          <div class="range-row">
+            <input type="range" id="cto-duree" class="range-inp" min="1" max="30" step="1" value="15">
+            <span class="range-disp" id="cto-duree-d">15 ans</span>
+          </div>
+        </div>
+
+        <div class="inp-sec">Paramètres avancés</div>
+
+        <div class="field">
+          <div class="field-label"><label for="cto-frais">Frais de gestion annuels</label></div>
+          <div class="range-row">
+            <input type="range" id="cto-frais" class="range-inp" min="0" max="2" step="0.05" value="0.2">
+            <span class="range-disp" id="cto-frais-d">0,20 %</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label"><label for="cto-infl">Inflation annuelle</label></div>
+          <div class="range-row">
+            <input type="range" id="cto-infl" class="range-inp" min="0" max="5" step="0.1" value="2">
+            <span class="range-disp" id="cto-infl-d">2,0 %</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label"><label for="cto-arb">Fréquence arbitrages</label></div>
+          <div class="select-wrap">
+            <select id="cto-arb">
+              <option value="0">Aucun (buy &amp; hold)</option>
+              <option value="0.1" selected>Annuel (~10 % du portef.)</option>
+              <option value="0.25">Trimestriel (~25 % / an)</option>
+              <option value="0.5">Fréquent (~50 % / an)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="inp-sec">Fiscalité</div>
+
+        <div class="field">
+          <div class="field-label"><label for="cto-tmr">Tranche marginale d'imposition</label></div>
+          <div class="select-wrap">
+            <select id="cto-tmr">
+              <option value="0">0 %</option>
+              <option value="11">11 %</option>
+              <option value="30" selected>30 %</option>
+              <option value="41">41 %</option>
+              <option value="45">45 %</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label"><label>Régime fiscal</label></div>
+          <div class="cto-regime-toggle">
+            <button class="cto-regime-btn active" data-regime="pfu">PFU 30 %</button>
+            <button class="cto-regime-btn" data-regime="bareme">Barème IR</button>
+          </div>
+        </div>
+
+      </aside>
+
+      <!-- ═══ MAIN ═══ -->
+      <section class="cto-main">
+        <nav class="cto-tabs-nav" role="tablist">
+          <button class="cto-tab-btn active" data-tab="capi" role="tab">
+            <svg class="cto-tab-icon" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6">
+              <polyline points="1,10 4,6 7,8 13,2"/>
+            </svg>Capitalisation
+          </button>
+          <button class="cto-tab-btn" data-tab="fisc" role="tab">
+            <svg class="cto-tab-icon" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6">
+              <rect x="2" y="2" width="10" height="10" rx="1.5"/><line x1="4" y1="7" x2="10" y2="7"/>
+            </svg>Fiscalité PFU
+          </button>
+          <button class="cto-tab-btn" data-tab="div" role="tab">
+            <svg class="cto-tab-icon" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6">
+              <circle cx="7" cy="7" r="5"/><line x1="7" y1="4" x2="7" y2="10"/><line x1="4.5" y1="6" x2="9.5" y2="6"/>
+            </svg>Dividendes
+          </button>
+          <button class="cto-tab-btn" data-tab="cmp" role="tab">
+            <svg class="cto-tab-icon" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6">
+              <circle cx="4.5" cy="7" r="3"/><circle cx="9.5" cy="7" r="3"/>
+            </svg>vs PEA
+          </button>
+          <button class="cto-tab-btn" data-tab="alloc" role="tab">
+            <svg class="cto-tab-icon" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6">
+              <circle cx="7" cy="7" r="5"/><line x1="7" y1="2" x2="7" y2="7"/><line x1="7" y1="7" x2="11" y2="9.5"/>
+            </svg>Allocation
+          </button>
+          <button class="cto-tab-btn" data-tab="trans" role="tab">
+            <svg class="cto-tab-icon" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6">
+              <path d="M2 12 L7 3 L12 12"/><line x1="4.5" y1="9" x2="9.5" y2="9"/>
+            </svg>Transmission
+          </button>
+          <button class="cto-tab-btn" data-tab="peda" role="tab">
+            <svg class="cto-tab-icon" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6">
+              <rect x="2" y="2" width="10" height="10" rx="1.5"/>
+              <line x1="4.5" y1="5" x2="9.5" y2="5"/><line x1="4.5" y1="7.5" x2="9.5" y2="7.5"/><line x1="4.5" y1="10" x2="7" y2="10"/>
+            </svg>Pédagogie
+          </button>
+        </nav>
+
+        <!-- ── CAPITALISATION ── -->
+        <div class="cto-panel active" id="cto-p-capi">
+          <div class="cto-kpi-row cto-kpi-3">
+            <div class="cto-kpi accent">
+              <div class="cto-kpi-label">Valeur finale brute</div>
+              <div class="cto-kpi-val lg green" id="kc-final-brut">—</div>
+              <div class="cto-kpi-sub" id="kc-duree-sub">avant fiscalité</div>
+            </div>
+            <div class="cto-kpi indigo">
+              <div class="cto-kpi-label">Valeur nette (après impôts)</div>
+              <div class="cto-kpi-val indigo" id="kc-final-net">—</div>
+              <div class="cto-kpi-sub">fiscal drag inclus</div>
+            </div>
+            <div class="cto-kpi amber">
+              <div class="cto-kpi-label">Capital investi</div>
+              <div class="cto-kpi-val" id="kc-investi">—</div>
+              <div class="cto-kpi-sub">versements cumulés</div>
+            </div>
+          </div>
+          <div class="cto-kpi-row cto-kpi-4">
+            <div class="cto-kpi success">
+              <div class="cto-kpi-label">Plus-values brutes</div>
+              <div class="cto-kpi-val" id="kc-pv">—</div>
+            </div>
+            <div class="cto-kpi danger">
+              <div class="cto-kpi-label">Coût fiscal total</div>
+              <div class="cto-kpi-val red" id="kc-tax">—</div>
+            </div>
+            <div class="cto-kpi slate">
+              <div class="cto-kpi-label">Rendement annualisé</div>
+              <div class="cto-kpi-val" id="kc-ann">—</div>
+            </div>
+            <div class="cto-kpi">
+              <div class="cto-kpi-label">Valeur réelle (inflation)</div>
+              <div class="cto-kpi-val" id="kc-reel">—</div>
+            </div>
+          </div>
+
+          <div class="cto-chart-wrap">
+            <div class="cto-chart-hdr">
+              <div>
+                <div class="cto-chart-title">Évolution du portefeuille</div>
+                <div class="cto-chart-sub">Capital investi · Valeur brute · Valeur nette après fiscal drag</div>
+              </div>
+              <span class="cto-chart-badge" id="kc-badge">15 ans</span>
+            </div>
+            <canvas class="cto-canvas cto-canvas-240" id="cto-chart-capi"></canvas>
+            <div class="cto-legend">
+              <div class="cto-legend-item"><div class="cto-legend-line" style="background:var(--amber)"></div>Capital investi</div>
+              <div class="cto-legend-item"><div class="cto-legend-line" style="background:var(--accent)"></div>Valeur brute</div>
+              <div class="cto-legend-item"><div class="cto-legend-line" style="background:var(--cto-indigo)"></div>Valeur nette fiscalisée</div>
+            </div>
+          </div>
+
+          <div class="cto-proj-wrap">
+            <table class="cto-proj-tbl">
+              <thead><tr>
+                <th>Année</th><th>Capital investi</th><th>Valeur brute</th>
+                <th>Impôts cumulés</th><th>Valeur nette</th>
+              </tr></thead>
+              <tbody id="cto-proj-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ── FISCALITÉ PFU ── -->
+        <div class="cto-panel" id="cto-p-fisc">
+          <div class="cto-drag-box">
+            <div>
+              <div class="cto-drag-title">Coût fiscal annuel moyen — <span id="fisc-regime-label">PFU 30 %</span></div>
+              <div class="cto-drag-sub">Dividendes + arbitrages taxés chaque année</div>
+            </div>
+            <div class="cto-drag-val" id="fisc-annual-tax">—</div>
+          </div>
+
+          <div class="cto-pfu-grid">
+            <div class="cto-pfu-card" id="fisc-pfu-card">
+              <span class="cto-pfu-badge pfu">PFU 30 %</span>
+              <div class="cto-pfu-name">Prélèvement Forfaitaire Unique</div>
+              <div class="cto-pfu-row"><span>Dividendes bruts annuels</span><span class="cto-pfu-v muted" id="fp-div">—</span></div>
+              <div class="cto-pfu-row"><span>Prélèvements sociaux (17,2 %)</span><span class="cto-pfu-v red" id="fp-ps-div">—</span></div>
+              <div class="cto-pfu-row"><span>IR sur dividendes (12,8 %)</span><span class="cto-pfu-v red" id="fp-ir-div">—</span></div>
+              <div class="cto-pfu-row"><span>Gains arbitrages taxés</span><span class="cto-pfu-v muted" id="fp-arb">—</span></div>
+              <div class="cto-pfu-row"><span>PFU sur arbitrages (30 %)</span><span class="cto-pfu-v red" id="fp-tax-arb">—</span></div>
+              <div class="cto-pfu-row total"><span>Revenu net annuel (dividendes)</span><span class="cto-pfu-v green" id="fp-net-div">—</span></div>
+            </div>
+
+            <div class="cto-pfu-card" id="fisc-bareme-card">
+              <span class="cto-pfu-badge bareme">Barème IR</span>
+              <div class="cto-pfu-name">Option barème progressif</div>
+              <div class="cto-pfu-row"><span>Dividendes bruts annuels</span><span class="cto-pfu-v muted" id="fb-div">—</span></div>
+              <div class="cto-pfu-row"><span>Abattement 40 % dividendes</span><span class="cto-pfu-v green" id="fb-abo">—</span></div>
+              <div class="cto-pfu-row"><span>IR (TMI sur 60 % des div.)</span><span class="cto-pfu-v red" id="fb-ir">—</span></div>
+              <div class="cto-pfu-row"><span>Prélèvements sociaux (17,2 %)</span><span class="cto-pfu-v red" id="fb-ps">—</span></div>
+              <div class="cto-pfu-row"><span>CSG déductible (6,8 %)</span><span class="cto-pfu-v green" id="fb-csg">—</span></div>
+              <div class="cto-pfu-row total"><span>Revenu net (barème)</span><span class="cto-pfu-v green" id="fb-net">—</span></div>
+            </div>
+          </div>
+
+          <div class="cto-advantage" id="fisc-best-box">
+            <div>
+              <div class="cto-advantage-title" id="fisc-best-title">Régime le plus avantageux</div>
+              <div class="cto-advantage-sub" id="fisc-best-sub">Économie annuelle estimée sur les dividendes</div>
+            </div>
+            <div class="cto-advantage-val" id="fisc-best-val">—</div>
+          </div>
+
+          <div class="cto-chart-wrap">
+            <div class="cto-chart-hdr">
+              <div>
+                <div class="cto-chart-title">Comparaison PFU vs Barème — fiscal total cumulé</div>
+                <div class="cto-chart-sub">Fiscalité totale sur la durée de simulation</div>
+              </div>
+            </div>
+            <canvas class="cto-canvas cto-canvas-160" id="cto-chart-fisc"></canvas>
+            <div class="cto-legend">
+              <div class="cto-legend-item"><div class="cto-legend-line" style="background:var(--cto-indigo)"></div>PFU 30 %</div>
+              <div class="cto-legend-item"><div class="cto-legend-line" style="background:var(--accent)"></div>Barème IR</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── DIVIDENDES ── -->
+        <div class="cto-panel" id="cto-p-div">
+          <div class="cto-div-toggle">
+            <div class="cto-div-opt active" id="div-reinvest-on" data-reinvest="1">Réinvestissement des dividendes</div>
+            <div class="cto-div-opt" id="div-reinvest-off" data-reinvest="0">Revenus encaissés</div>
+          </div>
+
+          <div class="cto-kpi-row cto-kpi-4">
+            <div class="cto-kpi accent">
+              <div class="cto-kpi-label">Revenus annuels nets</div>
+              <div class="cto-kpi-val green" id="kd-annual">—</div>
+              <div class="cto-kpi-sub">dividendes année finale</div>
+            </div>
+            <div class="cto-kpi amber">
+              <div class="cto-kpi-label">Revenus mensuels nets</div>
+              <div class="cto-kpi-val" id="kd-monthly">—</div>
+              <div class="cto-kpi-sub">équivalent mensuel</div>
+            </div>
+            <div class="cto-kpi success">
+              <div class="cto-kpi-label">Dividendes cumulés nets</div>
+              <div class="cto-kpi-val" id="kd-cumul">—</div>
+              <div class="cto-kpi-sub">sur toute la durée</div>
+            </div>
+            <div class="cto-kpi danger">
+              <div class="cto-kpi-label">Fiscalité cumulée dividendes</div>
+              <div class="cto-kpi-val red" id="kd-tax">—</div>
+              <div class="cto-kpi-sub">impôts sur revenus</div>
+            </div>
+          </div>
+
+          <div class="cto-chart-wrap">
+            <div class="cto-chart-hdr">
+              <div>
+                <div class="cto-chart-title">Flux de dividendes annuels</div>
+                <div class="cto-chart-sub">Net perçu (vert) · Fiscalité prélevée (terracotta)</div>
+              </div>
+              <span class="cto-chart-badge" id="kd-badge">15 ans</span>
+            </div>
+            <canvas class="cto-canvas cto-canvas-200" id="cto-chart-div"></canvas>
+          </div>
+
+          <div class="cto-chart-wrap">
+            <div class="cto-chart-hdr">
+              <div>
+                <div class="cto-chart-title">Évolution du portefeuille selon stratégie dividendes</div>
+                <div class="cto-chart-sub">Réinvestissement vs encaissement</div>
+              </div>
+            </div>
+            <canvas class="cto-canvas cto-canvas-160" id="cto-chart-div2"></canvas>
+            <div class="cto-legend">
+              <div class="cto-legend-item"><div class="cto-legend-line" style="background:var(--accent)"></div>Réinvestissement</div>
+              <div class="cto-legend-item"><div class="cto-legend-line" style="background:var(--amber)"></div>Encaissement</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── CTO vs PEA ── -->
+        <div class="cto-panel" id="cto-p-cmp">
+          <div class="cto-kpi-row cto-kpi-3" style="margin-bottom:1rem">
+            <div class="cto-kpi indigo">
+              <div class="cto-kpi-label">CTO — Capital net</div>
+              <div class="cto-kpi-val indigo" id="cmp-cto-net">—</div>
+              <div class="cto-kpi-sub">avec fiscal drag annuel</div>
+            </div>
+            <div class="cto-kpi accent">
+              <div class="cto-kpi-label">PEA — Capital net</div>
+              <div class="cto-kpi-val green" id="cmp-pea-net">—</div>
+              <div class="cto-kpi-sub">exit tax 17,2 % uniquement</div>
+            </div>
+            <div class="cto-kpi">
+              <div class="cto-kpi-label">Avantage PEA / CTO</div>
+              <div class="cto-kpi-val" id="cmp-avantage">—</div>
+              <div class="cto-kpi-sub" id="cmp-avantage-sub">après <span id="cmp-duree">15</span> ans</div>
+            </div>
+          </div>
+
+          <!-- Qualitative comparison -->
+          <div class="cto-qual-grid">
+            <div class="cto-qual-card">
+              <div class="cto-qual-label">Fiscalité</div>
+              <div class="cto-qual-row"><span class="cto-qual-badge lose">CTO</span>PFU 30 % annuel sur div. + arbitrages</div>
+              <div class="cto-qual-row"><span class="cto-qual-badge win">PEA</span>PS 17,2 % uniquement à la sortie (&gt;5 ans)</div>
+            </div>
+            <div class="cto-qual-card">
+              <div class="cto-qual-label">Plafond &amp; Liquidité</div>
+              <div class="cto-qual-row"><span class="cto-qual-badge win">CTO</span>Aucun plafond — retraits libres à tout moment</div>
+              <div class="cto-qual-row"><span class="cto-qual-badge lose">PEA</span>150 000 € — retrait avant 5 ans = clôture</div>
+            </div>
+            <div class="cto-qual-card">
+              <div class="cto-qual-label">Éligibilité des actifs</div>
+              <div class="cto-qual-row"><span class="cto-qual-badge win">CTO</span>Toutes actions mondiales, ETF, obligations, options</div>
+              <div class="cto-qual-row"><span class="cto-qual-badge lose">PEA</span>Actions EEE uniquement (ou ETF synthétiques)</div>
+            </div>
+            <div class="cto-qual-card">
+              <div class="cto-qual-label">Transmission successorale</div>
+              <div class="cto-qual-row"><span class="cto-qual-badge win">CTO</span>Purge des plus-values au décès — base relevée</div>
+              <div class="cto-qual-row"><span class="cto-qual-badge lose">PEA</span>Clôture au décès, PS 17,2 % sur gains latents</div>
+            </div>
+          </div>
+
+          <!-- Quantitative table -->
+          <table class="cto-cmp-table" style="margin-bottom:1rem">
+            <thead>
+              <tr>
+                <th>Critère</th>
+                <th>CTO</th>
+                <th>PEA</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Capital investi</td><td id="cmpt-investi-cto">—</td><td id="cmpt-investi-pea">—</td></tr>
+              <tr><td>Valeur finale brute</td><td id="cmpt-brut-cto">—</td><td id="cmpt-brut-pea">—</td></tr>
+              <tr><td>Fiscalité totale</td><td class="cto-cmp-lose" id="cmpt-fisc-cto">—</td><td class="cto-cmp-win" id="cmpt-fisc-pea">—</td></tr>
+              <tr><td>Capital net perçu</td><td id="cmpt-net-cto">—</td><td class="cto-cmp-win" id="cmpt-net-pea">—</td></tr>
+              <tr><td>Taux effectif d'imposition</td><td class="cto-cmp-lose" id="cmpt-taux-cto">—</td><td class="cto-cmp-win" id="cmpt-taux-pea">—</td></tr>
+            </tbody>
+          </table>
+
+          <div class="cto-chart-wrap">
+            <div class="cto-chart-hdr">
+              <div>
+                <div class="cto-chart-title">Capital net comparé — CTO vs PEA</div>
+                <div class="cto-chart-sub">Évolution sur l'horizon simulé</div>
+              </div>
+            </div>
+            <canvas class="cto-canvas cto-canvas-200" id="cto-chart-cmp"></canvas>
+            <div class="cto-legend">
+              <div class="cto-legend-item"><div class="cto-legend-line" style="background:var(--cto-indigo)"></div>CTO net</div>
+              <div class="cto-legend-item"><div class="cto-legend-line" style="background:var(--accent)"></div>PEA net (>5 ans)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── ALLOCATION ── -->
+        <div class="cto-panel" id="cto-p-alloc">
+          <div class="cto-profile-pills" id="cto-pills">
+            <button class="cto-profile-pill active" data-p="etf_monde">ETF Monde</button>
+            <button class="cto-profile-pill" data-p="dividendes">Dividendes</button>
+            <button class="cto-profile-pill" data-p="tech_us">Tech US</button>
+            <button class="cto-profile-pill" data-p="international">International</button>
+            <button class="cto-profile-pill" data-p="obligataire">Obligataire</button>
+            <button class="cto-profile-pill" data-p="croissance">Croissance</button>
+            <button class="cto-profile-pill" data-p="diversifie">Diversifié</button>
+            <button class="cto-profile-pill" data-p="prudent">Prudent</button>
+          </div>
+          <div class="cto-alloc-layout">
+            <div class="cto-alloc-card">
+              <div class="cto-alloc-name" id="alloc-name">ETF Monde</div>
+              <div class="cto-alloc-desc" id="alloc-desc">—</div>
+              <div class="cto-alloc-stats">
+                <div class="cto-alloc-stat"><div class="cto-alloc-stat-val" id="alloc-rdt">—</div><div class="cto-alloc-stat-lbl">Rendement</div></div>
+                <div class="cto-alloc-stat"><div class="cto-alloc-stat-val" id="alloc-div">—</div><div class="cto-alloc-stat-lbl">Dividende</div></div>
+                <div class="cto-alloc-stat"><div class="cto-alloc-stat-val" id="alloc-vola">—</div><div class="cto-alloc-stat-lbl">Volatilité</div></div>
+                <div class="cto-alloc-stat"><div class="cto-alloc-stat-val" id="alloc-horizon">—</div><div class="cto-alloc-stat-lbl">Horizon</div></div>
+              </div>
+              <div class="cto-alloc-list" id="alloc-list"></div>
+            </div>
+            <div class="cto-donut-wrap">
+              <canvas class="cto-donut-canvas" id="cto-chart-donut"></canvas>
+              <div id="alloc-donut-leg" style="width:100%"></div>
+            </div>
+          </div>
+          <div class="cto-chart-wrap" style="margin-top:1.1rem">
+            <div class="cto-chart-hdr">
+              <div>
+                <div class="cto-chart-title">Projection avec ce profil</div>
+                <div class="cto-chart-sub" id="alloc-proj-sub">Simulation sur votre durée paramétrée</div>
+              </div>
+              <div style="text-align:right">
+                <div style="font-family:var(--mono);font-size:.85rem;font-weight:700;color:var(--cto-indigo)" id="alloc-proj-net">—</div>
+                <div style="font-size:.6rem;color:var(--text-dim);margin-top:.1rem">valeur nette</div>
+              </div>
+            </div>
+            <canvas class="cto-canvas cto-canvas-160" id="cto-chart-alloc"></canvas>
+          </div>
+        </div>
+
+        <!-- ── TRANSMISSION ── -->
+        <div class="cto-panel" id="cto-p-trans">
+          <p class="pedago-p" style="margin-bottom:1rem">Le CTO bénéficie d'un avantage successoral unique : <strong>la purge des plus-values au décès</strong>. Les héritiers reçoivent les titres à leur valeur de marché au jour du décès, sans impôt sur les plus-values latentes. Mais les droits de succession s'appliquent sur la valeur totale.</p>
+          <div class="cto-trans-grid">
+            <div class="cto-trans-card best">
+              <div class="cto-trans-hdr">
+                <div class="cto-trans-dot" style="background:var(--cto-indigo)"></div>
+                <span class="cto-trans-title">CTO — Décès du titulaire</span>
+              </div>
+              <div class="cto-trans-body">
+                <div class="cto-trans-row"><span>Valeur du portefeuille</span><span class="cto-trans-v" id="tr-cto-val">—</span></div>
+                <div class="cto-trans-row"><span>Plus-values latentes</span><span class="cto-trans-v" id="tr-cto-pv">—</span></div>
+                <div class="cto-trans-row"><span>Impôt sur PV (purge)</span><span class="cto-trans-v amber">0 € ✓</span></div>
+                <div class="cto-trans-row"><span>Droits de succession (taux moyen)</span><span class="cto-trans-v red" id="tr-cto-ds">—</span></div>
+                <div class="cto-trans-row total"><span>Transmis net estimé</span><span class="cto-trans-v green" id="tr-cto-net">—</span></div>
+              </div>
+            </div>
+            <div class="cto-trans-card best">
+              <div class="cto-trans-hdr">
+                <div class="cto-trans-dot" style="background:var(--accent)"></div>
+                <span class="cto-trans-title">Assurance-vie</span>
+              </div>
+              <div class="cto-trans-body">
+                <div class="cto-trans-row"><span>Valeur du contrat</span><span class="cto-trans-v" id="tr-av-val">—</span></div>
+                <div class="cto-trans-row"><span>Abattement / bénéficiaire</span><span class="cto-trans-v green">152 500 €</span></div>
+                <div class="cto-trans-row"><span>PS sur gains (17,2 %)</span><span class="cto-trans-v red" id="tr-av-ps">—</span></div>
+                <div class="cto-trans-row"><span>Prélèvement 20 % (si dépassement)</span><span class="cto-trans-v red" id="tr-av-tax">—</span></div>
+                <div class="cto-trans-row total"><span>Transmis net estimé</span><span class="cto-trans-v green" id="tr-av-net">—</span></div>
+              </div>
+            </div>
+            <div class="cto-trans-card">
+              <div class="cto-trans-hdr">
+                <div class="cto-trans-dot" style="background:var(--danger)"></div>
+                <span class="cto-trans-title">PEA — Décès du titulaire</span>
+              </div>
+              <div class="cto-trans-body">
+                <div class="cto-trans-row"><span>Valeur du portefeuille</span><span class="cto-trans-v" id="tr-pea-val">—</span></div>
+                <div class="cto-trans-row"><span>PS sur gains (17,2 %)</span><span class="cto-trans-v red" id="tr-pea-ps">—</span></div>
+                <div class="cto-trans-row"><span>Droits de succession</span><span class="cto-trans-v red" id="tr-pea-ds">—</span></div>
+                <div class="cto-trans-row total"><span>Transmis net estimé</span><span class="cto-trans-v" id="tr-pea-net">—</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="pedago-alert">
+            <strong>Important :</strong> La purge des plus-values au décès ne supprime pas les droits de succession. Les héritiers prennent les titres à leur valeur vénale au jour du décès, qui s'intègre dans l'actif successoral taxable. Consultez un notaire pour une stratégie de transmission personnalisée.
+          </div>
+        </div>
+
+        <!-- ── PÉDAGOGIE ── -->
+        <div class="cto-panel" id="cto-p-peda">
+          <div class="cto-peda-grid">
+            <div class="pedago-card">
+              <div class="pedago-card-header"><div class="pedago-card-dot"></div><div class="pedago-card-title">Qu'est-ce que le CTO ?</div></div>
+              <div class="pedago-card-body">
+                <p class="pedago-p">Le <strong>Compte-Titres Ordinaire</strong> est une enveloppe d'investissement universelle permettant d'acheter et vendre tous types de valeurs mobilières : actions, obligations, ETF, OPCVM, options, warrants, produits structurés.</p>
+                <p class="pedago-p">Contrairement au PEA, le CTO n'impose <em>aucun plafond</em> de versement, aucune restriction géographique et permet des retraits libres à tout moment sans conséquence fiscale sur le solde restant.</p>
+                <div class="pedago-tip"><strong>Avantage unique :</strong> le CTO est la seule enveloppe permettant d'investir directement en actions américaines (Amazon, Nvidia, Apple…) sans passer par des fonds synthétiques.</div>
+              </div>
+            </div>
+            <div class="pedago-card">
+              <div class="pedago-card-header"><div class="pedago-card-dot"></div><div class="pedago-card-title">Le PFU — Prélèvement Forfaitaire Unique</div></div>
+              <div class="pedago-card-body">
+                <p class="pedago-p">Depuis 2018, les revenus du CTO sont soumis au <strong>PFU (flat tax) de 30 %</strong> : 12,8 % d'impôt sur le revenu + 17,2 % de prélèvements sociaux. Ce taux s'applique aussi bien aux dividendes qu'aux plus-values de cession.</p>
+                <p class="pedago-p"><strong>Option barème :</strong> les contribuables faiblement imposés (TMI 0 % ou 11 %) peuvent opter pour le barème progressif. Les dividendes bénéficient alors d'un <em>abattement de 40 %</em> avant imposition.</p>
+                <div class="pedago-alert"><strong>Attention :</strong> l'option barème s'applique à l'ensemble des revenus de capitaux mobiliers de l'année — impossible de choisir par revenu.</div>
+              </div>
+            </div>
+            <div class="pedago-card">
+              <div class="pedago-card-header"><div class="pedago-card-dot"></div><div class="pedago-card-title">Dividendes &amp; Arbitrages</div></div>
+              <div class="pedago-card-body">
+                <p class="pedago-p"><strong>Dividendes :</strong> perçus annuellement ou trimestriellement selon les titres. Taxés à la source au PFU (12,8 % IR acompte + 17,2 % PS). La régularisation intervient à la déclaration annuelle.</p>
+                <p class="pedago-p"><strong>Arbitrages :</strong> chaque cession de titre déclenche un événement fiscal sur la plus-value réalisée. Le CTO n'offre pas de capitalisation en franchise d'impôt comme le PEA ou l'assurance-vie.</p>
+                <div class="pedago-tip"><strong>Stratégie :</strong> limiter le nombre d'arbitrages ("buy &amp; hold") réduit significativement le coût fiscal annuel et améliore la performance nette composée.</div>
+              </div>
+            </div>
+            <div class="pedago-card">
+              <div class="pedago-card-header"><div class="pedago-card-dot"></div><div class="pedago-card-title">CTO vs PEA — Quelle enveloppe choisir ?</div></div>
+              <div class="pedago-card-body">
+                <p class="pedago-p"><strong>Choisir le PEA</strong> si : horizon &gt; 5 ans, investissement en actions européennes, objectif de capitalisation pure, recherche de l'efficacité fiscale maximale à la sortie.</p>
+                <p class="pedago-p"><strong>Choisir le CTO</strong> si : besoin de flexibilité totale, exposition internationale (US, Asie…), stratégie de revenus réguliers via dividendes, ou dépassement du plafond PEA.</p>
+                <div class="pedago-tip"><strong>Recommandation patrimoniale :</strong> utiliser les deux. PEA pour la capitalisation fiscalement optimisée + CTO pour la diversification internationale et les revenus complémentaires.</div>
+              </div>
+            </div>
+            <div class="pedago-card cto-peda-full">
+              <div class="pedago-card-header"><div class="pedago-card-dot"></div><div class="pedago-card-title">Stratégie patrimoniale CTO — 3 approches</div></div>
+              <div class="pedago-card-body">
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.8rem">
+                  <div class="pedago-block">
+                    <div class="pedago-block-label">Capitalisation passive</div>
+                    <p class="pedago-block-text">ETF World à faibles frais, zéro arbitrage. Minimise le fiscal drag. Dividendes réinvestis automatiquement. <strong>Performance nette maximale sur le long terme.</strong></p>
+                  </div>
+                  <div class="pedago-block">
+                    <div class="pedago-block-label">Revenus passifs</div>
+                    <p class="pedago-block-text">Portefeuille d'actions à dividendes élevés (REITs, aristoc. de dividendes). Objectif : générer un <strong>flux de revenus régulier</strong> taxé à 30 % ou barème.</p>
+                  </div>
+                  <div class="pedago-block">
+                    <div class="pedago-block-label">Gestion active</div>
+                    <p class="pedago-block-text">Sélection de titres, arbitrages sectoriels. Chaque cession déclenche une fiscalité. Réservé aux investisseurs expérimentés. <strong>Coût fiscal élevé mais flexibilité maximale.</strong></p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <span>PATRIMONIA.AI</span> — Simulateur CTO — Calculs indicatifs. PFU : 30 % (12,8 % IR + 17,2 % PS). Abattement dividendes barème : 40 %. Droits de succession : taux indicatifs (ligne directe). Les projections ne constituent pas une garantie de performance. Données à titre pédagogique — consultez un conseiller en gestion de patrimoine.
+</footer>
+
+<script>
+/* ════════════════════════════════════════════
+   CTO — Logique métier & rendu UI
+════════════════════════════════════════════ */
+const PS   = 0.172;
+const IR_PFU = 0.128;
+const PFU  = 0.30;
+const ABATT_DIV = 0.40;
+
+/* ─── ALLOCATION PROFILES ─── */
+const PROFILES = {
+  etf_monde:    { name:'ETF Monde', rdt:7.5, div:1.5, vola:'~15 %', horizon:'8+ ans',
+    desc:'Exposition mondiale diversifiée via ETF MSCI World. Stratégie passive à faibles coûts. La classe d\'actifs idéale pour un CTO à long terme.',
+    segs:[{l:'Actions US & Canada',p:65,c:'#4F8A78'},{l:'Actions Europe',p:20,c:'#B8860B'},{l:'Asie Pacifique',p:10,c:'#3D5A80'},{l:'Liq.',p:5,c:'#D2D2D7'}]},
+  dividendes:   { name:'Haut Dividende', rdt:5.0, div:4.5, vola:'~10 %', horizon:'5+ ans',
+    desc:'Sélection d\'aristoc. de dividendes européens et américains, REIT, infrastructures. Objectif : rente régulière et progressive.',
+    segs:[{l:'Aristoc. dividendes',p:50,c:'#4F8A78'},{l:'REIT US & EU',p:25,c:'#B8860B'},{l:'Infrastr.',p:20,c:'#3D5A80'},{l:'Liq.',p:5,c:'#D2D2D7'}]},
+  tech_us:      { name:'Tech US', rdt:10.0, div:0.5, vola:'~22 %', horizon:'10+ ans',
+    desc:'Concentration sur les géants technologiques américains (Magnificent 7, semi-conducteurs, cloud). Non éligible PEA — CTO uniquement.',
+    segs:[{l:'Big Tech (MAG7)',p:55,c:'#4F8A78'},{l:'Semi-conducteurs',p:25,c:'#B8860B'},{l:'Cloud & SaaS',p:15,c:'#3D5A80'},{l:'Liq.',p:5,c:'#D2D2D7'}]},
+  international:{ name:'International', rdt:6.5, div:2.0, vola:'~14 %', horizon:'7+ ans',
+    desc:'Diversification géographique maximale. Exposition à l\'Asie (Japon, Corée), marchés émergents, Amérique latine. CTO uniquement.',
+    segs:[{l:'Asie Pacifique',p:35,c:'#3D5A80'},{l:'Europe hors EEE',p:25,c:'#4F8A78'},{l:'Amériques',p:25,c:'#B8860B'},{l:'EM',p:15,c:'#D2D2D7'}]},
+  obligataire:  { name:'Obligataire', rdt:4.0, div:4.0, vola:'~6 %', horizon:'3+ ans',
+    desc:'Portefeuille obligataire diversifié : souverains, corporate investment grade, high yield. Génère des revenus réguliers avec une volatilité modérée.',
+    segs:[{l:'Souverains EU',p:40,c:'#3D5A80'},{l:'Corporate IG',p:35,c:'#4F8A78'},{l:'High Yield',p:15,c:'#B8860B'},{l:'Liq.',p:10,c:'#D2D2D7'}]},
+  croissance:   { name:'Croissance', rdt:9.0, div:0.8, vola:'~20 %', horizon:'10+ ans',
+    desc:'Small et mid caps mondiales, secteurs innovants, marchés émergents à forte croissance. Profil offensif pour investisseurs expérimentés.',
+    segs:[{l:'Small & Mid Cap',p:45,c:'#4F8A78'},{l:'Secteurs innov.',p:35,c:'#B8860B'},{l:'EM Croissance',p:15,c:'#3D5A80'},{l:'Liq.',p:5,c:'#D2D2D7'}]},
+  diversifie:   { name:'Diversifié', rdt:5.5, div:2.5, vola:'~10 %', horizon:'5+ ans',
+    desc:'Allocation multi-actifs équilibrée : actions, obligations, matières premières, REIT. Portefeuille "all weather" pour profil modéré.',
+    segs:[{l:'Actions monde',p:50,c:'#4F8A78'},{l:'Obligations',p:25,c:'#3D5A80'},{l:'Mat. premières',p:15,c:'#B8860B'},{l:'REIT & Liq.',p:10,c:'#D2D2D7'}]},
+  prudent:      { name:'Prudent', rdt:3.0, div:3.0, vola:'~5 %', horizon:'3+ ans',
+    desc:'Préservation du capital. Obligations sécurisées, actions défensives, or. Idéal pour un CTO de sécurisation ou d\'attente.',
+    segs:[{l:'Oblig. sécurisées',p:55,c:'#3D5A80'},{l:'Actions défens.',p:25,c:'#4F8A78'},{l:'Or & mat. prem.',p:15,c:'#B8860B'},{l:'Liq.',p:5,c:'#D2D2D7'}]}
+};
+let currentProfile = 'etf_monde';
+let reinvestDiv = true;
+let regime = 'pfu';
+
+/* ─── HELPERS ─── */
+const fmt = v => new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(Math.round(v||0));
+const fmtPct = (v,d=1) => v.toFixed(d).replace('.',',')+' %';
+const fmtX = (v,d=1) => '×'+v.toFixed(d).replace('.',',');
+const $ = id => document.getElementById(id);
+const setTxt = (id,v) => { const e=$(id); if(e) e.textContent=v; };
+function fmtK(v) {
+  if(v>=1e6) return (v/1e6).toFixed(1).replace('.',',')+' M€';
+  if(v>=1e3) return Math.round(v/1e3)+'K€';
+  return Math.round(v)+'€';
+}
+
+/* ─── EFFECTIVE TAX RATES ─── */
+function getEffectiveRates(tmr, regime) {
+  if(regime==='pfu') {
+    return { div: PFU, pv: PFU };
+  }
+  // Barème: dividendes avec abattement 40%, CSG déductible 6.8%
+  const ir_div = (tmr/100) * (1 - ABATT_DIV);
+  const ps_div = PS;
+  const csg_deduc = 0.068 * (tmr/100); // CSG déductible bénéficie à IR
+  const eff_div = Math.max(0, ir_div + ps_div - csg_deduc);
+  const eff_pv = tmr/100 + PS; // PV au barème sans abattement (>2 ans supprimé en 2018)
+  return { div: eff_div, pv: eff_pv };
+}
+
+/* ─── INPUTS ─── */
+function getInputs() {
+  const n = id => SP.parseNum($(id).value);
+  return {
+    initial: n('cto-vi'),
+    monthly: n('cto-vp'),
+    freq:    +($('cto-freq').value),
+    rdt:     +($('cto-rdt').value),
+    div:     +($('cto-div').value),
+    duree:   +($('cto-duree').value),
+    frais:   +($('cto-frais').value),
+    infl:    +($('cto-infl').value),
+    arb:     +($('cto-arb').value),
+    tmr:     +($('cto-tmr').value),
+  };
+}
+
+/* ─── PORTFOLIO SIMULATION ─── */
+function calcPortfolio(inp) {
+  const { initial, monthly, freq, rdt, div: divYield, duree, frais, arb, tmr } = inp;
+  const annualInflow = monthly * freq;
+  const rates = getEffectiveRates(tmr, regime);
+
+  const netRdt = (rdt - frais) / 100;
+  const divRate = divYield / 100;
+  const pvRate  = Math.max(0, netRdt - divRate);
+  const arbRate = arb;
+
+  let gross = initial, net = initial, invested = initial;
+  let cumTaxGross = 0, cumTaxNet = 0, cumDivGross = 0, cumDivNet = 0;
+
+  const dataGross=[{y:0,inv:initial,brut:initial,net:initial,taxCum:0}];
+  const dataNet=[...dataGross];
+
+  for(let y=1; y<=duree; y++) {
+    // Annual dividends
+    const divG = gross * divRate;
+    const taxDivG = divG * rates.div;
+    // Annual arbitrage gains
+    const arbGains = gross * pvRate * arbRate;
+    const taxArbG  = arbGains * rates.pv;
+    const totalTaxG = taxDivG + taxArbG;
+    cumTaxGross += totalTaxG;
+    cumDivGross += divG;
+
+    // Gross portfolio (no fiscal drag — just fee drag)
+    gross = gross * (1 + netRdt) + annualInflow;
+
+    // Net portfolio (dividends taxed annually, arbitrage taxed)
+    const divN = net * divRate;
+    const taxDivN = divN * rates.div;
+    const arbGainsN = net * pvRate * arbRate;
+    const taxArbN   = arbGainsN * rates.pv;
+    const totalTaxN = taxDivN + taxArbN;
+    cumTaxNet += totalTaxN;
+    cumDivNet += (divN - taxDivN);
+
+    net = net * (1 + netRdt) - totalTaxN + annualInflow;
+
+    invested += annualInflow;
+    dataGross.push({y, inv:invested, brut:gross, net, taxCum:cumTaxGross});
+    dataNet.push({y, inv:invested, brut:net, net, taxCum:cumTaxNet});
+  }
+
+  return { dataGross, invested, gross, net: net, cumTaxGross, cumTaxNet, cumDivGross, cumDivNet };
+}
+
+/* ─── RENDER CAPITALISATION ─── */
+function renderCapi(inp, res) {
+  const { gross, net, invested, cumTaxGross, duree, infl } = {...inp, ...res};
+  const gains = gross - invested;
+  const finalTax = Math.max(0, gains) * PFU; // exit PFU on remaining gains
+  const netFull = net; // already includes annual drag; add exit PV tax
+  const realVal = gross / Math.pow(1 + inp.infl/100, inp.duree);
+  const ann = inp.duree>0 ? (Math.pow(gross/invested,1/inp.duree)-1)*100 : 0;
+
+  setTxt('kc-final-brut', fmt(gross));
+  setTxt('kc-duree-sub', `sur ${inp.duree} an${inp.duree>1?'s':''}`);
+  setTxt('kc-final-net', fmt(net));
+  setTxt('kc-investi', fmt(invested));
+  setTxt('kc-pv', fmt(Math.max(0,gross-invested)));
+  setTxt('kc-tax', '−'+fmt(res.cumTaxNet));
+  setTxt('kc-ann', fmtPct(ann));
+  setTxt('kc-reel', fmt(realVal));
+  setTxt('kc-badge', inp.duree+' an'+(inp.duree>1?'s':''));
+
+  // Projection table
+  const tbody = $('cto-proj-body'); if(!tbody) return;
+  tbody.innerHTML='';
+  const milestones = new Set([1,5,10,15,20,25,30].filter(y=>y<=inp.duree));
+  milestones.add(inp.duree);
+  [...milestones].sort((a,b)=>a-b).forEach(y=>{
+    const d = res.dataGross[y]||res.dataGross[res.dataGross.length-1];
+    const dn = res.dataNet ? (res.dataNet[y]||res.dataNet[res.dataNet.length-1]) : d;
+    const tr=document.createElement('tr');
+    if(y===inp.duree) tr.className='highlight';
+    tr.innerHTML=`<td>${y===inp.duree?'Fin ('+y+' ans)':y+' an'+(y>1?'s':'')}</td>
+      <td>${fmt(d.inv)}</td><td>${fmt(d.brut)}</td>
+      <td>−${fmt(d.taxCum)}</td><td>${fmt(d.brut-d.taxCum)}</td>`;
+    tbody.appendChild(tr);
+  });
+
+  drawTripleChart($('cto-chart-capi'), res.dataGross);
+}
+
+/* ─── RENDER FISCALITÉ ─── */
+function renderFisc(inp, res) {
+  const rates = getEffectiveRates(inp.tmr, regime);
+  const midPortfolio = res.gross / 2;
+  const annDiv = midPortfolio * (inp.div/100);
+  const annArb = midPortfolio * Math.max(0,(inp.rdt-inp.div-inp.frais)/100) * inp.arb;
+
+  // PFU
+  const pfu_ps_div  = annDiv * PS;
+  const pfu_ir_div  = annDiv * IR_PFU;
+  const pfu_total_div = annDiv * PFU;
+  const pfu_tax_arb  = annArb * PFU;
+  const pfu_net_div  = annDiv - pfu_total_div;
+
+  // Barème
+  const tmr = inp.tmr/100;
+  const bar_ir    = annDiv * (1-ABATT_DIV) * tmr;
+  const bar_ps    = annDiv * PS;
+  const bar_csg   = annDiv * PS * 0.068/PS * tmr; // CSG déductible
+  const bar_net   = annDiv - bar_ir - bar_ps + bar_csg;
+
+  setTxt('fp-div',    fmt(annDiv));
+  setTxt('fp-ps-div', '−'+fmt(pfu_ps_div));
+  setTxt('fp-ir-div', '−'+fmt(pfu_ir_div));
+  setTxt('fp-arb',    fmt(annArb));
+  setTxt('fp-tax-arb','−'+fmt(pfu_tax_arb));
+  setTxt('fp-net-div', fmt(pfu_net_div));
+  setTxt('fb-div', fmt(annDiv));
+  setTxt('fb-abo', '+'+fmt(annDiv*ABATT_DIV));
+  setTxt('fb-ir',  '−'+fmt(bar_ir));
+  setTxt('fb-ps',  '−'+fmt(bar_ps));
+  setTxt('fb-csg', '+'+fmt(bar_csg));
+  setTxt('fb-net', fmt(bar_net));
+
+  const annTax = (regime==='pfu') ? (pfu_total_div + pfu_tax_arb) : (bar_ir+bar_ps-bar_csg);
+  setTxt('fisc-annual-tax', fmt(annTax));
+  setTxt('fisc-regime-label', regime==='pfu'?'PFU 30 %':'Barème IR');
+
+  // Best regime
+  const best = bar_net > pfu_net_div ? 'Barème IR' : 'PFU 30 %';
+  const econ = Math.abs(bar_net - pfu_net_div);
+  setTxt('fisc-best-title', `Régime optimal : ${best}`);
+  setTxt('fisc-best-val', '+'+fmt(econ)+' / an');
+
+  // Cumulative tax chart: PFU vs barème over years
+  const pfu_cum = res.dataGross.map((_,i) => i * (pfu_total_div+pfu_tax_arb));
+  const bar_cum = res.dataGross.map((_,i) => i * (bar_ir+bar_ps-bar_csg));
+  drawDualLineSimple($('cto-chart-fisc'), pfu_cum, bar_cum, inp.duree, '#3D5A80','#4F8A78');
+}
+
+/* ─── RENDER DIVIDENDES ─── */
+function renderDiv(inp, res) {
+  const rates = getEffectiveRates(inp.tmr, regime);
+  const divRate = inp.div/100;
+  const netRdt  = (inp.rdt-inp.frais)/100;
+  const annualInflow = inp.monthly * inp.freq;
+
+  let portReinv = inp.initial, portNone = inp.initial;
+  let cumDivNet=0, cumDivTax=0;
+  const bars=[];
+  const reinvLine=[], noneLine=[];
+
+  for(let y=1; y<=inp.duree; y++) {
+    const divGross = portReinv * divRate;
+    const tax = divGross * rates.div;
+    const divNet = divGross - tax;
+    cumDivNet += divNet; cumDivTax += tax;
+
+    if(reinvestDiv) {
+      portReinv = portReinv * (1+netRdt-divRate) + divNet + annualInflow;
+    } else {
+      portReinv = portReinv * (1+netRdt-divRate) + annualInflow;
+    }
+    portNone = portNone * (1+netRdt-divRate) + annualInflow;
+    bars.push({net:divNet, tax});
+    reinvLine.push(portReinv);
+    noneLine.push(portNone);
+  }
+
+  const lastDivNet = bars[bars.length-1]?.net||0;
+  setTxt('kd-annual', fmt(lastDivNet));
+  setTxt('kd-monthly', fmt(lastDivNet/12));
+  setTxt('kd-cumul', fmt(cumDivNet));
+  setTxt('kd-tax', '−'+fmt(cumDivTax));
+  setTxt('kd-badge', inp.duree+' an'+(inp.duree>1?'s':''));
+
+  drawDivBars($('cto-chart-div'), bars);
+  drawDualLineSimple($('cto-chart-div2'), reinvLine, noneLine, inp.duree,'#4F8A78','#B8860B');
+}
+
+/* ─── RENDER CTO vs PEA ─── */
+function renderCmp(inp, res) {
+  const { gross, net, invested } = res;
+  const gains = Math.max(0, gross-invested);
+  const ctoNet = net;
+  const peaNet = gross - gains*PS; // PEA exit tax only
+
+  setTxt('cmp-duree', inp.duree);
+  setTxt('cmp-cto-net', fmt(ctoNet));
+  setTxt('cmp-pea-net', fmt(peaNet));
+  const adv = peaNet - ctoNet;
+  setTxt('cmp-avantage', (adv>=0?'+':'')+fmt(adv));
+
+  setTxt('cmpt-investi-cto', fmt(invested));
+  setTxt('cmpt-investi-pea', fmt(invested));
+  setTxt('cmpt-brut-cto', fmt(gross));
+  setTxt('cmpt-brut-pea', fmt(gross));
+  setTxt('cmpt-fisc-cto', '−'+fmt(res.cumTaxNet));
+  setTxt('cmpt-fisc-pea', '−'+fmt(gains*PS));
+  setTxt('cmpt-net-cto', fmt(ctoNet));
+  setTxt('cmpt-net-pea', fmt(peaNet));
+  setTxt('cmpt-taux-cto', fmtPct(gains>0?res.cumTaxNet/gains*100:0));
+  setTxt('cmpt-taux-pea', fmtPct(gains>0?gains*PS/gains*100:0));
+
+  // CTO net line per year, PEA net line per year
+  const ctoLine = res.dataGross.map((d,i)=>{
+    const dn = res.dataNet ? (res.dataNet[i]||d) : d;
+    return dn.brut;
+  });
+  const peaLine = res.dataGross.map(d=>{
+    const g=Math.max(0,d.brut-d.inv);
+    return d.brut - g*PS;
+  });
+  drawDualLineSimple($('cto-chart-cmp'), ctoLine, peaLine, inp.duree, '#3D5A80','#4F8A78');
+}
+
+/* ─── RENDER ALLOCATION ─── */
+function renderAlloc(key, inp) {
+  const p = PROFILES[key];
+  setTxt('alloc-name', p.name);
+  $('alloc-desc').textContent = p.desc;
+  setTxt('alloc-rdt',    fmtPct(p.rdt));
+  setTxt('alloc-div',    fmtPct(p.div));
+  setTxt('alloc-vola',   p.vola);
+  setTxt('alloc-horizon',p.horizon);
+
+  const list=$('alloc-list');
+  if(list) list.innerHTML=p.segs.map(s=>`
+    <div class="cto-alloc-item">
+      <span class="cto-alloc-item-name">${s.l}</span>
+      <div class="cto-alloc-bar-wrap"><div class="cto-alloc-bar-fill" style="width:${s.p}%;background:${s.c}"></div></div>
+      <span class="cto-alloc-pct">${s.p} %</span>
+    </div>`).join('');
+
+  drawDonut($('cto-chart-donut'), p.segs);
+  const leg=$('alloc-donut-leg');
+  if(leg) leg.innerHTML=p.segs.map(s=>`
+    <div style="display:flex;align-items:center;gap:.3rem;font-size:.64rem;color:var(--text-muted);margin-bottom:.22rem">
+      <div style="width:7px;height:7px;border-radius:2px;background:${s.c};flex-shrink:0"></div>${s.l} — ${s.p}%
+    </div>`).join('');
+
+  // Profile projection (net)
+  const profInp = {...inp, rdt:p.rdt, div:p.div};
+  const profRes = calcPortfolio(profInp);
+  setTxt('alloc-proj-net', fmt(profRes.net));
+  $('alloc-proj-sub') && ($('alloc-proj-sub').textContent = `${p.name} — net sur ${inp.duree} ans`);
+  drawTripleChart($('cto-chart-alloc'), profRes.dataGross);
+}
+
+/* ─── RENDER TRANSMISSION ─── */
+function renderTrans(inp, res) {
+  const val = res.gross, inv = res.invested;
+  const gains = Math.max(0, val-inv);
+  const DS_RATE = 0.20; // taux indicatif ligne directe (simplifié)
+
+  // CTO: purge PV, droits succession sur valeur totale
+  const ds_cto = val * DS_RATE * 0.5; // abattement 100K enfant simplifié
+  const cto_net = val - ds_cto;
+  setTxt('tr-cto-val', fmt(val));
+  setTxt('tr-cto-pv', fmt(gains));
+  setTxt('tr-cto-ds', '−'+fmt(ds_cto));
+  setTxt('tr-cto-net', fmt(cto_net));
+
+  // AV
+  const av_ps = gains*PS;
+  const av_taxable = Math.max(0, val-152500-inv);
+  const av_tax = av_taxable*0.20;
+  const av_net = val-av_ps-av_tax;
+  setTxt('tr-av-val', fmt(val));
+  setTxt('tr-av-ps', '−'+fmt(av_ps));
+  setTxt('tr-av-tax', av_tax>0?'−'+fmt(av_tax):'0 €');
+  setTxt('tr-av-net', fmt(av_net));
+
+  // PEA
+  const pea_ps = gains*PS;
+  const pea_after_ps = val-pea_ps;
+  const pea_ds = pea_after_ps*DS_RATE*0.5;
+  const pea_net = pea_after_ps - pea_ds;
+  setTxt('tr-pea-val', fmt(val));
+  setTxt('tr-pea-ps', '−'+fmt(pea_ps));
+  setTxt('tr-pea-ds', '−'+fmt(pea_ds));
+  setTxt('tr-pea-net', fmt(pea_net));
+}
+
+/* ─── CHARTS ─── */
+function drawTripleChart(canvas, data) {
+  if(!canvas||data.length<2) return;
+  const dpr=devicePixelRatio||1;
+  const W=canvas.offsetWidth, H=canvas.offsetHeight;
+  canvas.width=W*dpr; canvas.height=H*dpr;
+  const ctx=canvas.getContext('2d'); ctx.scale(dpr,dpr);
+  ctx.clearRect(0,0,W,H);
+
+  const pad={t:18,r:18,b:36,l:64};
+  const cw=W-pad.l-pad.r, ch=H-pad.t-pad.b;
+  const n=data.length-1;
+  const maxY=Math.max(...data.map(d=>d.brut))*1.08;
+  const xS=i=>pad.l+(i/n)*cw;
+  const yS=v=>pad.t+ch-Math.max(0,Math.min(1,v/maxY))*ch;
+
+  [.25,.5,.75,1].forEach(f=>{
+    const y=pad.t+ch*(1-f);
+    ctx.strokeStyle='rgba(0,0,0,.055)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(pad.l+cw,y); ctx.stroke();
+    ctx.fillStyle='#98989D'; ctx.font='400 9px system-ui'; ctx.textAlign='right';
+    ctx.fillText(fmtK(maxY*f), pad.l-6, y+3);
+  });
+
+  // Area: invested
+  ctx.beginPath();
+  data.forEach((d,i)=>i===0?ctx.moveTo(xS(i),yS(d.inv)):ctx.lineTo(xS(i),yS(d.inv)));
+  ctx.lineTo(xS(n),yS(0)); ctx.lineTo(xS(0),yS(0)); ctx.closePath();
+  const g1=ctx.createLinearGradient(0,pad.t,0,H);
+  g1.addColorStop(0,'rgba(184,134,11,.28)'); g1.addColorStop(1,'rgba(184,134,11,.03)');
+  ctx.fillStyle=g1; ctx.fill();
+
+  // Area: gross (between brut and invested)
+  ctx.beginPath();
+  data.forEach((d,i)=>i===0?ctx.moveTo(xS(i),yS(d.brut)):ctx.lineTo(xS(i),yS(d.brut)));
+  for(let i=n;i>=0;i--) ctx.lineTo(xS(i),yS(data[i].inv));
+  ctx.closePath();
+  const g2=ctx.createLinearGradient(0,pad.t,0,H);
+  g2.addColorStop(0,'rgba(79,138,120,.3)'); g2.addColorStop(1,'rgba(79,138,120,.05)');
+  ctx.fillStyle=g2; ctx.fill();
+
+  // Tax drag area (between brut and net)
+  const netData = data.map(d=>({...d, net:d.brut-d.taxCum}));
+  ctx.beginPath();
+  data.forEach((d,i)=>i===0?ctx.moveTo(xS(i),yS(d.brut)):ctx.lineTo(xS(i),yS(d.brut)));
+  for(let i=n;i>=0;i--) ctx.lineTo(xS(i),yS(netData[i].net));
+  ctx.closePath();
+  ctx.fillStyle='rgba(155,90,58,.13)'; ctx.fill();
+
+  // Lines
+  const drawLine=(vals,color,w=2)=>{
+    ctx.beginPath();
+    vals.forEach((v,i)=>i===0?ctx.moveTo(xS(i),yS(v)):ctx.lineTo(xS(i),yS(v)));
+    ctx.strokeStyle=color; ctx.lineWidth=w; ctx.stroke();
+  };
+  drawLine(data.map(d=>d.inv),'#B8860B',1.5);
+  drawLine(data.map(d=>d.brut),'#4F8A78',2.5);
+  drawLine(netData.map(d=>d.net),'#3D5A80',2);
+
+  // X labels
+  ctx.fillStyle='#98989D'; ctx.font='400 9px system-ui'; ctx.textAlign='center';
+  const step=n<=10?1:n<=20?5:10;
+  for(let i=0;i<=n;i+=step) ctx.fillText(i+'a',xS(i),pad.t+ch+14);
+  if(n>0) ctx.fillText(n+'a',xS(n),pad.t+ch+14);
+}
+
+function drawDualLineSimple(canvas, line1, line2, years, c1, c2) {
+  if(!canvas) return;
+  const dpr=devicePixelRatio||1;
+  const W=canvas.offsetWidth, H=canvas.offsetHeight;
+  canvas.width=W*dpr; canvas.height=H*dpr;
+  const ctx=canvas.getContext('2d'); ctx.scale(dpr,dpr);
+  ctx.clearRect(0,0,W,H);
+
+  const pad={t:18,r:18,b:36,l:64};
+  const cw=W-pad.l-pad.r, ch=H-pad.t-pad.b;
+  const n=Math.max(line1.length,line2.length)-1;
+  const maxY=Math.max(...line1,...line2)*1.08||1;
+  const xS=i=>pad.l+(i/Math.max(n,1))*cw;
+  const yS=v=>pad.t+ch-Math.max(0,Math.min(1,v/maxY))*ch;
+
+  [.25,.5,.75,1].forEach(f=>{
+    const y=pad.t+ch*(1-f);
+    ctx.strokeStyle='rgba(0,0,0,.055)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(pad.l+cw,y); ctx.stroke();
+    ctx.fillStyle='#98989D'; ctx.font='400 9px system-ui'; ctx.textAlign='right';
+    ctx.fillText(fmtK(maxY*f),pad.l-6,y+3);
+  });
+
+  const drawLine=(vals,color,w=2)=>{
+    if(!vals.length) return;
+    ctx.beginPath();
+    vals.forEach((v,i)=>i===0?ctx.moveTo(xS(i),yS(v)):ctx.lineTo(xS(i),yS(v)));
+    ctx.strokeStyle=color; ctx.lineWidth=w; ctx.stroke();
+  };
+
+  // Fill between lines
+  if(line1.length&&line2.length) {
+    ctx.beginPath();
+    line1.forEach((v,i)=>i===0?ctx.moveTo(xS(i),yS(v)):ctx.lineTo(xS(i),yS(v)));
+    for(let i=Math.min(line2.length-1,n);i>=0;i--) ctx.lineTo(xS(i),yS(line2[i]));
+    ctx.closePath();
+    ctx.fillStyle='rgba(79,138,120,.08)'; ctx.fill();
+  }
+
+  drawLine(line2, c2, 1.8);
+  drawLine(line1, c1, 2.2);
+
+  ctx.fillStyle='#98989D'; ctx.font='400 9px system-ui'; ctx.textAlign='center';
+  const step=years<=10?1:years<=20?5:10;
+  for(let i=0;i<=years;i+=step) ctx.fillText(i+'a',xS(i),pad.t+ch+14);
+}
+
+function drawDivBars(canvas, bars) {
+  if(!canvas||!bars.length) return;
+  const dpr=devicePixelRatio||1;
+  const W=canvas.offsetWidth, H=canvas.offsetHeight;
+  canvas.width=W*dpr; canvas.height=H*dpr;
+  const ctx=canvas.getContext('2d'); ctx.scale(dpr,dpr);
+  ctx.clearRect(0,0,W,H);
+
+  const pad={t:16,r:10,b:28,l:60};
+  const cw=W-pad.l-pad.r, ch=H-pad.t-pad.b;
+  const maxY=Math.max(...bars.map(b=>b.net+b.tax))*1.08||1;
+  const barW=Math.max(2,(cw/bars.length)*0.8);
+  const gap=cw/bars.length;
+
+  [.5,1].forEach(f=>{
+    const y=pad.t+ch*(1-f);
+    ctx.strokeStyle='rgba(0,0,0,.055)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(pad.l+cw,y); ctx.stroke();
+    ctx.fillStyle='#98989D'; ctx.font='400 9px system-ui'; ctx.textAlign='right';
+    ctx.fillText(fmtK(maxY*f),pad.l-6,y+3);
+  });
+
+  bars.forEach((b,i)=>{
+    const total=b.net+b.tax;
+    const totalH=ch*(total/maxY);
+    const netH=ch*(b.net/maxY);
+    const x=pad.l+gap*i+gap/2-barW/2;
+    const r=2;
+
+    // Tax portion (top)
+    const taxH=totalH-netH;
+    if(taxH>1) {
+      ctx.fillStyle='rgba(155,90,58,.75)';
+      ctx.beginPath();
+      ctx.moveTo(x+r,pad.t+ch-totalH); ctx.lineTo(x+barW-r,pad.t+ch-totalH);
+      ctx.quadraticCurveTo(x+barW,pad.t+ch-totalH,x+barW,pad.t+ch-totalH+r);
+      ctx.lineTo(x+barW,pad.t+ch-netH); ctx.lineTo(x,pad.t+ch-netH); ctx.lineTo(x,pad.t+ch-totalH+r);
+      ctx.quadraticCurveTo(x,pad.t+ch-totalH,x+r,pad.t+ch-totalH);
+      ctx.fill();
+    }
+
+    // Net portion (bottom)
+    ctx.fillStyle='rgba(79,138,120,.75)';
+    ctx.beginPath();
+    ctx.moveTo(x,pad.t+ch-netH); ctx.lineTo(x+barW,pad.t+ch-netH);
+    ctx.lineTo(x+barW,pad.t+ch); ctx.lineTo(x,pad.t+ch); ctx.closePath();
+    ctx.fill();
+
+    // X label (every 5 years)
+    if((i+1)%5===0 || i===0 || i===bars.length-1) {
+      ctx.fillStyle='#98989D'; ctx.font='400 9px system-ui'; ctx.textAlign='center';
+      ctx.fillText((i+1)+'a', x+barW/2, pad.t+ch+14);
+    }
+  });
+}
+
+function drawDonut(canvas, segs) {
+  if(!canvas) return;
+  const dpr=devicePixelRatio||1;
+  const size=canvas.offsetWidth||155;
+  canvas.width=size*dpr; canvas.height=size*dpr;
+  const ctx=canvas.getContext('2d'); ctx.scale(dpr,dpr);
+  const cx=size/2, cy=size/2, r=size/2-10, ir=r*0.58;
+  let angle=-Math.PI/2;
+  segs.forEach(s=>{
+    const sweep=(s.p/100)*Math.PI*2;
+    ctx.beginPath();
+    ctx.arc(cx,cy,r,angle,angle+sweep);
+    ctx.arc(cx,cy,ir,angle+sweep,angle,true);
+    ctx.closePath();
+    ctx.fillStyle=s.c; ctx.fill();
+    ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.stroke();
+    angle+=sweep;
+  });
+  ctx.fillStyle='#1D1D1F'; ctx.font='700 10px system-ui'; ctx.textAlign='center';
+  ctx.fillText('CTO', cx, cy-3);
+  ctx.fillStyle='#6E6E73'; ctx.font='400 9px system-ui';
+  ctx.fillText('Allocation', cx, cy+9);
+}
+
+/* ─── GLOBAL UPDATE ─── */
+function update() {
+  const inp = getInputs();
+  const res = calcPortfolio(inp);
+  res.dataNet = res.dataGross; // already net in brut field for triple chart
+
+  renderCapi(inp, res);
+  renderFisc(inp, res);
+  renderDiv(inp, res);
+  renderCmp(inp, res);
+  renderAlloc(currentProfile, inp);
+  renderTrans(inp, res);
+}
+
+/* ─── SLIDER WIRING ─── */
+function wireSlider(id, dispId, format) {
+  const sld=$(id), disp=$(dispId); if(!sld) return;
+  const refresh=v=>{
+    sld.style.setProperty('--pct',((v-+sld.min)/(+sld.max-+sld.min)*100)+'%');
+    if(disp) disp.textContent = format==='yr'?v+' an'+(v>1?'s':''):fmtPct(v);
+  };
+  refresh(+sld.value);
+  sld.addEventListener('input',()=>{ refresh(+sld.value); update(); });
+}
+
+/* ─── INIT ─── */
+document.addEventListener('DOMContentLoaded',()=>{
+  wireSlider('cto-rdt','cto-rdt-d','pct');
+  wireSlider('cto-div','cto-div-d','pct');
+  wireSlider('cto-duree','cto-duree-d','yr');
+  wireSlider('cto-frais','cto-frais-d','pct');
+  wireSlider('cto-infl','cto-infl-d','pct');
+
+  // Capital initial
+  const vi=$('cto-vi'), viSld=$('cto-vi-sld'), viDisp=$('cto-vi-disp');
+  if(vi&&viSld) {
+    const syncVI=v=>{ viSld.value=v; viSld.style.setProperty('--pct',((v-+viSld.min)/(+viSld.max-+viSld.min)*100)+'%'); if(viDisp) viDisp.textContent=SP.fmtNum(v)+' €'; };
+    syncVI(+viSld.value);
+    viSld.addEventListener('input',()=>{ vi.value=SP.fmtNum(+viSld.value); syncVI(+viSld.value); update(); });
+    vi.addEventListener('input',()=>{ syncVI(SP.parseNum(vi.value)); update(); });
+    vi.addEventListener('blur',()=>{ vi.value=SP.fmtNum(SP.parseNum(vi.value)); });
+  }
+  $('cto-vp')&&$('cto-vp').addEventListener('input',update);
+  $('cto-vp')&&$('cto-vp').addEventListener('blur',()=>{ const e=$('cto-vp'); e.value=SP.fmtNum(SP.parseNum(e.value)); });
+  $('cto-freq')&&$('cto-freq').addEventListener('change',update);
+  $('cto-arb')&&$('cto-arb').addEventListener('change',update);
+  $('cto-tmr')&&$('cto-tmr').addEventListener('change',update);
+
+  // Regime toggle
+  document.querySelectorAll('.cto-regime-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      document.querySelectorAll('.cto-regime-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      regime=btn.dataset.regime;
+      update();
+    });
+  });
+
+  // Tabs
+  document.querySelectorAll('.cto-tab-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      document.querySelectorAll('.cto-tab-btn').forEach(b=>b.classList.remove('active'));
+      document.querySelectorAll('.cto-panel').forEach(p=>p.classList.remove('active'));
+      btn.classList.add('active');
+      const p=$('cto-p-'+btn.dataset.tab);
+      if(p) p.classList.add('active');
+      setTimeout(update,10);
+    });
+  });
+
+  // Allocation pills
+  document.querySelectorAll('.cto-profile-pill').forEach(pill=>{
+    pill.addEventListener('click',()=>{
+      document.querySelectorAll('.cto-profile-pill').forEach(p=>p.classList.remove('active'));
+      pill.classList.add('active');
+      currentProfile=pill.dataset.p;
+      renderAlloc(currentProfile, getInputs());
+    });
+  });
+
+  // Dividende toggle
+  [$('div-reinvest-on'),$('div-reinvest-off')].forEach(el=>{
+    if(!el) return;
+    el.addEventListener('click',()=>{
+      [$('div-reinvest-on'),$('div-reinvest-off')].forEach(e=>e&&e.classList.remove('active'));
+      el.classList.add('active');
+      reinvestDiv = el.dataset.reinvest==='1';
+      update();
+    });
+  });
+
+  SP.initFmt&&SP.initFmt(document.body);
+  update();
+});
+
+window.addEventListener('resize',()=>{
+  clearTimeout(window._ctoRT);
+  window._ctoRT=setTimeout(update,120);
+});
+</script>
+</body>
+</html>

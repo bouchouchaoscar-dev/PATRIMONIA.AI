@@ -1,0 +1,1523 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="favicon-64.png">
+  <link rel="shortcut icon" href="favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="favicon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cash-flow Immobilier — PATRIMONIA.AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css?v=19">
+<script src="shared.js?v=2"></script>
+  <script src="shared-nav.js?v=6"></script>
+<style>
+.cf-body { display:grid; grid-template-columns:420px 1fr }
+@media(max-width:960px){ .cf-body { grid-template-columns:1fr } }
+
+.cf-inputs-panel {
+  padding:1.75rem 1.75rem 2rem;
+  background:var(--surface-2);
+  border-right:1px solid var(--border-subtle);
+}
+@media(max-width:960px){ .cf-inputs-panel { border-right:none; border-bottom:1px solid var(--border-subtle) } }
+
+.cf-results-panel { padding:1.5rem 1.5rem 2rem; background:var(--surface); overflow-x:auto }
+
+.inp-sec {
+  font-size:.6rem; font-weight:700; color:var(--text-dim);
+  letter-spacing:.08em; text-transform:uppercase;
+  margin:1.4rem 0 .85rem;
+}
+.inp-sec:first-child { margin-top:0 }
+
+/* Tabs */
+.cf-tabs { display:flex; gap:.32rem; margin-bottom:1.25rem; flex-wrap:wrap }
+.cf-tab {
+  font-family:var(--sans); font-size:.74rem; font-weight:500;
+  color:var(--text-muted); background:var(--surface-2);
+  border:1.5px solid var(--border); border-radius:100px;
+  padding:.33rem 1rem; cursor:pointer; transition:all .18s; user-select:none;
+}
+.cf-tab:hover { color:var(--accent); border-color:rgba(79,138,120,.3); background:var(--accent-dim) }
+.cf-tab.active { background:var(--accent); border-color:var(--accent); color:#fff; font-weight:600 }
+.cf-panel { display:none }
+.cf-panel.active { display:block }
+
+/* KPI */
+.cf-kpi-row   { display:grid; grid-template-columns:1fr 1fr; gap:.7rem; margin-bottom:1.2rem }
+.cf-kpi-row-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:.7rem; margin-bottom:1.2rem }
+.cf-kpi {
+  background:var(--surface-2); border:1.5px solid var(--border-subtle);
+  border-radius:var(--r-sm); padding:.95rem 1rem; text-align:center;
+}
+.cf-kpi.accent { border-color:rgba(79,138,120,.3) }
+.cf-kpi.amber  { border-color:rgba(255,159,10,.3) }
+.cf-kpi.green  { border-color:rgba(59,140,90,.3) }
+.cf-kpi.red    { border-color:rgba(155,90,58,.3) }
+.cf-kpi-badge {
+  font-size:.58rem; font-weight:700; letter-spacing:.07em;
+  text-transform:uppercase; margin-bottom:.45rem; display:block; color:var(--text-dim);
+}
+.cf-kpi.accent .cf-kpi-badge { color:var(--accent) }
+.cf-kpi.amber  .cf-kpi-badge { color:var(--amber) }
+.cf-kpi.green  .cf-kpi-badge { color:var(--success) }
+.cf-kpi.red    .cf-kpi-badge { color:#9B5A3A }
+.cf-kpi-val { font-size:1.25rem; font-weight:700; letter-spacing:-.04em; line-height:1; color:var(--text) }
+.cf-kpi.accent .cf-kpi-val { color:var(--accent) }
+.cf-kpi.amber  .cf-kpi-val { color:var(--amber) }
+.cf-kpi.green  .cf-kpi-val { color:var(--success) }
+.cf-kpi.red    .cf-kpi-val { color:#9B5A3A }
+.cf-kpi-sub { font-size:.63rem; color:var(--text-dim); margin-top:.3rem; line-height:1.4 }
+
+/* Chart bars */
+.cf-chart-wrap {
+  background:var(--surface-2); border:1px solid var(--border-subtle);
+  border-radius:var(--r-sm); padding:1.1rem 1.25rem; margin-bottom:1.1rem;
+}
+.cf-chart-title {
+  font-size:.6rem; font-weight:700; color:var(--text-dim);
+  letter-spacing:.07em; text-transform:uppercase; margin-bottom:.9rem;
+}
+.cf-chart-row   { display:flex; align-items:center; gap:.7rem; margin-bottom:.55rem }
+.cf-chart-lbl   { font-size:.7rem; color:var(--text-muted); width:150px; text-align:right; flex-shrink:0; letter-spacing:-.01em }
+.cf-chart-bg    { flex:1; height:13px; border-radius:3px; background:var(--surface-3); overflow:hidden }
+.cf-chart-bar   { height:100%; border-radius:3px; transition:width .5s cubic-bezier(.4,0,.2,1); min-width:3px }
+.cf-chart-val   { font-family:var(--mono); font-size:.69rem; font-weight:600; color:var(--text-muted); width:90px; flex-shrink:0 }
+
+/* Table */
+.cf-tbl-wrap { overflow-x:auto; border-radius:var(--r-sm); border:1px solid var(--border-subtle); margin-bottom:1.1rem }
+.cf-tbl { width:100%; border-collapse:collapse; font-size:.77rem; min-width:280px }
+.cf-tbl th {
+  padding:.65rem .9rem; font-size:.62rem; font-weight:700;
+  letter-spacing:.05em; text-transform:uppercase;
+  border-bottom:2px solid var(--border); text-align:right; color:var(--text-dim);
+}
+.cf-tbl th:first-child { text-align:left }
+.cf-tbl td {
+  padding:.52rem .9rem; border-top:1px solid var(--border-subtle);
+  text-align:right; font-family:var(--mono); font-size:.77rem; color:var(--text-muted);
+}
+.cf-tbl td:first-child { text-align:left; font-family:var(--sans); font-size:.75rem; color:var(--text-muted); font-weight:400 }
+.cf-tbl tr.sect-head td {
+  background:var(--surface); font-family:var(--sans); font-size:.6rem;
+  font-weight:700; color:var(--text-dim); letter-spacing:.07em;
+  text-transform:uppercase; padding:.45rem .9rem; border-top:2px solid var(--border-subtle);
+}
+.cf-tbl tr:hover td { background:rgba(0,0,0,.018) }
+.cf-tbl tr.sect-head:hover td { background:var(--surface) }
+.val-pos { color:var(--success)!important; font-weight:600 }
+.val-neg { color:#9B5A3A!important; font-weight:600 }
+.val-acc { color:var(--accent)!important; font-weight:700 }
+.val-amb { color:var(--amber)!important; font-weight:600 }
+
+/* Advanced options */
+details.adv-opts { margin-top:1.4rem; border-top:1px solid var(--border-subtle); padding-top:1.2rem }
+details.adv-opts summary {
+  list-style:none; display:flex; align-items:center; gap:.5rem;
+  font-size:.75rem; font-weight:500; color:var(--text-muted);
+  cursor:pointer; padding:.4rem .65rem; border-radius:var(--r-sm);
+  transition:all .2s; user-select:none; letter-spacing:-.01em;
+}
+details.adv-opts summary:hover { color:var(--accent); background:var(--accent-dim) }
+details.adv-opts summary::before { content:'▼'; font-size:.55rem; color:var(--accent); transition:transform .25s }
+details.adv-opts[open] summary::before { transform:rotate(180deg) }
+details.adv-opts summary::-webkit-details-marker { display:none }
+.adv-inner { padding-top:.75rem }
+.field-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:.75rem }
+@media(max-width:480px){ .field-grid-2 { grid-template-columns:1fr } }
+
+/* Alerts */
+.cf-alert {
+  background:rgba(155,90,58,.07); border:1px solid rgba(155,90,58,.2);
+  border-radius:var(--r-sm); padding:.8rem 1rem .8rem 2.1rem;
+  font-size:.78rem; line-height:1.75; color:var(--text-muted);
+  position:relative; margin-bottom:1rem;
+}
+.cf-alert::before { content:'!'; color:#9B5A3A; font-weight:700; position:absolute; left:.8rem; top:.82rem }
+.cf-alert strong { color:#9B5A3A; font-weight:600 }
+.cf-info {
+  background:var(--accent-dim); border:1px solid rgba(79,138,120,.15);
+  border-radius:var(--r-sm); padding:.8rem 1rem .8rem 2.1rem;
+  font-size:.78rem; line-height:1.75; color:var(--text-muted);
+  position:relative; margin-bottom:1rem;
+}
+.cf-info::before { content:'→'; color:var(--accent); font-weight:700; position:absolute; left:.75rem; top:.82rem }
+.cf-info strong { color:var(--accent); font-weight:600 }
+
+/* Projection milestone bars */
+.proj-row { display:flex; align-items:center; gap:.75rem; margin-bottom:.85rem }
+.proj-lbl { font-size:.72rem; color:var(--text-muted); width:55px; flex-shrink:0; text-align:right; font-weight:600 }
+.proj-bars { flex:1; display:flex; flex-direction:column; gap:5px }
+.proj-track { height:10px; border-radius:3px; background:var(--surface-3); overflow:hidden }
+.proj-fill  { height:100%; border-radius:3px; transition:width .55s cubic-bezier(.4,0,.2,1); min-width:3px }
+.proj-val { font-family:var(--mono); font-size:.68rem; font-weight:600; color:var(--text-muted); width:75px; flex-shrink:0; text-align:right }
+
+/* Legend */
+.chart-legend { display:flex; flex-wrap:wrap; gap:.85rem; margin-top:.65rem }
+.legend-item  { display:flex; align-items:center; gap:.4rem; font-size:.71rem; color:var(--text-muted) }
+.legend-dot   { width:8px; height:8px; border-radius:50%; flex-shrink:0 }
+
+.field-hint { font-size:.62rem; color:var(--text-dim); font-family:var(--mono); margin-top:.3rem }
+.cf-disclaimer { font-size:.67rem; color:var(--text-dim); line-height:1.75; font-family:var(--mono); opacity:.8; margin-top:1rem }
+
+/* Budget allocation strip (cashflow tab) */
+.cf-alloc-wrap {
+  background:var(--surface-2); border:1px solid var(--border-subtle);
+  border-radius:var(--r-sm); padding:1.1rem 1.25rem; margin-bottom:1.1rem;
+}
+.cf-alloc-title {
+  font-size:.6rem; font-weight:700; color:var(--text-dim);
+  letter-spacing:.07em; text-transform:uppercase; margin-bottom:.85rem;
+}
+.cf-alloc-bar {
+  height:28px; border-radius:4px; overflow:hidden; display:flex; margin-bottom:.75rem; gap:2px;
+}
+.cf-alloc-seg {
+  height:100%; transition:flex .55s cubic-bezier(.4,0,.2,1); min-width:0;
+  display:flex; align-items:center; justify-content:center; overflow:hidden;
+}
+.cf-alloc-seg:first-child { border-radius:4px 0 0 4px }
+.cf-alloc-seg:last-child  { border-radius:0 4px 4px 0 }
+.cf-alloc-seg.only-child  { border-radius:4px }
+.cf-alloc-lbl { font-size:.58rem; font-weight:700; color:#fff; letter-spacing:.03em; white-space:nowrap; padding:0 .4rem }
+.cf-alloc-legend { display:flex; flex-wrap:wrap; gap:.7rem }
+.cf-alloc-legend-item { display:flex; align-items:center; gap:.35rem; font-size:.7rem; color:var(--text-muted) }
+.cf-alloc-dot { width:8px; height:8px; border-radius:2px; flex-shrink:0 }
+
+/* Metrics 4-col override */
+.metrics-4 { grid-template-columns:repeat(4,1fr) !important }
+@media(max-width:600px){ .metrics-4 { grid-template-columns:1fr 1fr !important } }
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="index.html" class="nav-logo"><img src="logo.png?v=3" alt="PATRIMONIA.AI" class="nav-logo-img"></a>
+  <div class="nav-right">
+    <a href="index.html" class="nav-back">
+      <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7.5 1.5L3 6l4.5 4.5"/></svg>
+      Accueil
+    </a>
+    <div class="nav-dropdown" id="mainDropdown">
+      <button class="nav-dropdown-btn" aria-expanded="false" aria-haspopup="true">
+        Simulateurs <svg class="nav-chevron" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.8" style="width:13px;height:8px;flex-shrink:0"><path d="M1 1l4 4 4-4"/></svg>
+      </button>
+      <div class="nav-dropdown-menu" id="navMenu" role="menu"></div>
+    </div>
+  </div>
+</nav>
+
+<div class="sim-page">
+  <div class="sim-page-header">
+    <span class="sim-num-badge">12</span>
+    <div>
+      <div class="sim-eyebrow">Immobilier</div><h1>Cash-flow <em class="gradient-text">Immobilier</em></h1>
+      <p>Rentabilité, cash-flow, projection long terme, revente et analyse pédagogique — tous régimes fiscaux</p>
+    </div>
+  </div>
+
+  <div class="sim-card-wrap">
+    <div class="cf-body">
+
+      <!-- ══ INPUTS ══ -->
+      <div class="cf-inputs-panel">
+
+        <div class="inp-sec">Bien immobilier</div>
+
+        <div class="field">
+          <div class="field-label"><label for="cf-prix">Prix d'achat</label><span class="field-val" id="cf-prix-disp">250 000 €</span></div>
+          <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="cf-prix" value="250000"><span class="unit">€</span></div>
+          <input type="range" id="cf-prix-sld" min="30000" max="2000000" step="5000" value="250000">
+        </div>
+
+        <div class="field-grid-2">
+          <div class="field">
+            <div class="field-label"><label for="cf-type-bien">Type de bien</label></div>
+            <div class="select-wrap">
+              <select id="cf-type-bien">
+                <option value="ancien" selected>Ancien</option>
+                <option value="neuf">Neuf</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <div class="field-label"><label for="cf-notaire">Frais de notaire</label></div>
+            <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="cf-notaire" value="20000"><span class="unit">€</span></div>
+            <div class="field-hint" id="cf-notaire-hint">≈ 8 % du prix (ancien)</div>
+          </div>
+        </div>
+
+        <div class="field-grid-2">
+          <div class="field">
+            <div class="field-label"><label for="cf-travaux">Travaux</label></div>
+            <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="cf-travaux" value="0"><span class="unit">€</span></div>
+          </div>
+          <div class="field" id="wrap-mobilier">
+            <div class="field-label"><label for="cf-mobilier">Mobilier</label></div>
+            <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="cf-mobilier" value="5000"><span class="unit">€</span></div>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label"><label for="cf-apport">Apport personnel</label><span class="field-val" id="cf-apport-disp">50 000 €</span></div>
+          <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="cf-apport" value="50000"><span class="unit">€</span></div>
+          <input type="range" id="cf-apport-sld" min="0" max="500000" step="5000" value="50000">
+        </div>
+
+        <div class="field">
+          <div class="field-label"><label for="cf-duree-det">Durée de détention prévue</label></div>
+          <div class="select-wrap">
+            <select id="cf-duree-det">
+              <option value="5">5 ans</option>
+              <option value="10">10 ans</option>
+              <option value="15" selected>15 ans</option>
+              <option value="20">20 ans</option>
+              <option value="25">25 ans</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="section-sep"></div>
+
+        <div class="inp-sec">Revenus locatifs</div>
+
+        <div class="field-grid-2">
+          <div class="field">
+            <div class="field-label"><label for="cf-type-loc">Type de location</label></div>
+            <div class="select-wrap">
+              <select id="cf-type-loc">
+                <option value="nue" selected>Location nue</option>
+                <option value="meublee">Meublée longue durée</option>
+                <option value="airbnb">Courte durée / Airbnb</option>
+                <option value="services">Résidence services</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <div class="field-label"><label for="cf-vacance">Vacance locative</label></div>
+            <div class="select-wrap">
+              <select id="cf-vacance">
+                <option value="0">Aucune</option>
+                <option value="0.5" selected>0,5 mois/an</option>
+                <option value="1">1 mois/an</option>
+                <option value="2">2 mois/an</option>
+                <option value="3">3 mois/an</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label"><label for="cf-loyer">Loyer mensuel HC</label><span class="field-val" id="cf-loyer-disp">900 €</span></div>
+          <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="cf-loyer" value="900"><span class="unit">€/mois</span></div>
+          <input type="range" id="cf-loyer-sld" min="200" max="8000" step="50" value="900">
+        </div>
+
+        <div class="section-sep"></div>
+
+        <div class="inp-sec">Charges annuelles</div>
+
+        <div class="field-grid-2">
+          <div class="field">
+            <div class="field-label"><label for="cf-tf">Taxe foncière</label></div>
+            <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="cf-tf" value="1200"><span class="unit">€/an</span></div>
+          </div>
+          <div class="field">
+            <div class="field-label"><label for="cf-copro">Charges copro</label></div>
+            <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="cf-copro" value="800"><span class="unit">€/an</span></div>
+          </div>
+          <div class="field">
+            <div class="field-label"><label for="cf-pno">Assurance PNO</label></div>
+            <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="cf-pno" value="180"><span class="unit">€/an</span></div>
+          </div>
+          <div class="field">
+            <div class="field-label"><label for="cf-gli">GLI</label></div>
+            <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="cf-gli" value="0"><span class="unit">€/an</span></div>
+          </div>
+          <div class="field">
+            <div class="field-label"><label for="cf-gestion">Gestion locative</label></div>
+            <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="cf-gestion" value="0"><span class="unit">€/an</span></div>
+          </div>
+          <div class="field">
+            <div class="field-label"><label for="cf-entretien">Entretien</label></div>
+            <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="cf-entretien" value="500"><span class="unit">€/an</span></div>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label"><label for="cf-autres">Autres charges</label></div>
+          <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="cf-autres" value="0"><span class="unit">€/an</span></div>
+        </div>
+
+        <div class="section-sep"></div>
+
+        <div class="inp-sec">Financement</div>
+
+        <div class="field">
+          <div class="field-label"><label for="cf-emprunt">Montant emprunté</label><span class="field-val" id="cf-emprunt-disp">230 000 €</span></div>
+          <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="cf-emprunt" value="230000"><span class="unit">€</span></div>
+          <input type="range" id="cf-emprunt-sld" min="0" max="1500000" step="5000" value="230000">
+        </div>
+
+        <div class="field-grid-2">
+          <div class="field">
+            <div class="field-label"><label for="cf-taux">Taux annuel</label></div>
+            <div class="input-wrap"><input type="number" id="cf-taux" value="3.5" min="0" max="12" step="0.05"><span class="unit">%</span></div>
+          </div>
+          <div class="field">
+            <div class="field-label"><label for="cf-duree-cr">Durée du crédit</label></div>
+            <div class="select-wrap">
+              <select id="cf-duree-cr">
+                <option value="10">10 ans</option>
+                <option value="15">15 ans</option>
+                <option value="20" selected>20 ans</option>
+                <option value="25">25 ans</option>
+                <option value="30">30 ans</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label"><label for="cf-assur">Assurance emprunteur</label></div>
+          <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="cf-assur" value="50"><span class="unit">€/mois</span></div>
+        </div>
+
+        <div class="section-sep"></div>
+
+        <div class="inp-sec">Fiscalité</div>
+
+        <div class="field">
+          <div class="field-label"><label for="cf-regime">Régime fiscal</label></div>
+          <div class="select-wrap">
+            <select id="cf-regime">
+              <option value="micro-foncier">Micro-foncier (location nue)</option>
+              <option value="reel-foncier">Réel foncier (location nue)</option>
+              <option value="micro-bic">Micro-BIC (meublé)</option>
+              <option value="lmnp-reel" selected>LMNP réel (meublé)</option>
+              <option value="sci-is">SCI à l'IS</option>
+              <option value="nu">Sans fiscalité (brut charges)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label"><label for="cf-tmi">TMI</label></div>
+          <div class="select-wrap">
+            <select id="cf-tmi">
+              <option value="0">0 %</option>
+              <option value="11">11 %</option>
+              <option value="30" selected>30 %</option>
+              <option value="41">41 %</option>
+              <option value="45">45 %</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- OPTIONS AVANCÉES -->
+        <details class="adv-opts" id="adv-block">
+          <summary>Options avancées</summary>
+          <div class="adv-inner">
+
+            <!-- LMNP amortissements -->
+            <div id="wrap-amort">
+              <div class="inp-sec" style="margin-top:.2rem">Amortissements LMNP / SCI IS</div>
+              <div class="field">
+                <div class="field-label"><label for="cf-terrain">Quote-part terrain (non amortissable)</label></div>
+                <div class="select-wrap">
+                  <select id="cf-terrain">
+                    <option value="10">10 %</option>
+                    <option value="15" selected>15 %</option>
+                    <option value="20">20 %</option>
+                    <option value="25">25 %</option>
+                    <option value="30">30 %</option>
+                  </select>
+                </div>
+              </div>
+              <div class="field-grid-2">
+                <div class="field">
+                  <div class="field-label"><label for="cf-amort-bati">Durée amort. bâti</label></div>
+                  <div class="select-wrap">
+                    <select id="cf-amort-bati">
+                      <option value="25">25 ans</option>
+                      <option value="30" selected>30 ans</option>
+                      <option value="35">35 ans</option>
+                      <option value="40">40 ans</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="field">
+                  <div class="field-label"><label for="cf-amort-trav">Durée amort. travaux</label></div>
+                  <div class="select-wrap">
+                    <select id="cf-amort-trav">
+                      <option value="5">5 ans</option>
+                      <option value="10" selected>10 ans</option>
+                      <option value="15">15 ans</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div class="field-grid-2">
+                <div class="field">
+                  <div class="field-label"><label for="cf-amort-mob">Durée amort. mobilier</label></div>
+                  <div class="select-wrap">
+                    <select id="cf-amort-mob">
+                      <option value="5">5 ans</option>
+                      <option value="7" selected>7 ans</option>
+                      <option value="10">10 ans</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="field" id="wrap-type-meuble">
+                  <div class="field-label"><label for="cf-type-meuble">Type de meublé</label></div>
+                  <div class="select-wrap">
+                    <select id="cf-type-meuble">
+                      <option value="standard" selected>Standard</option>
+                      <option value="classe">Classé / Chambre d'hôtes</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="inp-sec">Acquisition (avancé)</div>
+            <div class="field-grid-2">
+              <div class="field">
+                <div class="field-label"><label for="cf-agence">Frais d'agence</label></div>
+                <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="cf-agence" value="0"><span class="unit">€</span></div>
+              </div>
+              <div class="field">
+                <div class="field-label"><label for="cf-frais-bank">Frais bancaires</label></div>
+                <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="cf-frais-bank" value="0"><span class="unit">€</span></div>
+              </div>
+            </div>
+
+            <div class="inp-sec">Projection & revente</div>
+            <div class="field-grid-2">
+              <div class="field">
+                <div class="field-label"><label for="cf-inflation">Inflation des loyers</label></div>
+                <div class="select-wrap">
+                  <select id="cf-inflation">
+                    <option value="0">0 %/an</option>
+                    <option value="1">1 %/an</option>
+                    <option value="2" selected>2 %/an (ILC)</option>
+                    <option value="3">3 %/an</option>
+                  </select>
+                </div>
+              </div>
+              <div class="field">
+                <div class="field-label"><label for="cf-revalo">Revalorisation du bien</label></div>
+                <div class="select-wrap">
+                  <select id="cf-revalo">
+                    <option value="-1">−1 %/an</option>
+                    <option value="0">0 %/an</option>
+                    <option value="1">1 %/an</option>
+                    <option value="2" selected>2 %/an</option>
+                    <option value="3">3 %/an</option>
+                    <option value="4">4 %/an</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="field-grid-2">
+              <div class="field">
+                <div class="field-label"><label for="cf-prix-revente">Prix de revente estimé</label></div>
+                <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="cf-prix-revente" value="320000"><span class="unit">€</span></div>
+              </div>
+              <div class="field">
+                <div class="field-label"><label for="cf-frais-cession">Frais de cession</label></div>
+                <div class="select-wrap">
+                  <select id="cf-frais-cession">
+                    <option value="0">0 %</option>
+                    <option value="3">3 %</option>
+                    <option value="5" selected>5 %</option>
+                    <option value="7">7 %</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </details>
+
+      </div><!-- /inputs -->
+
+      <!-- ══ RESULTS ══ -->
+      <div class="cf-results-panel">
+
+        <div class="cf-tabs">
+          <button class="cf-tab active" data-tab="synthese">Synthèse</button>
+          <button class="cf-tab" data-tab="cashflow">Cash-flow</button>
+          <button class="cf-tab" data-tab="projection">Projection</button>
+          <button class="cf-tab" data-tab="revente">Revente</button>
+          <button class="cf-tab" data-tab="pedago">Pédagogie</button>
+        </div>
+
+        <!-- TAB SYNTHÈSE -->
+        <div class="cf-panel active" id="panel-synthese"></div>
+
+        <!-- TAB CASH-FLOW -->
+        <div class="cf-panel" id="panel-cashflow"></div>
+
+        <!-- TAB PROJECTION -->
+        <div class="cf-panel" id="panel-projection"></div>
+
+        <!-- TAB REVENTE -->
+        <div class="cf-panel" id="panel-revente"></div>
+
+        <!-- TAB PÉDAGOGIE -->
+        <div class="cf-panel" id="panel-pedago"></div>
+
+      </div><!-- /results -->
+
+    </div>
+  </div>
+</div>
+
+<footer>
+  <span>PATRIMONIA.AI</span> — Simulation indicative à titre informatif uniquement.<br>
+  Régimes fiscaux : CGI art. 14, 28, 31, 32, 35, 39 C II, 50-0, 150 U, 150 VC, 1609 nonies G · Barèmes 2026.<br>
+  Les performances réelles dépendent de la fiscalité, des charges réelles, de la vacance locative, du financement, de l'évolution du marché et des règles fiscales applicables.
+</footer>
+
+<script>
+'use strict';
+
+/* ══ UTILS ══ */
+const pN = id => SP.parseNum(document.getElementById(id)?.value);
+const gv = id => (document.getElementById(id)?.value || '');
+const fmt = n  => SP.fmtNum(n);
+const eur = n  => fmt(n) + ' €';
+const pct = (n, d=1) => n.toFixed(d).replace('.', ',') + ' %';
+const sgn = n  => n >= 0 ? '+' : '−';
+const abs = Math.abs;
+
+/* ══ FINANCE ══ */
+function calcMens(cap, tauxAnn, dureeAns) {
+  if (!cap || !tauxAnn || !dureeAns) return cap / Math.max(dureeAns * 12, 1);
+  const r = tauxAnn / 100 / 12, n = dureeAns * 12;
+  return cap * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1);
+}
+
+function calcCRD(cap, tauxAnn, dureeAns, apresAns) {
+  if (apresAns >= dureeAns) return 0;
+  if (!tauxAnn) return Math.max(0, cap - cap / dureeAns * apresAns);
+  const r = tauxAnn / 100 / 12, n = dureeAns * 12, k = apresAns * 12;
+  const mens = calcMens(cap, tauxAnn, dureeAns);
+  return Math.max(0, cap * Math.pow(1 + r, k) - mens * (Math.pow(1 + r, k) - 1) / r);
+}
+
+function calcInteretsAnnee(cap, tauxAnn, dureeAns, annee) {
+  if (!cap || !tauxAnn) return 0;
+  const r = tauxAnn / 100 / 12;
+  const mens = calcMens(cap, tauxAnn, dureeAns);
+  let bal = calcCRD(cap, tauxAnn, dureeAns, annee - 1);
+  let total = 0;
+  for (let m = 0; m < 12; m++) {
+    if (bal <= 0) break;
+    const int = bal * r;
+    total += int;
+    bal -= (mens - int);
+  }
+  return total;
+}
+
+/* ══ PV ABATTEMENTS CGI art. 150 VC ══ */
+function calcAbattements(duree) {
+  let abIR = 0, abPS = 0;
+  for (let y = 1; y <= duree; y++) {
+    if (y >= 6  && y <= 21) abIR += 6;
+    if (y === 22)            abIR += 4;
+    if (y >= 6  && y <= 11) abPS += 1.65;
+    if (y === 12)            abPS += 1.60;
+    if (y >= 13 && y <= 30) abPS += 9;
+  }
+  return { abIR: Math.min(abIR, 100), abPS: Math.min(abPS, 100) };
+}
+
+function calcSurtaxe(pvNet) {
+  if (pvNet <= 50000) return 0;
+  let t = 0;
+  if      (pvNet <= 100000) t = 0.02;
+  else if (pvNet <= 150000) t = 0.03;
+  else if (pvNet <= 200000) t = 0.04;
+  else if (pvNet <= 250000) t = 0.05;
+  else                      t = 0.06;
+  return pvNet * t;
+}
+
+/* ══ AMORTISSEMENTS (LMNP / SCI IS) ══ */
+function calcAmort(params) {
+  const { coutAcquis, terrain, travaux, mobilier, dureeAmortBati, dureeAmortTrav, dureeAmortMob } = params;
+  const valBati  = coutAcquis * (1 - terrain / 100);
+  const amortBati = valBati > 0 ? valBati / dureeAmortBati : 0;
+  const amortTrav = travaux > 0 ? travaux / dureeAmortTrav : 0;
+  const amortMob  = mobilier > 0 ? mobilier / dureeAmortMob : 0;
+  return { valBati, amortBati, amortTrav, amortMob, amortTotal: amortBati + amortTrav + amortMob };
+}
+
+/* ══ FISCALITÉ ANNUELLE ══ */
+function calcFisc(regime, p) {
+  const PS = 0.172;
+  const { loyers, chargesExploit, interets1, tmi, typeMeuble, amortTotal, resultAvantAmort } = p;
+  let ir = 0, ps = 0, revImposable = 0, deficit = 0, extraInfo = {};
+
+  switch (regime) {
+    case 'micro-foncier': {
+      revImposable = loyers * 0.70;
+      ir = revImposable * tmi / 100;
+      ps = revImposable * PS;
+      extraInfo.label = 'Micro-foncier · abattement 30 %';
+      extraInfo.seuilOK = loyers <= 15000;
+      break;
+    }
+    case 'reel-foncier': {
+      revImposable = loyers - chargesExploit - interets1;
+      if (revImposable >= 0) {
+        ir = revImposable * tmi / 100;
+        ps = revImposable * PS;
+      } else {
+        deficit = abs(revImposable);
+        const deductible = Math.min(deficit, 10700);
+        ir = -deductible * tmi / 100;
+        ps = 0;
+      }
+      extraInfo.label = 'Réel foncier';
+      extraInfo.deficit = deficit;
+      break;
+    }
+    case 'micro-bic': {
+      const abatt = typeMeuble === 'classe' ? 0.71 : 0.50;
+      const seuil = typeMeuble === 'classe' ? 188700 : 77700;
+      revImposable = loyers * (1 - abatt);
+      ir = revImposable * tmi / 100;
+      ps = revImposable * PS;
+      extraInfo.label = 'Micro-BIC · abattement ' + (abatt * 100) + ' %';
+      extraInfo.seuil = seuil;
+      extraInfo.seuilOK = loyers <= seuil;
+      break;
+    }
+    case 'lmnp-reel': {
+      let amortUtilise, amortDiffere, resultFiscal;
+      if (resultAvantAmort <= 0) {
+        amortUtilise = 0; amortDiffere = amortTotal; resultFiscal = 0;
+      } else {
+        amortUtilise = Math.min(amortTotal, resultAvantAmort);
+        amortDiffere = Math.max(0, amortTotal - amortUtilise);
+        resultFiscal = resultAvantAmort - amortUtilise;
+      }
+      revImposable = resultFiscal;
+      ir = resultFiscal * tmi / 100;
+      ps = resultFiscal * PS;
+      extraInfo = { label: 'LMNP réel', amortUtilise, amortDiffere, resultFiscal };
+      break;
+    }
+    case 'sci-is': {
+      const resAvantIS = Math.max(0, resultAvantAmort - amortTotal);
+      const IS = resAvantIS <= 42500
+        ? resAvantIS * 0.15
+        : 42500 * 0.15 + (resAvantIS - 42500) * 0.25;
+      revImposable = resAvantIS;
+      ir = IS; ps = 0;
+      extraInfo = { label: 'SCI IS · IS 15 %/25 %', IS, resAvantIS };
+      break;
+    }
+    default:
+      extraInfo.label = 'Sans fiscalité';
+  }
+
+  return { ir, ps, total: ir + ps, revImposable, deficit, extraInfo };
+}
+
+/* ══ INPUTS ══ */
+function getInputs() {
+  return {
+    prix:          pN('cf-prix'),
+    typeBien:      gv('cf-type-bien'),
+    notaire:       pN('cf-notaire'),
+    travaux:       pN('cf-travaux'),
+    mobilier:      pN('cf-mobilier'),
+    apport:        pN('cf-apport'),
+    dureeDetention:parseInt(gv('cf-duree-det')) || 15,
+
+    typeLoc:       gv('cf-type-loc'),
+    vacance:       parseFloat(gv('cf-vacance')) || 0,
+    loyer:         pN('cf-loyer'),
+
+    tf:            pN('cf-tf'),
+    copro:         pN('cf-copro'),
+    pno:           pN('cf-pno'),
+    gli:           pN('cf-gli'),
+    gestion:       pN('cf-gestion'),
+    entretien:     pN('cf-entretien'),
+    autres:        pN('cf-autres'),
+
+    emprunt:       pN('cf-emprunt'),
+    taux:          parseFloat(gv('cf-taux')) || 0,
+    dureeCr:       parseInt(gv('cf-duree-cr')) || 20,
+    assur:         pN('cf-assur'),
+
+    regime:        gv('cf-regime'),
+    tmi:           parseInt(gv('cf-tmi')) || 0,
+
+    terrain:       parseInt(gv('cf-terrain')) || 15,
+    amortBatiD:    parseInt(gv('cf-amort-bati')) || 30,
+    amortTravD:    parseInt(gv('cf-amort-trav')) || 10,
+    amortMobD:     parseInt(gv('cf-amort-mob')) || 7,
+    typeMeuble:    gv('cf-type-meuble') || 'standard',
+    agence:        pN('cf-agence'),
+    fraisBank:     pN('cf-frais-bank'),
+    inflation:     parseInt(gv('cf-inflation')) || 2,
+    revalo:        parseInt(gv('cf-revalo')) || 2,
+    prixRevente:   pN('cf-prix-revente'),
+    fraisCession:  parseFloat(gv('cf-frais-cession')) || 5,
+  };
+}
+
+/* ══ CALCUL PRINCIPAL ══ */
+function calcAll() {
+  const i = getInputs();
+  const PS = 0.172;
+
+  /* Acquisition */
+  const coutAcquis    = i.prix + i.notaire + i.agence + i.fraisBank;
+  const investTotal   = coutAcquis + i.travaux + i.mobilier;
+  const montantFinance = Math.max(0, i.emprunt);
+  const apportReel    = investTotal - montantFinance;
+
+  /* Revenus */
+  const loyersBruts   = i.loyer * 12;
+  const loyersEncaiss = i.loyer * (12 - i.vacance);
+  const pertVacance   = loyersBruts - loyersEncaiss;
+
+  /* Charges d'exploitation */
+  const chargesExploit = i.tf + i.copro + i.pno + i.gli + i.gestion + i.entretien + i.autres;
+
+  /* Crédit */
+  const mensualite   = calcMens(i.emprunt, i.taux, i.dureeCr);
+  const assurAnn     = i.assur * 12;
+  const interets1    = calcInteretsAnnee(i.emprunt, i.taux, i.dureeCr, 1);
+  const capitalRemb1 = Math.max(0, mensualite * 12 - interets1);
+  const coutTotalCr  = mensualite * i.dureeCr * 12 - i.emprunt;
+
+  /* Amortissements */
+  const amortParams = { coutAcquis, terrain: i.terrain, travaux: i.travaux, mobilier: i.mobilier,
+    dureeAmortBati: i.amortBatiD, dureeAmortTrav: i.amortTravD, dureeAmortMob: i.amortMobD };
+  const { valBati, amortBati, amortTrav, amortMob, amortTotal } = calcAmort(amortParams);
+
+  /* Résultat avant amortissement */
+  const resultAvantAmort = loyersEncaiss - chargesExploit - interets1 - assurAnn;
+
+  /* Fiscalité */
+  const fiscParams = {
+    loyers: loyersEncaiss, chargesExploit, interets1, tmi: i.tmi,
+    typeMeuble: i.typeMeuble, amortTotal, resultAvantAmort
+  };
+  const fisc = calcFisc(i.regime, fiscParams);
+
+  /* Cash-flow */
+  const cfBrut    = loyersEncaiss - chargesExploit - mensualite * 12 - assurAnn;
+  const cfNet     = cfBrut - fisc.total;
+  const cfMensuel = cfNet / 12;
+  const effortEpargne = Math.max(0, -cfNet);
+
+  /* Enrichissement annuel = CF net + capital remboursé */
+  const enrichAnnuel = cfNet + capitalRemb1;
+
+  /* Rentabilités */
+  const rentBrute = investTotal > 0 ? loyersBruts / investTotal * 100 : 0;
+  const rentNette = investTotal > 0 ? (loyersBruts - chargesExploit) / investTotal * 100 : 0;
+  const rentNN    = investTotal > 0 ? (loyersEncaiss - chargesExploit - fisc.total) / investTotal * 100 : 0;
+  const yieldSurApport = i.apport > 0 ? cfNet / i.apport * 100 : 0;
+
+  /* LMNP spécifique */
+  const lmnpInfo = fisc.extraInfo;
+
+  return {
+    i, coutAcquis, investTotal, montantFinance, apportReel,
+    loyersBruts, loyersEncaiss, pertVacance,
+    chargesExploit, mensualite, assurAnn, interets1, capitalRemb1, coutTotalCr,
+    valBati, amortBati, amortTrav, amortMob, amortTotal, resultAvantAmort,
+    fisc, cfBrut, cfNet, cfMensuel, effortEpargne, enrichAnnuel,
+    rentBrute, rentNette, rentNN, yieldSurApport, lmnpInfo
+  };
+}
+
+/* ══ PROJECTION ══ */
+function calcProjection(d) {
+  const { i, mensualite, assurAnn, chargesExploit, fisc, loyersEncaiss, rentNN } = d;
+  const horizons = [1, 2, 3, 4, 5, 10, 15, 20, 25];
+  const milestones = [5, 10, 15, 20, 25];
+
+  let cfCumul = 0;
+  const annual = {};
+  const taxRate = d.loyersEncaiss > 0 ? (fisc.total / d.loyersEncaiss) : 0;
+
+  for (let yr = 1; yr <= 25; yr++) {
+    const loyAn   = loyersEncaiss * Math.pow(1 + i.inflation / 100, yr - 1);
+    const chgAn   = chargesExploit * Math.pow(1 + 0.015, yr - 1);
+    const int_yr  = calcInteretsAnnee(i.emprunt, i.taux, i.dureeCr, yr);
+    const fiscAn  = loyAn * taxRate;
+    const cfAn    = loyAn - chgAn - mensualite * 12 - assurAnn - fiscAn;
+    cfCumul += cfAn;
+    const crd     = calcCRD(i.emprunt, i.taux, i.dureeCr, yr);
+    const valBien = i.prix * Math.pow(1 + i.revalo / 100, yr);
+    const patriNet = valBien - crd + cfCumul;
+    annual[yr] = { cfAn, cfCumul, crd, valBien, patriNet };
+  }
+
+  return { annual, milestones };
+}
+
+/* ══ TRI (bisection) ══ */
+function calcTRI(apport, annualCFs, netRevente, horizon) {
+  if (apport <= 0) return null;
+  function npv(r) {
+    let v = -apport;
+    annualCFs.forEach((cf, idx) => { v += cf / Math.pow(1 + r, idx + 1); });
+    v += netRevente / Math.pow(1 + r, horizon);
+    return v;
+  }
+  let lo = -0.5, hi = 5, mid = 0;
+  for (let k = 0; k < 60; k++) {
+    mid = (lo + hi) / 2;
+    npv(mid) > 0 ? (lo = mid) : (hi = mid);
+  }
+  return mid * 100;
+}
+
+/* ══ RENDER BAR CHART ══ */
+function renderBars(id, rows) {
+  const maxAbs = Math.max(...rows.map(r => abs(r.val)), 1);
+  document.getElementById(id).innerHTML = rows.map(r => {
+    const w   = Math.max(0, abs(r.val) / maxAbs * 100).toFixed(1);
+    const col = r.color || (r.val < 0 ? '#9B5A3A' : 'var(--accent)');
+    const sign = r.val < 0 ? '−' : r.val === 0 ? '' : '+';
+    return `<div class="cf-chart-row">
+      <div class="cf-chart-lbl">${r.lbl}</div>
+      <div class="cf-chart-bg"><div class="cf-chart-bar" style="width:${w}%;background:${col}"></div></div>
+      <div class="cf-chart-val" style="color:${r.val<0?'#9B5A3A':r.val===0?'var(--text-dim)':'var(--text-muted)'}">${sign}${eur(abs(r.val))}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ══ RENDER SYNTHÈSE ══ */
+function renderSynthese(d) {
+  const { rentBrute, rentNette, rentNN, cfMensuel, cfNet, cfBrut, effortEpargne,
+          enrichAnnuel, investTotal, i, fisc, mensualite, assurAnn,
+          loyersEncaiss, loyersBruts, chargesExploit, capitalRemb1, lmnpInfo } = d;
+
+  const cfColor = cfMensuel >= 0 ? 'green' : 'red';
+  const enrichColor = enrichAnnuel >= 0 ? 'green' : 'red';
+
+  let warningHtml = '';
+  if (fisc.extraInfo.seuilOK === false) {
+    warningHtml = `<div class="cf-alert"><strong>Seuil dépassé.</strong> Vos loyers (${eur(loyersEncaiss)}) dépassent le seuil d'application de ce régime. Le régime réel est obligatoire.</div>`;
+  }
+  if (i.regime === 'lmnp-reel' && lmnpInfo.amortDiffere > 0) {
+    warningHtml += `<div class="cf-info"><strong>${eur(lmnpInfo.amortDiffere)} d'amortissements différés</strong> reportés sur les exercices futurs (CGI art. 39 C II). Non perdus.</div>`;
+  }
+
+  const cfSubLabel = cfMensuel >= 0
+    ? `Opération autofinancée — les loyers couvrent toutes les dépenses`
+    : `Effort d'épargne de ${eur(abs(cfMensuel))}/mois · enrichissement patrimonial ${eur(abs(enrichAnnuel/12))}/mois`;
+
+  document.getElementById('panel-synthese').innerHTML = `
+    ${warningHtml}
+    <div class="key-result" style="margin-bottom:1.2rem">
+      <div class="key-result-label">Cash-flow mensuel net</div>
+      <div class="key-result-val" style="color:${cfMensuel>=0?'var(--success)':'#9B5A3A'}">${sgn(cfMensuel)}${eur(abs(cfMensuel))}</div>
+      <div class="key-result-sub">${cfSubLabel}</div>
+    </div>
+    <div class="metrics-grid metrics-4" style="margin-bottom:1.2rem">
+      <div class="metric">
+        <div class="metric-label">Rentabilité brute</div>
+        <div class="metric-val accent">${pct(rentBrute)}</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Renta. nette charges</div>
+        <div class="metric-val amber">${pct(rentNette)}</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Renta. nette nette</div>
+        <div class="metric-val ${rentNN>=0?'success':''}" style="${rentNN<0?'color:#9B5A3A;':''}">${pct(rentNN)}</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Enrichissement/an</div>
+        <div class="metric-val" style="${enrichAnnuel<0?'color:#9B5A3A;':''}">${sgn(enrichAnnuel)}${eur(abs(enrichAnnuel))}</div>
+      </div>
+    </div>
+
+    <div class="cf-chart-wrap">
+      <div class="cf-chart-title">Décomposition des flux annuels</div>
+      <div id="bars-synthese"></div>
+    </div>
+
+    <div class="cf-tbl-wrap">
+      <table class="cf-tbl">
+        <thead><tr>
+          <th>Poste</th><th>Mensuel</th><th>Annuel</th>
+        </tr></thead>
+        <tbody>
+          <tr class="sect-head"><td colspan="3">Encaissements</td></tr>
+          <tr><td>Loyers bruts</td><td class="val-acc">+${eur(loyersBruts/12)}</td><td class="val-acc">+${eur(loyersBruts)}</td></tr>
+          <tr><td>Perte vacance (${i.vacance} mois/an)</td><td class="val-neg">−${eur((loyersBruts-loyersEncaiss)/12)}</td><td class="val-neg">−${eur(loyersBruts-loyersEncaiss)}</td></tr>
+          <tr><td><strong>Loyers encaissés</strong></td><td><strong class="val-acc">+${eur(loyersEncaiss/12)}</strong></td><td><strong class="val-acc">+${eur(loyersEncaiss)}</strong></td></tr>
+          <tr class="sect-head"><td colspan="3">Charges d'exploitation</td></tr>
+          <tr><td>Total charges</td><td class="val-neg">−${eur(chargesExploit/12)}</td><td class="val-neg">−${eur(chargesExploit)}</td></tr>
+          <tr class="sect-head"><td colspan="3">Service de la dette</td></tr>
+          <tr><td>Mensualité crédit</td><td class="val-neg">−${eur(mensualite)}</td><td class="val-neg">−${eur(mensualite*12)}</td></tr>
+          <tr><td>Assurance emprunteur</td><td class="val-neg">−${eur(assurAnn/12)}</td><td class="val-neg">−${eur(assurAnn)}</td></tr>
+          <tr class="sect-head"><td colspan="3">Fiscalité (${fisc.extraInfo.label || i.regime})</td></tr>
+          <tr><td>IR + PS (ou IS)</td><td class="${fisc.total>0?'val-neg':fisc.total<0?'val-pos':''}">${fisc.total>=0?'−':'+'}${eur(abs(fisc.total/12))}</td><td class="${fisc.total>0?'val-neg':fisc.total<0?'val-pos':''}">${fisc.total>=0?'−':'+'}${eur(abs(fisc.total))}</td></tr>
+          <tr class="sect-head"><td colspan="3">Résultat</td></tr>
+          <tr><td><strong>Cash-flow net après impôt</strong></td>
+              <td><strong class="${cfMensuel>=0?'val-pos':'val-neg'}">${sgn(cfMensuel)}${eur(abs(cfMensuel))}</strong></td>
+              <td><strong class="${cfNet>=0?'val-pos':'val-neg'}">${sgn(cfNet)}${eur(abs(cfNet))}</strong></td></tr>
+          <tr><td>dont capital remboursé (épargne forcée)</td><td class="val-acc">+${eur(capitalRemb1/12)}</td><td class="val-acc">+${eur(capitalRemb1)}</td></tr>
+          <tr><td><strong>Enrichissement patrimonial annuel</strong></td>
+              <td></td>
+              <td><strong class="${enrichAnnuel>=0?'val-pos':'val-neg'}">${sgn(enrichAnnuel)}${eur(abs(enrichAnnuel))}</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="cf-tbl-wrap">
+      <table class="cf-tbl">
+        <thead><tr><th>Indicateur</th><th>Valeur</th></tr></thead>
+        <tbody>
+          <tr><td>Coût total du projet</td><td class="val-acc">${eur(d.investTotal)}</td></tr>
+          <tr><td>Montant emprunté</td><td>${eur(i.emprunt)}</td></tr>
+          <tr><td>Apport personnel</td><td>${eur(i.apport)}</td></tr>
+          <tr><td>Mensualité crédit</td><td>${eur(mensualite)}</td></tr>
+          <tr><td>Coût total du crédit</td><td class="val-neg">−${eur(d.coutTotalCr)}</td></tr>
+          ${i.apport > 0 ? `<tr><td>Rendement sur apport (CF/apport)</td><td class="${d.yieldSurApport>=0?'val-pos':'val-neg'}">${pct(d.yieldSurApport)}</td></tr>` : ''}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="cf-disclaimer">Régime : ${fisc.extraInfo.label || i.regime} · TMI ${i.tmi}%</div>
+  `;
+
+  renderBars('bars-synthese', [
+    { lbl: 'Loyers encaissés',    val: loyersEncaiss,    color: 'var(--accent)' },
+    { lbl: '− Charges exploit.',  val: -chargesExploit,  color: '#9B5A3A' },
+    { lbl: '− Service de dette',  val: -(mensualite*12+assurAnn), color: 'var(--amber)' },
+    { lbl: '− Fiscalité',         val: -(fisc.total),    color: '#b05a00' },
+    { lbl: '= Cash-flow net',     val: cfNet,            color: cfNet >= 0 ? 'var(--success)' : '#9B5A3A' },
+  ]);
+}
+
+/* ══ RENDER CASH-FLOW ══ */
+function renderCashflow(d) {
+  const { i, loyersEncaiss, loyersBruts, chargesExploit, interets1, capitalRemb1,
+          mensualite, assurAnn, fisc, cfBrut, cfNet, cfMensuel, enrichAnnuel,
+          rentBrute, rentNette, rentNN, effortEpargne } = d;
+
+  const cfColor = cfNet >= 0 ? 'green' : 'red';
+
+  let lmnpRows = '';
+  if ((i.regime === 'lmnp-reel' || i.regime === 'sci-is') && fisc.extraInfo) {
+    const e = fisc.extraInfo;
+    lmnpRows = `
+      <tr class="sect-head"><td colspan="3">Amortissements</td></tr>
+      <tr><td>Amortissement bâti</td><td colspan="2" style="text-align:right">${eur(d.amortBati)}</td></tr>
+      <tr><td>Amortissement travaux</td><td colspan="2" style="text-align:right">${eur(d.amortTrav)}</td></tr>
+      <tr><td>Amortissement mobilier</td><td colspan="2" style="text-align:right">${eur(d.amortMob)}</td></tr>
+      <tr><td>Total amortissements</td><td colspan="2" style="text-align:right">${eur(d.amortTotal)}</td></tr>
+      ${e.amortUtilise !== undefined ? `<tr><td>Amortissements utilisés (CGI 39C II)</td><td colspan="2" style="text-align:right" class="val-acc">${eur(e.amortUtilise)}</td></tr>` : ''}
+      ${e.amortDiffere > 0 ? `<tr><td>Amortissements différés (report sans limite)</td><td colspan="2" style="text-align:right" class="val-amb">${eur(e.amortDiffere)}</td></tr>` : ''}
+    `;
+  }
+
+  /* Budget allocation strip */
+  const allocTotal = chargesExploit + mensualite*12 + assurAnn + Math.max(0, fisc.total) + Math.max(0, cfNet);
+  const aT = allocTotal || 1;
+  const aChg  = chargesExploit / aT;
+  const aDette = (mensualite*12 + assurAnn) / aT;
+  const aFisc  = Math.max(0, fisc.total) / aT;
+  const aCF    = Math.max(0, cfNet) / aT;
+  const allocStripHtml = `
+    <div class="cf-alloc-wrap">
+      <div class="cf-alloc-title">Allocation des loyers encaissés (${eur(loyersEncaiss)}/an = 100 %)</div>
+      <div class="cf-alloc-bar">
+        <div class="cf-alloc-seg" style="flex:${aChg};background:#cc3300"><span class="cf-alloc-lbl">${(aChg*100).toFixed(0)}%</span></div>
+        <div class="cf-alloc-seg" style="flex:${aDette};background:var(--amber)"><span class="cf-alloc-lbl">${(aDette*100).toFixed(0)}%</span></div>
+        ${fisc.total>0?`<div class="cf-alloc-seg" style="flex:${aFisc};background:#b07000"><span class="cf-alloc-lbl">${(aFisc*100).toFixed(0)}%</span></div>`:''}
+        ${cfNet>0?`<div class="cf-alloc-seg" style="flex:${aCF};background:var(--success)"><span class="cf-alloc-lbl">${(aCF*100).toFixed(0)}%</span></div>`:''}
+      </div>
+      <div class="cf-alloc-legend">
+        <div class="cf-alloc-legend-item"><div class="cf-alloc-dot" style="background:#cc3300"></div>Charges exploit. ${eur(chargesExploit)}</div>
+        <div class="cf-alloc-legend-item"><div class="cf-alloc-dot" style="background:var(--amber)"></div>Service de la dette ${eur(mensualite*12+assurAnn)}</div>
+        ${fisc.total>0?`<div class="cf-alloc-legend-item"><div class="cf-alloc-dot" style="background:#b07000"></div>Fiscalité ${eur(fisc.total)}</div>`:''}
+        ${cfNet>0?`<div class="cf-alloc-legend-item"><div class="cf-alloc-dot" style="background:var(--success)"></div>Cash-flow net ${eur(cfNet)}</div>`:''}
+        ${cfNet<0?`<div class="cf-alloc-legend-item" style="color:#9B5A3A">→ Déficit de trésorerie ${eur(abs(cfNet))}/an (effort d'épargne)</div>`:''}
+      </div>
+    </div>`;
+
+  document.getElementById('panel-cashflow').innerHTML = `
+    <div class="cf-kpi-row">
+      <div class="cf-kpi ${cfColor}">
+        <span class="cf-kpi-badge">CF mensuel après impôt</span>
+        <div class="cf-kpi-val">${sgn(cfMensuel)}${eur(abs(cfMensuel))}</div>
+        <div class="cf-kpi-sub">${cfMensuel >= 0 ? 'Excédent de trésorerie' : 'Effort d\'épargne'}</div>
+      </div>
+      <div class="cf-kpi ${enrichAnnuel >= 0 ? 'green' : 'red'}">
+        <span class="cf-kpi-badge">Enrichissement annuel</span>
+        <div class="cf-kpi-val">${sgn(enrichAnnuel)}${eur(abs(enrichAnnuel))}</div>
+        <div class="cf-kpi-sub">CF net + ${eur(capitalRemb1)} capital remboursé</div>
+      </div>
+    </div>
+
+    ${allocStripHtml}
+
+    <div class="cf-chart-wrap">
+      <div class="cf-chart-title">Décomposition détaillée du cash-flow annuel</div>
+      <div id="bars-cashflow"></div>
+    </div>
+
+    <div class="cf-tbl-wrap">
+      <table class="cf-tbl">
+        <thead><tr><th>Détail</th><th>Mensuel</th><th>Annuel</th></tr></thead>
+        <tbody>
+          <tr class="sect-head"><td colspan="3">Encaissements</td></tr>
+          <tr><td>Loyers bruts (12 mois)</td><td>${eur(loyersBruts/12)}</td><td>${eur(loyersBruts)}</td></tr>
+          <tr><td>− Vacance (${i.vacance} mois/an)</td><td class="val-neg">−${eur((loyersBruts-loyersEncaiss)/12)}</td><td class="val-neg">−${eur(loyersBruts-loyersEncaiss)}</td></tr>
+          <tr><td><strong>= Loyers nets encaissés</strong></td><td><strong>${eur(loyersEncaiss/12)}</strong></td><td><strong>${eur(loyersEncaiss)}</strong></td></tr>
+
+          <tr class="sect-head"><td colspan="3">Charges d'exploitation</td></tr>
+          <tr><td>Taxe foncière</td><td>${eur(i.tf/12)}</td><td>${eur(i.tf)}</td></tr>
+          <tr><td>Charges copropriété</td><td>${eur(i.copro/12)}</td><td>${eur(i.copro)}</td></tr>
+          <tr><td>Assurance PNO</td><td>${eur(i.pno/12)}</td><td>${eur(i.pno)}</td></tr>
+          ${i.gli>0?`<tr><td>GLI</td><td>${eur(i.gli/12)}</td><td>${eur(i.gli)}</td></tr>`:''}
+          ${i.gestion>0?`<tr><td>Gestion locative</td><td>${eur(i.gestion/12)}</td><td>${eur(i.gestion)}</td></tr>`:''}
+          <tr><td>Entretien / réparations</td><td>${eur(i.entretien/12)}</td><td>${eur(i.entretien)}</td></tr>
+          ${i.autres>0?`<tr><td>Autres charges</td><td>${eur(i.autres/12)}</td><td>${eur(i.autres)}</td></tr>`:''}
+          <tr><td><strong>= Total charges exploit.</strong></td><td><strong class="val-neg">−${eur(chargesExploit/12)}</strong></td><td><strong class="val-neg">−${eur(chargesExploit)}</strong></td></tr>
+
+          <tr class="sect-head"><td colspan="3">Service de la dette</td></tr>
+          <tr><td>Mensualité crédit (capital + intérêts)</td><td class="val-neg">−${eur(mensualite)}</td><td class="val-neg">−${eur(mensualite*12)}</td></tr>
+          <tr><td>dont intérêts (année 1)</td><td style="color:var(--amber)">−${eur(interets1/12)}</td><td style="color:var(--amber)">−${eur(interets1)}</td></tr>
+          <tr><td>dont capital remboursé (épargne)</td><td style="color:var(--success)">+${eur(capitalRemb1/12)}</td><td style="color:var(--success)">+${eur(capitalRemb1)}</td></tr>
+          <tr><td>Assurance emprunteur</td><td class="val-neg">−${eur(assurAnn/12)}</td><td class="val-neg">−${eur(assurAnn)}</td></tr>
+
+          <tr class="sect-head"><td colspan="3">Résultat avant impôt</td></tr>
+          <tr><td><strong>Cash-flow brut</strong></td>
+              <td><strong class="${cfBrut>=0?'val-pos':'val-neg'}">${sgn(cfBrut/12)}${eur(abs(cfBrut/12))}</strong></td>
+              <td><strong class="${cfBrut>=0?'val-pos':'val-neg'}">${sgn(cfBrut)}${eur(abs(cfBrut))}</strong></td></tr>
+
+          ${lmnpRows}
+
+          <tr class="sect-head"><td colspan="3">Fiscalité</td></tr>
+          <tr><td>${fisc.extraInfo.label || i.regime}</td>
+              <td class="${fisc.total>0?'val-neg':fisc.total<0?'val-pos':''}">${fisc.total>=0?'−':'+'}${eur(abs(fisc.total/12))}</td>
+              <td class="${fisc.total>0?'val-neg':fisc.total<0?'val-pos':''}">${fisc.total>=0?'−':'+'}${eur(abs(fisc.total))}</td></tr>
+          ${fisc.total < 0 ? `<tr><td colspan="3" class="cf-info" style="border:none;padding:.5rem .9rem;font-family:var(--sans);font-size:.73rem;color:var(--text-muted)">→ Déficit foncier imputable sur le revenu global (limite 10 700 €/an, CGI art. 156)</td></tr>` : ''}
+
+          <tr class="sect-head"><td colspan="3">Net</td></tr>
+          <tr><td><strong>Cash-flow net après impôt</strong></td>
+              <td><strong class="${cfMensuel>=0?'val-pos':'val-neg'}">${sgn(cfMensuel)}${eur(abs(cfMensuel))}</strong></td>
+              <td><strong class="${cfNet>=0?'val-pos':'val-neg'}">${sgn(cfNet)}${eur(abs(cfNet))}</strong></td></tr>
+          <tr><td><strong>Enrichissement patrimonial réel</strong></td>
+              <td></td>
+              <td><strong class="${enrichAnnuel>=0?'val-pos':'val-neg'}">${sgn(enrichAnnuel)}${eur(abs(enrichAnnuel))}</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+  `;
+
+  renderBars('bars-cashflow', [
+    { lbl: 'Loyers encaissés',       val: loyersEncaiss,         color: 'var(--accent)' },
+    { lbl: '− Charges exploit.',     val: -chargesExploit,       color: '#cc3300' },
+    { lbl: '− Intérêts crédit',      val: -interets1,            color: 'var(--amber)' },
+    { lbl: '− Capital remboursé',    val: -capitalRemb1,         color: '#5a8a00' },
+    { lbl: '− Assurance emprunt',    val: -assurAnn,             color: '#888' },
+    { lbl: '− Fiscalité',            val: -fisc.total,           color: '#b07000' },
+    { lbl: '= CF net',               val: cfNet,                 color: cfNet >= 0 ? 'var(--success)' : '#9B5A3A' },
+  ]);
+}
+
+/* ══ RENDER PROJECTION ══ */
+function renderProjection(d) {
+  const proj = calcProjection(d);
+  const { i } = d;
+  const milestones = [5, 10, 15, 20, 25].filter(y => y <= Math.max(i.dureeCr, i.dureeDetention, 25));
+
+  const maxPatri = Math.max(...milestones.map(y => abs(proj.annual[y]?.patriNet || 0)), 1);
+  const maxCFCumul = Math.max(...milestones.map(y => abs(proj.annual[y]?.cfCumul || 0)), 1);
+
+  const projBarsHtml = milestones.map(yr => {
+    const a = proj.annual[yr] || {};
+    const wPatri = Math.max(0, Math.min(100, abs(a.patriNet || 0) / maxPatri * 100)).toFixed(1);
+    const wCF    = Math.max(0, Math.min(100, abs(a.cfCumul || 0) / maxCFCumul * 100)).toFixed(1);
+    const patriCol = (a.patriNet || 0) >= 0 ? 'var(--accent)' : '#9B5A3A';
+    const cfCol    = (a.cfCumul  || 0) >= 0 ? 'var(--success)' : '#9B5A3A';
+    return `<div class="proj-row">
+      <div class="proj-lbl">${yr} ans</div>
+      <div class="proj-bars">
+        <div class="proj-track"><div class="proj-fill" style="width:${wPatri}%;background:${patriCol}"></div></div>
+        <div class="proj-track"><div class="proj-fill" style="width:${wCF}%;background:${cfCol}"></div></div>
+      </div>
+      <div class="proj-val">${eur(a.patriNet||0)}</div>
+    </div>`;
+  }).join('');
+
+  const tableRows = milestones.map(yr => {
+    const a = proj.annual[yr] || {};
+    return `<tr>
+      <td>${yr} ans</td>
+      <td class="${(a.cfCumul||0)>=0?'val-pos':'val-neg'}">${sgn(a.cfCumul||0)}${eur(abs(a.cfCumul||0))}</td>
+      <td class="val-acc">${eur(Math.max(0, i.emprunt - (a.crd||0)))}</td>
+      <td>${eur(a.crd||0)}</td>
+      <td>${eur(a.valBien||0)}</td>
+      <td class="${(a.patriNet||0)>=0?'val-pos':'val-neg'}">${sgn(a.patriNet||0)}${eur(abs(a.patriNet||0))}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('panel-projection').innerHTML = `
+    <div class="cf-info"><strong>Projection à ${i.inflation}%/an</strong> d'inflation loyers, <strong>${i.revalo}%/an</strong> de revalorisation du bien. Simulation indicative — les conditions de marché peuvent évoluer significativement.</div>
+
+    <div class="cf-chart-wrap">
+      <div class="cf-chart-title">Patrimoine net et trésorerie cumulée par horizon</div>
+      ${projBarsHtml}
+      <div class="chart-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div>Patrimoine net (valeur bien − CRD + CF cumulé)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--success)"></div>Trésorerie cumulée (CF nets)</div>
+      </div>
+    </div>
+
+    <div class="cf-tbl-wrap">
+      <table class="cf-tbl">
+        <thead><tr>
+          <th>Horizon</th>
+          <th>Tréso. cumulée</th>
+          <th>Capital remboursé</th>
+          <th>CRD restant</th>
+          <th>Valeur bien estimée</th>
+          <th>Patrimoine net</th>
+        </tr></thead>
+        <tbody>${tableRows}</tbody>
+      </table>
+    </div>
+
+    <div class="cf-disclaimer">
+      Patrimoine net = valeur estimée du bien − capital restant dû + trésorerie cumulée.<br>
+      Hypothèses : inflation charges +1,5%/an · fiscalité proportionnelle à la 1ère année · mensualités constantes.
+    </div>
+  `;
+}
+
+/* ══ RENDER REVENTE ══ */
+function renderRevente(d) {
+  const { i, cfNet } = d;
+  const proj = calcProjection(d);
+  const N = i.dureeDetention;
+  const a = proj.annual[N] || {};
+
+  const prixRevente = i.prixRevente;
+  const crdN        = a.crd || 0;
+  const cfCumulN    = a.cfCumul || 0;
+  const fraisCession = prixRevente * i.fraisCession / 100;
+
+  /* PV particuliers (CGI art. 150 U) — sauf SCI IS */
+  const prixAcqCorrige = i.prix + i.notaire + i.agence + i.travaux;
+  const { abIR, abPS } = calcAbattements(N);
+  const pvBrute  = Math.max(0, prixRevente - prixAcqCorrige);
+  const pvNetIR  = pvBrute * (1 - abIR / 100);
+  const pvNetPS  = pvBrute * (1 - abPS / 100);
+  const irPV     = pvNetIR * 0.19;
+  const psPV     = pvNetPS * 0.172;
+  const surtaxe  = calcSurtaxe(pvNetIR);
+  const fiscPVParticulier = irPV + psPV + surtaxe;
+
+  /* SCI IS : PV professionnelle */
+  let fiscPV, pvNote;
+  if (i.regime === 'sci-is') {
+    const amortCumul = d.amortBati * Math.min(N, i.amortBatiD);
+    const vnc        = Math.max(0, d.valBati - amortCumul);
+    const pvProf     = Math.max(0, prixRevente - vnc);
+    const isOnPV     = pvProf <= 42500 ? pvProf * 0.15 : 42500 * 0.15 + (pvProf - 42500) * 0.25;
+    fiscPV   = isOnPV;
+    pvNote   = `PV professionnelle SCI IS : IS sur ${eur(pvProf)} (VNC = ${eur(vnc)}). Distributions non incluses.`;
+  } else {
+    fiscPV = fiscPVParticulier;
+    pvNote = `Régime des particuliers (CGI art. 150 U). Amortissements LMNP non réintégrés — avantage vs SCI IS.`;
+  }
+
+  const netVendeur    = prixRevente - crdN - fraisCession - fiscPV;
+  const enrichTotal   = netVendeur + cfCumulN - i.apport;
+
+  /* TRI */
+  const annualCFs = [];
+  for (let yr = 1; yr <= N; yr++) {
+    const a_yr = proj.annual[yr] || {};
+    annualCFs.push(a_yr.cfAn !== undefined ? a_yr.cfAn : cfNet);
+  }
+  const tri = calcTRI(i.apport, annualCFs, netVendeur, N);
+
+  const enrichColor  = enrichTotal >= 0 ? 'green' : 'red';
+  const netVendColor = netVendeur >= 0 ? 'accent' : 'red';
+
+  document.getElementById('panel-revente').innerHTML = `
+    <div class="cf-kpi-row">
+      <div class="cf-kpi ${netVendColor}">
+        <span class="cf-kpi-badge">Net vendeur</span>
+        <div class="cf-kpi-val">${sgn(netVendeur)}${eur(abs(netVendeur))}</div>
+        <div class="cf-kpi-sub">Après remboursement crédit, frais et PV</div>
+      </div>
+      <div class="cf-kpi ${enrichColor}">
+        <span class="cf-kpi-badge">Enrichissement total (${N} ans)</span>
+        <div class="cf-kpi-val">${sgn(enrichTotal)}${eur(abs(enrichTotal))}</div>
+        <div class="cf-kpi-sub">Net vendeur + tréso. cumulée − apport initial</div>
+      </div>
+    </div>
+    ${tri !== null ? `
+    <div class="cf-kpi-row">
+      <div class="cf-kpi ${tri >= 0 ? 'accent' : 'red'}">
+        <span class="cf-kpi-badge">TRI indicatif (${N} ans)</span>
+        <div class="cf-kpi-val">${pct(tri)}</div>
+        <div class="cf-kpi-sub">Taux de rendement interne sur l'apport</div>
+      </div>
+      <div class="cf-kpi amber">
+        <span class="cf-kpi-badge">Multiple sur apport</span>
+        <div class="cf-kpi-val">${i.apport > 0 ? ((enrichTotal + i.apport) / i.apport).toFixed(2) + 'x' : 'N/A'}</div>
+        <div class="cf-kpi-sub">Capital total créé / apport investi</div>
+      </div>
+    </div>` : ''}
+
+    <div class="cf-chart-wrap">
+      <div class="cf-chart-title">Décomposition de l'enrichissement à la revente (${N} ans)</div>
+      <div id="bars-revente"></div>
+    </div>
+
+    <div class="cf-tbl-wrap">
+      <table class="cf-tbl">
+        <thead><tr><th>Poste</th><th>Montant</th></tr></thead>
+        <tbody>
+          <tr class="sect-head"><td colspan="2">Revente du bien</td></tr>
+          <tr><td>Prix de revente</td><td class="val-acc">+${eur(prixRevente)}</td></tr>
+          <tr><td>Prix d'acquisition corrigé</td><td>${eur(prixAcqCorrige)}</td></tr>
+          <tr><td>Plus-value brute</td><td class="${pvBrute>0?'val-amb':''}">${eur(pvBrute)}</td></tr>
+          <tr><td>Abattement IR (${N} ans) = ${abIR.toFixed(0)}%</td><td>${eur(pvBrute * abIR / 100)}</td></tr>
+          <tr><td>Abattement PS (${N} ans) = ${abPS.toFixed(0)}%</td><td>${eur(pvBrute * abPS / 100)}</td></tr>
+          <tr><td>Fiscalité plus-value</td><td class="val-neg">−${eur(fiscPV)}</td></tr>
+          <tr><td>Capital restant dû (CRD)</td><td class="val-neg">−${eur(crdN)}</td></tr>
+          <tr><td>Frais de cession (${i.fraisCession}%)</td><td class="val-neg">−${eur(fraisCession)}</td></tr>
+          <tr><td><strong>Net vendeur</strong></td><td><strong class="${netVendeur>=0?'val-pos':'val-neg'}">${sgn(netVendeur)}${eur(abs(netVendeur))}</strong></td></tr>
+          <tr class="sect-head"><td colspan="2">Enrichissement global</td></tr>
+          <tr><td>Trésorerie cumulée (${N} ans)</td><td class="${cfCumulN>=0?'val-pos':'val-neg'}">${sgn(cfCumulN)}${eur(abs(cfCumulN))}</td></tr>
+          <tr><td>Net vendeur</td><td class="${netVendeur>=0?'val-pos':'val-neg'}">${sgn(netVendeur)}${eur(abs(netVendeur))}</td></tr>
+          <tr><td>− Apport initial</td><td class="val-neg">−${eur(i.apport)}</td></tr>
+          <tr><td><strong>Enrichissement net total</strong></td><td><strong class="${enrichTotal>=0?'val-pos':'val-neg'}">${sgn(enrichTotal)}${eur(abs(enrichTotal))}</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="cf-disclaimer">${pvNote}</div>
+  `;
+
+  renderBars('bars-revente', [
+    { lbl: 'Net vendeur',        val: netVendeur,  color: netVendeur >= 0 ? 'var(--accent)' : '#9B5A3A' },
+    { lbl: 'Tréso. cumulée',    val: cfCumulN,    color: cfCumulN >= 0 ? 'var(--success)' : '#9B5A3A' },
+    { lbl: 'Fiscalité PV',      val: -fiscPV,     color: 'var(--amber)' },
+    { lbl: 'CRD remboursé',     val: -crdN,       color: '#888' },
+  ]);
+}
+
+/* ══ RENDER PÉDAGOGIE ══ */
+function buildPedago(d) {
+  const { i, rentBrute, rentNette, rentNN, cfNet, cfMensuel, cfBrut,
+          enrichAnnuel, capitalRemb1, fisc, loyersEncaiss, chargesExploit,
+          interets1, mensualite, assurAnn, investTotal, lmnpInfo } = d;
+
+  const cfMsg = cfMensuel >= 0
+    ? `Ce projet génère <strong>${eur(abs(cfMensuel))}/mois</strong> de cash-flow positif. Chaque mois, les loyers couvrent non seulement l'ensemble des charges et du crédit, mais dégagent un excédent de trésorerie.`
+    : `Ce projet nécessite un effort d'épargne de <strong>${eur(abs(cfMensuel))}/mois</strong>. Cela ne signifie pas que l'investissement est mauvais — ce complément mensuel "achète" de la richesse patrimoniale à long terme.`;
+
+  const enrichMsg = enrichAnnuel >= 0
+    ? `Votre enrichissement réel est de <strong>${eur(enrichAnnuel)}/an</strong> — dont ${eur(capitalRemb1)} de capital remboursé automatiquement par le locataire.`
+    : `Malgré un enrichissement annuel négatif de <em>${eur(abs(enrichAnnuel))}</em>, la revalorisation du bien (${i.revalo}%/an) peut compenser sur la durée.`;
+
+  let regimeTip = '';
+  if (i.regime === 'lmnp-reel' && lmnpInfo) {
+    regimeTip = `<div class="pedago-block"><div class="pedago-block-label">LMNP réel — amortissements</div><p class="pedago-block-text">
+      L'amortissement annuel du bâti est de <strong>${eur(d.amortBati)}</strong>, des travaux <strong>${eur(d.amortTrav)}</strong>, du mobilier <strong>${eur(d.amortMob)}</strong> — soit <strong>${eur(d.amortTotal)}/an</strong> de charges "fictives" qui réduisent le résultat fiscal sans sortie de trésorerie.
+      ${lmnpInfo.amortDiffere > 0 ? `<br>Cette année, <strong>${eur(lmnpInfo.amortDiffere)}</strong> sont différés (CGI art. 39 C II) — reportés indéfiniment, ils réduiront la fiscalité des années futures.` : ''}
+    </p></div>`;
+  }
+  if (i.regime === 'micro-foncier') {
+    regimeTip = `<div class="pedago-block"><div class="pedago-block-label">Micro-foncier</div><p class="pedago-block-text">L'abattement forfaitaire de 30 % simplifie la déclaration mais ne tient pas compte de vos charges réelles. Si vos charges dépassent 30 % des loyers (ce qui est fréquent), le régime réel sera plus avantageux.</p></div>`;
+  }
+  if (i.regime === 'reel-foncier') {
+    const deficit = fisc.deficit || 0;
+    regimeTip = deficit > 0
+      ? `<div class="pedago-block"><div class="pedago-block-label">Déficit foncier</div><p class="pedago-block-text">Votre déficit foncier de <strong>${eur(deficit)}</strong> est imputable sur votre revenu global dans la limite de <strong>10 700 €/an</strong> (CGI art. 156), ce qui génère une économie d'impôt immédiate à votre TMI de ${i.tmi}%.</p></div>`
+      : `<div class="pedago-block"><div class="pedago-block-label">Réel foncier</div><p class="pedago-block-text">Vous déduisez l'ensemble de vos charges réelles (taxe foncière, copro, assurance, entretien, intérêts d'emprunt…) pour calculer votre revenu net foncier imposable.</p></div>`;
+  }
+  if (i.regime === 'sci-is') {
+    regimeTip = `<div class="pedago-block"><div class="pedago-block-label">SCI IS — attention à la revente</div><p class="pedago-block-text">L'IS est calculé sur le résultat après amortissements (${eur(d.amortTotal)}/an), ce qui réduit la fiscalité annuelle. <strong>Mais</strong> à la revente, la plus-value professionnelle intègre les amortissements déduits — l'économie fiscale annuelle se retrouve fiscalisée à la sortie. À analyser sur la durée totale.</p></div>`;
+  }
+
+  const chargesPct = loyersEncaiss > 0 ? (chargesExploit / loyersEncaiss * 100).toFixed(0) : 0;
+  const fiscPct    = loyersEncaiss > 0 ? (fisc.total / loyersEncaiss * 100).toFixed(0) : 0;
+  const dettePct   = loyersEncaiss > 0 ? ((mensualite*12+assurAnn) / loyersEncaiss * 100).toFixed(0) : 0;
+
+  document.getElementById('panel-pedago').innerHTML = `
+    <div class="pedago-card">
+      <div class="pedago-card-header">
+        <div class="pedago-card-dot"></div>
+        <div class="pedago-card-title">Cash-flow et trésorerie</div>
+      </div>
+      <div class="pedago-card-body">
+        <p class="pedago-p">${cfMsg}</p>
+        <p class="pedago-p">${enrichMsg}</p>
+        <div class="pedago-tip"><strong>À retenir :</strong> Le cash-flow mesure la trésorerie réelle. L'enrichissement patrimonial est différent — il intègre le capital remboursé par le locataire, invisible dans le compte bancaire mais bien réel dans le patrimoine.</div>
+      </div>
+    </div>
+
+    <div class="pedago-card" style="margin-top:1rem">
+      <div class="pedago-card-header">
+        <div class="pedago-card-dot"></div>
+        <div class="pedago-card-title">Rentabilité</div>
+      </div>
+      <div class="pedago-card-body">
+        <p class="pedago-p">La rentabilité <strong>brute</strong> est de <em>${pct(rentBrute)}</em> — c'est le ratio loyers bruts / coût total. Elle ne tient pas compte des charges ni de la fiscalité.</p>
+        <p class="pedago-p">Après déduction des <strong>${eur(chargesExploit)}/an</strong> de charges (soit ${chargesPct}% des loyers), la rentabilité <strong>nette</strong> tombe à <em>${pct(rentNette)}</em>. Après fiscalité (${fiscPct}% des loyers supplémentaires), la rentabilité <strong>nette nette</strong> est de <em>${pct(rentNN)}</em>.</p>
+        <div class="pedago-alert"><strong>Les 3 rentabilités sont toutes pertinentes.</strong> La brute sert à comparer rapidement des biens. La nette intègre la réalité des charges. La nette nette révèle le rendement réel après impôt.</div>
+      </div>
+    </div>
+
+    <div class="pedago-card" style="margin-top:1rem">
+      <div class="pedago-card-header">
+        <div class="pedago-card-dot"></div>
+        <div class="pedago-card-title">Impact du financement</div>
+      </div>
+      <div class="pedago-card-body">
+        <p class="pedago-p">Le crédit mobilise <strong>${eur(mensualite*12)}/an</strong> de remboursements (dont <strong>${eur(interets1)}</strong> d'intérêts purs et <strong>${eur(capitalRemb1)}</strong> de capital). Ces ${dettePct}% de vos loyers servent le financement bancaire.</p>
+        <p class="pedago-p">L'effet de levier est le principal avantage de l'immobilier : avec seulement <strong>${eur(i.apport)}</strong> d'apport, vous contrôlez un actif de <strong>${eur(investTotal)}</strong>. Si le bien se revaLorise de ${i.revalo}%/an, votre capital s'enrichit bien plus vite que votre apport.</p>
+        ${i.apport > 0 ? `<div class="pedago-tip">Votre rendement sur apport (cash-flow / apport) est de <strong>${pct(d.yieldSurApport)}</strong>. C'est ce chiffre qui mesure l'efficacité du levier.</div>` : ''}
+      </div>
+    </div>
+
+    <div class="pedago-card" style="margin-top:1rem">
+      <div class="pedago-card-header">
+        <div class="pedago-card-dot"></div>
+        <div class="pedago-card-title">Régime fiscal — ${fisc.extraInfo.label || i.regime}</div>
+      </div>
+      <div class="pedago-card-body">
+        <p class="pedago-p">La fiscalité locative est déterminante. Avec une TMI de <strong>${i.tmi}%</strong>, chaque euro de revenu imposable supplémentaire coûte <strong>${(i.tmi/100 + 0.172).toFixed(3)}</strong> (IR + prélèvements sociaux). Optimiser le régime fiscal peut changer fondamentalement la rentabilité d'une opération.</p>
+        ${regimeTip}
+      </div>
+    </div>
+  `;
+}
+
+/* ══ RENDER ALL ══ */
+let _activeTab = 'synthese';
+function renderAll() {
+  const d = calcAll();
+  if (_activeTab === 'synthese')   renderSynthese(d);
+  if (_activeTab === 'cashflow')   renderCashflow(d);
+  if (_activeTab === 'projection') renderProjection(d);
+  if (_activeTab === 'revente')    renderRevente(d);
+  if (_activeTab === 'pedago')     buildPedago(d);
+}
+
+/* ══ TABS ══ */
+document.querySelectorAll('.cf-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.cf-tab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.cf-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    _activeTab = btn.dataset.tab;
+    document.getElementById('panel-' + _activeTab).classList.add('active');
+    renderAll();
+  });
+});
+
+/* ══ SLIDERS ══ */
+function linkSlider(inputId, sliderId, dispId) {
+  const inp = document.getElementById(inputId);
+  const sld = document.getElementById(sliderId);
+  const disp = dispId ? document.getElementById(dispId) : null;
+
+  function syncFromInput() {
+    const n = SP.parseNum(inp.value);
+    if (n >= +sld.min && n <= +sld.max) {
+      sld.value = n;
+      const pct = (n - +sld.min) / (+sld.max - +sld.min) * 100;
+      sld.style.setProperty('--pct', pct.toFixed(1) + '%');
+    }
+    if (disp) disp.textContent = SP.fmtNum(n) + ' €';
+    renderAll();
+  }
+  function syncFromSlider() {
+    SP.setVal(inp, +sld.value);
+    const pct = (+sld.value - +sld.min) / (+sld.max - +sld.min) * 100;
+    sld.style.setProperty('--pct', pct.toFixed(1) + '%');
+    if (disp) disp.textContent = SP.fmtNum(+sld.value) + ' €';
+    renderAll();
+  }
+
+  inp.addEventListener('input', syncFromInput);
+  inp.addEventListener('blur', syncFromInput);
+  sld.addEventListener('input', syncFromSlider);
+  syncFromInput();
+}
+
+/* ══ AUTO NOTAIRE ══ */
+function updateNotaire() {
+  const prix = SP.parseNum(document.getElementById('cf-prix').value);
+  const typeBien = document.getElementById('cf-type-bien').value;
+  const rate = typeBien === 'neuf' ? 0.025 : 0.08;
+  const notaireEl = document.getElementById('cf-notaire');
+  const hintEl    = document.getElementById('cf-notaire-hint');
+  SP.setVal(notaireEl, Math.round(prix * rate));
+  hintEl.textContent = '≈ ' + (rate * 100).toFixed(0) + ' % du prix (' + (typeBien === 'neuf' ? 'neuf' : 'ancien') + ')';
+  renderAll();
+}
+
+/* ══ SHOW/HIDE per regime ══ */
+function updateRegimeUI() {
+  const regime = document.getElementById('cf-regime').value;
+  const showAmort = ['lmnp-reel', 'sci-is'].includes(regime);
+  const showMeuble = ['micro-bic', 'lmnp-reel'].includes(regime);
+  const showMobilier = ['lmnp-reel', 'micro-bic', 'sci-is'].includes(regime);
+  document.getElementById('wrap-amort').style.display = showAmort ? '' : 'none';
+  document.getElementById('wrap-type-meuble').style.display = showMeuble ? '' : 'none';
+  document.getElementById('wrap-mobilier').style.display = showMobilier ? '' : 'none';
+}
+
+/* ══ INIT ══ */
+document.addEventListener('DOMContentLoaded', () => {
+  SP.initFmt(document);
+
+  linkSlider('cf-prix',    'cf-prix-sld',    'cf-prix-disp');
+  linkSlider('cf-apport',  'cf-apport-sld',  'cf-apport-disp');
+  linkSlider('cf-loyer',   'cf-loyer-sld',   'cf-loyer-disp');
+  linkSlider('cf-emprunt', 'cf-emprunt-sld', 'cf-emprunt-disp');
+
+  document.getElementById('cf-type-bien').addEventListener('change', updateNotaire);
+  document.getElementById('cf-prix').addEventListener('input', updateNotaire);
+  document.getElementById('cf-prix-sld').addEventListener('input', updateNotaire);
+
+  document.getElementById('cf-regime').addEventListener('change', () => { updateRegimeUI(); renderAll(); });
+
+  document.querySelectorAll('input[data-fmt], input[type=number], select').forEach(el => {
+    el.addEventListener('change', renderAll);
+    el.addEventListener('input', renderAll);
+  });
+
+  updateRegimeUI();
+  updateNotaire();
+  renderAll();
+});
+
+/* Menu déroulant catégorisé — voir shared-nav.js */
+SP.nav.init();
+</script>
+</body>
+</html>

@@ -1,0 +1,1803 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="favicon-64.png">
+  <link rel="shortcut icon" href="favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="favicon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Assurance-vie — PATRIMONIA.AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css?v=19">
+<script src="shared.js?v=2"></script>
+  <script src="shared-nav.js?v=6"></script>
+<style>
+/* ── AV LAYOUT ── */
+.av-body { display:grid; grid-template-columns:430px 1fr }
+@media(max-width:960px){ .av-body { grid-template-columns:1fr } }
+
+.av-inp {
+  padding:1.75rem 1.5rem 2rem;
+  background:var(--surface-2);
+  border-right:1px solid var(--border-subtle);
+  overflow-y:auto;
+}
+@media(max-width:960px){ .av-inp { border-right:none; border-bottom:1px solid var(--border-subtle) } }
+
+.av-res {
+  padding:1.5rem 1.5rem 2rem;
+  background:var(--surface);
+  overflow-x:auto;
+}
+
+/* ── SECTION LABELS ── */
+.inp-sec {
+  font-size:.6rem; font-weight:700; color:var(--text-dim);
+  letter-spacing:.08em; text-transform:uppercase;
+  margin:1.4rem 0 .85rem;
+}
+.inp-sec:first-child { margin-top:0 }
+
+/* ── TABS — segmented control ── */
+.av-tabs {
+  display:inline-flex; background:var(--surface-3);
+  border-radius:12px; padding:3px; gap:2px;
+  margin-bottom:1.4rem; flex-wrap:wrap; width:100%;
+}
+.av-tab {
+  flex:1; min-width:0;
+  font-family:var(--sans); font-size:.72rem; font-weight:500;
+  color:var(--text-muted); background:transparent;
+  border:none; border-radius:9px;
+  padding:.38rem .5rem; cursor:pointer;
+  transition:all .18s; user-select:none; white-space:nowrap;
+  text-align:center; letter-spacing:-.01em;
+}
+.av-tab:hover { color:var(--text) }
+.av-tab.active {
+  background:var(--bg); color:var(--text); font-weight:600;
+  box-shadow:0 1px 6px rgba(0,0,0,.10), 0 0 0 1px rgba(0,0,0,.04);
+}
+.av-panel { display:none }
+.av-panel.active { display:block }
+
+/* ── DESIGN TOKENS spécifiques AV ── */
+:root {
+  --av-gold:#B8860B;
+  --av-gold-light:#C8A84B;
+  --av-gold-dim:rgba(184,134,11,.09);
+  --av-emerald:#0A7051;
+  --av-emerald-dim:rgba(10,112,81,.08);
+  --av-rose:#9B5A3A;
+  --av-rose-dim:rgba(155,90,58,.07);
+  --av-slate:#3D5A80;
+  --av-slate-dim:rgba(61,90,128,.08);
+}
+
+/* ── CANVAS CHART ── */
+.av-chart-wrap {
+  background:var(--surface-2); border:1px solid var(--border-subtle);
+  border-radius:var(--r); padding:1.1rem 1.1rem .9rem; margin-bottom:1rem;
+  position:relative;
+}
+.av-chart-hdr {
+  display:flex; justify-content:space-between; align-items:baseline;
+  margin-bottom:.85rem;
+}
+.av-chart-title {
+  font-size:.6rem; font-weight:700; color:var(--text-dim);
+  letter-spacing:.07em; text-transform:uppercase;
+}
+.av-chart-val {
+  font-family:var(--mono); font-size:.75rem; font-weight:600; color:var(--text-muted);
+}
+.av-canvas { width:100%; height:180px; display:block }
+
+/* Chart legend */
+.av-legend {
+  display:flex; flex-wrap:wrap; gap:.75rem; margin-top:.6rem;
+}
+.av-legend-item {
+  display:flex; align-items:center; gap:.35rem;
+  font-size:.68rem; color:var(--text-muted);
+}
+.av-legend-dot {
+  width:9px; height:9px; border-radius:2px; flex-shrink:0;
+}
+
+/* ── TIMELINE CONTRAT ── */
+.av-timeline {
+  background:var(--surface-2); border:1px solid var(--border-subtle);
+  border-radius:var(--r-sm); padding:.9rem 1.1rem; margin-bottom:1rem;
+}
+.av-timeline-title {
+  font-size:.6rem; font-weight:700; color:var(--text-dim);
+  letter-spacing:.07em; text-transform:uppercase; margin-bottom:.75rem;
+}
+.av-tl-track-wrap { position:relative; height:6px; margin-bottom:1.6rem }
+.av-tl-track { height:6px; border-radius:3px; background:var(--surface-3) }
+.av-tl-fill {
+  height:6px; border-radius:3px; position:absolute; top:0; left:0;
+  background:linear-gradient(90deg, var(--accent) 0%, var(--av-gold-light) 100%);
+  transition:width .5s ease;
+}
+.av-tl-marker {
+  position:absolute; top:-5px; transform:translateX(-50%);
+  width:16px; height:16px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:.5rem; font-weight:700; z-index:1;
+  transition:left .5s ease;
+}
+.av-tl-marker.milestone {
+  background:var(--surface-3); border:2px solid var(--border); color:var(--text-dim);
+}
+.av-tl-marker.reached {
+  background:var(--accent); border:2px solid var(--accent); color:#fff;
+}
+.av-tl-marker.current {
+  background:var(--av-gold-light); border:2px solid var(--av-gold); color:#fff;
+}
+.av-tl-label {
+  position:absolute; top:14px; transform:translateX(-50%);
+  font-size:.55rem; color:var(--text-dim); white-space:nowrap; font-weight:500;
+}
+.av-tl-milestones {
+  display:flex; justify-content:space-between;
+}
+.av-tl-milestone {
+  text-align:center; font-size:.65rem; color:var(--text-muted);
+}
+.av-tl-milestone span { display:block; font-weight:600; color:var(--text); font-size:.72rem }
+.av-tl-milestone.reached span { color:var(--accent) }
+
+/* ── PROJECTION TABLE ── */
+.av-proj-wrap {
+  overflow-x:auto; border-radius:var(--r-sm);
+  border:1px solid var(--border-subtle); margin-bottom:1rem;
+}
+.av-proj-tbl { width:100%; border-collapse:collapse; font-size:.75rem; min-width:380px }
+.av-proj-tbl th {
+  padding:.55rem .8rem; font-size:.6rem; font-weight:700;
+  letter-spacing:.05em; text-transform:uppercase;
+  border-bottom:2px solid var(--border); text-align:right; color:var(--text-dim);
+  background:var(--surface-2);
+}
+.av-proj-tbl th:first-child { text-align:left }
+.av-proj-tbl td {
+  padding:.48rem .8rem; border-top:1px solid var(--border-subtle);
+  text-align:right; font-family:var(--mono); font-size:.75rem; color:var(--text-muted);
+}
+.av-proj-tbl td:first-child {
+  text-align:left; font-family:var(--sans); font-size:.73rem;
+  color:var(--text); font-weight:600;
+}
+.av-proj-tbl tr.milestone-row td { background:var(--accent-dim) }
+.av-proj-tbl tr.milestone-row td:first-child { color:var(--accent) }
+.av-proj-tbl tr:last-child td { border-bottom:none; font-weight:700; color:var(--text) }
+
+/* ── FISCAL BREAKDOWN ── */
+.av-fisc-wrap {
+  background:var(--surface-2); border:1px solid var(--border-subtle);
+  border-radius:var(--r-sm); padding:1rem 1.1rem; margin-bottom:1rem;
+}
+.av-fisc-hdr {
+  display:flex; align-items:center; gap:.6rem; margin-bottom:.75rem;
+}
+.av-fisc-title {
+  font-size:.6rem; font-weight:700; color:var(--text-dim);
+  letter-spacing:.07em; text-transform:uppercase;
+}
+.av-fisc-badge {
+  font-size:.6rem; font-weight:700; padding:.15rem .5rem;
+  border-radius:100px; flex-shrink:0;
+}
+.av-fisc-badge.before { background:var(--av-rose-dim); color:var(--av-rose) }
+.av-fisc-badge.after  { background:var(--av-emerald-dim); color:var(--av-emerald) }
+
+.av-fisc-row {
+  display:flex; justify-content:space-between; align-items:baseline;
+  padding:.3rem 0; border-bottom:1px solid var(--border-subtle);
+  font-size:.78rem; color:var(--text-muted);
+}
+.av-fisc-row:last-child { border-bottom:none }
+.av-fisc-row.total {
+  font-weight:700; font-size:.82rem; color:var(--text);
+  border-top:2px solid var(--border-subtle); border-bottom:none;
+  margin-top:.25rem; padding-top:.5rem;
+}
+.av-fisc-val { font-family:var(--mono); font-weight:600; font-size:.78rem }
+.av-fisc-val.red   { color:var(--av-rose) }
+.av-fisc-val.green { color:var(--av-emerald) }
+.av-fisc-val.gold  { color:var(--av-gold) }
+.av-fisc-val.muted { color:var(--text-muted) }
+
+/* Rachat bar visuelle */
+.av-rachat-bar {
+  height:22px; border-radius:4px; overflow:hidden;
+  display:flex; margin-bottom:.65rem; gap:2px;
+}
+.av-rachat-seg {
+  height:100%; display:flex; align-items:center; justify-content:center;
+  font-size:.58rem; font-weight:700; color:#fff; overflow:hidden;
+  white-space:nowrap; padding:0 .4rem; transition:flex .5s;
+}
+.av-rachat-seg.capital  { background:var(--accent) }
+.av-rachat-seg.gains    { background:var(--av-gold-light) }
+
+/* ── TRANSMISSION / BÉNÉFICIAIRES ── */
+.av-bene-card {
+  background:var(--surface-2); border:1px solid var(--border-subtle);
+  border-radius:var(--r-sm); padding:.85rem 1rem; margin-bottom:.65rem;
+}
+.av-bene-hdr {
+  display:flex; justify-content:space-between; align-items:center;
+  margin-bottom:.6rem;
+}
+.av-bene-name { font-size:.82rem; font-weight:700; color:var(--text) }
+.av-bene-net {
+  font-size:.72rem; font-weight:700; font-family:var(--mono); color:var(--av-emerald);
+}
+.av-bene-row {
+  display:flex; justify-content:space-between; align-items:baseline;
+  font-size:.74rem; padding:.2rem 0;
+  border-bottom:1px solid var(--border-subtle); color:var(--text-muted);
+}
+.av-bene-row:last-child { border-bottom:none }
+.av-bene-row strong { color:var(--text); font-family:var(--mono) }
+
+/* Waterfall visuel */
+.av-waterfall-bar {
+  display:flex; height:14px; border-radius:3px; overflow:hidden;
+  gap:2px; margin:.45rem 0;
+}
+.av-wf-seg {
+  height:100%; transition:flex .5s; min-width:0;
+}
+.av-wf-seg.exo     { background:var(--av-emerald) }
+.av-wf-seg.abatt   { background:var(--av-gold-light) }
+.av-wf-seg.taxable { background:var(--av-rose) }
+
+.av-wf-legend {
+  display:flex; gap:.65rem; flex-wrap:wrap; margin-top:.3rem;
+}
+.av-wf-legend-item {
+  display:flex; align-items:center; gap:.3rem;
+  font-size:.65rem; color:var(--text-muted);
+}
+.av-wf-dot { width:7px; height:7px; border-radius:1px; flex-shrink:0 }
+
+/* ── ANALYSE GLOBALE — KPI cards ── */
+.av-kpi-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:.75rem; margin-bottom:1rem }
+.av-kpi-grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:.75rem; margin-bottom:1rem }
+@media(max-width:600px){
+  .av-kpi-grid-3 { grid-template-columns:1fr 1fr }
+}
+.av-kpi {
+  background:var(--surface-2); border:1.5px solid var(--border-subtle);
+  border-radius:var(--r-sm); padding:.9rem 1rem;
+}
+.av-kpi.gold   { border-color:rgba(200,168,75,.35); background:var(--av-gold-dim) }
+.av-kpi.green  { border-color:rgba(59,140,90,.25); background:rgba(59,140,90,.04) }
+.av-kpi.blue   { border-color:rgba(79,138,120,.2); background:var(--accent-dim) }
+.av-kpi.slate  { border-color:rgba(61,90,128,.2); background:var(--av-slate-dim) }
+.av-kpi-label {
+  font-size:.6rem; font-weight:700; color:var(--text-dim);
+  letter-spacing:.07em; text-transform:uppercase; margin-bottom:.4rem; display:block;
+}
+.av-kpi.gold  .av-kpi-label { color:var(--av-gold) }
+.av-kpi.green .av-kpi-label { color:var(--success) }
+.av-kpi.blue  .av-kpi-label { color:var(--accent) }
+.av-kpi.slate .av-kpi-label { color:var(--av-slate) }
+.av-kpi-val { font-size:1.25rem; font-weight:700; letter-spacing:-.04em; color:var(--text); line-height:1 }
+.av-kpi.gold  .av-kpi-val { color:var(--av-gold) }
+.av-kpi.green .av-kpi-val { color:var(--success) }
+.av-kpi.blue  .av-kpi-val { color:var(--accent) }
+.av-kpi.slate .av-kpi-val { color:var(--av-slate) }
+.av-kpi-sub { font-size:.62rem; color:var(--text-dim); margin-top:.3rem; line-height:1.4 }
+
+/* Avantage successoral */
+.av-advantage {
+  background:var(--av-gold-dim); border:1px solid rgba(200,168,75,.3);
+  border-radius:var(--r-sm); padding:.85rem 1rem; margin-bottom:1rem;
+  font-size:.78rem; color:var(--text-muted); line-height:1.65;
+}
+.av-advantage strong { color:var(--av-gold); font-weight:700 }
+
+/* Comparaison fiscale */
+.av-cmp-grid {
+  display:grid; grid-template-columns:1fr 1fr; gap:.75rem; margin-bottom:1rem;
+}
+.av-cmp-col {
+  background:var(--surface-2); border:1.5px solid var(--border-subtle);
+  border-radius:var(--r-sm); padding:.85rem;
+}
+.av-cmp-col.winner {
+  border-color:rgba(10,112,81,.3); background:var(--av-emerald-dim);
+}
+.av-cmp-col-title {
+  font-size:.6rem; font-weight:700; letter-spacing:.07em;
+  text-transform:uppercase; color:var(--text-dim); margin-bottom:.6rem;
+}
+.av-cmp-col.winner .av-cmp-col-title { color:var(--av-emerald) }
+.av-cmp-item {
+  display:flex; justify-content:space-between;
+  font-size:.74rem; padding:.22rem 0;
+  border-bottom:1px solid var(--border-subtle); color:var(--text-muted);
+}
+.av-cmp-item:last-child { border-bottom:none }
+.av-cmp-item strong { font-family:var(--mono); font-weight:600; color:var(--text) }
+.av-cmp-col.winner .av-cmp-item:last-child strong { color:var(--av-emerald) }
+
+/* ── INFO / WARN boxes ── */
+.av-info {
+  background:var(--accent-dim); border-left:3px solid var(--accent);
+  border-radius:0 var(--r-sm) var(--r-sm) 0;
+  padding:.65rem .9rem; font-size:.77rem; line-height:1.7;
+  color:var(--text-muted); margin-bottom:.85rem;
+}
+.av-info strong { color:var(--accent) }
+.av-warn {
+  background:var(--av-gold-dim); border-left:3px solid var(--av-gold-light);
+  border-radius:0 var(--r-sm) var(--r-sm) 0;
+  padding:.65rem .9rem; font-size:.77rem; line-height:1.7;
+  color:var(--text-muted); margin-bottom:.85rem;
+}
+.av-warn strong { color:var(--av-gold) }
+.av-ok {
+  background:var(--av-emerald-dim); border-left:3px solid var(--av-emerald);
+  border-radius:0 var(--r-sm) var(--r-sm) 0;
+  padding:.65rem .9rem; font-size:.77rem; line-height:1.7;
+  color:var(--text-muted); margin-bottom:.85rem;
+}
+.av-ok strong { color:var(--av-emerald) }
+
+/* ── ADVANCED OPTS accordion ── */
+details.av-adv { border-top:1px solid var(--border-subtle); padding-top:1.1rem; margin-top:1.2rem }
+details.av-adv summary {
+  list-style:none; display:flex; align-items:center; gap:.5rem;
+  font-size:.75rem; font-weight:500; color:var(--text-muted);
+  cursor:pointer; padding:.35rem .6rem; border-radius:var(--r-sm);
+  transition:all .2s; user-select:none;
+}
+details.av-adv summary:hover { color:var(--accent); background:var(--accent-dim) }
+details.av-adv summary::before { content:'▼'; font-size:.55rem; color:var(--accent); transition:transform .25s }
+details.av-adv[open] summary::before { transform:rotate(180deg) }
+details.av-adv summary::-webkit-details-marker { display:none }
+.adv-inner { padding-top:.85rem; display:flex; flex-direction:column; gap:.6rem }
+
+/* ── RANGE helpers ── */
+.range-row { display:grid; grid-template-columns:1fr 52px; gap:.5rem; align-items:center }
+.range-disp {
+  font-family:var(--mono); font-size:.72rem; font-weight:600;
+  color:var(--text-muted); text-align:right;
+}
+
+/* ── BÉNÉFICIAIRES input rows ── */
+.bene-row-inp {
+  display:grid; grid-template-columns:100px 1fr 60px;
+  gap:.5rem; align-items:end; margin-bottom:.5rem;
+}
+.bene-row-inp .field { margin:0 }
+
+/* ── PÉDAGOGIE ── */
+.av-ped-card {
+  background:var(--surface-2); border:1px solid var(--border-subtle);
+  border-radius:var(--r-sm); padding:1rem 1.1rem; margin-bottom:.75rem;
+}
+.av-ped-title {
+  font-size:.72rem; font-weight:700; color:var(--text); margin-bottom:.6rem;
+  display:flex; align-items:center; gap:.5rem;
+}
+.av-ped-num {
+  display:inline-flex; align-items:center; justify-content:center;
+  width:18px; height:18px; border-radius:50%;
+  background:var(--accent); color:#fff; font-size:.6rem; font-weight:700;
+  flex-shrink:0;
+}
+.av-ped-body { font-size:.77rem; color:var(--text-muted); line-height:1.75 }
+.av-ped-body strong { color:var(--text); font-weight:600 }
+.av-ped-body em { color:var(--accent); font-style:normal; font-weight:500 }
+.av-ped-tip {
+  margin-top:.65rem; background:var(--av-gold-dim);
+  border-radius:var(--r-sm); padding:.5rem .75rem;
+  font-size:.73rem; color:var(--av-gold); font-weight:500;
+}
+.av-ped-tip::before { content:'💡 ' }
+
+.av-disclaimer {
+  font-size:.65rem; color:var(--text-dim); font-family:var(--mono);
+  opacity:.75; margin-top:1rem; line-height:1.7;
+}
+
+.field-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:.75rem }
+@media(max-width:480px){ .field-grid-2 { grid-template-columns:1fr } }
+.section-sep {
+  height:1px; background:var(--border-subtle); margin:1.25rem 0 0;
+}
+
+/* ── BÉNÉFICIAIRES DYNAMIQUES ── */
+.av-bene-inp-card {
+  background:var(--bg); border:1px solid var(--border-subtle);
+  border-radius:var(--r-sm); padding:.65rem .75rem; margin-bottom:.5rem;
+  transition:border-color .2s;
+}
+.av-bene-inp-card:hover { border-color:var(--border) }
+.av-bene-inp-hdr {
+  display:flex; justify-content:space-between; align-items:center;
+  margin-bottom:.5rem;
+}
+.av-bene-badge-lien {
+  font-size:.6rem; font-weight:700; padding:.18rem .55rem;
+  border-radius:100px; letter-spacing:.03em;
+  transition:background .2s, color .2s;
+}
+.av-bene-del {
+  background:none; border:none; cursor:pointer;
+  color:var(--text-dim); font-size:1rem; line-height:1;
+  padding:.1rem .35rem; border-radius:4px; transition:all .15s;
+  flex-shrink:0;
+}
+.av-bene-del:hover { color:var(--av-rose); background:var(--av-rose-dim) }
+.av-bene-inp-grid {
+  display:grid; grid-template-columns:1fr 1.4fr 64px;
+  gap:.4rem; align-items:end;
+}
+.av-bene-inp-label {
+  font-size:.58rem; font-weight:700; color:var(--text-dim);
+  letter-spacing:.05em; text-transform:uppercase;
+  margin-bottom:.25rem;
+}
+input.no-spinner::-webkit-outer-spin-button,
+input.no-spinner::-webkit-inner-spin-button { -webkit-appearance:none; margin:0 }
+input.no-spinner { -moz-appearance:textfield }
+
+/* Indicateur total répartition */
+.av-bene-total {
+  font-size:.72rem; font-weight:700; text-align:center;
+  padding:.32rem .6rem; border-radius:var(--r-sm);
+  margin:.4rem 0; transition:all .25s; letter-spacing:-.01em;
+}
+.av-bene-total.ok    { background:var(--av-emerald-dim); color:var(--av-emerald) }
+.av-bene-total.over  { background:var(--av-rose-dim);    color:var(--av-rose)    }
+.av-bene-total.under { background:var(--av-gold-dim);    color:var(--av-gold)    }
+
+/* Bouton ajouter */
+.av-add-bene-btn {
+  width:100%; padding:.42rem .6rem;
+  background:transparent; border:1.5px dashed var(--border);
+  border-radius:var(--r-sm); font-size:.74rem;
+  color:var(--text-muted); cursor:pointer;
+  transition:all .2s; font-family:var(--sans); display:block;
+}
+.av-add-bene-btn:hover { border-color:var(--accent); color:var(--accent); background:var(--accent-dim) }
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="index.html" class="nav-logo"><img src="logo.png?v=3" alt="PATRIMONIA.AI" class="nav-logo-img"></a>
+  <div class="nav-right">
+    <a href="index.html" class="nav-back">
+      <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7.5 1.5L3 6l4.5 4.5"/></svg>
+      Accueil
+    </a>
+    <div class="nav-dropdown" id="mainDropdown">
+      <button class="nav-dropdown-btn" aria-expanded="false" aria-haspopup="true">
+        Simulateurs <svg class="nav-chevron" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.8" style="width:13px;height:8px;flex-shrink:0"><path d="M1 1l4 4 4-4"/></svg>
+      </button>
+      <div class="nav-dropdown-menu" id="navMenu" role="menu"></div>
+    </div>
+  </div>
+</nav>
+
+<div class="sim-page">
+  <div class="sim-page-header">
+    <span class="sim-num-badge">13</span>
+    <div>
+      <div class="sim-eyebrow">Transmission · Finance</div><h1>Assurance-<em class="gradient-text">vie</em></h1>
+      <p>Capitalisation, fiscalité des rachats, transmission successorale et analyse patrimoniale — moteur fiscal complet</p>
+    </div>
+  </div>
+
+  <div class="sim-card-wrap">
+    <div class="av-body">
+
+      <!-- ══ INPUTS ══ -->
+      <div class="av-inp">
+
+        <div class="inp-sec">Contrat</div>
+
+        <div class="field">
+          <div class="field-label"><label for="av-vi">Versement initial</label><span class="field-val" id="av-vi-disp">50 000 €</span></div>
+          <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="av-vi" value="50000"><span class="unit">€</span></div>
+          <input type="range" id="av-vi-sld" min="1000" max="500000" step="1000" value="50000">
+        </div>
+
+        <div class="field-grid-2">
+          <div class="field">
+            <div class="field-label"><label for="av-vp">Versements programmés</label></div>
+            <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="av-vp" value="200"><span class="unit">€</span></div>
+          </div>
+          <div class="field">
+            <div class="field-label"><label for="av-freq">Fréquence</label></div>
+            <div class="select-wrap">
+              <select id="av-freq">
+                <option value="0">Aucun</option>
+                <option value="1">Mensuel</option>
+                <option value="4">Trimestriel</option>
+                <option value="12" selected>Annuel</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label"><label for="av-rdt">Rendement moyen annuel</label></div>
+          <div class="range-row">
+            <input type="range" id="av-rdt" class="range-inp" min="0" max="12" step="0.1" value="4">
+            <span class="range-disp" id="av-rdt-disp">4,0 %</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label"><label for="av-fg">Frais de gestion annuels</label></div>
+          <div class="range-row">
+            <input type="range" id="av-fg" class="range-inp" min="0" max="3" step="0.05" value="0.75">
+            <span class="range-disp" id="av-fg-disp">0,75 %</span>
+          </div>
+        </div>
+
+        <div class="field-grid-2">
+          <div class="field">
+            <div class="field-label"><label for="av-duree">Durée simulation</label></div>
+            <div class="select-wrap">
+              <select id="av-duree">
+                <option value="5">5 ans</option>
+                <option value="8">8 ans</option>
+                <option value="10">10 ans</option>
+                <option value="15">15 ans</option>
+                <option value="20" selected>20 ans</option>
+                <option value="25">25 ans</option>
+                <option value="30">30 ans</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <div class="field-label"><label for="av-age">Âge actuel du contrat</label></div>
+            <div class="select-wrap">
+              <select id="av-age">
+                <option value="0" selected>Nouveau</option>
+                <option value="1">1 an</option>
+                <option value="2">2 ans</option>
+                <option value="3">3 ans</option>
+                <option value="4">4 ans</option>
+                <option value="5">5 ans</option>
+                <option value="6">6 ans</option>
+                <option value="7">7 ans</option>
+                <option value="8">8 ans +</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="field-grid-2">
+          <div class="field">
+            <div class="field-label"><label for="av-sit">Situation</label></div>
+            <div class="select-wrap">
+              <select id="av-sit">
+                <option value="celib" selected>Célibataire</option>
+                <option value="couple">Couple</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <div class="field-label"><label for="av-tmi">TMI</label></div>
+            <div class="select-wrap">
+              <select id="av-tmi">
+                <option value="0">0 %</option>
+                <option value="11">11 %</option>
+                <option value="30" selected>30 %</option>
+                <option value="41">41 %</option>
+                <option value="45">45 %</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Paramètres avancés ── -->
+        <details class="av-adv">
+          <summary>Paramètres avancés</summary>
+          <div class="adv-inner">
+            <div class="field">
+              <div class="field-label"><label for="av-fv">Frais sur versements</label></div>
+              <div class="range-row">
+                <input type="range" id="av-fv" class="range-inp" min="0" max="5" step="0.1" value="0">
+                <span class="range-disp" id="av-fv-disp">0,0 %</span>
+              </div>
+            </div>
+            <div class="field">
+              <div class="field-label"><label for="av-infl">Inflation</label></div>
+              <div class="range-row">
+                <input type="range" id="av-infl" class="range-inp" min="0" max="5" step="0.1" value="2">
+                <span class="range-disp" id="av-infl-disp">2,0 %</span>
+              </div>
+            </div>
+            <div class="field">
+              <div class="field-label"><label for="av-fe">Part fonds euros</label></div>
+              <div class="range-row">
+                <input type="range" id="av-fe" class="range-inp" min="0" max="100" step="5" value="40">
+                <span class="range-disp" id="av-fe-disp">40 %</span>
+              </div>
+            </div>
+          </div>
+        </details>
+
+        <!-- ── Simulation de rachat ── -->
+        <details class="av-adv">
+          <summary>Simulation de rachat</summary>
+          <div class="adv-inner">
+            <div class="field">
+              <div class="field-label"><label for="av-val">Valeur actuelle du contrat</label></div>
+              <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="av-val" value="75000"><span class="unit">€</span></div>
+            </div>
+            <div class="field">
+              <div class="field-label"><label for="av-gains">Dont total des gains (intérêts)</label></div>
+              <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="av-gains" value="25000"><span class="unit">€</span></div>
+            </div>
+            <div class="field">
+              <div class="field-label"><label for="av-rachat">Montant du rachat</label></div>
+              <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="av-rachat" value="10000"><span class="unit">€</span></div>
+            </div>
+            <div class="field">
+              <div class="field-label"><label for="av-opt">Option fiscale</label></div>
+              <div class="select-wrap">
+                <select id="av-opt">
+                  <option value="pfu" selected>PFU (flat tax)</option>
+                  <option value="bareme">Barème IR</option>
+                </select>
+              </div>
+            </div>
+            <div class="field">
+              <div class="field-label"><label for="av-vers-nets">Versements nets totaux</label>
+                <span class="field-hint">Pour calcul seuil 150 000 €</span>
+              </div>
+              <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="av-vers-nets" value="50000"><span class="unit">€</span></div>
+            </div>
+          </div>
+        </details>
+
+        <!-- ── Transmission ── -->
+        <details class="av-adv">
+          <summary>Transmission &amp; bénéficiaires</summary>
+          <div class="adv-inner">
+            <div class="field">
+              <div class="field-label"><label for="av-vdeces">Valeur au décès (capital transmis)</label></div>
+              <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="av-vdeces" value="120000"><span class="unit">€</span></div>
+            </div>
+            <div class="field-grid-2">
+              <div class="field">
+                <div class="field-label"><label for="av-p70a">Primes versées avant 70 ans</label></div>
+                <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="av-p70a" value="80000"><span class="unit">€</span></div>
+              </div>
+              <div class="field">
+                <div class="field-label"><label for="av-p70b">Primes versées après 70 ans</label></div>
+                <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="av-p70b" value="20000"><span class="unit">€</span></div>
+              </div>
+            </div>
+            <div class="inp-sec" style="margin-top:.75rem;margin-bottom:.5rem">Bénéficiaires</div>
+            <div id="av-bene-container"></div>
+            <div class="av-bene-total under" id="av-bene-total">Répartition : 0 %</div>
+            <button type="button" id="av-add-bene" class="av-add-bene-btn">+ Ajouter un bénéficiaire</button>
+            <!-- Démembrement -->
+            <div class="field">
+              <div class="field-label"><label for="av-demem">Clause bénéficiaire démembrée</label></div>
+              <div class="select-wrap">
+                <select id="av-demem">
+                  <option value="non" selected>Non</option>
+                  <option value="oui">Oui (usufruit / nue-propriété)</option>
+                </select>
+              </div>
+            </div>
+            <div id="wrap-demem" style="display:none">
+              <div class="field-grid-2">
+                <div class="field">
+                  <div class="field-label"><label for="av-age-usu">Âge usufruitier</label></div>
+                  <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="av-age-usu" value="65"><span class="unit">ans</span></div>
+                </div>
+                <div class="field">
+                  <div class="field-label"><label for="av-lien-usu">Lien usufruitier</label></div>
+                  <div class="select-wrap">
+                    <select id="av-lien-usu">
+                      <option value="conjoint_pacs" selected>Conjoint / PACS</option>
+                      <option value="enfant">Enfant</option>
+                      <option value="autre">Autre</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </details>
+
+      </div><!-- /av-inp -->
+
+      <!-- ══ RÉSULTATS ══ -->
+      <div class="av-res">
+
+        <!-- TABS -->
+        <div class="av-tabs">
+          <button class="av-tab active" data-panel="capitalisation">Capitalisation</button>
+          <button class="av-tab" data-panel="fiscalite">Fiscalité</button>
+          <button class="av-tab" data-panel="transmission">Transmission</button>
+          <button class="av-tab" data-panel="analyse">Analyse</button>
+          <button class="av-tab" data-panel="pedago">Pédagogie</button>
+        </div>
+
+        <!-- ─── TAB 1 : CAPITALISATION ─── -->
+        <div class="av-panel active" id="panel-capitalisation">
+          <div class="av-chart-wrap">
+            <div class="av-chart-hdr">
+              <span class="av-chart-title">Évolution du capital</span>
+              <span class="av-chart-val" id="av-val-final-chart">—</span>
+            </div>
+            <canvas class="av-canvas" id="av-canvas"></canvas>
+            <div class="av-legend">
+              <div class="av-legend-item"><div class="av-legend-dot" style="background:rgba(79,138,120,.55)"></div>Capital investi</div>
+              <div class="av-legend-item"><div class="av-legend-dot" style="background:rgba(200,168,75,.7)"></div>Intérêts nets</div>
+              <div class="av-legend-item"><div class="av-legend-dot" style="background:rgba(200,168,75,.25);border:1px dashed #C8A84B"></div>Inflation (pouvoir d'achat réel)</div>
+            </div>
+          </div>
+
+          <div id="av-timeline-wrap"></div>
+
+          <div class="av-proj-wrap">
+            <table class="av-proj-tbl">
+              <thead>
+                <tr>
+                  <th>Horizon</th>
+                  <th>Capital investi</th>
+                  <th>Valeur brute</th>
+                  <th>Intérêts nets</th>
+                  <th>Valeur réelle (inflation)</th>
+                </tr>
+              </thead>
+              <tbody id="av-proj-tbody"></tbody>
+            </table>
+          </div>
+          <div class="av-disclaimer" id="av-cap-disclaimer"></div>
+        </div>
+
+        <!-- ─── TAB 2 : FISCALITÉ ─── -->
+        <div class="av-panel" id="panel-fiscalite">
+          <div id="av-fisc-regime"></div>
+          <div id="av-fisc-rachat"></div>
+          <div id="av-fisc-comparaison"></div>
+        </div>
+
+        <!-- ─── TAB 3 : TRANSMISSION ─── -->
+        <div class="av-panel" id="panel-transmission">
+          <div id="av-trans-content"></div>
+        </div>
+
+        <!-- ─── TAB 4 : ANALYSE ─── -->
+        <div class="av-panel" id="panel-analyse">
+          <div id="av-analyse-content"></div>
+        </div>
+
+        <!-- ─── TAB 5 : PÉDAGOGIE ─── -->
+        <div class="av-panel" id="panel-pedago">
+          <div id="av-pedago-content"></div>
+        </div>
+
+      </div><!-- /av-res -->
+    </div><!-- /av-body -->
+  </div><!-- /sim-card-wrap -->
+</div><!-- /sim-page -->
+
+<script>
+/* ══════════════════════════════════════════════
+   CONSTANTES FISCALES — sources CGI / BOFiP 2024
+   ══════════════════════════════════════════════ */
+const AV = {
+  PS: 0.172,
+  PFU_AVANT8: 0.128,
+  PFU_APRES8_BAS: 0.075,    // versements ≤ 150k (CGI art. 125-0 A)
+  PFU_APRES8_HAUT: 0.128,   // versements > 150k (LFR 2017)
+  SEUIL_150K: 150000,
+  ABATT_CELIB: 4600,         // CGI art. 125-0 A après 8 ans
+  ABATT_COUPLE: 9200,
+  ABATT_990I: 152500,        // CGI art. 990 I — par bénéficiaire
+  SEUIL_990I_1: 700000,
+  TAUX_990I_1: 0.20,
+  TAUX_990I_2: 0.3125,
+  ABATT_757B: 30500,         // CGI art. 757 B — global
+  // Abattements succession classique (CGI art. 779)
+  ABATT_SUCC: {
+    conjoint_pacs: Infinity,
+    enfant: 100000,
+    frere_soeur: 15932,
+    neveu_niece: 7967,
+    autre: 1594,
+    association: 0
+  },
+  // Barème succession enfants (CGI art. 777) — seuils cumulatifs
+  TRANCHES_ENFANT: [[8072,.05],[12109,.10],[15932,.15],[552324,.20],[902838,.30],[1805677,.40],[Infinity,.45]],
+  TRANCHES_FRERE:  [[24430,.35],[Infinity,.45]],
+  TRANCHES_NEVEU:  [[Infinity,.55]],
+  TRANCHES_AUTRE:  [[Infinity,.60]],
+  TRANCHES_ASSO:   [[Infinity,.60]],
+  // Barème usufruit viager (CGI art. 762) — valeur usufruit par tranche d'âge
+  USUFRUIT_VIAGER: [[20,.90],[30,.80],[40,.70],[50,.60],[60,.50],[70,.40],[80,.30],[90,.20],[Infinity,.10]]
+};
+
+/* ══ HELPERS ══ */
+const eur = n => SP.fmtNum(n) + ' €';
+const pct = n => (n*100).toFixed(2).replace('.',',') + ' %';
+const p1  = n => n.toFixed(1).replace('.',',') + ' %';
+const abs = Math.abs;
+const clamp = (v,mn,mx) => Math.max(mn, Math.min(mx, v));
+
+/* ══ BÉNÉFICIAIRES — ÉTAT GLOBAL ══ */
+const LIEN_OPTS = [
+  { v:'conjoint_pacs', l:'Conjoint / PACS', bg:'#4F8A78' },
+  { v:'enfant',        l:'Enfant',           bg:'#B8860B' },
+  { v:'frere_soeur',   l:'Frère / Sœur',     bg:'#FF9F0A' },
+  { v:'neveu_niece',   l:'Neveu / Nièce',    bg:'#AF52DE' },
+  { v:'autre',         l:'Tiers / Autre',     bg:'#6E6E73' },
+  { v:'association',   l:'Association',        bg:'#0A7051' }
+];
+
+let beneState = [
+  { id:1, nom:'Conjoint', lien:'conjoint_pacs', quota:50 },
+  { id:2, nom:'Enfant 1', lien:'enfant',        quota:50 }
+];
+let nextBeneId = 3;
+
+function renderBeneInputs() {
+  const container = document.getElementById('av-bene-container');
+  if (!container) return;
+  container.innerHTML = beneState.map(b => {
+    const opt = LIEN_OPTS.find(o => o.v === b.lien) || LIEN_OPTS[1];
+    const selectOpts = LIEN_OPTS.map(o =>
+      `<option value="${o.v}"${o.v === b.lien ? ' selected' : ''}>${o.l}</option>`
+    ).join('');
+    const safeNom = b.nom.replace(/"/g, '&quot;');
+    return `<div class="av-bene-inp-card" data-bene-id="${b.id}">
+      <div class="av-bene-inp-hdr">
+        <span class="av-bene-badge-lien" id="bene-badge-${b.id}"
+              style="background:${opt.bg}22;color:${opt.bg}">${opt.l}</span>
+        <button class="av-bene-del" type="button" title="Supprimer"
+                onclick="deleteBene(${b.id})">×</button>
+      </div>
+      <div class="av-bene-inp-grid">
+        <div>
+          <div class="av-bene-inp-label">Nom / Libellé</div>
+          <input class="input-plain" type="text" placeholder="Nom" value="${safeNom}"
+                 oninput="updateBeneProp(${b.id},'nom',this.value)" style="width:100%">
+        </div>
+        <div>
+          <div class="av-bene-inp-label">Lien de parenté</div>
+          <div class="select-wrap">
+            <select onchange="updateBeneLien(${b.id},this.value)">${selectOpts}</select>
+          </div>
+        </div>
+        <div>
+          <div class="av-bene-inp-label">Quota</div>
+          <div class="input-wrap">
+            <input type="number" class="no-spinner" min="0" max="100" step="1"
+                   value="${b.quota}" oninput="updateBeneQuota(${b.id},this.value)"
+                   style="padding-right:1.4rem">
+            <span class="unit">%</span>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  updateBeneTotals();
+}
+
+function updateBeneTotals() {
+  const total = beneState.reduce((s, b) => s + b.quota, 0);
+  const el = document.getElementById('av-bene-total');
+  if (!el) return;
+  let cls, txt;
+  if (total === 100)      { cls='ok';    txt=`Répartition totale : 100 % ✓`; }
+  else if (total > 100)   { cls='over';  txt=`Répartition totale : ${total} % ⚠ dépassement`; }
+  else                    { cls='under'; txt=`Répartition totale : ${total} % — ${100-total} % non attribués`; }
+  el.className = `av-bene-total ${cls}`;
+  el.textContent = txt;
+}
+
+function updateBeneProp(id, field, value) {
+  const b = beneState.find(b => b.id === id);
+  if (b) { b[field] = value; renderAll(); }
+}
+
+function updateBeneQuota(id, raw) {
+  const b = beneState.find(b => b.id === id);
+  if (!b) return;
+  b.quota = Math.max(0, Math.min(100, +raw || 0));
+  updateBeneTotals();
+  renderAll();
+}
+
+function updateBeneLien(id, value) {
+  const b = beneState.find(b => b.id === id);
+  if (!b) return;
+  b.lien = value;
+  const badge = document.getElementById('bene-badge-' + id);
+  const opt = LIEN_OPTS.find(o => o.v === value);
+  if (badge && opt) {
+    badge.style.background = opt.bg + '22';
+    badge.style.color = opt.bg;
+    badge.textContent = opt.l;
+  }
+  renderAll();
+}
+
+function deleteBene(id) {
+  beneState = beneState.filter(b => b.id !== id);
+  renderBeneInputs();
+  renderAll();
+}
+
+function addBene() {
+  const used = beneState.reduce((s, b) => s + b.quota, 0);
+  beneState.push({ id: nextBeneId++, nom: '', lien: 'enfant', quota: Math.max(0, 100 - used) });
+  renderBeneInputs();
+  renderAll();
+}
+
+function calcTranches(base, tranches) {
+  let tax = 0, prev = 0;
+  for (const [limit, rate] of tranches) {
+    if (base <= prev) break;
+    const top = limit === Infinity ? base : limit;
+    tax += (Math.min(base, top) - prev) * rate;
+    prev = top;
+    if (base <= top) break;
+  }
+  return tax;
+}
+
+function calcDroitsSuccession(base, lien) {
+  const abatt = AV.ABATT_SUCC[lien] ?? 1594;
+  if (abatt === Infinity) return 0;
+  const taxable = Math.max(0, base - abatt);
+  if (taxable <= 0) return 0;
+  let tranches;
+  if (lien === 'enfant')      tranches = AV.TRANCHES_ENFANT;
+  else if (lien === 'frere_soeur') tranches = AV.TRANCHES_FRERE;
+  else if (lien === 'neveu_niece') tranches = AV.TRANCHES_NEVEU;
+  else if (lien === 'association') tranches = AV.TRANCHES_ASSO;
+  else                        tranches = AV.TRANCHES_AUTRE;
+  return calcTranches(taxable, tranches);
+}
+
+function valeurUsufruit(age) {
+  for (const [limite, val] of AV.USUFRUIT_VIAGER) {
+    if (age <= limite) return val;
+  }
+  return 0.10;
+}
+
+/* ══ READ INPUTS ══ */
+function getInputs() {
+  const n = id => SP.parseNum(document.getElementById(id).value);
+  const s = id => document.getElementById(id).value;
+  return {
+    vi: n('av-vi'),
+    vp: n('av-vp'),
+    freq: +s('av-freq'),
+    rdt: +document.getElementById('av-rdt').value / 100,
+    fg: +document.getElementById('av-fg').value / 100,
+    fv: +document.getElementById('av-fv').value / 100,
+    infl: +document.getElementById('av-infl').value / 100,
+    fe: +document.getElementById('av-fe').value / 100,
+    duree: +s('av-duree'),
+    ageContrat: +s('av-age'),
+    sit: s('av-sit'),
+    tmi: +s('av-tmi') / 100,
+    // Rachat
+    valContrat: n('av-val'),
+    totalGains: n('av-gains'),
+    montantRachat: n('av-rachat'),
+    optFisc: s('av-opt'),
+    versNets: n('av-vers-nets'),
+    // Transmission
+    vDeces: n('av-vdeces'),
+    primesA70: n('av-p70a'),
+    primesP70: n('av-p70b'),
+    benes: beneState.filter(b => b.quota > 0),
+    demem: s('av-demem'),
+    ageUsu: n('av-age-usu'),
+    lienUsu: s('av-lien-usu')
+  };
+}
+
+/* ══ MOTEUR 1 — CAPITALISATION ══ */
+function calcCapitalisation(d) {
+  const tauxNet = d.rdt - d.fg;
+  const versAnnuel = d.freq > 0 ? d.vp * d.freq : 0;
+  const history = [];
+  let capital = d.vi * (1 - d.fv);
+  let investi = d.vi;
+
+  for (let y = 1; y <= d.duree; y++) {
+    const versNet = versAnnuel * (1 - d.fv);
+    investi += versAnnuel;
+    capital += versNet;
+    capital *= (1 + tauxNet);
+    const valReel = capital / Math.pow(1 + d.infl, y);
+    history.push({
+      year: y,
+      capital: Math.round(capital),
+      investi: Math.round(investi),
+      gains: Math.round(capital - investi),
+      valReel: Math.round(valReel)
+    });
+  }
+  return history;
+}
+
+/* ══ MOTEUR 2 — FISCALITÉ RACHAT ══ */
+function calcRachat(d) {
+  const { valContrat, totalGains, montantRachat, ageContrat, sit, tmi, optFisc, versNets } = d;
+  if (montantRachat <= 0 || valContrat <= 0) return null;
+
+  const ratioGains = valContrat > 0 ? Math.min(1, totalGains / valContrat) : 0;
+  const gainsRachetes = montantRachat * ratioGains;
+  const capitalRachete = montantRachat - gainsRachetes;
+
+  const apres8 = ageContrat >= 8;
+  const abattIR = apres8 ? (sit === 'couple' ? AV.ABATT_COUPLE : AV.ABATT_CELIB) : 0;
+
+  // PS : toujours sur la totalité des gains (sans abattement)
+  const ps = gainsRachetes * AV.PS;
+
+  // Base IR après abattement
+  const gainsNetAbatt = Math.max(0, gainsRachetes - abattIR);
+
+  let ir = 0;
+  if (optFisc === 'bareme') {
+    ir = gainsNetAbatt * tmi;
+  } else if (apres8) {
+    if (versNets <= AV.SEUIL_150K) {
+      ir = gainsNetAbatt * AV.PFU_APRES8_BAS;
+    } else {
+      const ratio150 = clamp(AV.SEUIL_150K / versNets, 0, 1);
+      const partBas  = gainsNetAbatt * ratio150;
+      const partHaut = gainsNetAbatt - partBas;
+      ir = partBas * AV.PFU_APRES8_BAS + partHaut * AV.PFU_APRES8_HAUT;
+    }
+  } else {
+    ir = gainsRachetes * AV.PFU_AVANT8;
+  }
+
+  const totalFisc = ir + ps;
+  const netPercu  = montantRachat - totalFisc;
+  const txEffectif = gainsRachetes > 0 ? totalFisc / gainsRachetes : 0;
+
+  // Simulation en barème IR pour comparaison
+  const ir_bareme_alt = gainsNetAbatt * tmi;
+  const total_bareme = ir_bareme_alt + ps;
+
+  return {
+    gainsRachetes, capitalRachete, ratioGains,
+    abattIR, gainsNetAbatt,
+    ps, ir, totalFisc, netPercu, txEffectif,
+    apres8,
+    altTotal: total_bareme, altIR: ir_bareme_alt,
+    optFisc, gainsRachetes
+  };
+}
+
+/* ══ MOTEUR 3 — TRANSMISSION ══ */
+function calcTransmission(d) {
+  const { vDeces, primesA70, primesP70, benes, demem, ageUsu, lienUsu } = d;
+  const totalPrimes = primesA70 + primesP70;
+  const totalGainsContr = Math.max(0, vDeces - totalPrimes);
+  const ratioA70 = totalPrimes > 0 ? primesA70 / totalPrimes : 1;
+
+  // Base 990 I = primes avant 70 + gains attribuables aux primes avant 70
+  const base990I_total = primesA70 + totalGainsContr * ratioA70;
+  // Base 757 B = primes après 70 (hors gains qui sont exonérés)
+  const base757B_primes = primesP70;
+  const base757B_gains_exo = totalGainsContr * (1 - ratioA70);
+  // 757B taxable = max(0, primes après 70 - abattement 30 500€)
+  const taxable757B_global = Math.max(0, base757B_primes - AV.ABATT_757B);
+
+  const totalQuotaNonConjoint = benes
+    .filter(b => b.lien !== 'conjoint_pacs')
+    .reduce((s, b) => s + b.quota, 0);
+
+  // Démembrement : calcul valeur usufruit
+  let pctUsu = 0, pctNuProp = 0;
+  if (demem === 'oui') {
+    pctUsu = valeurUsufruit(ageUsu);
+    pctNuProp = 1 - pctUsu;
+  }
+
+  const results = benes.map(b => {
+    const q = b.quota / 100;
+    if (b.lien === 'conjoint_pacs') {
+      return {
+        ...b, q,
+        part990I: base990I_total * q,
+        taxe990I: 0,
+        part757B: base757B_primes * q,
+        taxe757B: 0,
+        partGainsExo: base757B_gains_exo * q,
+        totalTaxe: 0,
+        netRecu: vDeces * q,
+        exonere: true
+      };
+    }
+
+    // ─── Art. 990 I ───
+    let base990I_bene = base990I_total * q;
+    let abatt990I_bene = AV.ABATT_990I;
+
+    if (demem === 'oui') {
+      // Cas démembrement : l'abattement est fractionné selon barème viager
+      const isUsu = b.lien === lienUsu;
+      abatt990I_bene = isUsu ? AV.ABATT_990I * pctUsu : AV.ABATT_990I * pctNuProp;
+      base990I_bene  = isUsu ? base990I_total * q * pctUsu : base990I_total * q * pctNuProp;
+    }
+
+    const taxable990I = Math.max(0, base990I_bene - abatt990I_bene);
+    let taxe990I = 0;
+    if (taxable990I > 0) {
+      if (taxable990I <= AV.SEUIL_990I_1) {
+        taxe990I = taxable990I * AV.TAUX_990I_1;
+      } else {
+        taxe990I = AV.SEUIL_990I_1 * AV.TAUX_990I_1 + (taxable990I - AV.SEUIL_990I_1) * AV.TAUX_990I_2;
+      }
+    }
+
+    // ─── Art. 757 B ───
+    const qNonConj = totalQuotaNonConjoint > 0 ? b.quota / totalQuotaNonConjoint : 0;
+    const taxable757B_bene = taxable757B_global * qNonConj;
+    const taxe757B = calcDroitsSuccession(taxable757B_bene, b.lien);
+
+    const totalTaxe = taxe990I + taxe757B;
+    const netRecu   = vDeces * q - totalTaxe;
+
+    return {
+      ...b, q,
+      base990I_bene, abatt990I_bene, taxable990I, taxe990I,
+      part757B: base757B_primes * q, taxable757B_bene, taxe757B,
+      partGainsExo: base757B_gains_exo * q,
+      totalTaxe, netRecu, exonere: false
+    };
+  });
+
+  const totalTaxe = results.reduce((s, b) => s + b.totalTaxe, 0);
+  return {
+    base990I_total, base757B_primes, base757B_gains_exo,
+    taxable757B_global, totalGainsContr, totalPrimes,
+    beneficiaires: results, totalTaxe,
+    netTransmis: vDeces - totalTaxe
+  };
+}
+
+/* ══ RENDER HELPERS ══ */
+function row(label, val, cls='') {
+  return `<div class="av-fisc-row"><span>${label}</span><span class="av-fisc-val ${cls}">${val}</span></div>`;
+}
+
+/* ══ RENDER 1 — CAPITALISATION ══ */
+function renderCapitalisation(proj, d) {
+  const final = proj[proj.length - 1];
+  document.getElementById('av-val-final-chart').textContent = eur(final.capital);
+
+  // Canvas chart
+  drawCapitalChart(proj, d);
+
+  // Timeline contrat
+  renderTimeline(d);
+
+  // Projection table
+  const milestones = new Set([5,8,10,15,20,25,30].filter(y => y <= d.duree));
+  milestones.add(d.duree);
+  let rows = '';
+  for (const y of [...milestones].sort((a,b)=>a-b)) {
+    const p = proj.find(r => r.year === y) || proj[proj.length-1];
+    const isMile = y === 8;
+    rows += `<tr class="${isMile?'milestone-row':''}">
+      <td>${y} ans${isMile?' ✦':''}</td>
+      <td>${eur(p.investi)}</td>
+      <td>${eur(p.capital)}</td>
+      <td style="color:var(--av-gold-light)">${eur(p.gains)}</td>
+      <td style="color:var(--text-dim)">${eur(p.valReel)}</td>
+    </tr>`;
+  }
+  document.getElementById('av-proj-tbody').innerHTML = rows;
+
+  const tauxNet = (d.rdt - d.fg) * 100;
+  document.getElementById('av-cap-disclaimer').textContent =
+    `Hypothèses : rendement net ${tauxNet.toFixed(2).replace('.',',')} % (brut ${(d.rdt*100).toFixed(1).replace('.',',')} % - frais ${(d.fg*100).toFixed(2).replace('.',',')} %), ` +
+    `inflation ${(d.infl*100).toFixed(1).replace('.',',')} %, versements ${d.freq>0?eur(d.vp*d.freq)+'/an':'sans versement programmé'}. ` +
+    `La valeur réelle corrige le pouvoir d'achat estimé selon l'inflation. Ces projections sont indicatives.`;
+}
+
+/* ── Canvas growth chart ── */
+function drawCapitalChart(proj, d) {
+  const canvas = document.getElementById('av-canvas');
+  if (!canvas) return;
+  const dpr = window.devicePixelRatio || 1;
+  const cssW = canvas.offsetWidth || 600;
+  const cssH = 180;
+  canvas.width  = cssW * dpr;
+  canvas.height = cssH * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  const W = cssW, H = cssH;
+  const PAD = {t:12, r:16, b:30, l:62};
+
+  ctx.clearRect(0,0,W,H);
+
+  const maxVal = Math.max(...proj.map(p => p.capital), 1);
+  const n = proj.length;
+  const xS = i => PAD.l + (i / n) * (W - PAD.l - PAD.r);
+  const yS = v => PAD.t + (1 - v / maxVal) * (H - PAD.t - PAD.b);
+
+  // Draw grid lines
+  ctx.strokeStyle = 'rgba(0,0,0,.06)';
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= 4; i++) {
+    const y = PAD.t + (i / 4) * (H - PAD.t - PAD.b);
+    ctx.beginPath(); ctx.moveTo(PAD.l, y); ctx.lineTo(W - PAD.r, y); ctx.stroke();
+    const val = maxVal * (1 - i/4);
+    ctx.fillStyle = 'rgba(0,0,0,.35)';
+    ctx.font = `${10*dpr/dpr}px var(--mono,monospace)`;
+    ctx.textAlign = 'right';
+    ctx.fillText(SP.fmtNum(val), PAD.l - 5, y + 3.5);
+  }
+
+  // Capital investi area
+  ctx.beginPath();
+  ctx.moveTo(xS(0), yS(0));
+  proj.forEach((p,i) => ctx.lineTo(xS(i+1), yS(p.investi)));
+  ctx.lineTo(xS(n), yS(0));
+  ctx.closePath();
+  const gradInv = ctx.createLinearGradient(0, PAD.t, 0, H - PAD.b);
+  gradInv.addColorStop(0, 'rgba(79,138,120,.55)');
+  gradInv.addColorStop(1, 'rgba(79,138,120,.08)');
+  ctx.fillStyle = gradInv;
+  ctx.fill();
+
+  // Gains area (stacked on top)
+  ctx.beginPath();
+  ctx.moveTo(xS(0), yS(0));
+  proj.forEach((p,i) => ctx.lineTo(xS(i+1), yS(p.capital)));
+  [...proj].reverse().forEach((p,i) => ctx.lineTo(xS(n - i), yS(p.investi)));
+  ctx.closePath();
+  const gradGains = ctx.createLinearGradient(0, PAD.t, 0, H - PAD.b);
+  gradGains.addColorStop(0, 'rgba(200,168,75,.75)');
+  gradGains.addColorStop(1, 'rgba(200,168,75,.20)');
+  ctx.fillStyle = gradGains;
+  ctx.fill();
+
+  // Valeur réelle (dashed line)
+  if (d.infl > 0) {
+    ctx.beginPath();
+    ctx.setLineDash([4,4]);
+    ctx.strokeStyle = 'rgba(200,168,75,.45)';
+    ctx.lineWidth = 1.5;
+    proj.forEach((p,i) => {
+      if (i===0) ctx.moveTo(xS(i+1), yS(p.valReel));
+      else       ctx.lineTo(xS(i+1), yS(p.valReel));
+    });
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // Milestone line at year 8
+  if (8 <= d.duree) {
+    const x8 = xS(8);
+    ctx.setLineDash([5,4]);
+    ctx.strokeStyle = 'rgba(155,90,58,.5)';
+    ctx.lineWidth = 1.2;
+    ctx.beginPath(); ctx.moveTo(x8, PAD.t); ctx.lineTo(x8, H - PAD.b); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = 'rgba(155,90,58,.7)';
+    ctx.font = '9px var(--sans,sans-serif)';
+    ctx.textAlign = 'center';
+    ctx.fillText('8 ans', x8, PAD.t + 8);
+  }
+
+  // X-axis labels
+  ctx.fillStyle = 'rgba(0,0,0,.35)';
+  ctx.font = '9px var(--mono,monospace)';
+  ctx.textAlign = 'center';
+  const labelYears = [1, Math.floor(n/2), n];
+  for (const y of labelYears) {
+    const p = proj[y-1];
+    if (!p) continue;
+    ctx.fillText(y+'a', xS(y), H - PAD.b + 12);
+  }
+}
+
+/* ── Timeline contrat ── */
+function renderTimeline(d) {
+  const el = document.getElementById('av-timeline-wrap');
+  const maxAge = d.ageContrat + d.duree;
+  const pctCurrent = Math.min(1, d.ageContrat / Math.max(maxAge, 30)) * 100;
+  const pct8 = (8 / Math.max(maxAge, 30)) * 100;
+
+  const m8reached = d.ageContrat >= 8;
+
+  el.innerHTML = `
+  <div class="av-timeline">
+    <div class="av-timeline-title">Cycle de vie du contrat</div>
+    <div class="av-tl-track-wrap">
+      <div class="av-tl-track"></div>
+      <div class="av-tl-fill" style="width:${pctCurrent.toFixed(1)}%"></div>
+      <div class="av-tl-marker milestone ${m8reached?'reached':''}" style="left:${pct8.toFixed(1)}%">
+        <span>8</span>
+        <div class="av-tl-label">8 ans</div>
+      </div>
+      <div class="av-tl-marker current" style="left:${pctCurrent.toFixed(1)}%">
+        <span>▸</span>
+        <div class="av-tl-label">Aujourd'hui</div>
+      </div>
+    </div>
+    <div class="av-tl-milestones">
+      <div class="av-tl-milestone"><span>Ouverture</span>fiscalité pleine</div>
+      <div class="av-tl-milestone ${m8reached?'reached':''}"><span>8 ans</span>abattement annuel + taux réduit</div>
+      <div class="av-tl-milestone"><span>70 ans</span>changement régime successoral</div>
+    </div>
+  </div>`;
+}
+
+/* ══ RENDER 2 — FISCALITÉ ══ */
+function renderFiscalite(r, d) {
+  const regimeEl = document.getElementById('av-fisc-regime');
+  const rachatEl = document.getElementById('av-fisc-rachat');
+  const cmpEl    = document.getElementById('av-fisc-comparaison');
+
+  if (!r) {
+    regimeEl.innerHTML = '<div class="av-warn">Saisissez un montant de rachat pour obtenir le calcul fiscal détaillé.</div>';
+    rachatEl.innerHTML = '';
+    cmpEl.innerHTML = '';
+    return;
+  }
+
+  const badgeCls = r.apres8 ? 'after' : 'before';
+  const badgeTxt = r.apres8 ? 'Après 8 ans — régime favorable' : 'Avant 8 ans — régime standard';
+
+  // Quote-part intérêts
+  const qpPct = (r.ratioGains * 100).toFixed(1).replace('.',',');
+  regimeEl.innerHTML = `
+  <div class="av-fisc-wrap">
+    <div class="av-fisc-hdr">
+      <span class="av-fisc-title">Quote-part d'intérêts</span>
+      <span class="av-fisc-badge ${badgeCls}">${badgeTxt}</span>
+    </div>
+    <div class="av-rachat-bar">
+      <div class="av-rachat-seg capital" style="flex:${100-r.ratioGains*100}">Capital</div>
+      <div class="av-rachat-seg gains"   style="flex:${r.ratioGains*100}">Intérêts</div>
+    </div>
+    ${row('Montant du rachat', eur(d.montantRachat))}
+    ${row(`Capital récupéré (${(100-r.ratioGains*100).toFixed(1).replace('.',',')} %)`, eur(r.capitalRachete), 'muted')}
+    ${row(`Intérêts dans le rachat (${qpPct} %)`, eur(r.gainsRachetes), 'gold')}
+    ${r.abattIR > 0 ? row(`Abattement après 8 ans (${d.sit==='couple'?'couple':'célibataire'})`, '− '+eur(r.abattIR), 'green') : ''}
+    ${r.abattIR > 0 ? row('Base imposable IR', eur(r.gainsNetAbatt)) : ''}
+  </div>`;
+
+  // Détail fiscal
+  rachatEl.innerHTML = `
+  <div class="av-fisc-wrap">
+    <div class="av-fisc-hdr">
+      <span class="av-fisc-title">Détail fiscal — option ${d.optFisc === 'pfu' ? 'PFU' : 'barème IR'}</span>
+    </div>
+    ${row(`Prélèvements sociaux 17,2 % sur ${eur(r.gainsRachetes)}`, '− '+eur(r.ps), 'red')}
+    ${row(`IR ${d.optFisc==='pfu'? (r.apres8? (d.versNets<=AV.SEUIL_150K?'7,5 %':'7,5–12,8 %') : '12,8 %') : p1(d.tmi)} sur ${eur(r.gainsNetAbatt)}`, '− '+eur(r.ir), 'red')}
+    <div class="av-fisc-row total">${row('Fiscalité totale', '− '+eur(r.totalFisc), 'red')}</div>
+    ${row('Net perçu', eur(r.netPercu), 'green')}
+    ${row('Taux effectif sur gains', pct(r.txEffectif), 'muted')}
+  </div>`;
+
+  // Comparaison PFU vs barème
+  const winnerPFU = r.ir <= r.altIR;
+  cmpEl.innerHTML = `
+  <div class="av-cmp-grid">
+    <div class="av-cmp-col ${winnerPFU?'winner':''}">
+      <div class="av-cmp-col-title">PFU (flat tax)${winnerPFU?' ✦':''}</div>
+      <div class="av-cmp-item"><span>IR</span><strong>− ${eur(r.ir)}</strong></div>
+      <div class="av-cmp-item"><span>PS</span><strong>− ${eur(r.ps)}</strong></div>
+      <div class="av-cmp-item"><span>Net perçu</span><strong>${eur(d.montantRachat - r.ir - r.ps)}</strong></div>
+    </div>
+    <div class="av-cmp-col ${!winnerPFU?'winner':''}">
+      <div class="av-cmp-col-title">Barème IR (TMI ${p1(d.tmi)})${!winnerPFU?' ✦':''}</div>
+      <div class="av-cmp-item"><span>IR</span><strong>− ${eur(r.altIR)}</strong></div>
+      <div class="av-cmp-item"><span>PS</span><strong>− ${eur(r.ps)}</strong></div>
+      <div class="av-cmp-item"><span>Net perçu</span><strong>${eur(d.montantRachat - r.altIR - r.ps)}</strong></div>
+    </div>
+  </div>
+  <div class="av-info">
+    <strong>Option optimale :</strong> avec un TMI de ${p1(d.tmi)}, ${winnerPFU?'le PFU est plus avantageux.':'le barème IR est plus avantageux — pensez à l\'exercer lors de votre déclaration de revenus.'}
+    ${r.apres8 && d.versNets > AV.SEUIL_150K ? `<br><strong>Seuil 150 000 € dépassé :</strong> la part des versements au-delà de ${eur(AV.SEUIL_150K)} est taxée à 12,8 % au lieu de 7,5 % (CGI art. 125-0 A).` : ''}
+  </div>`;
+}
+
+/* ══ RENDER 3 — TRANSMISSION ══ */
+function renderTransmission(t, d) {
+  const el = document.getElementById('av-trans-content');
+  if (!t || d.benes.length === 0) {
+    el.innerHTML = '<div class="av-warn">Configurez les bénéficiaires dans le panneau gauche pour simuler la transmission.</div>';
+    return;
+  }
+
+  const hasPrimesP70 = d.primesP70 > 0;
+
+  let html = `
+  <div class="av-kpi-grid-3">
+    <div class="av-kpi gold">
+      <span class="av-kpi-label">Capital transmis</span>
+      <div class="av-kpi-val">${eur(d.vDeces)}</div>
+      <div class="av-kpi-sub">${eur(d.primesA70)} avant 70 ans · ${eur(d.primesP70)} après</div>
+    </div>
+    <div class="av-kpi green">
+      <span class="av-kpi-label">Net bénéficiaires</span>
+      <div class="av-kpi-val">${eur(t.netTransmis)}</div>
+      <div class="av-kpi-sub">Après toutes taxes</div>
+    </div>
+    <div class="av-kpi ${t.totalTaxe===0?'green':'blue'}">
+      <span class="av-kpi-label">Fiscalité totale</span>
+      <div class="av-kpi-val">${t.totalTaxe===0?'0 €':'− '+eur(t.totalTaxe)}</div>
+      <div class="av-kpi-sub">${t.totalTaxe===0?'Exonération totale':pct(t.totalTaxe/d.vDeces)+' du capital'}</div>
+    </div>
+  </div>`;
+
+  if (hasPrimesP70) {
+    html += `<div class="av-info">
+      <strong>Art. 757 B CGI :</strong> les ${eur(d.primesP70)} versés après 70 ans entrent dans la succession (hors gains de ${eur(t.base757B_gains_exo)} qui sont exonérés).
+      Abattement global de ${eur(AV.ABATT_757B)} partagé entre les bénéficiaires.
+      ${t.taxable757B_global===0?`<strong> → Aucune taxation 757 B</strong> (primes inférieures à l'abattement).`:`Base taxable 757 B : ${eur(t.taxable757B_global)}.`}
+    </div>`;
+  }
+
+  // Par bénéficiaire
+  for (const b of t.beneficiaires) {
+    const exo = b.exonere;
+    const totalPart = d.vDeces * b.q;
+    const wfExo   = exo ? totalPart : (b.abatt990I_bene + (b.part757B - b.taxable757B_bene));
+    const wfAbatt = exo ? 0 : (b.abatt990I_bene + Math.max(0, b.part757B - b.taxable757B_bene));
+    const wfTax   = exo ? 0 : b.totalTaxe;
+    const wfTotal = Math.max(1, wfExo + wfAbatt + wfTax + (b.partGainsExo||0));
+
+    html += `<div class="av-bene-card">
+      <div class="av-bene-hdr">
+        <span class="av-bene-name">${b.nom} <span style="font-weight:400;color:var(--text-dim);font-size:.72rem">(${b.quota} %)</span></span>
+        <span class="av-bene-net">${exo?'Exonéré':eur(b.netRecu)}</span>
+      </div>
+      <div class="av-waterfall-bar">
+        ${(b.partGainsExo||0)>0?`<div class="av-wf-seg exo" style="flex:${b.partGainsExo/wfTotal*100}"></div>`:''}
+        <div class="av-wf-seg exo"    style="flex:${exo?totalPart/wfTotal*100 : wfExo/wfTotal*100}"></div>
+        <div class="av-wf-seg abatt"  style="flex:${wfAbatt/wfTotal*100}"></div>
+        <div class="av-wf-seg taxable" style="flex:${wfTax/wfTotal*100}"></div>
+      </div>
+      <div class="av-wf-legend">
+        <span class="av-wf-legend-item"><span class="av-wf-dot" style="background:var(--av-emerald)"></span>Exonéré / hors succession</span>
+        <span class="av-wf-legend-item"><span class="av-wf-dot" style="background:var(--av-gold-light)"></span>Abattement appliqué</span>
+        <span class="av-wf-legend-item"><span class="av-wf-dot" style="background:var(--av-rose)"></span>Taxes</span>
+      </div>
+      ${exo ? `<div class="av-bene-row">Reçoit <strong>${eur(totalPart)}</strong> — <em style="color:var(--av-emerald)">Totalement exonéré (art. 796-0 bis CGI)</em></div>` : `
+      ${row990I(b, d)}
+      ${hasPrimesP70 ? row757B(b) : ''}
+      <div class="av-bene-row" style="font-weight:600"><span>Net reçu</span><strong style="color:var(--av-emerald)">${eur(b.netRecu)}</strong></div>`}
+    </div>`;
+  }
+
+  // Démembrement
+  if (d.demem === 'oui') {
+    const pctU = valeurUsufruit(d.ageUsu);
+    html += `<div class="av-ok">
+      <strong>Clause bénéficiaire démembrée</strong> — usufruitier âgé de ${d.ageUsu} ans : valeur de l'usufruit = <strong>${Math.round(pctU*100)} %</strong> du capital (barème viager, CGI art. 762).
+      L'abattement 990 I de ${eur(AV.ABATT_990I)} est réparti entre usufruitier (${eur(AV.ABATT_990I*pctU)}) et nu-propriétaire (${eur(AV.ABATT_990I*(1-pctU))}).
+      Le quasi-usufruit permet à l'usufruitier de disposer du capital, avec obligation de restitution à terme.
+    </div>`;
+  }
+
+  el.innerHTML = html;
+}
+
+function row990I(b, d) {
+  if (b.base990I_bene <= 0) return '';
+  return `
+    <div class="av-bene-row"><span>Part contrat (avant 70 ans — art. 990 I)</span><strong>${eur(b.base990I_bene)}</strong></div>
+    <div class="av-bene-row"><span>Abattement 990 I</span><strong style="color:var(--av-emerald)">− ${eur(b.abatt990I_bene)}</strong></div>
+    ${b.taxable990I > 0 ? `<div class="av-bene-row"><span>Taxable 990 I → ${b.taxable990I<=AV.SEUIL_990I_1?'20 %':'20 % puis 31,25 %'}</span><strong style="color:var(--av-rose)">− ${eur(b.taxe990I)}</strong></div>` :
+      `<div class="av-bene-row"><span>Taxable 990 I</span><strong style="color:var(--av-emerald)">Exonéré (sous abattement)</strong></div>`}`;
+}
+
+function row757B(b) {
+  if (b.part757B <= 0) return '';
+  return `
+    <div class="av-bene-row"><span>Primes après 70 ans (art. 757 B)</span><strong>${eur(b.part757B)}</strong></div>
+    ${b.partGainsExo > 0 ? `<div class="av-bene-row"><span>Gains sur primes après 70 ans</span><strong style="color:var(--av-emerald)">Exonérés : ${eur(b.partGainsExo)}</strong></div>` : ''}
+    ${b.taxe757B > 0 ? `<div class="av-bene-row"><span>Droits de succession 757 B</span><strong style="color:var(--av-rose)">− ${eur(b.taxe757B)}</strong></div>` :
+      `<div class="av-bene-row"><span>Droits 757 B</span><strong style="color:var(--av-emerald)">Sous abattement 30 500 €</strong></div>`}`;
+}
+
+/* ══ RENDER 4 — ANALYSE GLOBALE ══ */
+function renderAnalyse(proj, r, t, d) {
+  const el = document.getElementById('av-analyse-content');
+  const final = proj[proj.length - 1];
+  const tauxCroissance = d.vi > 0 ? final.capital / d.vi - 1 : 0;
+  const tauxNet = d.rdt - d.fg;
+  const tauxReel = (1 + tauxNet) / (1 + d.infl) - 1;
+  const investiTotal = final.investi;
+
+  // Avantage successoral estimé : comparer AV vs succession directe
+  const avantageSucc = t ? Math.max(0, d.vDeces - t.netTransmis) : 0;
+  const tauxTransmis = t && d.vDeces > 0 ? t.netTransmis / d.vDeces : 1;
+
+  el.innerHTML = `
+  <div class="av-kpi-grid-3">
+    <div class="av-kpi gold">
+      <span class="av-kpi-label">Valeur finale estimée</span>
+      <div class="av-kpi-val">${eur(final.capital)}</div>
+      <div class="av-kpi-sub">Après ${d.duree} ans</div>
+    </div>
+    <div class="av-kpi green">
+      <span class="av-kpi-label">Intérêts nets cumulés</span>
+      <div class="av-kpi-val">${eur(final.gains)}</div>
+      <div class="av-kpi-sub">${pct(final.gains/Math.max(1,investiTotal))} du capital investi</div>
+    </div>
+    <div class="av-kpi blue">
+      <span class="av-kpi-label">Capital total investi</span>
+      <div class="av-kpi-val">${eur(investiTotal)}</div>
+      <div class="av-kpi-sub">VI ${eur(d.vi)} + VP ${eur(investiTotal-d.vi)}</div>
+    </div>
+  </div>
+
+  <div class="av-kpi-grid-2">
+    <div class="av-kpi">
+      <span class="av-kpi-label">Rendement net annualisé</span>
+      <div class="av-kpi-val">${p1(tauxNet*100)}</div>
+      <div class="av-kpi-sub">Réel après inflation : ${p1(tauxReel*100)}</div>
+    </div>
+    <div class="av-kpi ${t&&t.totalTaxe===0?'green':''}">
+      <span class="av-kpi-label">Taux de transmission</span>
+      <div class="av-kpi-val">${t ? pct(tauxTransmis) : '—'}</div>
+      <div class="av-kpi-sub">${t ? eur(t.netTransmis)+' nets aux bénéficiaires' : 'Renseignez la transmission'}</div>
+    </div>
+  </div>
+
+  ${t ? `<div class="av-advantage">
+    <strong>Avantage successoral estimé de l'assurance-vie :</strong>
+    grâce aux art. 990 I et 757 B CGI, le contrat permet de transmettre ${eur(d.vDeces)} hors succession civile (avant 70 ans).
+    La fiscalité AV représente seulement ${pct(1 - tauxTransmis)} du capital, contre des droits de succession classiques potentiellement bien supérieurs.
+    ${t.totalTaxe === 0 ? `<br><strong>→ Aucune taxe dans votre configuration</strong> — transmission totalement exonérée.` : `<br><strong>→ Économie estimée vs droits classiques :</strong> à quantifier selon le patrimoine total.`}
+  </div>` : ''}
+
+  ${r ? `<div class="av-kpi-grid-2" style="margin-top:.25rem">
+    <div class="av-kpi">
+      <span class="av-kpi-label">Fiscalité rachat actuel</span>
+      <div class="av-kpi-val">− ${eur(r.totalFisc)}</div>
+      <div class="av-kpi-sub">Net perçu : ${eur(r.netPercu)}</div>
+    </div>
+    <div class="av-kpi ${r.apres8?'green':''}">
+      <span class="av-kpi-label">Régime fiscal</span>
+      <div class="av-kpi-val" style="font-size:.95rem">${r.apres8?'Après 8 ans ✦':'Avant 8 ans'}</div>
+      <div class="av-kpi-sub">${r.apres8?'Abattement '+eur(r.abattIR)+'/an':'Taux plein 30 %'}</div>
+    </div>
+  </div>` : ''}`;
+}
+
+/* ══ RENDER 5 — PÉDAGOGIE ══ */
+function renderPedago(proj, r, t, d) {
+  const el = document.getElementById('av-pedago-content');
+  const final = proj[proj.length - 1];
+  const apres8 = d.ageContrat >= 8;
+  const tauxNet = (d.rdt - d.fg) * 100;
+
+  const cards = [];
+
+  // Card 1 — Capitalisation
+  cards.push(`
+  <div class="av-ped-card">
+    <div class="av-ped-title"><span class="av-ped-num">1</span>Comment fonctionne la capitalisation de votre contrat</div>
+    <div class="av-ped-body">
+      Votre versement initial de <strong>${eur(d.vi)}</strong>${d.freq>0?` et vos ${eur(d.vp*d.freq)} de versements annuels`:''}
+      produisent un rendement net de <em>${p1(tauxNet)}</em> par an (après ${p1(d.fg*100)} de frais de gestion).
+      Grâce à la <strong>capitalisation des intérêts</strong>, chaque euro de gain produit à son tour des gains futurs.
+      Au bout de <strong>${d.duree} ans</strong>, le capital estimé est de <strong>${eur(final.capital)}</strong>, soit <strong>${eur(final.gains)}</strong> d'intérêts nets accumulés.
+      <div class="av-ped-tip">L'assurance-vie capitalise en franchise d'impôt : vous ne payez la fiscalité qu'au moment des rachats, pas chaque année. C'est l'un des grands avantages de l'enveloppe.</div>
+    </div>
+  </div>`);
+
+  // Card 2 — Fiscalité rachats
+  cards.push(`
+  <div class="av-ped-card">
+    <div class="av-ped-title"><span class="av-ped-num">2</span>La fiscalité des rachats : avant et après 8 ans</div>
+    <div class="av-ped-body">
+      L'assurance-vie n'est taxée que sur la <strong>quote-part d'intérêts</strong> dans chaque rachat. Le capital récupéré n'est jamais imposé.
+      <br><br><strong>Avant 8 ans :</strong> les gains sont soumis au PFU de 30 % (12,8 % IR + 17,2 % prélèvements sociaux — CGI art. 125-0 A).
+      <br><strong>Après 8 ans :</strong> un abattement annuel de <em>${eur(d.sit==='couple'?AV.ABATT_COUPLE:AV.ABATT_CELIB)}</em> s'applique sur les gains.
+      Le taux passe à 7,5 % pour les contrats dont les versements n'excèdent pas ${eur(AV.SEUIL_150K)} (sinon 12,8 % pour la part au-delà).
+      ${apres8 ? `<br><br>Votre contrat a <strong>${d.ageContrat} ans</strong> : <em>vous bénéficiez du régime favorable après 8 ans.</em>` :
+      `<br><br>Votre contrat n'a que <strong>${d.ageContrat} ans</strong> : <em>patientez jusqu'à 8 ans pour optimiser votre fiscalité.</em>`}
+      <div class="av-ped-tip">Pensez à effectuer des rachats partiels chaque année pour consommer l'abattement de ${eur(d.sit==='couple'?AV.ABATT_COUPLE:AV.ABATT_CELIB)} sans être imposé sur les gains.</div>
+    </div>
+  </div>`);
+
+  // Card 3 — Transmission avant 70 ans
+  cards.push(`
+  <div class="av-ped-card">
+    <div class="av-ped-title"><span class="av-ped-num">3</span>Art. 990 I CGI — Transmission pour les primes avant 70 ans</div>
+    <div class="av-ped-body">
+      Les primes versées <strong>avant 70 ans</strong> — et tous leurs gains — sont transmises <em>hors succession civile</em>.
+      Chaque bénéficiaire dispose d'un <strong>abattement de ${eur(AV.ABATT_990I)}</strong> (toutes AV du même assuré confondues).
+      Au-delà : <strong>20 %</strong> jusqu'à ${eur(AV.SEUIL_990I_1)} de base nette taxable, puis <strong>31,25 %</strong>.
+      Le conjoint ou partenaire PACS est <em>totalement exonéré</em>.
+      <br><br>Pour 2 enfants bénéficiaires et un capital de 305 000 €, l'abattement double (2 × ${eur(AV.ABATT_990I)}) suffit à ne payer aucune taxe.
+      <div class="av-ped-tip">L'assurance-vie est l'un des rares outils patrimoniaux permettant de transmettre jusqu'à ${eur(AV.ABATT_990I)} par bénéficiaire sans aucune fiscalité.</div>
+    </div>
+  </div>`);
+
+  // Card 4 — Transmission après 70 ans
+  cards.push(`
+  <div class="av-ped-card">
+    <div class="av-ped-title"><span class="av-ped-num">4</span>Art. 757 B CGI — Primes après 70 ans : règles différentes</div>
+    <div class="av-ped-body">
+      Les primes versées <strong>après 70 ans</strong> obéissent à un autre régime : elles entrent dans la succession civile (au-delà d'un abattement global de <strong>${eur(AV.ABATT_757B)}</strong> partagé entre tous les bénéficiaires).
+      Mais les <em>intérêts et gains</em> sur ces primes restent totalement exonérés — seul le capital prime est taxable.
+      <br><br>Exemple : si vous versez ${eur(d.primesP70)} après 70 ans, seul <strong>${eur(Math.max(0, d.primesP70 - AV.ABATT_757B))}</strong> sera soumis aux droits de succession.
+      <div class="av-ped-tip">Stratégiquement, il reste souvent pertinent d'alimenter un contrat après 70 ans car les gains s'accumulent toujours en exonération de droits successoraux.</div>
+    </div>
+  </div>`);
+
+  // Card 5 — Démembrement (si activé)
+  if (d.demem === 'oui') {
+    const pctU = valeurUsufruit(d.ageUsu);
+    cards.push(`
+    <div class="av-ped-card">
+      <div class="av-ped-title"><span class="av-ped-num">5</span>Clause bénéficiaire démembrée — quasi-usufruit</div>
+      <div class="av-ped-body">
+        Le démembrement de la clause bénéficiaire désigne un <strong>usufruitier</strong> (souvent le conjoint survivant) et un <strong>nu-propriétaire</strong> (souvent les enfants).
+        L'usufruitier âgé de <strong>${d.ageUsu} ans</strong> a une valeur fiscale de <em>${Math.round(pctU*100)} %</em> selon le barème viager (CGI art. 762).
+        <br><br>L'abattement de ${eur(AV.ABATT_990I)} est partagé : <strong>${eur(AV.ABATT_990I*pctU)}</strong> pour l'usufruitier et <strong>${eur(AV.ABATT_990I*(1-pctU))}</strong> pour le nu-propriétaire.
+        Le quasi-usufruit permet à l'usufruitier de <em>consommer le capital</em>, avec une créance de restitution inscrite au passif successoral.
+        <div class="av-ped-tip">La créance de restitution du nu-propriétaire est déductible de la succession de l'usufruitier — ce qui génère une économie fiscale supplémentaire à son décès.</div>
+      </div>
+    </div>`);
+  }
+
+  // Card 6 — Conseils stratégiques
+  const conseils = [];
+  if (!apres8) conseils.push(`Votre contrat a ${d.ageContrat} an(s). Évitez les rachats avant 8 ans sauf nécessité : vous payez 30 % sur vos gains au lieu de ${d.sit==='couple'?'9 200':'4 600'} € d'abattement par an.`);
+  if (d.tmi >= 30 && apres8) conseils.push(`À TMI ${p1(d.tmi)}, le PFU à 7,5 % est très largement avantageux par rapport au barème. Conservez l'option PFU.`);
+  if (d.versNets > AV.SEUIL_150K) conseils.push(`Vos versements dépassent ${eur(AV.SEUIL_150K)}. La part au-delà est taxée à 12,8 % et non 7,5 % — anticipez-le dans vos rachats.`);
+  if (t && t.totalTaxe === 0) conseils.push(`Votre configuration de bénéficiaires génère une transmission sans fiscalité. Maintenir cette clause est optimal.`);
+  if (d.primesP70 > AV.ABATT_757B) conseils.push(`Vos primes après 70 ans dépassent ${eur(AV.ABATT_757B)}. La fraction excédentaire de ${eur(d.primesP70-AV.ABATT_757B)} sera soumise aux droits de succession.`);
+
+  if (conseils.length > 0) {
+    cards.push(`
+    <div class="av-ped-card">
+      <div class="av-ped-title"><span class="av-ped-num">${cards.length+1}</span>Points de vigilance — votre situation</div>
+      <div class="av-ped-body">
+        <ul style="margin:.25rem 0 0 1rem;padding:0;line-height:2">
+          ${conseils.map(c=>`<li>${c}</li>`).join('')}
+        </ul>
+      </div>
+    </div>`);
+  }
+
+  el.innerHTML = cards.join('') + `
+  <div class="av-disclaimer">
+    Sources : CGI art. 125-0 A, 150-0 A, 990 I, 757 B, 762, 779, 796-0 bis — BOFiP — France Assureurs — ACPR — AMF — impots.gouv.fr.
+    Ce simulateur est fourni à titre informatif. Il ne constitue pas un conseil fiscal, juridique ou financier.
+    Consultez un conseiller en gestion de patrimoine (CGP) pour une analyse personnalisée.
+  </div>`;
+}
+
+/* ══ MAIN RENDER ══ */
+function renderAll() {
+  const d = getInputs();
+  const proj = calcCapitalisation(d);
+  const r    = d.montantRachat > 0 ? calcRachat(d) : null;
+  const t    = d.benes.length > 0  ? calcTransmission(d) : null;
+
+  renderCapitalisation(proj, d);
+  renderFiscalite(r, d);
+  renderTransmission(t, d);
+  renderAnalyse(proj, r, t, d);
+  renderPedago(proj, r, t, d);
+}
+
+/* ══ TABS ══ */
+document.querySelectorAll('.av-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.av-tab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.av-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-' + btn.dataset.panel).classList.add('active');
+    if (btn.dataset.panel === 'capitalisation') drawCapitalChart(calcCapitalisation(getInputs()), getInputs());
+  });
+});
+
+/* ══ RANGE DISPLAYS ══ */
+function linkRange(id, dispId, suffix, decimals) {
+  const el = document.getElementById(id);
+  const disp = document.getElementById(dispId);
+  function upd() {
+    const v = parseFloat(el.value);
+    disp.textContent = v.toFixed(decimals).replace('.',',') + ' ' + suffix;
+    renderAll();
+  }
+  el.addEventListener('input', upd);
+  upd();
+}
+
+/* ══ SLIDER (versement initial) ══ */
+function linkSlider(inputId, sliderId, dispId) {
+  const inp  = document.getElementById(inputId);
+  const sld  = document.getElementById(sliderId);
+  const disp = dispId ? document.getElementById(dispId) : null;
+  function fromInput() {
+    const n = SP.parseNum(inp.value);
+    if (n >= +sld.min && n <= +sld.max) {
+      sld.value = n;
+      const p = (n - +sld.min) / (+sld.max - +sld.min) * 100;
+      sld.style.setProperty('--pct', p.toFixed(1) + '%');
+    }
+    if (disp) disp.textContent = SP.fmtNum(n) + ' €';
+    renderAll();
+  }
+  function fromSlider() {
+    SP.setVal(inp, +sld.value);
+    const p = (+sld.value - +sld.min) / (+sld.max - +sld.min) * 100;
+    sld.style.setProperty('--pct', p.toFixed(1) + '%');
+    if (disp) disp.textContent = SP.fmtNum(+sld.value) + ' €';
+    renderAll();
+  }
+  inp.addEventListener('input', fromInput);
+  inp.addEventListener('blur', fromInput);
+  sld.addEventListener('input', fromSlider);
+  fromInput();
+}
+
+/* ══ DÉMEMBREMENT toggle ══ */
+document.getElementById('av-demem').addEventListener('change', function() {
+  document.getElementById('wrap-demem').style.display = this.value === 'oui' ? '' : 'none';
+  renderAll();
+});
+
+/* ══ INIT ══ */
+document.addEventListener('DOMContentLoaded', () => {
+  SP.initFmt(document);
+
+  // Initialise les cartes bénéficiaires dynamiques
+  renderBeneInputs();
+
+  // Bouton ajouter un bénéficiaire
+  document.getElementById('av-add-bene').addEventListener('click', addBene);
+
+  linkSlider('av-vi', 'av-vi-sld', 'av-vi-disp');
+  linkRange('av-rdt',  'av-rdt-disp',  '%', 1);
+  linkRange('av-fg',   'av-fg-disp',   '%', 2);
+  linkRange('av-fv',   'av-fv-disp',   '%', 1);
+  linkRange('av-infl', 'av-infl-disp', '%', 1);
+  linkRange('av-fe',   'av-fe-disp',   '%', 0);
+
+  // Écoute tous les champs statiques (hors bénéficiaires gérés via état global)
+  document.querySelectorAll('select:not(.bene-select), input[data-fmt], input[type=text]:not(.bene-inp)').forEach(el => {
+    el.addEventListener('change', renderAll);
+    el.addEventListener('input',  renderAll);
+  });
+
+  renderAll();
+});
+
+/* Menu déroulant catégorisé — voir shared-nav.js */
+SP.nav.init();
+</script>
+</body>
+</html>

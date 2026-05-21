@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="favicon-64.png">
+  <link rel="shortcut icon" href="favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="favicon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crédit Immobilier — PATRIMONIA.AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css?v=19">
+<script src="shared.js?v=2"></script>
+  <script src="shared-nav.js?v=6"></script>
+<style>
+
+/* Type selector */
+.c-type-row{display:flex;gap:.35rem;flex-wrap:wrap;margin-top:.4rem}
+.c-type-opt{display:flex;align-items:center;gap:.3rem;font-size:.69rem;font-family:var(--mono);color:var(--text-muted);cursor:pointer;padding:.22rem .7rem;border:1px solid var(--border);border-radius:100px;transition:all .15s;user-select:none}
+.c-type-opt input{display:none}
+.c-type-opt:has(input:checked){background:var(--accent-dim);border-color:var(--accent);color:var(--accent);font-weight:600}
+.c-hint{font-size:.63rem;color:var(--text-dim);font-family:var(--mono);line-height:1.5;margin-top:.3rem;opacity:.85}
+
+/* Phase boxes */
+.c-phase-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+.c-phase-box{background:var(--surface-2);border:1px solid var(--border-subtle);border-radius:var(--r-sm);padding:.75rem .9rem}
+.c-phase-label{font-size:.6rem;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.25rem}
+.c-phase-val{font-family:var(--mono);font-size:.92rem;font-weight:700;color:var(--text);letter-spacing:-.03em}
+.c-phase-sub{font-size:.62rem;color:var(--text-dim);margin-top:.1rem;font-family:var(--mono)}
+.c-phase-val.blue{color:var(--blue)}
+.c-phase-val.amber{color:var(--amber)}
+
+/* In fine alert */
+.c-infine-note{background:var(--amber-dim);border:1px solid rgba(255,159,10,.25);border-radius:var(--r-sm);padding:.7rem .9rem;font-size:.72rem;color:var(--text-muted);line-height:1.5}
+.c-infine-note strong{color:var(--amber)}
+
+/* Amort toggle */
+.amort-toggle-btn{display:flex;align-items:center;justify-content:space-between;gap:.6rem;width:100%;background:var(--surface-2);border:1px solid var(--border-subtle);border-radius:var(--r-sm);padding:.85rem 1.15rem;color:var(--text-muted);font-size:.8rem;font-weight:500;cursor:pointer;font-family:var(--sans);text-align:left;transition:border-color .18s,color .18s}
+.amort-toggle-btn:hover{border-color:var(--border);color:var(--text)}
+.amort-toggle-btn.open{border-color:var(--accent);color:var(--accent)}
+.amort-toggle-chevron{transition:transform .22s;flex-shrink:0}
+.amort-toggle-btn.open .amort-toggle-chevron{transform:rotate(180deg)}
+.amort-full-wrap{margin-top:.5rem}
+.amort-full-wrap .amort-table-wrap{max-height:580px;overflow-y:auto;overflow-x:auto;border-radius:var(--r-sm)}
+#amort-table thead th{position:sticky;top:0;z-index:2;background:var(--surface-2)}
+.amort-year-row>td{background:rgba(255,255,255,.03);font-size:.62rem;font-weight:700;color:var(--text-dim);letter-spacing:.08em;text-transform:uppercase;padding:.28rem .75rem;border-bottom:none;border-top:1px solid var(--border-subtle)}
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="index.html" class="nav-logo"><img src="logo.png?v=3" alt="PATRIMONIA.AI" class="nav-logo-img"></a>
+  <div class="nav-right">
+    <a href="index.html" class="nav-back">
+      <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7.5 1.5L3 6l4.5 4.5"/></svg>
+      Accueil
+    </a>
+    <div class="nav-dropdown" id="mainDropdown">
+      <button class="nav-dropdown-btn" aria-expanded="false" aria-haspopup="true">
+        Simulateurs <svg class="nav-chevron" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.8" style="width:13px;height:8px;flex-shrink:0"><path d="M1 1l4 4 4-4"/></svg>
+      </button>
+      <div class="nav-dropdown-menu" id="navMenu" role="menu"></div>
+    </div>
+  </div>
+</nav>
+
+<div class="sim-page">
+  <div class="sim-page-header">
+    <span class="sim-num-badge">01</span>
+    <div>
+      <div class="sim-eyebrow">Immobilier</div><h1>Crédit <em class="gradient-text">Immobilier</em></h1>
+      <p>Amortissable · Différé partiel · Différé total · In fine · TAEG actuariel</p>
+    </div>
+  </div>
+
+  <div class="sim-card-wrap">
+    <div class="sim-body">
+
+      <div class="inputs-panel">
+
+        <!-- TYPE DE CRÉDIT -->
+        <div class="field">
+          <div class="field-label"><label>Type de crédit</label></div>
+          <div class="c-type-row">
+            <label class="c-type-opt"><input type="radio" name="c-type" value="amort" checked> Amortissable</label>
+            <label class="c-type-opt"><input type="radio" name="c-type" value="dif-partiel"> Différé partiel</label>
+            <label class="c-type-opt"><input type="radio" name="c-type" value="dif-total"> Différé total</label>
+            <label class="c-type-opt"><input type="radio" name="c-type" value="infine"> In fine</label>
+          </div>
+          <div class="c-hint" id="c-type-desc">Mensualités constantes incluant capital et intérêts. Le capital remboursé augmente chaque mois à mesure que les intérêts diminuent.</div>
+        </div>
+
+        <!-- DURÉE DU DIFFÉRÉ (conditionnelle) -->
+        <div class="field" id="c-differe-wrap" style="display:none">
+          <div class="field-label">
+            <label for="c-differe">Durée du différé</label>
+            <span class="field-val" id="c-differe-disp">12 mois</span>
+          </div>
+          <div class="input-wrap"><input type="number" id="c-differe" value="12" min="1" max="36" step="1"><span class="unit">mois</span></div>
+          <input type="range" id="c-differe-s" min="1" max="36" step="1" value="12">
+        </div>
+
+        <div class="section-sep"></div>
+
+        <div class="field">
+          <div class="field-label">
+            <label for="c-montant">Montant emprunté</label>
+            <span class="field-val" id="c-montant-disp">200 000 €</span>
+          </div>
+          <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="c-montant" value="200000" min="0" max="5000000" step="1000"><span class="unit">€</span></div>
+          <input type="range" id="c-montant-s" min="10000" max="2000000" step="1000" value="200000">
+        </div>
+
+        <div class="field">
+          <div class="field-label">
+            <label for="c-apport">Apport personnel</label>
+            <span class="field-val" id="c-apport-disp">0 €</span>
+          </div>
+          <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="c-apport" value="0" min="0" max="3000000" step="1000"><span class="unit">€</span></div>
+          <input type="range" id="c-apport-s" min="0" max="500000" step="1000" value="0">
+        </div>
+
+        <div class="field">
+          <div class="field-label">
+            <label for="c-taux">Taux annuel (hors assurance)</label>
+            <span class="field-val" id="c-taux-disp">3,50 %</span>
+          </div>
+          <div class="input-wrap"><input type="number" id="c-taux" value="3.50" min="0" max="15" step="0.01"><span class="unit">%</span></div>
+          <input type="range" id="c-taux-s" min="0" max="8" step="0.01" value="3.50">
+        </div>
+
+        <div class="field">
+          <div class="field-label">
+            <label for="c-duree">Durée totale du crédit</label>
+            <span class="field-val" id="c-duree-disp">20 ans</span>
+          </div>
+          <div class="input-wrap"><input type="number" id="c-duree" value="20" min="1" max="30" step="1"><span class="unit">ans</span></div>
+          <input type="range" id="c-duree-s" min="1" max="30" step="1" value="20">
+        </div>
+
+        <div class="section-sep"></div>
+
+        <div class="field">
+          <div class="field-label">
+            <label for="c-assur">Taux assurance annuel</label>
+            <span class="field-val" id="c-assur-disp">0,36 %</span>
+          </div>
+          <div class="input-wrap"><input type="number" id="c-assur" value="0.36" min="0" max="3" step="0.01"><span class="unit">%</span></div>
+          <input type="range" id="c-assur-s" min="0" max="1.5" step="0.01" value="0.36">
+          <div class="c-hint">Calculée sur le capital initial · Assurance décès-invalidité standard.</div>
+        </div>
+
+        <div style="font-size:.61rem;color:var(--text-dim);line-height:1.7;font-family:var(--mono);margin-top:1.2rem;opacity:.7">
+          <div>TAEG calculé par méthode actuarielle (IRR)</div>
+          <div>Simulation hors frais de dossier et garanties</div>
+          <div>Résultats non contractuels</div>
+        </div>
+
+      </div><!-- /inputs-panel -->
+
+      <div class="results-panel" id="credit-results"></div>
+
+    </div><!-- /sim-body -->
+
+    <!-- TABLEAU D'AMORTISSEMENT -->
+    <div class="amort-section" id="amort-section">
+      <button class="amort-toggle-btn" id="amort-toggle-btn" onclick="toggleAmort()">
+        <span class="amort-toggle-label">Voir le tableau d'amortissement complet</span>
+        <svg class="amort-toggle-chevron" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.8" style="width:14px;height:9px"><path d="M1 1l4 4 4-4"/></svg>
+      </button>
+      <div class="amort-full-wrap" id="amort-full-wrap" style="display:none">
+        <div class="amort-table-wrap">
+          <table id="amort-table">
+            <thead id="amort-thead"><tr><th>#</th><th>An</th><th>Mensualité</th><th>Intérêts</th><th>Capital</th><th>Capital restant dû</th></tr></thead>
+            <tbody id="amort-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <span>PATRIMONIA.AI</span> — Simulation indicative à titre informatif uniquement.<br>
+  TAEG actuariel · Résultats non contractuels · Vérifiez les conditions auprès de votre établissement.
+</footer>
+
+<script>
+const fmtNum = (v, d=0) => new Intl.NumberFormat('fr-FR',{minimumFractionDigits:d,maximumFractionDigits:d}).format(v).replace(/[\u202F\u00A0]/g,' ');
+const fmtEur = (v, d=0) => fmtNum(v, d) + ' €';
+
+/* ── Amort state ── */
+let _schedule = [], _Massur = 0, _showPhase = false, _amortVisible = false, _creditType = 'amort';
+
+/* ── Helpers ── */
+function annuite(principal, r, n) {
+  if (n <= 0) return 0;
+  if (r === 0) return principal / n;
+  return principal * r * Math.pow(1+r,n) / (Math.pow(1+r,n) - 1);
+}
+
+/* ── TAEG actuariel (IRR mensuel → taux annuel effectif) ── */
+function calcTAEG(principal, payments) {
+  if (principal <= 0 || payments.length === 0) return 0;
+  let lo = 0, hi = 0.5;
+  for (let i = 0; i < 300; i++) {
+    const m = (lo + hi) / 2;
+    let pv = 0;
+    for (let t = 0; t < payments.length; t++) pv += payments[t] / Math.pow(1+m, t+1);
+    if (pv > principal) lo = m; else hi = m;
+  }
+  return (Math.pow(1 + (lo+hi)/2, 12) - 1) * 100;
+}
+
+/* ── Slider sync ── */
+function syncSlider(numId, sldId, dispId, fmt) {
+  const num = document.getElementById(numId);
+  const sld = document.getElementById(sldId);
+  const disp = document.getElementById(dispId);
+  function setPct() {
+    const min=parseFloat(sld.min)||0, max=parseFloat(sld.max)||100;
+    const val=Math.min(Math.max(parseFloat(sld.value)||0,min),max);
+    sld.style.setProperty('--pct', ((val-min)/(max-min)*100).toFixed(1)+'%');
+  }
+  function onNum() {
+    const v=SP.parseNum(num.value);
+    sld.value=Math.min(Math.max(v,parseFloat(sld.min)||0),parseFloat(sld.max)||100);
+    setPct(); if(disp) disp.textContent=fmt(v);
+  }
+  function onSld() {
+    SP.setVal(num, parseFloat(sld.value)||0);
+    if(disp) disp.textContent=fmt(parseFloat(sld.value)||0);
+    setPct();
+  }
+  num.addEventListener('input', onNum);
+  sld.addEventListener('input', onSld);
+  setPct();
+  if(disp) disp.textContent=fmt(SP.parseNum(num.value)||0);
+}
+
+/* ══════════════════════════════════════════
+   TEXTE PÉDAGOGIQUE — analyse qualitative
+══════════════════════════════════════════ */
+function buildPedagoText({type, P, apport, ra, duree, n, k, M2, Massur, coutCredit, coutAssur, coutTotal, prixBien, tauxApport, P2}) {
+  if (P <= 0) return '';
+
+  // ── Qualifications du taux ──
+  const tauxQual = ra === 0
+    ? 'un taux à 0 % (cas théorique ou prêt aidé)'
+    : ra < 2.5
+      ? `un taux de <strong>${fmtNum(ra,2)} %</strong>, particulièrement compétitif sur le marché actuel`
+      : ra < 3.5
+        ? `un taux de <strong>${fmtNum(ra,2)} %</strong>, dans la moyenne basse des crédits immobiliers actuels`
+        : ra < 4.5
+          ? `un taux de <strong>${fmtNum(ra,2)} %</strong>, légèrement au-dessus de la moyenne 2025 — négocier 0,2 à 0,5 point peut faire une différence sensible`
+          : `un taux de <strong>${fmtNum(ra,2)} %</strong>, élevé pour un crédit immobilier — chaque dixième de point compte à ce niveau`;
+
+  // ── Qualification de la durée ──
+  const dureeQual = duree <= 10
+    ? `une durée courte de <strong>${duree} ans</strong> : les mensualités sont élevées mais le coût total des intérêts reste maîtrisé`
+    : duree <= 15
+      ? `une durée de <strong>${duree} ans</strong>, équilibrée entre effort mensuel et coût total`
+      : duree <= 20
+        ? `une durée de <strong>${duree} ans</strong>, la plus fréquente en France — bon compromis mensualité / coût global`
+        : duree <= 25
+          ? `une durée longue de <strong>${duree} ans</strong> : les mensualités sont allégées, mais le coût des intérêts augmente significativement`
+          : `une durée très longue de <strong>${duree} ans</strong> — les mensualités restent accessibles mais le coût total des intérêts dépasse souvent 50 % du capital`;
+
+  // ── Ratio intérêts / capital ──
+  const ratioInterets = P > 0 ? (coutCredit / P * 100) : 0;
+  const ratioQual = ratioInterets < 10
+    ? `représente moins de 10 % du capital emprunté — coût du crédit très limité`
+    : ratioInterets < 25
+      ? `représente ${fmtNum(ratioInterets,0)} % du capital emprunté — coût maîtrisé`
+      : ratioInterets < 50
+        ? `représente ${fmtNum(ratioInterets,0)} % du capital emprunté — impact significatif à anticiper`
+        : `représente ${fmtNum(ratioInterets,0)} % du capital emprunté — le crédit coûte autant que la moitié du bien financé`;
+
+  // ── Assurance ──
+  let assurText = '';
+  if (Massur > 0) {
+    const pctAssur = coutTotal > 0 ? (coutAssur / coutTotal * 100) : 0;
+    assurText = pctAssur > 20
+      ? `L'assurance emprunteur, calculée à <strong>${fmtNum(Massur * 12 / P * 100, 2)} % annuel</strong> sur le capital, représente <strong>${fmtEur(coutAssur, 0)}</strong> sur la durée totale — soit ${fmtNum(pctAssur, 0)} % du coût global. À ce niveau, comparer les offres d'assurance déléguée peut générer une économie substantielle.`
+      : `L'assurance emprunteur s'élève à <strong>${fmtEur(coutAssur, 0)}</strong> sur <strong>${duree} ans</strong>, soit ${fmtNum(pctAssur, 0)} % du coût total du financement.`;
+  } else {
+    assurText = `Aucune assurance n'a été saisie. En pratique, toute banque exige une assurance décès-invalidité — comptez généralement entre 0,20 % et 0,50 % du capital par an selon votre profil.`;
+  }
+
+  // ── Apport ──
+  let apportText = '';
+  if (apport > 0) {
+    apportText = tauxApport >= 20
+      ? `Avec un apport de <strong>${fmtEur(apport, 0)}</strong> (${fmtNum(tauxApport, 1)} % du bien), vous présentez un dossier solide : au-delà de 20 % d'apport, les banques proposent généralement leurs meilleures conditions.`
+      : tauxApport >= 10
+        ? `Votre apport de <strong>${fmtEur(apport, 0)}</strong> représente ${fmtNum(tauxApport, 1)} % du bien, ce qui couvre a minima les frais de notaire et de garantie.`
+        : `Votre apport de <strong>${fmtEur(apport, 0)}</strong> est modeste (${fmtNum(tauxApport, 1)} % du bien). Certaines banques peuvent exiger 10 % minimum — prévoyez au moins de couvrir les frais annexes.`;
+  }
+
+  // ── Paragraphe principal adapté au type ──
+  let mainPara = '';
+  const mensHT = fmtEur(M2, 2);
+  const mensTC = fmtEur(M2 + Massur, 2);
+
+  if (type === 'amort') {
+    mainPara = `Sur ${duree} ans, vous remboursez <strong>${mensTC}/mois</strong> (dont ${mensHT} hors assurance). Au total, le crédit vous coûte <strong>${fmtEur(coutCredit, 0)} d'intérêts</strong>, ce qui ${ratioQual}. Les premières mensualités sont très majoritairement composées d'intérêts ; la part de capital remboursée s'accélère progressivement, surtout dans la seconde moitié du prêt.`;
+
+  } else if (type === 'dif-partiel') {
+    const kAns = k >= 12 ? `${Math.floor(k/12)} an${Math.floor(k/12)>1?'s':''}` : `${k} mois`;
+    mainPara = `Pendant la phase de différé (${kAns}), vous ne remboursez que les intérêts, soit <strong>${fmtEur(M2, 2)}/mois</strong> — le capital reste intact. À l'issue du différé, la mensualité passe à <strong>${fmtEur(M2 + Massur, 2)}</strong>, ce qui implique des échéances plus élevées que dans un amortissable classique sur la même durée. Le surcoût lié au différé est de <strong>${fmtEur(k * (M2 + Massur), 0)}</strong> supplémentaires en intérêts, en échange d'une meilleure trésorerie à court terme.`;
+
+  } else if (type === 'dif-total') {
+    const intCap = P2 - P;
+    mainPara = `Pendant la phase de différé total (${k} mois), aucune mensualité n'est due — mais les intérêts <em>s'accumulent</em> et s'ajoutent au capital initial. Résultat : vous amortissez non plus <strong>${fmtEur(P, 0)}</strong> mais <strong>${fmtEur(P2, 0)}</strong>, soit <strong>${fmtEur(intCap, 0)} de plus</strong> dès la mise en place. Ce mécanisme de capitalisation génère des intérêts sur des intérêts et peut alourdir le coût total de manière substantielle — il s'utilise surtout lorsqu'aucune rentrée de trésorerie n'est possible pendant les premiers mois (VEFA, travaux, etc.).`;
+
+  } else if (type === 'infine') {
+    mainPara = `Dans ce montage, vous payez chaque mois <strong>${mensTC}</strong> d'intérêts purs (${mensHT} hors assurance) — le capital de <strong>${fmtEur(P, 0)}</strong> n'est jamais entamé. À l'échéance des <strong>${duree} ans</strong>, vous devez rembourser la totalité en une seule fois. Le coût total des intérêts atteint <strong>${fmtEur(coutCredit, 0)}</strong>, supérieur à un crédit amortissable équivalent. Ce type de prêt est réservé aux investisseurs disposant d'un placement adossé (assurance-vie, SCPI en nantissement) destiné à financer le remboursement final.`;
+  }
+
+  // ── Assemblage HTML ──
+  return `
+    <div class="pedago-card animate">
+      <div class="pedago-card-header">
+        <div class="pedago-card-dot"></div>
+        <div class="pedago-card-title">Analyse du financement</div>
+      </div>
+      <div class="pedago-card-body">
+        <p class="pedago-p">Vous simulez ${tauxQual}, sur ${dureeQual}.</p>
+        <p class="pedago-p">${mainPara}</p>
+        ${apportText ? `<p class="pedago-p">${apportText}</p>` : ''}
+        <p class="pedago-p">${assurText}</p>
+        <p class="pedago-dim">Le montant total décaissé sur la durée du prêt s'élève à <strong>${fmtEur(P + coutTotal, 0)}</strong> — pour un capital financé de <strong>${fmtEur(P, 0)}</strong>.</p>
+      </div>
+    </div>`;
+}
+
+/* ══════════════════════════════════════════
+   CALCUL PRINCIPAL
+══════════════════════════════════════════ */
+const TYPE_DESC = {
+  'amort':       'Mensualités constantes incluant capital et intérêts. Le capital remboursé augmente chaque mois à mesure que les intérêts diminuent.',
+  'dif-partiel': 'Phase 1 : intérêts seuls remboursés pendant le différé (capital inchangé). Phase 2 : amortissement classique sur la durée restante.',
+  'dif-total':   'Phase 1 : aucun paiement — les intérêts s\'accumulent et s\'ajoutent au capital (capitalisation). Phase 2 : amortissement sur capital augmenté.',
+  'infine':      'Intérêts seuls remboursés chaque mois sur toute la durée. Le capital emprunté est remboursé intégralement en une seule fois à l\'échéance.'
+};
+
+function calcCredit() {
+  const P      = SP.parseNum(document.getElementById('c-montant').value);
+  const apport = SP.parseNum(document.getElementById('c-apport').value);
+  const ra     = parseFloat(document.getElementById('c-taux').value) || 0;
+  const duree  = Math.round(parseFloat(document.getElementById('c-duree').value) || 1);
+  const ta     = parseFloat(document.getElementById('c-assur').value) || 0;
+  const type   = document.querySelector('input[name="c-type"]:checked')?.value || 'amort';
+
+  const hasDiffere = type === 'dif-partiel' || type === 'dif-total';
+  document.getElementById('c-differe-wrap').style.display = hasDiffere ? 'block' : 'none';
+  document.getElementById('c-type-desc').textContent = TYPE_DESC[type];
+
+  const n      = duree * 12;
+  const r      = ra / 100 / 12;
+  const Massur = P * (ta / 100 / 12);
+
+  // Durée différé (cappée à n-1)
+  const kRaw = hasDiffere ? Math.round(parseFloat(document.getElementById('c-differe').value) || 0) : 0;
+  const k    = Math.min(kRaw, n - 1);
+
+  const prixBien   = P + apport;
+  const tauxApport = prixBien > 0 ? apport / prixBien * 100 : 0;
+
+  /* ────────────────────────────────────────
+     SCHEDULE CONSTRUCTION + MÉTRIQUES
+  ──────────────────────────────────────── */
+  let schedule = []; // {mois, mens, interets, capital, solde, phase}
+  let M1 = 0, M2 = 0, P2 = P;
+  let coutCredit = 0;
+
+  if (type === 'amort') {
+    /*
+     * Annuité constante :
+     *   M = P · r · (1+r)^n / ((1+r)^n − 1)
+     * Chaque mois :
+     *   intérêts_t = solde_{t-1} · r
+     *   capital_t  = M − intérêts_t
+     *   solde_t    = solde_{t-1} − capital_t
+     */
+    M2 = annuite(P, r, n);
+    let solde = P;
+    for (let i = 1; i <= n; i++) {
+      const interets = solde * r;
+      const capital  = M2 - interets;
+      solde = Math.max(0, solde - capital);
+      schedule.push({mois:i, mens:M2, interets, capital, solde, phase:'Amort.'});
+    }
+    coutCredit = M2 * n - P;
+
+  } else if (type === 'dif-partiel') {
+    /*
+     * Différé partiel (franchise d'amortissement) :
+     *   Phase 1 (k mois) : M₁ = P · r   [intérêts purs, capital non remboursé]
+     *   Phase 2 (n−k mois) : M₂ = annuité(P, r, n−k)  [amortissement sur P]
+     *
+     * Capital restant = P inchangé pendant toute la phase 1.
+     * Surcoût vs amortissable pur = k × M₁ + (n−k)·M₂ − P  [> M_amort · n − P]
+     */
+    M1 = r > 0 ? P * r : 0;
+    const n2 = n - k;
+    M2 = annuite(P, r, n2);
+
+    for (let i = 1; i <= k; i++) {
+      schedule.push({mois:i, mens:M1, interets:M1, capital:0, solde:P, phase:'Différé'});
+    }
+    let solde = P;
+    for (let i = k+1; i <= n; i++) {
+      const interets = solde * r;
+      const capital  = M2 - interets;
+      solde = Math.max(0, solde - capital);
+      schedule.push({mois:i, mens:M2, interets, capital, solde, phase:'Amort.'});
+    }
+    coutCredit = M1 * k + M2 * (n - k) - P;
+
+  } else if (type === 'dif-total') {
+    /*
+     * Différé total (franchise totale / capitalisation des intérêts) :
+     *   Phase 1 (k mois) : aucun paiement — intérêts capitalisés chaque mois
+     *     solde_t = solde_{t-1} · (1+r)   →  après k mois : P₂ = P · (1+r)^k
+     *   Phase 2 (n−k mois) : M₂ = annuité(P₂, r, n−k)
+     *
+     * Surcoût majeur : les intérêts du différé s'ajoutent au capital
+     * et génèrent eux-mêmes des intérêts sur toute la phase 2.
+     */
+    P2 = P * Math.pow(1+r, k);
+    M1 = 0;
+    const n2 = n - k;
+    M2 = annuite(P2, r, n2);
+
+    let solde = P;
+    for (let i = 1; i <= k; i++) {
+      const interetsCap = solde * r;
+      solde = solde * (1 + r);
+      schedule.push({mois:i, mens:0, interets:interetsCap, capital:0, solde, phase:'Diff. total'});
+    }
+    for (let i = k+1; i <= n; i++) {
+      const interets = solde * r;
+      const capital  = M2 - interets;
+      solde = Math.max(0, solde - capital);
+      schedule.push({mois:i, mens:M2, interets, capital, solde, phase:'Amort.'});
+    }
+    // Coût total intérêts = capital final remboursé − capital initial
+    coutCredit = M2 * (n - k) - P;
+
+  } else if (type === 'infine') {
+    /*
+     * In fine :
+     *   Mensualité courante = P · r  [intérêts sur capital plein, constant]
+     *   Dernière échéance   = P · r + P  [intérêts + remboursement intégral du capital]
+     *
+     * Le capital ne diminue jamais : P · r reste constant sur toute la durée.
+     * Adapté aux investissements dont le capital est placé en parallèle (assurance-vie,
+     * SCPI...) pour rembourser le prêt à terme.
+     */
+    M2 = r > 0 ? P * r : 0;
+    for (let i = 1; i <= n; i++) {
+      const isLast  = i === n;
+      const capital = isLast ? P : 0;
+      const mens    = isLast ? M2 + P : M2;
+      schedule.push({mois:i, mens, interets:M2, capital, solde:isLast?0:P, phase:'In fine'});
+    }
+    coutCredit = M2 * n;
+  }
+
+  const coutAssur = Massur * n;
+  const coutTotal = coutCredit + coutAssur;
+
+  // ── TAEG (IRR actuariel sur flux réels) ──
+  let taegPayments;
+  if (type === 'dif-total') {
+    // Phase 1 : assurance seule (pas de paiement crédit)
+    // Phase 2 : M2 + assurance
+    taegPayments = schedule.map((row, i) => i < k ? Massur : row.mens + Massur);
+  } else {
+    taegPayments = schedule.map(row => row.mens + Massur);
+  }
+  const taeg = P > 0 ? calcTAEG(P, taegPayments) : 0;
+
+  /* ────────────────────────────────────────
+     RENDER RESULTS
+  ──────────────────────────────────────── */
+  const el = document.getElementById('credit-results');
+
+  let html = '';
+
+  if (type === 'amort') {
+    const Mtotal = M2 + Massur;
+    html = `
+      <div class="key-result animate">
+        <div class="key-result-label">Mensualité totale (avec assurance)</div>
+        <div class="key-result-val">${fmtEur(Mtotal,2)}</div>
+        <div class="key-result-sub">dont ${fmtEur(M2,2)} hors assurance + ${fmtEur(Massur,2)} assurance</div>
+      </div>
+      <div class="metrics-grid animate">
+        <div class="metric"><div class="metric-label">Coût total intérêts</div><div class="metric-val amber">${fmtEur(coutCredit,0)}</div></div>
+        <div class="metric"><div class="metric-label">Coût total assurance</div><div class="metric-val">${fmtEur(coutAssur,0)}</div></div>
+        <div class="metric"><div class="metric-label">Coût total (intérêts + ass.)</div><div class="metric-val accent">${fmtEur(coutTotal,0)}</div></div>
+        <div class="metric"><div class="metric-label">TAEG actuariel</div><div class="metric-val">${fmtNum(taeg,2)} %</div></div>
+      </div>`;
+
+  } else if (type === 'dif-partiel') {
+    const Mt1 = M1 + Massur;
+    const Mt2 = M2 + Massur;
+    html = `
+      <div class="key-result animate">
+        <div class="key-result-label">Mensualité après différé (avec assurance)</div>
+        <div class="key-result-val">${fmtEur(Mt2,2)}</div>
+        <div class="key-result-sub">dont ${fmtEur(M2,2)} capital+intérêts + ${fmtEur(Massur,2)} assurance</div>
+      </div>
+      <div class="c-phase-grid animate">
+        <div class="c-phase-box">
+          <div class="c-phase-label">Phase différé — ${k} mois</div>
+          <div class="c-phase-val blue">${fmtEur(Mt1,2)}<span style="font-size:.65rem;font-weight:400;color:var(--text-dim)">/mois</span></div>
+          <div class="c-phase-sub">Intérêts seuls : ${fmtEur(M1,2)} + assur. ${fmtEur(Massur,2)}</div>
+        </div>
+        <div class="c-phase-box">
+          <div class="c-phase-label">Phase amortissement — ${n-k} mois</div>
+          <div class="c-phase-val">${fmtEur(Mt2,2)}<span style="font-size:.65rem;font-weight:400;color:var(--text-dim)">/mois</span></div>
+          <div class="c-phase-sub">Capital + intérêts + assurance</div>
+        </div>
+      </div>
+      <div class="metrics-grid animate">
+        <div class="metric"><div class="metric-label">Intérêts phase différé</div><div class="metric-val blue">${fmtEur(M1*k,0)}</div></div>
+        <div class="metric"><div class="metric-label">Coût total intérêts</div><div class="metric-val amber">${fmtEur(coutCredit,0)}</div></div>
+        <div class="metric"><div class="metric-label">Coût total (int. + ass.)</div><div class="metric-val accent">${fmtEur(coutTotal,0)}</div></div>
+        <div class="metric"><div class="metric-label">TAEG actuariel</div><div class="metric-val">${fmtNum(taeg,2)} %</div></div>
+      </div>`;
+
+  } else if (type === 'dif-total') {
+    const Mt2  = M2 + Massur;
+    const intCap = P2 - P; // intérêts capitalisés
+    html = `
+      <div class="key-result animate">
+        <div class="key-result-label">Mensualité après différé (avec assurance)</div>
+        <div class="key-result-val">${fmtEur(Mt2,2)}</div>
+        <div class="key-result-sub">Phase différé : ${k} mois sans paiement · Capital capitalisé : ${fmtEur(P2,0)}</div>
+      </div>
+      <div class="c-phase-grid animate">
+        <div class="c-phase-box">
+          <div class="c-phase-label">Capital initial emprunté</div>
+          <div class="c-phase-val">${fmtEur(P,0)}</div>
+          <div class="c-phase-sub">Intérêts capitalisés : +${fmtEur(intCap,0)}</div>
+        </div>
+        <div class="c-phase-box">
+          <div class="c-phase-label">Capital après différé (${k} mois)</div>
+          <div class="c-phase-val amber">${fmtEur(P2,0)}</div>
+          <div class="c-phase-sub">Base d'amortissement réelle</div>
+        </div>
+      </div>
+      <div class="metrics-grid animate">
+        <div class="metric"><div class="metric-label">Intérêts capitalisés</div><div class="metric-val amber">${fmtEur(intCap,0)}</div></div>
+        <div class="metric"><div class="metric-label">Coût total intérêts</div><div class="metric-val amber">${fmtEur(coutCredit,0)}</div></div>
+        <div class="metric"><div class="metric-label">Coût total (int. + ass.)</div><div class="metric-val accent">${fmtEur(coutTotal,0)}</div></div>
+        <div class="metric"><div class="metric-label">TAEG actuariel</div><div class="metric-val">${fmtNum(taeg,2)} %</div></div>
+      </div>`;
+
+  } else if (type === 'infine') {
+    const Mt_courant = M2 + Massur;
+    const Mt_final   = M2 + P + Massur;
+    html = `
+      <div class="key-result animate">
+        <div class="key-result-label">Mensualité courante (avec assurance)</div>
+        <div class="key-result-val">${fmtEur(Mt_courant,2)}</div>
+        <div class="key-result-sub">Intérêts seuls : ${fmtEur(M2,2)} + assurance ${fmtEur(Massur,2)}</div>
+      </div>
+      <div class="c-phase-grid animate">
+        <div class="c-phase-box">
+          <div class="c-phase-label">Mensualités m1 → m${n-1}</div>
+          <div class="c-phase-val">${fmtEur(Mt_courant,2)}<span style="font-size:.65rem;font-weight:400;color:var(--text-dim)">/mois</span></div>
+          <div class="c-phase-sub">Intérêts purs · Capital inchangé</div>
+        </div>
+        <div class="c-phase-box">
+          <div class="c-phase-label">Dernière échéance (m${n})</div>
+          <div class="c-phase-val amber">${fmtEur(Mt_final,0)}</div>
+          <div class="c-phase-sub">Intérêts + rembt. intégral capital</div>
+        </div>
+      </div>
+      <div class="metrics-grid animate">
+        <div class="metric"><div class="metric-label">Coût total intérêts</div><div class="metric-val amber">${fmtEur(coutCredit,0)}</div></div>
+        <div class="metric"><div class="metric-label">Coût total assurance</div><div class="metric-val">${fmtEur(coutAssur,0)}</div></div>
+        <div class="metric"><div class="metric-label">Coût total (int. + ass.)</div><div class="metric-val accent">${fmtEur(coutTotal,0)}</div></div>
+        <div class="metric"><div class="metric-label">TAEG actuariel</div><div class="metric-val">${fmtNum(taeg,2)} %</div></div>
+      </div>
+      <div class="c-infine-note animate">
+        <strong>Crédit in fine :</strong> le capital n'est jamais remboursé en cours de prêt. À l'échéance, l'emprunteur doit disposer de ${fmtEur(P,0)} pour le remboursement intégral. Ce montage est généralement adossé à un placement (assurance-vie, SCPI, nantissement) constitué en parallèle.
+      </div>`;
+  }
+
+  // RÉCAPITULATIF commun
+  const typeLabel = {
+    'amort':'Amortissable classique', 'dif-partiel':'Différé partiel',
+    'dif-total':'Différé total', 'infine':'In fine'
+  }[type];
+
+  html += `
+    <div class="bracket-detail animate">
+      <div class="bracket-title">Récapitulatif du financement</div>
+      ${prixBien>0 ? `<div class="bracket-row"><span class="rate-badge" style="background:var(--surface-3);color:var(--text-muted)">Prix</span><span class="tranche">Prix total du bien</span><span class="tax">${fmtEur(prixBien,0)}</span></div>` : ''}
+      ${apport>0  ? `<div class="bracket-row"><span class="rate-badge" style="background:rgba(96,165,250,.12);color:var(--blue)">Apport</span><span class="tranche">Apport personnel (${fmtNum(tauxApport,1)} % du bien)</span><span class="tax" style="color:var(--blue)">${fmtEur(apport,0)}</span></div>` : ''}
+      <div class="bracket-row"><span class="rate-badge">Type</span><span class="tranche">${typeLabel}</span><span class="tax" style="color:var(--text-muted);font-size:.73rem">${fmtNum(duree)} ans · ${fmtNum(n)} mois</span></div>
+      <div class="bracket-row"><span class="rate-badge">Capital</span><span class="tranche">Montant emprunté</span><span class="tax">${fmtEur(P,0)}</span></div>
+      ${hasDiffere ? `<div class="bracket-row"><span class="rate-badge" style="background:rgba(96,165,250,.12);color:var(--blue)">Différé</span><span class="tranche">Durée phase différé</span><span class="tax" style="color:var(--blue)">${fmtNum(k)} mois</span></div>` : ''}
+      ${type==='dif-total' ? `<div class="bracket-row"><span class="rate-badge" style="background:var(--amber-dim);color:var(--amber)">Cap.+</span><span class="tranche">Capital après capitalisation</span><span class="tax" style="color:var(--amber)">${fmtEur(P2,0)}</span></div>` : ''}
+      <div class="bracket-row"><span class="rate-badge" style="background:var(--amber-dim);color:var(--amber)">Total</span><span class="tranche">Capital + Intérêts + Assurance</span><span class="tax">${fmtEur(P + coutTotal,0)}</span></div>
+    </div>`;
+
+  // SECTION PÉDAGOGIQUE
+  html += buildPedagoText({type, P, apport, ra, duree, n, k, M2, Massur, coutCredit, coutAssur, coutTotal, prixBien, tauxApport, P2});
+
+  el.innerHTML = html;
+
+  /* ──── Save amort state; rebuild table if visible ──── */
+  const showPhase = type !== 'amort';
+  _schedule   = schedule;
+  _Massur     = Massur;
+  _showPhase  = showPhase;
+  _creditType = type;
+  if (_amortVisible) buildAmortTable();
+}
+
+/* ── Amort toggle & full table ── */
+function toggleAmort() {
+  _amortVisible = !_amortVisible;
+  const btn   = document.getElementById('amort-toggle-btn');
+  const wrap  = document.getElementById('amort-full-wrap');
+  const label = btn.querySelector('.amort-toggle-label');
+  if (_amortVisible) {
+    buildAmortTable();
+    wrap.style.display = 'block';
+    btn.classList.add('open');
+    label.textContent = 'Masquer le tableau d\'amortissement';
+    wrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  } else {
+    wrap.style.display = 'none';
+    btn.classList.remove('open');
+    label.textContent = 'Voir le tableau d\'amortissement complet';
+  }
+}
+
+function buildAmortTable() {
+  const schedule  = _schedule;
+  const Massur    = _Massur;
+  const showPhase = _showPhase;
+  const type      = _creditType;
+  const hasAssur  = Massur > 0;
+  const totalCols = 6 + (showPhase ? 1 : 0) + (hasAssur ? 1 : 0);
+
+  document.getElementById('amort-thead').innerHTML = `<tr>
+    <th>#</th><th>An</th>
+    ${showPhase ? '<th>Phase</th>' : ''}
+    <th>Mensualité</th>
+    <th>Intérêts</th>
+    <th>Capital</th>
+    ${hasAssur ? '<th>Assurance</th>' : ''}
+    <th>Capital restant dû</th>
+  </tr>`;
+
+  const tbody = document.getElementById('amort-body');
+  tbody.innerHTML = '';
+  let currentYear = 0;
+
+  schedule.forEach(row => {
+    const yearNum = Math.ceil(row.mois / 12);
+    if (yearNum !== currentYear) {
+      currentYear = yearNum;
+      const sep = document.createElement('tr');
+      sep.className = 'amort-year-row';
+      sep.innerHTML = `<td colspan="${totalCols}">Année ${yearNum}</td>`;
+      tbody.appendChild(sep);
+    }
+    const tr = document.createElement('tr');
+    const isDiffere = row.phase !== 'Amort.' && row.phase !== 'In fine';
+    const isLast    = type === 'infine' && row.capital > 0;
+    const mensTotal = row.mens === 0 ? 0 : row.mens + Massur;
+    tr.innerHTML = `
+      <td>${row.mois}</td>
+      <td style="color:var(--text-dim)">${yearNum}</td>
+      ${showPhase ? `<td style="color:${isDiffere ? 'var(--blue)' : 'var(--text-muted)'};font-size:.7rem">${row.phase}</td>` : ''}
+      <td>${row.mens === 0 ? '<span style="color:var(--text-dim)">—</span>' : fmtEur(mensTotal, 2)}</td>
+      <td class="interest">${fmtEur(row.interets, 2)}</td>
+      <td class="${row.capital > 0 ? 'capital' : ''}">${row.capital === 0 ? '<span style="color:var(--text-dim)">—</span>' : fmtEur(row.capital, 2)}</td>
+      ${hasAssur ? `<td style="color:var(--text-dim);font-size:.76rem">${row.mens === 0 ? '<span style="color:var(--text-dim)">—</span>' : fmtEur(Massur, 2)}</td>` : ''}
+      <td class="remaining${isLast ? ' capital' : ''}">${fmtEur(Math.max(0, row.solde), 0)}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+/* ── Init sliders ── */
+syncSlider('c-montant','c-montant-s','c-montant-disp', v=>fmtEur(v,0));
+syncSlider('c-apport', 'c-apport-s', 'c-apport-disp',  v=>fmtEur(v,0));
+syncSlider('c-taux',   'c-taux-s',  'c-taux-disp',    v=>fmtNum(v,2)+' %');
+syncSlider('c-duree',  'c-duree-s', 'c-duree-disp',   v=>Math.round(v)+' ans');
+syncSlider('c-assur',  'c-assur-s', 'c-assur-disp',   v=>fmtNum(v,2)+' %');
+syncSlider('c-differe','c-differe-s','c-differe-disp', v=>Math.round(v)+' mois');
+
+/* ── Event listeners ── */
+['c-montant','c-apport','c-taux','c-duree','c-assur','c-differe',
+ 'c-montant-s','c-apport-s','c-taux-s','c-duree-s','c-assur-s','c-differe-s']
+  .forEach(id => { const el=document.getElementById(id); if(el) el.addEventListener('input', calcCredit); });
+document.querySelectorAll('input[name="c-type"]').forEach(r => r.addEventListener('change', calcCredit));
+
+calcCredit();
+
+/* ── Dropdown ── */
+/* Menu déroulant catégorisé — voir shared-nav.js */
+SP.nav.init();
+</script>
+</body>
+</html>

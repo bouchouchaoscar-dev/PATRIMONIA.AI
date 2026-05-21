@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="favicon-64.png">
+  <link rel="shortcut icon" href="favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="favicon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rentabilité Locative — PATRIMONIA.AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css?v=19">
+<script src="shared.js?v=2"></script>
+  <script src="shared-nav.js?v=6"></script>
+<style>
+
+/* ── TABS ── */
+.rl-tabs {
+  display: flex; gap: .35rem; padding: 1.5rem 2rem .5rem;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border-subtle);
+  flex-wrap: wrap;
+}
+.rl-tab {
+  font-family: var(--sans); font-size: .78rem; font-weight: 500;
+  color: var(--text-muted); background: var(--surface);
+  border: 1.5px solid var(--border); border-radius: 100px;
+  padding: .4rem 1.15rem; cursor: pointer;
+  transition: all .18s; user-select: none; letter-spacing: -.01em;
+}
+.rl-tab:hover { color: var(--accent); border-color: rgba(79,138,120,.3); background: var(--accent-dim) }
+.rl-tab.active { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600 }
+
+/* ── TAB PANELS ── */
+.rl-panel { display: none }
+.rl-panel.active { display: grid }
+
+/* ── BADGE RENTABILITÉ ── */
+.rl-badge {
+  display: inline-flex; align-items: center; gap: .45rem;
+  font-size: .69rem; font-weight: 600; letter-spacing: .04em;
+  text-transform: uppercase; padding: .28rem .85rem;
+  border-radius: 100px; margin-top: .55rem;
+}
+.rl-badge.low    { background: rgba(255,159,10,.12); color: var(--amber) }
+.rl-badge.ok     { background: rgba(59,140,90,.12);  color: var(--success) }
+.rl-badge.good   { background: rgba(79,138,120,.1);   color: var(--accent) }
+.rl-badge.great  { background: rgba(59,140,90,.18);  color: #3B8C5A }
+.rl-badge::before { content:''; width:7px; height:7px; border-radius:50%; background:currentColor; flex-shrink:0 }
+
+/* ── CASHFLOW BOX ── */
+.cf-toggle-wrap { margin-top: 1.2rem }
+.cf-toggle {
+  display: flex; align-items: center; gap: .6rem; cursor: pointer;
+  font-size: .75rem; font-weight: 500; color: var(--text-muted);
+  user-select: none;
+}
+.cf-toggle input { accent-color: var(--accent); width: 15px; height: 15px; cursor: pointer }
+.cf-panel { display: none; margin-top: 1rem }
+.cf-panel.open { display: block }
+
+/* ── TOGGLE SECTION (mode simple / avancé) ── */
+.mode-toggle-row {
+  display: flex; align-items: center; gap: .85rem;
+  margin-bottom: 1rem;
+}
+.mode-btn {
+  font-size: .72rem; font-weight: 500; color: var(--text-muted);
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 100px; padding: .3rem .95rem; cursor: pointer;
+  transition: all .18s; user-select: none;
+}
+.mode-btn.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); font-weight: 600 }
+
+/* ── RESULT HIGHLIGHT ── */
+.rl-result-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: .5rem 0; border-bottom: 1px solid var(--border-subtle);
+  font-size: .8rem;
+}
+.rl-result-row:last-child { border-bottom: none }
+.rl-result-row span { color: var(--text-muted); letter-spacing: -.01em }
+.rl-result-row strong { font-family: var(--mono); font-weight: 600; color: var(--text) }
+.rl-result-row.accent-row strong { color: var(--accent) }
+.rl-result-row.amber-row strong  { color: var(--amber) }
+.rl-result-row.success-row strong{ color: var(--success) }
+.rl-result-row.neg-row strong    { color: #9B5A3A }
+
+/* ── ALERT FISCAL ── */
+.fiscal-alert {
+  background: var(--amber-dim); border: 1px solid rgba(255,159,10,.22);
+  border-radius: var(--r-sm); padding: .75rem 1rem;
+  font-size: .75rem; line-height: 1.65; color: var(--text-muted);
+  margin-top: .85rem;
+}
+.fiscal-alert strong { color: var(--amber) }
+
+/* ── DISCLAIMER ── */
+.rl-disclaimer {
+  font-size: .67rem; color: var(--text-dim); line-height: 1.7;
+  font-family: var(--mono); margin-top: 1rem; opacity: .75;
+}
+
+@media(max-width:760px){
+  .rl-tabs { padding: 1rem 1.25rem .5rem }
+}
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="index.html" class="nav-logo"><img src="logo.png?v=3" alt="PATRIMONIA.AI" class="nav-logo-img"></a>
+  <div class="nav-right">
+    <a href="index.html" class="nav-back">
+      <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7.5 1.5L3 6l4.5 4.5"/></svg>
+      Accueil
+    </a>
+    <div class="nav-dropdown" id="mainDropdown">
+      <button class="nav-dropdown-btn" aria-expanded="false" aria-haspopup="true">
+        Simulateurs <svg class="nav-chevron" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.8" style="width:13px;height:8px;flex-shrink:0"><path d="M1 1l4 4 4-4"/></svg>
+      </button>
+      <div class="nav-dropdown-menu" id="navMenu" role="menu"></div>
+    </div>
+  </div>
+</nav>
+
+<div class="sim-page">
+  <div class="sim-page-header">
+    <span class="sim-num-badge">08</span>
+    <div>
+      <div class="sim-eyebrow">Immobilier</div><h1>Rentabilité <em class="gradient-text">Locative</em></h1>
+      <p>Brute · Nette de frais · Nette d'impôts · Cash-flow</p>
+    </div>
+  </div>
+
+  <div class="sim-card-wrap">
+
+    <!-- TABS -->
+    <div class="rl-tabs">
+      <button class="rl-tab active" data-tab="brute">Rentabilité brute</button>
+      <button class="rl-tab" data-tab="nette">Rentabilité nette de frais</button>
+      <button class="rl-tab" data-tab="nette-nette">Rentabilité nette d'impôts</button>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         ONGLET 1 — RENTABILITÉ BRUTE
+    ═══════════════════════════════════════ -->
+    <div class="rl-panel active" id="panel-brute" style="grid-template-columns:1fr 1fr">
+      <div class="inputs-panel">
+
+        <div class="field">
+          <div class="field-label"><label>Prix d'achat du bien</label><span class="field-val" id="b-prix-disp">200 000 €</span></div>
+          <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="b-prix" value="200000"><span class="unit">€</span></div>
+          <input type="range" id="b-prix-s" min="20000" max="2000000" step="5000" value="200000">
+        </div>
+
+        <div class="field">
+          <div class="field-label"><label>Frais de notaire</label><span class="field-val" id="b-notaire-disp">15 600 €</span></div>
+          <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="b-notaire" value="15600"><span class="unit">€</span></div>
+          <input type="range" id="b-notaire-s" min="0" max="100000" step="500" value="15600">
+          <div style="font-size:.63rem;color:var(--text-dim);font-family:var(--mono);margin-top:.3rem">Environ 7–8 % dans l'ancien, 2–3 % dans le neuf</div>
+        </div>
+
+        <div class="field">
+          <div class="field-label"><label>Frais d'agence</label><span class="field-val" id="b-agence-disp">0 €</span></div>
+          <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="b-agence" value="0"><span class="unit">€</span></div>
+          <input type="range" id="b-agence-s" min="0" max="60000" step="500" value="0">
+        </div>
+
+        <div class="field">
+          <div class="field-label"><label>Travaux</label><span class="field-val" id="b-travaux-disp">0 €</span></div>
+          <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="b-travaux" value="0"><span class="unit">€</span></div>
+          <input type="range" id="b-travaux-s" min="0" max="200000" step="1000" value="0">
+        </div>
+
+        <div class="field">
+          <div class="field-label"><label>Mobilier (meublé)</label><span class="field-val" id="b-mobilier-disp">0 €</span></div>
+          <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="b-mobilier" value="0"><span class="unit">€</span></div>
+          <input type="range" id="b-mobilier-s" min="0" max="50000" step="500" value="0">
+        </div>
+
+        <div class="field">
+          <div class="field-label"><label>Autres frais d'acquisition</label><span class="field-val" id="b-autres-disp">0 €</span></div>
+          <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="b-autres" value="0"><span class="unit">€</span></div>
+        </div>
+
+        <div class="section-sep"></div>
+
+        <div class="field">
+          <div class="field-label"><label>Loyer mensuel hors charges</label><span class="field-val" id="b-loyer-disp">800 €</span></div>
+          <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="b-loyer" value="800"><span class="unit">€</span></div>
+          <input type="range" id="b-loyer-s" min="100" max="10000" step="50" value="800">
+        </div>
+
+        <div class="field">
+          <div class="field-label"><label>Vacance locative</label><span class="field-val" id="b-vacance-disp">0,5 mois/an</span></div>
+          <div class="input-wrap"><input type="number" id="b-vacance" value="0.5" min="0" max="6" step="0.5"><span class="unit">mois/an</span></div>
+          <input type="range" id="b-vacance-s" min="0" max="6" step="0.5" value="0.5">
+        </div>
+
+        <div class="rl-disclaimer">
+          Simulation indicative — résultats non contractuels
+        </div>
+
+      </div><!-- /inputs-panel -->
+
+      <div class="results-panel" id="results-brute"></div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         ONGLET 2 — RENTABILITÉ NETTE
+    ═══════════════════════════════════════ -->
+    <div class="rl-panel" id="panel-nette" style="grid-template-columns:1fr 1fr">
+      <div class="inputs-panel">
+
+        <div style="font-size:.65rem;font-weight:600;color:var(--text-dim);letter-spacing:.06em;text-transform:uppercase;margin-bottom:1rem">
+          Acquisition — reprend les données de l'onglet Brute
+        </div>
+
+        <div class="field">
+          <div class="field-label"><label>Prix d'achat</label><span class="field-val" id="n-prix-disp">200 000 €</span></div>
+          <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="n-prix" value="200000"><span class="unit">€</span></div>
+        </div>
+
+        <div class="field">
+          <div class="field-label"><label>Coût total acquisition</label></div>
+          <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="n-cout" value="215600"><span class="unit">€</span></div>
+          <div style="font-size:.63rem;color:var(--text-dim);font-family:var(--mono);margin-top:.3rem">Prix + notaire + agence + travaux + mobilier + autres</div>
+        </div>
+
+        <div class="field">
+          <div class="field-label"><label>Loyer mensuel HC</label><span class="field-val" id="n-loyer-disp">800 €</span></div>
+          <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="n-loyer" value="800"><span class="unit">€</span></div>
+        </div>
+
+        <div class="field">
+          <div class="field-label"><label>Vacance locative</label></div>
+          <div class="input-wrap"><input type="number" id="n-vacance" value="0.5" min="0" max="6" step="0.5"><span class="unit">mois/an</span></div>
+        </div>
+
+        <div class="section-sep"></div>
+
+        <div style="font-size:.65rem;font-weight:600;color:var(--text-dim);letter-spacing:.06em;text-transform:uppercase;margin-bottom:1rem">
+          Charges annuelles du bien
+        </div>
+
+        <div class="field">
+          <div class="field-label"><label>Charges copro non récupérables</label></div>
+          <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="n-copro" value="800"><span class="unit">€/an</span></div>
+        </div>
+
+        <div class="field">
+          <div class="field-label"><label>Taxe foncière</label></div>
+          <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="n-tf" value="900"><span class="unit">€/an</span></div>
+        </div>
+
+        <div class="field">
+          <div class="field-label"><label>Assurance PNO</label></div>
+          <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="n-pno" value="150"><span class="unit">€/an</span></div>
+        </div>
+
+        <div class="field">
+          <div class="field-label"><label>Assurance loyers impayés (GLI)</label></div>
+          <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="n-gli" value="0"><span class="unit">€/an</span></div>
+        </div>
+
+        <div class="field">
+          <div class="field-label"><label>Gestion locative</label></div>
+          <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="n-gestion" value="0"><span class="unit">€/an</span></div>
+          <div style="font-size:.63rem;color:var(--text-dim);font-family:var(--mono);margin-top:.3rem">Généralement 7–10 % des loyers si agence</div>
+        </div>
+
+        <div class="field">
+          <div class="field-label"><label>Entretien / maintenance</label></div>
+          <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="n-entretien" value="300"><span class="unit">€/an</span></div>
+        </div>
+
+        <div class="field">
+          <div class="field-label"><label>Comptabilité / CFE / autres</label></div>
+          <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="n-autres" value="0"><span class="unit">€/an</span></div>
+        </div>
+
+        <div class="section-sep"></div>
+
+        <div class="cf-toggle-wrap">
+          <label class="cf-toggle">
+            <input type="checkbox" id="n-cf-check"> Ajouter un crédit (analyse cash-flow)
+          </label>
+          <div class="cf-panel" id="n-cf-panel">
+            <div class="field">
+              <div class="field-label"><label>Mensualité crédit (hors assurance)</label></div>
+              <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="n-mens" value="800"><span class="unit">€/mois</span></div>
+            </div>
+            <div class="field">
+              <div class="field-label"><label>Assurance emprunteur</label></div>
+              <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="n-assur-empr" value="50"><span class="unit">€/mois</span></div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /inputs-panel -->
+
+      <div class="results-panel" id="results-nette"></div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         ONGLET 3 — RENTABILITÉ NETTE NETTE
+    ═══════════════════════════════════════ -->
+    <div class="rl-panel" id="panel-nette-nette" style="grid-template-columns:1fr 1fr">
+      <div class="inputs-panel">
+
+        <div style="font-size:.65rem;font-weight:600;color:var(--text-dim);letter-spacing:.06em;text-transform:uppercase;margin-bottom:1rem">
+          Base nette
+        </div>
+
+        <div class="field">
+          <div class="field-label"><label>Coût total acquisition</label></div>
+          <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="nn-cout" value="215600"><span class="unit">€</span></div>
+        </div>
+
+        <div class="field">
+          <div class="field-label"><label>Revenus locatifs annuels bruts</label></div>
+          <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="nn-revenus" value="9150"><span class="unit">€/an</span></div>
+          <div style="font-size:.63rem;color:var(--text-dim);font-family:var(--mono);margin-top:.3rem">Calculés automatiquement depuis Nette si vide</div>
+        </div>
+
+        <div class="field">
+          <div class="field-label"><label>Charges déductibles annuelles</label></div>
+          <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="nn-charges" value="2150"><span class="unit">€/an</span></div>
+        </div>
+
+        <div class="section-sep"></div>
+
+        <div style="font-size:.65rem;font-weight:600;color:var(--text-dim);letter-spacing:.06em;text-transform:uppercase;margin-bottom:1rem">
+          Fiscalité
+        </div>
+
+        <div class="field">
+          <div class="field-label"><label>Type de location</label></div>
+          <div class="select-wrap">
+            <select id="nn-type-loc">
+              <option value="nue">Location nue</option>
+              <option value="lmnp" selected>Location meublée LMNP</option>
+              <option value="lmp">Location meublée LMP</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field" id="nn-regime-wrap">
+          <div class="field-label"><label>Régime fiscal</label></div>
+          <div class="select-wrap">
+            <select id="nn-regime">
+              <option value="micro-bic" selected>Micro-BIC (abattement 50 %)</option>
+              <option value="reel-bic">Réel BIC / LMNP réel</option>
+              <option value="micro-foncier">Micro-foncier (abattement 30 %)</option>
+              <option value="reel-foncier">Réel foncier</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label"><label>TMI (tranche marginale)</label></div>
+          <div class="select-wrap">
+            <select id="nn-tmi">
+              <option value="0">0 %</option>
+              <option value="11">11 %</option>
+              <option value="30" selected>30 %</option>
+              <option value="41">41 %</option>
+              <option value="45">45 %</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field" id="nn-amort-wrap">
+          <div class="field-label"><label>Amortissement annuel estimé (LMNP réel)</label></div>
+          <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="nn-amort" value="0"><span class="unit">€/an</span></div>
+          <div style="font-size:.63rem;color:var(--text-dim);font-family:var(--mono);margin-top:.3rem">Environ 2–4 % de la valeur du bien + mobilier hors terrain</div>
+        </div>
+
+        <div class="field" id="nn-interets-wrap">
+          <div class="field-label"><label>Intérêts d'emprunt annuels (réel)</label></div>
+          <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="nn-interets" value="0"><span class="unit">€/an</span></div>
+        </div>
+
+        <div class="field" id="nn-deficit-wrap" style="display:none">
+          <div class="field-label"><label>Déficit foncier reportable</label></div>
+          <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="nn-deficit" value="0"><span class="unit">€</span></div>
+          <div style="font-size:.63rem;color:var(--text-dim);font-family:var(--mono);margin-top:.3rem">Plafond d'imputation : 10 700 €/an sur le revenu global</div>
+        </div>
+
+        <div class="section-sep"></div>
+
+        <div class="mode-toggle-row">
+          <span style="font-size:.72rem;color:var(--text-muted)">Impôt :</span>
+          <button class="mode-btn active" id="nn-mode-auto">Estimé</button>
+          <button class="mode-btn" id="nn-mode-manuel">Manuel</button>
+        </div>
+
+        <div class="field" id="nn-impot-manuel-wrap" style="display:none">
+          <div class="field-label"><label>Impôt annuel connu</label></div>
+          <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="nn-impot-manuel" value="0"><span class="unit">€/an</span></div>
+        </div>
+
+        <div class="section-sep"></div>
+
+        <div class="cf-toggle-wrap">
+          <label class="cf-toggle">
+            <input type="checkbox" id="nn-cf-check"> Ajouter un crédit (cash-flow)
+          </label>
+          <div class="cf-panel" id="nn-cf-panel">
+            <div class="field">
+              <div class="field-label"><label>Mensualité crédit (hors ass.)</label></div>
+              <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="nn-mens" value="800"><span class="unit">€/mois</span></div>
+            </div>
+            <div class="field">
+              <div class="field-label"><label>Assurance emprunteur</label></div>
+              <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="nn-assur-empr" value="50"><span class="unit">€/mois</span></div>
+            </div>
+            <div class="field">
+              <div class="field-label"><label>Apport personnel</label></div>
+              <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="nn-apport" value="0"><span class="unit">€</span></div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /inputs-panel -->
+
+      <div class="results-panel" id="results-nn"></div>
+    </div>
+
+  </div><!-- /sim-card-wrap -->
+</div><!-- /sim-page -->
+
+<footer>
+  <span>PATRIMONIA.AI</span> — Simulation indicative et pédagogique.<br>
+  Cette simulation ne constitue pas un conseil en investissement. La rentabilité réelle dépend de nombreux paramètres : fiscalité exacte, régime choisi, charges réelles, vacance locative, travaux, financement, assurance, gestion et évolution du marché.
+</footer>
+
+<script>
+'use strict';
+
+/* ── Formatage ── */
+const fmtNum = (v, d=0) => new Intl.NumberFormat('fr-FR',{minimumFractionDigits:d,maximumFractionDigits:d}).format(v).replace(/[\u202F\u00A0]/g,' ');
+const fmtEur = (v, d=0) => fmtNum(v,d) + ' €';
+const fmtPct = (v, d=2) => fmtNum(v,d) + ' %';
+
+/* ── Badge rentabilité ── */
+function rendBadge(r) {
+  if (r <= 0)   return '';
+  if (r < 3)    return `<span class="rl-badge low">Rentabilité faible</span>`;
+  if (r < 5)    return `<span class="rl-badge ok">Rentabilité correcte</span>`;
+  if (r < 7)    return `<span class="rl-badge good">Rentabilité attractive</span>`;
+  return              `<span class="rl-badge great">Rentabilité élevée</span>`;
+}
+
+/* ── Slider sync ── */
+function syncSlider(numId, sldId, dispId, fmt) {
+  const num = document.getElementById(numId);
+  const sld = document.getElementById(sldId);
+  const disp = dispId ? document.getElementById(dispId) : null;
+  if (!num || !sld) return;
+  function setPct() {
+    const mn=parseFloat(sld.min)||0, mx=parseFloat(sld.max)||100;
+    const v=Math.min(Math.max(parseFloat(sld.value)||0,mn),mx);
+    sld.style.setProperty('--pct',((v-mn)/(mx-mn)*100).toFixed(1)+'%');
+  }
+  function onNum() {
+    const v=SP.parseNum(num.value);
+    sld.value=Math.min(Math.max(v,parseFloat(sld.min)||0),parseFloat(sld.max)||100);
+    setPct(); if(disp) disp.textContent=fmt(v);
+  }
+  function onSld() {
+    SP.setVal(num, parseFloat(sld.value)||0);
+    if(disp) disp.textContent=fmt(parseFloat(sld.value)||0);
+    setPct();
+  }
+  num.addEventListener('input', onNum);
+  sld.addEventListener('input', onSld);
+  setPct();
+  if(disp) disp.textContent=fmt(SP.parseNum(num.value)||0);
+}
+
+/* ══════════════════════════════════════════
+   ONGLET BRUTE
+══════════════════════════════════════════ */
+function calcBrute() {
+  const prix     = SP.parseNum(document.getElementById('b-prix').value);
+  const notaire  = SP.parseNum(document.getElementById('b-notaire').value);
+  const agence   = SP.parseNum(document.getElementById('b-agence').value);
+  const travaux  = SP.parseNum(document.getElementById('b-travaux').value);
+  const mobilier = SP.parseNum(document.getElementById('b-mobilier').value);
+  const autres   = SP.parseNum(document.getElementById('b-autres').value);
+  const loyer    = SP.parseNum(document.getElementById('b-loyer').value);
+  const vacance  = parseFloat(document.getElementById('b-vacance').value) || 0;
+
+  const coutTotal = prix + notaire + agence + travaux + mobilier + autres;
+  const loyersBruts = loyer * 12;
+  const loyersVacance = loyer * vacance;
+  const loyersEffectifs = Math.max(0, loyersBruts - loyersVacance);
+  const rentBrute = coutTotal > 0 ? loyersEffectifs / coutTotal * 100 : 0;
+  const rentBruteSansVacance = coutTotal > 0 ? loyersBruts / coutTotal * 100 : 0;
+
+  // Sync dans onglet Nette
+  SP.setVal(document.getElementById('n-prix'), prix);
+  document.getElementById('n-prix-disp').textContent = fmtEur(prix);
+  SP.setVal(document.getElementById('n-cout'), coutTotal);
+  SP.setVal(document.getElementById('n-loyer'), loyer);
+  document.getElementById('n-loyer-disp').textContent = fmtEur(loyer);
+  document.getElementById('n-vacance').value = vacance;
+
+  // Sync dans onglet NN
+  SP.setVal(document.getElementById('nn-cout'), coutTotal);
+
+  const el = document.getElementById('results-brute');
+  if (coutTotal <= 0 || loyer <= 0) {
+    el.innerHTML = `<div class="result-empty">Renseignez le prix d'achat et le loyer.</div>`;
+    return;
+  }
+
+  const rentLabel = vacance > 0
+    ? `Rentabilité brute (après vacance)`
+    : `Rentabilité brute`;
+
+  el.innerHTML = `
+    <div class="key-result animate">
+      <div class="key-result-label">${rentLabel}</div>
+      <div class="key-result-val">${fmtPct(rentBrute)}</div>
+      ${rendBadge(rentBrute)}
+      ${vacance > 0 ? `<div class="key-result-sub">Sans vacance : ${fmtPct(rentBruteSansVacance)} · Impact vacance : −${fmtPct(rentBruteSansVacance - rentBrute)}</div>` : ''}
+    </div>
+    <div class="metrics-grid animate">
+      <div class="metric"><div class="metric-label">Coût total acquisition</div><div class="metric-val">${fmtEur(coutTotal)}</div></div>
+      <div class="metric"><div class="metric-label">Loyers annuels bruts</div><div class="metric-val accent">${fmtEur(loyersBruts)}</div></div>
+      <div class="metric"><div class="metric-label">Loyers effectifs (−vacance)</div><div class="metric-val">${fmtEur(loyersEffectifs)}</div></div>
+      <div class="metric"><div class="metric-label">Loyer mensuel</div><div class="metric-val">${fmtEur(loyer)}/mois</div></div>
+    </div>
+    <div class="bracket-detail animate">
+      <div class="bracket-title">Détail du coût d'acquisition</div>
+      <div class="bracket-row"><span class="rate-badge">Prix</span><span class="tranche">Prix d'achat du bien</span><span class="tax">${fmtEur(prix)}</span></div>
+      ${notaire>0?`<div class="bracket-row"><span class="rate-badge" style="background:var(--surface-3);color:var(--text-muted)">Notaire</span><span class="tranche">Frais de notaire</span><span class="tax">${fmtEur(notaire)} (${fmtPct(notaire/prix*100,1)})</span></div>`:''}
+      ${agence>0?`<div class="bracket-row"><span class="rate-badge" style="background:var(--surface-3);color:var(--text-muted)">Agence</span><span class="tranche">Frais d'agence</span><span class="tax">${fmtEur(agence)}</span></div>`:''}
+      ${travaux>0?`<div class="bracket-row"><span class="rate-badge" style="background:var(--amber-dim);color:var(--amber)">Travaux</span><span class="tranche">Travaux</span><span class="tax">${fmtEur(travaux)}</span></div>`:''}
+      ${mobilier>0?`<div class="bracket-row"><span class="rate-badge" style="background:var(--surface-3);color:var(--text-muted)">Mobilier</span><span class="tranche">Mobilier</span><span class="tax">${fmtEur(mobilier)}</span></div>`:''}
+      ${autres>0?`<div class="bracket-row"><span class="rate-badge" style="background:var(--surface-3);color:var(--text-muted)">Autres</span><span class="tranche">Autres frais</span><span class="tax">${fmtEur(autres)}</span></div>`:''}
+      <div class="bracket-row"><span class="rate-badge" style="background:var(--accent-dim);color:var(--accent)">Total</span><span class="tranche">Coût total d'acquisition</span><span class="tax">${fmtEur(coutTotal)}</span></div>
+    </div>
+    ${buildPedagoBrute({prix, notaire, coutTotal, loyer, loyersBruts, loyersEffectifs, vacance, rentBrute, rentBruteSansVacance})}
+  `;
+}
+
+/* ══════════════════════════════════════════
+   ONGLET NETTE
+══════════════════════════════════════════ */
+function calcNette() {
+  const cout    = SP.parseNum(document.getElementById('n-cout').value);
+  const loyer   = SP.parseNum(document.getElementById('n-loyer').value);
+  const vacance = parseFloat(document.getElementById('n-vacance').value) || 0;
+  const copro   = SP.parseNum(document.getElementById('n-copro').value);
+  const tf      = SP.parseNum(document.getElementById('n-tf').value);
+  const pno     = SP.parseNum(document.getElementById('n-pno').value);
+  const gli     = SP.parseNum(document.getElementById('n-gli').value);
+  const gestion = SP.parseNum(document.getElementById('n-gestion').value);
+  const entretien=SP.parseNum(document.getElementById('n-entretien').value);
+  const autres  = SP.parseNum(document.getElementById('n-autres').value);
+
+  const hasCf   = document.getElementById('n-cf-check').checked;
+  const mens    = hasCf ? SP.parseNum(document.getElementById('n-mens').value) : 0;
+  const assurEmpr=hasCf ? SP.parseNum(document.getElementById('n-assur-empr').value) : 0;
+
+  const loyersBruts = loyer * (12 - vacance);
+  const charges = copro + tf + pno + gli + gestion + entretien + autres;
+  const tauxCharges = loyersBruts > 0 ? charges / loyersBruts * 100 : 0;
+  const loyersNets = loyersBruts - charges;
+  const rentNette = cout > 0 ? loyersNets / cout * 100 : 0;
+
+  const annuelCredit = (mens + assurEmpr) * 12;
+  const cashflowAvant = hasCf ? loyersNets - annuelCredit : null;
+
+  // Sync NN
+  SP.setVal(document.getElementById('nn-revenus'), Math.round(loyersBruts));
+  SP.setVal(document.getElementById('nn-charges'), Math.round(charges));
+
+  const el = document.getElementById('results-nette');
+  if (cout <= 0 || loyer <= 0) {
+    el.innerHTML = `<div class="result-empty">Renseignez le coût total et le loyer.</div>`;
+    return;
+  }
+
+  const cfColor = cashflowAvant !== null ? (cashflowAvant >= 0 ? 'success-row' : 'neg-row') : '';
+
+  el.innerHTML = `
+    <div class="key-result animate">
+      <div class="key-result-label">Rentabilité nette de frais</div>
+      <div class="key-result-val">${fmtPct(rentNette)}</div>
+      ${rendBadge(rentNette)}
+      <div class="key-result-sub">Taux de charges : ${fmtPct(tauxCharges, 1)} des loyers</div>
+    </div>
+    <div class="metrics-grid animate">
+      <div class="metric"><div class="metric-label">Loyers annuels bruts</div><div class="metric-val">${fmtEur(loyersBruts)}</div></div>
+      <div class="metric"><div class="metric-label">Charges annuelles</div><div class="metric-val amber">${fmtEur(charges)}</div></div>
+      <div class="metric"><div class="metric-label">Loyers nets avant impôt</div><div class="metric-val accent">${fmtEur(loyersNets)}</div></div>
+      <div class="metric"><div class="metric-label">Loyers nets / mois</div><div class="metric-val">${fmtEur(loyersNets/12, 0)}/mois</div></div>
+    </div>
+    <div class="bracket-detail animate">
+      <div class="bracket-title">Détail des charges annuelles</div>
+      ${copro>0?`<div class="bracket-row"><span class="rate-badge" style="background:var(--surface-3);color:var(--text-muted)">Copro</span><span class="tranche">Charges copro non récupérables</span><span class="tax">${fmtEur(copro)}</span></div>`:''}
+      ${tf>0?`<div class="bracket-row"><span class="rate-badge" style="background:var(--surface-3);color:var(--text-muted)">TF</span><span class="tranche">Taxe foncière</span><span class="tax">${fmtEur(tf)}</span></div>`:''}
+      ${pno>0?`<div class="bracket-row"><span class="rate-badge" style="background:var(--surface-3);color:var(--text-muted)">PNO</span><span class="tranche">Assurance propriétaire non occupant</span><span class="tax">${fmtEur(pno)}</span></div>`:''}
+      ${gli>0?`<div class="bracket-row"><span class="rate-badge" style="background:var(--surface-3);color:var(--text-muted)">GLI</span><span class="tranche">Garantie loyers impayés</span><span class="tax">${fmtEur(gli)}</span></div>`:''}
+      ${gestion>0?`<div class="bracket-row"><span class="rate-badge" style="background:var(--surface-3);color:var(--text-muted)">Gest.</span><span class="tranche">Gestion locative</span><span class="tax">${fmtEur(gestion)}</span></div>`:''}
+      ${entretien>0?`<div class="bracket-row"><span class="rate-badge" style="background:var(--surface-3);color:var(--text-muted)">Entr.</span><span class="tranche">Entretien / maintenance</span><span class="tax">${fmtEur(entretien)}</span></div>`:''}
+      ${autres>0?`<div class="bracket-row"><span class="rate-badge" style="background:var(--surface-3);color:var(--text-muted)">Autres</span><span class="tranche">Autres charges</span><span class="tax">${fmtEur(autres)}</span></div>`:''}
+      <div class="bracket-row"><span class="rate-badge" style="background:var(--amber-dim);color:var(--amber)">Total</span><span class="tranche">Total charges annuelles</span><span class="tax">${fmtEur(charges)}</span></div>
+    </div>
+    ${hasCf ? `
+    <div class="bracket-detail animate">
+      <div class="bracket-title">Analyse cash-flow (avec crédit)</div>
+      <div class="bracket-row"><span class="rate-badge">Loyers</span><span class="tranche">Loyers nets avant impôt</span><span class="tax">${fmtEur(loyersNets)}/an</span></div>
+      <div class="bracket-row"><span class="rate-badge" style="background:var(--amber-dim);color:var(--amber)">Crédit</span><span class="tranche">Annuités crédit + assurance</span><span class="tax">−${fmtEur(annuelCredit)}/an</span></div>
+      <div class="bracket-row"><span class="rate-badge" style="background:${cashflowAvant>=0?'rgba(59,140,90,.12)':'rgba(155,90,58,.1)'};color:${cashflowAvant>=0?'var(--success)':'#9B5A3A'}">CF</span>
+        <span class="tranche">Cash-flow avant impôt</span>
+        <span class="tax" style="color:${cashflowAvant>=0?'var(--success)':'#9B5A3A'};font-family:var(--mono)">${cashflowAvant>=0?'+':''}${fmtEur(cashflowAvant)}/an</span></div>
+      <div class="bracket-row" style="border-bottom:none"><span class="rate-badge" style="background:var(--surface-3);color:var(--text-dim)">Mois</span><span class="tranche">Cash-flow mensuel avant impôt</span><span class="tax" style="color:${cashflowAvant>=0?'var(--success)':'#9B5A3A'};font-family:var(--mono)">${cashflowAvant>=0?'+':''}${fmtEur(cashflowAvant/12, 0)}/mois</span></div>
+    </div>` : ''}
+    ${buildPedagoNette({loyersBruts, charges, loyersNets, rentNette, tauxCharges, hasCf, cashflowAvant})}
+  `;
+}
+
+/* ══════════════════════════════════════════
+   ONGLET NETTE NETTE
+══════════════════════════════════════════ */
+function calcNN() {
+  const cout      = SP.parseNum(document.getElementById('nn-cout').value);
+  const revenus   = SP.parseNum(document.getElementById('nn-revenus').value);
+  const charges   = SP.parseNum(document.getElementById('nn-charges').value);
+  const typeLoc   = document.getElementById('nn-type-loc').value;
+  const regime    = document.getElementById('nn-regime').value;
+  const tmi       = parseInt(document.getElementById('nn-tmi').value) || 0;
+  const amort     = SP.parseNum(document.getElementById('nn-amort').value);
+  const interets  = SP.parseNum(document.getElementById('nn-interets').value);
+  const deficit   = SP.parseNum(document.getElementById('nn-deficit').value);
+  const modeManuel= document.getElementById('nn-mode-auto').classList.contains('active') ? false : true;
+  const impotManuel= modeManuel ? SP.parseNum(document.getElementById('nn-impot-manuel').value) : 0;
+
+  const hasCf     = document.getElementById('nn-cf-check').checked;
+  const mens      = hasCf ? SP.parseNum(document.getElementById('nn-mens').value) : 0;
+  const assurEmpr = hasCf ? SP.parseNum(document.getElementById('nn-assur-empr').value) : 0;
+  const apport    = hasCf ? SP.parseNum(document.getElementById('nn-apport').value) : 0;
+
+  // ── Affichage conditionnel des champs ──
+  const isLmnp = typeLoc === 'lmnp' || typeLoc === 'lmp';
+  const isFoncier = typeLoc === 'nue';
+  const isReel = regime === 'reel-bic' || regime === 'reel-foncier';
+
+  document.getElementById('nn-amort-wrap').style.display   = (isLmnp && regime === 'reel-bic') ? 'block' : 'none';
+  document.getElementById('nn-interets-wrap').style.display= isReel ? 'block' : 'none';
+  document.getElementById('nn-deficit-wrap').style.display = isFoncier ? 'block' : 'none';
+
+  // ── Calcul de la base imposable ──
+  let baseImposable = 0;
+  let abattement = 0;
+  let alertFiscal = '';
+
+  if (regime === 'micro-foncier') {
+    if (revenus > 15000) {
+      alertFiscal = `Le micro-foncier est limité aux revenus fonciers bruts inférieurs à <strong>15 000 €/an</strong> (CGI art. 32). Au-delà, le régime réel s'applique obligatoirement.`;
+    }
+    abattement = revenus * 0.30;
+    baseImposable = revenus * 0.70;
+  } else if (regime === 'micro-bic') {
+    const seuil = 77700;
+    if (revenus > seuil) {
+      alertFiscal = `Le micro-BIC est limité à <strong>${fmtEur(seuil)}/an</strong> de recettes pour la location meublée classique (2026). Au-delà, le régime réel BIC s'applique.`;
+    }
+    abattement = revenus * 0.50;
+    baseImposable = revenus * 0.50;
+  } else if (regime === 'reel-foncier') {
+    const chargesDed = charges + interets;
+    const revenuNetFoncier = revenus - chargesDed;
+    if (revenuNetFoncier < 0) {
+      const deficitImput = Math.min(Math.abs(revenuNetFoncier), 10700);
+      baseImposable = 0;
+      alertFiscal = `Déficit foncier de <strong>${fmtEur(Math.abs(revenuNetFoncier))}</strong> : jusqu'à <strong>10 700 €</strong> imputables sur le revenu global (CGI art. 156). Le surplus est reportable sur les revenus fonciers des 10 années suivantes.`;
+    } else {
+      baseImposable = Math.max(0, revenuNetFoncier - deficit);
+    }
+  } else if (regime === 'reel-bic') {
+    const chargesDed = charges + interets + amort;
+    baseImposable = Math.max(0, revenus - chargesDed);
+    if (amort > 0) {
+      alertFiscal = `En LMNP réel, l'amortissement du bien et du mobilier est déductible du résultat imposable. Le déficit BIC généré <strong>ne peut pas</strong> s'imputer sur le revenu global (sauf LMP). Il est reportable sur les bénéfices BIC des 10 années suivantes.`;
+    }
+  }
+
+  // ── Taux prélèvements sociaux ──
+  const TAUX_PS = 17.2;
+  let impotIR = 0;
+  let impotPS = 0;
+  let impotTotal = 0;
+
+  if (modeManuel) {
+    impotTotal = impotManuel;
+    impotIR = impotManuel;
+    impotPS = 0;
+  } else {
+    impotIR = baseImposable * (tmi / 100);
+    impotPS = baseImposable * (TAUX_PS / 100);
+    impotTotal = impotIR + impotPS;
+  }
+
+  const revenuNetApresImpot = revenus - charges - impotTotal;
+  const rentNN = cout > 0 ? revenuNetApresImpot / cout * 100 : 0;
+
+  const annuelCredit = (mens + assurEmpr) * 12;
+  const cashflowApres = hasCf ? revenuNetApresImpot - annuelCredit : null;
+  const rentApport = (hasCf && apport > 0 && cashflowApres !== null)
+    ? cashflowApres / apport * 100 : null;
+
+  const el = document.getElementById('results-nn');
+  if (cout <= 0 || revenus <= 0) {
+    el.innerHTML = `<div class="result-empty">Renseignez le coût d'acquisition et les revenus locatifs.</div>`;
+    return;
+  }
+
+  const regimeLabel = {
+    'micro-foncier': `Micro-foncier (−30 %)`,
+    'reel-foncier':  `Réel foncier`,
+    'micro-bic':     `Micro-BIC (−50 %)`,
+    'reel-bic':      `Réel BIC / LMNP réel`
+  }[regime];
+
+  el.innerHTML = `
+    <div class="key-result animate">
+      <div class="key-result-label">Rentabilité nette d'impôts</div>
+      <div class="key-result-val">${fmtPct(rentNN)}</div>
+      ${rendBadge(rentNN)}
+      <div class="key-result-sub">${regimeLabel} · TMI ${tmi} % · PS ${modeManuel ? 'inclus dans impôt manuel' : fmtPct(TAUX_PS, 1)}</div>
+    </div>
+    <div class="metrics-grid animate">
+      <div class="metric"><div class="metric-label">Revenus bruts</div><div class="metric-val">${fmtEur(revenus)}</div></div>
+      <div class="metric"><div class="metric-label">Base imposable</div><div class="metric-val amber">${modeManuel ? '(manuel)' : fmtEur(baseImposable)}</div></div>
+      <div class="metric"><div class="metric-label">Impôt IR estimé</div><div class="metric-val amber">${fmtEur(impotIR)}</div></div>
+      <div class="metric"><div class="metric-label">Prélèvements sociaux</div><div class="metric-val amber">${modeManuel ? '—' : fmtEur(impotPS)}</div></div>
+    </div>
+    <div class="bracket-detail animate">
+      <div class="bracket-title">Calcul de la rentabilité nette d'impôts</div>
+      <div class="bracket-row"><span class="rate-badge">Loyers</span><span class="tranche">Revenus locatifs annuels bruts</span><span class="tax">${fmtEur(revenus)}</span></div>
+      ${charges>0?`<div class="bracket-row"><span class="rate-badge" style="background:var(--amber-dim);color:var(--amber)">Charges</span><span class="tranche">Charges annuelles</span><span class="tax">−${fmtEur(charges)}</span></div>`:''}
+      ${!modeManuel && abattement>0?`<div class="bracket-row"><span class="rate-badge" style="background:var(--surface-3);color:var(--text-muted)">Abatt.</span><span class="tranche">Abattement forfaitaire</span><span class="tax">−${fmtEur(abattement)}</span></div>`:''}
+      ${!modeManuel && amort>0?`<div class="bracket-row"><span class="rate-badge" style="background:var(--surface-3);color:var(--text-muted)">Amort.</span><span class="tranche">Amortissement (LMNP réel)</span><span class="tax">−${fmtEur(amort)}</span></div>`:''}
+      ${!modeManuel && interets>0?`<div class="bracket-row"><span class="rate-badge" style="background:var(--surface-3);color:var(--text-muted)">Int.</span><span class="tranche">Intérêts d'emprunt (réel)</span><span class="tax">−${fmtEur(interets)}</span></div>`:''}
+      ${!modeManuel?`<div class="bracket-row"><span class="rate-badge" style="background:var(--accent-dim);color:var(--accent)">Base</span><span class="tranche">Base imposable estimée</span><span class="tax">${fmtEur(baseImposable)}</span></div>`:''}
+      <div class="bracket-row"><span class="rate-badge" style="background:var(--amber-dim);color:var(--amber)">Impôt</span><span class="tranche">IR${modeManuel?' (manuel)':' (TMI '+tmi+' %)'}</span><span class="tax">−${fmtEur(impotIR)}</span></div>
+      ${!modeManuel?`<div class="bracket-row"><span class="rate-badge" style="background:var(--amber-dim);color:var(--amber)">PS</span><span class="tranche">Prélèvements sociaux (17,2 %)</span><span class="tax">−${fmtEur(impotPS)}</span></div>`:''}
+      <div class="bracket-row"><span class="rate-badge" style="background:var(--accent-dim);color:var(--accent)">Net</span><span class="tranche">Revenu net après impôt</span><span class="tax">${fmtEur(revenuNetApresImpot)}</span></div>
+    </div>
+    ${alertFiscal ? `<div class="fiscal-alert animate"><strong>Note fiscale :</strong> ${alertFiscal}</div>` : ''}
+    ${hasCf && cashflowApres !== null ? `
+    <div class="bracket-detail animate">
+      <div class="bracket-title">Cash-flow après fiscalité</div>
+      <div class="bracket-row"><span class="rate-badge">Net</span><span class="tranche">Revenu net après impôt</span><span class="tax">${fmtEur(revenuNetApresImpot)}/an</span></div>
+      <div class="bracket-row"><span class="rate-badge" style="background:var(--amber-dim);color:var(--amber)">Crédit</span><span class="tranche">Annuités crédit + assurance</span><span class="tax">−${fmtEur(annuelCredit)}/an</span></div>
+      <div class="bracket-row"><span class="rate-badge" style="background:${cashflowApres>=0?'rgba(59,140,90,.12)':'rgba(155,90,58,.1)'};color:${cashflowApres>=0?'var(--success)':'#9B5A3A'}">CF</span>
+        <span class="tranche">Cash-flow après impôt</span>
+        <span class="tax" style="color:${cashflowApres>=0?'var(--success)':'#9B5A3A'};font-family:var(--mono)">${cashflowApres>=0?'+':''}${fmtEur(cashflowApres)}/an · ${cashflowApres>=0?'+':''}${fmtEur(cashflowApres/12,0)}/mois</span></div>
+      ${rentApport !== null ? `<div class="bracket-row" style="border-bottom:none"><span class="rate-badge" style="background:var(--accent-dim);color:var(--accent)">Apport</span><span class="tranche">Rendement sur apport</span><span class="tax" style="color:var(--accent);font-family:var(--mono)">${fmtPct(rentApport, 1)}</span></div>` : ''}
+    </div>` : ''}
+    ${buildPedagoNN({revenus, charges, baseImposable, impotIR, impotPS, impotTotal, revenuNetApresImpot, rentNN, tmi, regime, typeLoc, amort, modeManuel, hasCf, cashflowApres})}
+  `;
+}
+
+/* ══════════════════════════════════════════
+   SECTIONS PÉDAGOGIQUES
+══════════════════════════════════════════ */
+function buildPedagoBrute({prix, notaire, coutTotal, loyer, loyersBruts, loyersEffectifs, vacance, rentBrute, rentBruteSansVacance}) {
+  const rentQual = rentBrute < 3
+    ? `inférieure à 3 % — elle couvre à peine les frais courants sur le long terme`
+    : rentBrute < 5
+      ? `entre 3 % et 5 % — correcte, mais les charges et la fiscalité vont encore la réduire`
+      : rentBrute < 7
+        ? `entre 5 % et 7 % — attractive pour un marché urbain mature`
+        : `supérieure à 7 % — élevée pour de l'immobilier résidentiel. Vérifier le risque associé.`;
+
+  let vacanceNote = '';
+  if (vacance > 0) {
+    const impactVacance = loyersBruts - loyersEffectifs;
+    vacanceNote = `<p class="pedago-p">La vacance locative de <strong>${vacance} mois/an</strong> représente un manque à gagner de <strong>${fmtEur(impactVacance)}/an</strong>, soit une perte de <strong>${fmtPct(rentBruteSansVacance - rentBrute)}</strong> sur la rentabilité brute. En pratique, prévoir au moins 1 mois de vacance par an est prudent, même dans les marchés tendus.</p>`;
+  }
+
+  const tauxNotaire = prix > 0 ? notaire/prix*100 : 0;
+  let notaireNote = '';
+  if (notaire > 0) {
+    notaireNote = tauxNotaire > 5
+      ? `Les frais de notaire représentent <strong>${fmtPct(tauxNotaire,1)}</strong> du prix d'achat — c'est le taux standard dans l'ancien (environ 7–8 %). Dans le neuf, ces frais descendent à 2–3 % environ.`
+      : `Les frais de notaire sont de <strong>${fmtPct(tauxNotaire,1)}</strong> — cohérent avec un achat dans le neuf ou sous régime particulier.`;
+  }
+
+  return `
+    <div class="pedago-card animate">
+      <div class="pedago-card-header">
+        <div class="pedago-card-dot"></div>
+        <div class="pedago-card-title">Rentabilité brute — analyse</div>
+      </div>
+      <div class="pedago-card-body">
+        <p class="pedago-p">La <strong>rentabilité brute</strong> est le premier indicateur d'un investissement locatif. Elle mesure simplement le rapport entre les loyers annuels et le coût total investi. Avec <strong>${fmtPct(rentBrute)}</strong>, votre investissement présente une rentabilité brute ${rentQual}.</p>
+        ${vacanceNote}
+        ${notaireNote ? `<p class="pedago-p">${notaireNote}</p>` : ''}
+        <div class="pedago-tip">Attention : la rentabilité <strong>brute</strong> ne tient pas compte des charges d'exploitation ni de la fiscalité. La rentabilité réelle sera toujours inférieure. Utilisez les onglets <strong>Nette de frais</strong> et <strong>Nette d'impôts</strong> pour affiner l'analyse.</div>
+        <p class="pedago-dim">Formule : rentabilité brute = loyers annuels effectifs ÷ coût total d'acquisition × 100. Coût total ici = <strong>${fmtEur(coutTotal)}</strong>. Loyers effectifs = <strong>${fmtEur(loyersEffectifs)}</strong>.</p>
+      </div>
+    </div>`;
+}
+
+function buildPedagoNette({loyersBruts, charges, loyersNets, rentNette, tauxCharges, hasCf, cashflowAvant}) {
+  const chargesQual = tauxCharges < 15
+    ? `relativement faibles (${fmtPct(tauxCharges,1)} des loyers) — situation favorable`
+    : tauxCharges < 30
+      ? `dans la moyenne (${fmtPct(tauxCharges,1)} des loyers)`
+      : tauxCharges < 50
+        ? `élevées (${fmtPct(tauxCharges,1)} des loyers) — surveiller l'évolution`
+        : `très élevées (${fmtPct(tauxCharges,1)} des loyers) — elles absorbent plus de la moitié des loyers`;
+
+  let cfNote = '';
+  if (hasCf && cashflowAvant !== null) {
+    cfNote = cashflowAvant >= 0
+      ? `<p class="pedago-p">Avec le crédit, le cash-flow avant impôt est <strong style="color:var(--success)">positif : +${fmtEur(cashflowAvant)}/an</strong> (+${fmtEur(cashflowAvant/12,0)}/mois). Le bien s'autofinance partiellement — situation confortable.</p>`
+      : `<div class="pedago-alert">Le cash-flow avant impôt est <strong>négatif : ${fmtEur(cashflowAvant)}/an</strong> (${fmtEur(cashflowAvant/12,0)}/mois). L'investisseur doit compléter l'effort d'épargne de sa poche chaque mois. Ce n'est pas nécessairement rédhibitoire si la plus-value potentielle est au rendez-vous.</div>`;
+  }
+
+  return `
+    <div class="pedago-card animate">
+      <div class="pedago-card-header">
+        <div class="pedago-card-dot"></div>
+        <div class="pedago-card-title">Rentabilité nette — analyse</div>
+      </div>
+      <div class="pedago-card-body">
+        <p class="pedago-p">La <strong>rentabilité nette</strong> déduit les charges réelles du bien avant impôt. Vos charges sont ${chargesQual}. Après déduction, les loyers nets représentent <strong>${fmtEur(loyersNets)}/an</strong> pour une rentabilité nette de frais de <strong>${fmtPct(rentNette)}</strong>.</p>
+        ${cfNote}
+        <div class="pedago-tip"><strong>Rentabilité ≠ cash-flow.</strong> La rentabilité nette mesure la performance du capital investi. Le cash-flow mesure l'équilibre mensuel entre revenus locatifs et remboursement du crédit. Un bien peut être rentable avec un cash-flow négatif, et inversement.</div>
+        <p class="pedago-dim">Formule : rentabilité nette = (loyers bruts − charges) ÷ coût total × 100. L'impôt sur le revenu et les prélèvements sociaux ne sont pas encore déduits — utilisez l'onglet <strong>Nette d'impôts</strong> pour cela.</p>
+      </div>
+    </div>`;
+}
+
+function buildPedagoNN({revenus, charges, baseImposable, impotIR, impotPS, impotTotal, revenuNetApresImpot, rentNN, tmi, regime, typeLoc, amort, modeManuel, hasCf, cashflowApres}) {
+  const regimeName = {
+    'micro-foncier': 'micro-foncier',
+    'reel-foncier':  'réel foncier',
+    'micro-bic':     'micro-BIC',
+    'reel-bic':      'réel BIC (LMNP réel)'
+  }[regime];
+
+  let fiscNote = '';
+  if (regime === 'micro-bic') {
+    fiscNote = `<p class="pedago-p">En <strong>micro-BIC</strong>, un abattement forfaitaire de <strong>50 %</strong> s'applique sur les recettes brutes. Pas besoin de justifier les charges réelles : le fisc accepte que la moitié des loyers couvre les frais. C'est simple et souvent avantageux tant que les charges réelles sont inférieures à 50 %.</p>`;
+  } else if (regime === 'micro-foncier') {
+    fiscNote = `<p class="pedago-p">En <strong>micro-foncier</strong>, l'abattement forfaitaire est de <strong>30 %</strong>. Il est applicable uniquement si les revenus fonciers bruts annuels n'excèdent pas 15 000 € (CGI art. 32). Au-delà, le régime réel s'impose.</p>`;
+  } else if (regime === 'reel-bic' && amort > 0) {
+    fiscNote = `<p class="pedago-p">En <strong>LMNP réel</strong>, l'amortissement comptable du bien (hors terrain) et du mobilier permet de réduire la base imposable à quasi zéro dans de nombreux cas. C'est l'un des régimes fiscaux les plus favorables de l'immobilier résidentiel, à condition d'être bien accompagné par un expert-comptable.</p>`;
+  } else if (regime === 'reel-foncier') {
+    fiscNote = `<p class="pedago-p">En <strong>réel foncier</strong>, toutes les charges réelles sont déductibles : taxe foncière, travaux d'entretien, intérêts d'emprunt, assurances, frais de gestion. En cas de déficit, il est imputable sur le revenu global dans la limite de 10 700 €/an, et reportable sur 10 ans sur les revenus fonciers.</p>`;
+  }
+
+  const tmiNote = tmi >= 41
+    ? `<div class="pedago-alert">Avec une <strong>TMI de ${tmi} %</strong>, la fiscalité pèse lourd. Explorez des structures optimisées : LMNP réel avec amortissement, SCI à l'IS, ou dispositifs de défiscalisation adaptés à votre situation.</div>`
+    : tmi >= 30
+      ? `<p class="pedago-p">Avec une <strong>TMI de ${tmi} %</strong>, la fiscalité représente un enjeu significatif. Le choix du régime fiscal est déterminant : un passage au réel (LMNP ou foncier) peut sensiblement améliorer la rentabilité nette d'impôts.</p>`
+      : '';
+
+  let cfNote = '';
+  if (hasCf && cashflowApres !== null) {
+    cfNote = cashflowApres >= 0
+      ? `<p class="pedago-p">Après impôt et remboursement du crédit, le cash-flow est <strong style="color:var(--success)">positif : +${fmtEur(cashflowApres)}/an</strong>. Le bien s'autofinance après fiscalité.</p>`
+      : `<div class="pedago-alert">Le cash-flow <strong>après impôt est négatif : ${fmtEur(cashflowApres)}/an</strong>. L'effort d'épargne mensuel est de <strong>${fmtEur(Math.abs(cashflowApres/12), 0)}/mois</strong>. Cet effort peut être compensé par la constitution d'un patrimoine et une plus-value à la revente.</div>`;
+  }
+
+  return `
+    <div class="pedago-card animate">
+      <div class="pedago-card-header">
+        <div class="pedago-card-dot"></div>
+        <div class="pedago-card-title">Rentabilité nette d'impôts — analyse</div>
+      </div>
+      <div class="pedago-card-body">
+        <p class="pedago-p">La <strong>rentabilité nette d'impôts</strong> est l'indicateur le plus précis : elle défalque charges ET fiscalité. En régime <strong>${regimeName}</strong>
+        ${!modeManuel ? `, la base imposable estimée est de <strong>${fmtEur(baseImposable)}</strong>, générant <strong>${fmtEur(impotIR)} d'IR</strong> et <strong>${fmtEur(impotPS)} de prélèvements sociaux (17,2 %)</strong> — soit <strong>${fmtEur(impotTotal)}</strong> au total.` : ''}
+        Après fiscalité, le revenu net s'établit à <strong>${fmtEur(revenuNetApresImpot)}/an</strong>, pour une rentabilité nette d'impôts de <strong>${fmtPct(rentNN)}</strong>.</p>
+        ${fiscNote}
+        ${tmiNote}
+        ${cfNote}
+        <p class="pedago-dim">Les prélèvements sociaux de 17,2 % s'appliquent sur les revenus fonciers et BIC non professionnels (LMNP). Sources : CGI art. 32, 35, 156 ; BOFiP — IR — revenus fonciers, BIC ; impots.gouv.fr.</p>
+      </div>
+    </div>`;
+}
+
+/* ══════════════════════════════════════════
+   INIT
+══════════════════════════════════════════ */
+
+/* Tabs */
+document.querySelectorAll('.rl-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.rl-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.rl-panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+  });
+});
+
+/* CF toggles */
+document.getElementById('n-cf-check').addEventListener('change', function() {
+  document.getElementById('n-cf-panel').classList.toggle('open', this.checked);
+  calcNette();
+});
+document.getElementById('nn-cf-check').addEventListener('change', function() {
+  document.getElementById('nn-cf-panel').classList.toggle('open', this.checked);
+  calcNN();
+});
+
+/* Mode manuel / estimé */
+document.getElementById('nn-mode-auto').addEventListener('click', () => {
+  document.getElementById('nn-mode-auto').classList.add('active');
+  document.getElementById('nn-mode-manuel').classList.remove('active');
+  document.getElementById('nn-impot-manuel-wrap').style.display = 'none';
+  calcNN();
+});
+document.getElementById('nn-mode-manuel').addEventListener('click', () => {
+  document.getElementById('nn-mode-manuel').classList.add('active');
+  document.getElementById('nn-mode-auto').classList.remove('active');
+  document.getElementById('nn-impot-manuel-wrap').style.display = 'block';
+  calcNN();
+});
+
+/* Type de location → filtrer régimes */
+document.getElementById('nn-type-loc').addEventListener('change', function() {
+  const v = this.value;
+  const sel = document.getElementById('nn-regime');
+  const current = sel.value;
+  sel.innerHTML = '';
+  const opts = v === 'nue'
+    ? [['micro-foncier','Micro-foncier (abattement 30 %)'],['reel-foncier','Réel foncier']]
+    : [['micro-bic','Micro-BIC (abattement 50 %)'],['reel-bic','Réel BIC / LMNP réel']];
+  opts.forEach(([val,label]) => {
+    const o = document.createElement('option');
+    o.value = val; o.textContent = label;
+    if (val === current) o.selected = true;
+    sel.appendChild(o);
+  });
+  calcNN();
+});
+
+/* Sliders onglet Brute */
+syncSlider('b-prix',    'b-prix-s',    'b-prix-disp',    v => fmtEur(v));
+syncSlider('b-notaire', 'b-notaire-s', 'b-notaire-disp', v => fmtEur(v));
+syncSlider('b-agence',  'b-agence-s',  'b-agence-disp',  v => fmtEur(v));
+syncSlider('b-travaux', 'b-travaux-s', 'b-travaux-disp', v => fmtEur(v));
+syncSlider('b-mobilier','b-mobilier-s','b-mobilier-disp',v => fmtEur(v));
+syncSlider('b-loyer',   'b-loyer-s',   'b-loyer-disp',   v => fmtEur(v));
+syncSlider('b-vacance', 'b-vacance-s', 'b-vacance-disp', v => fmtNum(v,1) + ' mois/an');
+
+/* Listeners brute */
+['b-prix','b-notaire','b-agence','b-travaux','b-mobilier','b-autres','b-loyer','b-vacance',
+ 'b-prix-s','b-notaire-s','b-agence-s','b-travaux-s','b-mobilier-s','b-loyer-s','b-vacance-s']
+  .forEach(id => { const e = document.getElementById(id); if(e) e.addEventListener('input', calcBrute); });
+
+/* Listeners nette */
+['n-cout','n-loyer','n-vacance','n-copro','n-tf','n-pno','n-gli','n-gestion','n-entretien','n-autres','n-mens','n-assur-empr']
+  .forEach(id => { const e = document.getElementById(id); if(e) e.addEventListener('input', calcNette); });
+
+/* Listeners NN */
+['nn-cout','nn-revenus','nn-charges','nn-tmi','nn-regime','nn-type-loc','nn-amort','nn-interets','nn-deficit','nn-impot-manuel',
+ 'nn-mens','nn-assur-empr','nn-apport']
+  .forEach(id => { const e = document.getElementById(id); if(e) e.addEventListener('input', calcNN); if(e&&e.tagName==='SELECT') e.addEventListener('change', calcNN); });
+
+/* Calculs initiaux pour les 3 onglets — résultats visibles dès le chargement */
+calcBrute(); calcNette(); calcNN();
+
+/* Dropdown nav */
+/* Menu déroulant catégorisé — voir shared-nav.js */
+SP.nav.init();
+</script>
+</body>
+</html>

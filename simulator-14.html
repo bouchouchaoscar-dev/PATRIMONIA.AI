@@ -1,0 +1,1860 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="favicon-64.png">
+  <link rel="shortcut icon" href="favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="favicon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<!-- v=14.1.0 - polish UX done -->
+<title>PER — Plan Épargne Retraite — PATRIMONIA.AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css?v=19">
+<script src="shared.js?v=2"></script>
+<script src="shared-nav.js?v=6"></script>
+<script src="shared-constants.js?v=4"></script>
+<script src="shared-tax.js?v=3"></script>
+<style>
+/* ════════════════════════════════════════════════════════
+   PER — Identité visuelle propre : tons sage + or doux
+   ════════════════════════════════════════════════════════ */
+:root {
+  --per-sage:        #4F8A78;
+  --per-sage-light:  rgba(79,138,120,.08);
+  --per-sage-dim:    rgba(79,138,120,.18);
+  --per-amber:       #B8860B;
+  --per-amber-light: rgba(184,134,11,.08);
+  --per-amber-dim:   rgba(184,134,11,.18);
+  --per-deep:        #1F3A38;
+  --per-mist:        #F5F8F7;
+  --per-rose:        #9B5A3A;
+  --per-rose-dim:    rgba(155,90,58,.08);
+  --r-md:            14px;
+}
+
+/* ── Header personnalisé ── */
+.per-hero {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  gap: 2rem; margin-bottom: 1.75rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.per-hero-titles { flex: 1; min-width: 0 }
+.per-hero-eyebrow {
+  font-size: .62rem; font-weight: 700;
+  color: var(--per-sage); letter-spacing: .14em;
+  text-transform: uppercase; margin-bottom: .55rem;
+  display: inline-flex; align-items: center; gap: .5rem;
+}
+.per-hero-eyebrow::before {
+  content: ''; width: 7px; height: 7px; border-radius: 50%;
+  background: var(--per-sage); box-shadow: 0 0 0 3px var(--per-sage-light);
+}
+.per-hero h1 {
+  font-family: var(--sans); font-size: 1.65rem; font-weight: 700;
+  letter-spacing: -.04em; color: var(--text); line-height: 1.15;
+  margin-bottom: .35rem;
+}
+.per-hero h1 em {
+  font-style: normal; color: var(--per-sage);
+  background: linear-gradient(90deg, var(--per-sage) 0%, var(--per-amber) 100%);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+.per-hero p {
+  font-size: .85rem; color: var(--text-muted);
+  font-weight: 400; letter-spacing: -.01em;
+  max-width: 540px;
+}
+.per-hero-aside {
+  flex-shrink: 0;
+  display: flex; gap: .65rem;
+}
+.per-hero-stat {
+  background: var(--surface-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-md); padding: .65rem 1rem;
+  min-width: 110px;
+}
+.per-hero-stat-label {
+  font-size: .58rem; font-weight: 600;
+  color: var(--text-dim); letter-spacing: .08em;
+  text-transform: uppercase; margin-bottom: .25rem;
+}
+.per-hero-stat-val {
+  font-family: var(--mono); font-size: .92rem; font-weight: 600;
+  color: var(--per-sage); letter-spacing: -.015em;
+}
+
+/* ── Tabs (pills inline avec indicator) ── */
+.per-tabs {
+  display: flex; gap: .35rem; padding: .25rem;
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 100px;
+  margin-bottom: 1.5rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  position: relative;
+  z-index: 5;
+}
+.per-tabs::-webkit-scrollbar { display: none }
+.per-tab {
+  flex: 1; min-width: max-content;
+  font-family: var(--sans); font-size: .76rem; font-weight: 500;
+  color: var(--text-muted); letter-spacing: -.01em;
+  background: transparent; border: none; cursor: pointer;
+  padding: .5rem 1rem; border-radius: 100px;
+  transition: color .2s ease, background .2s ease;
+  display: inline-flex; align-items: center; gap: .45rem;
+  white-space: nowrap;
+  position: relative;
+  z-index: 6;
+}
+.per-tab:hover { color: var(--text) }
+.per-tab.active {
+  background: var(--bg);
+  color: var(--per-sage);
+  box-shadow: 0 1px 6px rgba(0,0,0,.06), 0 0 0 1px rgba(0,0,0,.04);
+}
+.per-tab-icon { width: 14px; height: 14px; flex-shrink: 0 }
+
+/* ── Body split ── */
+.per-body {
+  display: grid; grid-template-columns: 380px 1fr; gap: 1.5rem;
+  align-items: start;
+}
+@media(max-width:920px) {
+  .per-body { grid-template-columns: 1fr }
+}
+
+/* ── Panneau inputs ── */
+.per-inputs {
+  background: var(--surface-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r);
+  padding: 1.5rem 1.4rem;
+  box-shadow: 0 2px 12px rgba(0,0,0,.03);
+  position: sticky; top: 70px;
+  max-height: calc(100vh - 90px); overflow-y: auto;
+  scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+}
+.per-inputs::-webkit-scrollbar { width: 6px }
+.per-inputs::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px }
+
+.per-sec {
+  font-size: .6rem; font-weight: 700; color: var(--text-dim);
+  letter-spacing: .12em; text-transform: uppercase;
+  padding: .85rem 0 .55rem; margin-top: .5rem;
+  border-top: 1px solid var(--border-subtle);
+  display: flex; align-items: center; gap: .45rem;
+}
+.per-sec:first-of-type { border-top: none; margin-top: 0; padding-top: 0 }
+.per-sec::before {
+  content: ''; width: 4px; height: 4px; border-radius: 50%;
+  background: var(--per-sage);
+}
+
+.per-field { margin-bottom: .9rem }
+.per-field-label {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-bottom: .35rem;
+}
+.per-field-label label {
+  font-size: .73rem; font-weight: 500;
+  color: var(--text); letter-spacing: -.01em;
+}
+.per-field-val {
+  font-family: var(--mono); font-size: .7rem; font-weight: 600;
+  color: var(--per-sage);
+}
+
+.per-inp-wrap {
+  display: flex; align-items: center; gap: .45rem;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: .45rem .8rem;
+  transition: all .25s ease;
+}
+.per-inp-wrap:focus-within {
+  border-color: var(--per-sage);
+  box-shadow: 0 0 0 3px var(--per-sage-light);
+  background: var(--surface-2);
+}
+.per-inp-wrap input[type=text],
+.per-inp-wrap input[type=number] {
+  flex: 1; background: inherit; border: none; outline: none;
+  font-family: var(--sans); font-size: .85rem; font-weight: 500;
+  color: var(--text); letter-spacing: -.015em;
+  width: 100%; min-width: 0;
+  -webkit-appearance: none; appearance: none;
+}
+.per-inp-wrap input::-webkit-outer-spin-button,
+.per-inp-wrap input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0 }
+.per-unit { font-size: .76rem; color: var(--text-dim); font-weight: 500 }
+
+.per-sel {
+  width: 100%; background: var(--surface);
+  border: 1.5px solid var(--border); border-radius: var(--r-sm);
+  font-family: var(--sans); font-size: .82rem; font-weight: 400;
+  color: var(--text); padding: .5rem .8rem;
+  outline: none; cursor: pointer;
+  -webkit-appearance: none; appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6' fill='none' stroke='%2398989D' stroke-width='1.6'%3E%3Cpath d='M1 1l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right .8rem center; background-size: 10px;
+  padding-right: 2rem;
+  transition: all .2s ease;
+}
+.per-sel:focus { border-color: var(--per-sage); box-shadow: 0 0 0 3px var(--per-sage-light) }
+
+/* Pill selector */
+.per-pills {
+  display: flex; gap: .3rem; padding: .25rem;
+  background: var(--surface); border: 1px solid var(--border-subtle);
+  border-radius: 100px;
+}
+.per-pill {
+  flex: 1; text-align: center;
+  font-size: .73rem; font-weight: 500;
+  color: var(--text-muted); letter-spacing: -.01em;
+  padding: .42rem .55rem; border-radius: 100px;
+  cursor: pointer; transition: all .2s ease;
+  background: transparent; border: none;
+}
+.per-pill:hover { color: var(--text) }
+.per-pill.active {
+  background: var(--bg); color: var(--per-sage);
+  font-weight: 600;
+  box-shadow: 0 1px 6px rgba(0,0,0,.06), 0 0 0 1px rgba(0,0,0,.04);
+}
+
+/* Slider */
+.per-range {
+  width: 100%; height: 4px; border-radius: 2px;
+  appearance: none; -webkit-appearance: none;
+  outline: none; cursor: pointer; margin-top: .55rem;
+  background: linear-gradient(
+    to right,
+    var(--per-sage) 0%, var(--per-sage) var(--pct,30%),
+    var(--border) var(--pct,30%), var(--border) 100%
+  );
+}
+.per-range::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%;
+  background: var(--surface-2); border: 2px solid var(--per-sage);
+  box-shadow: 0 1px 5px rgba(79,138,120,.25), 0 0 0 4px rgba(79,138,120,.06);
+  transition: transform .15s ease;
+}
+.per-range::-webkit-slider-thumb:hover { transform: scale(1.12) }
+.per-range::-moz-range-thumb {
+  width: 18px; height: 18px; border-radius: 50%;
+  background: var(--surface-2); border: 2px solid var(--per-sage);
+}
+
+/* ── Panneau résultats ── */
+.per-results {
+  min-width: 0;
+  display: flex; flex-direction: column; gap: 1.25rem;
+}
+.per-pane { display: none; flex-direction: column; gap: 1.25rem }
+.per-pane.active { display: flex; animation: paneFade .35s ease }
+@keyframes paneFade {
+  from { opacity: 0; transform: translateY(6px) }
+  to   { opacity: 1; transform: translateY(0) }
+}
+
+/* ── Hero result ── */
+.per-hero-card {
+  background: linear-gradient(140deg, #fff 0%, var(--per-sage-light) 100%);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r);
+  padding: 1.75rem 2rem;
+  position: relative; overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0,0,0,.04);
+}
+.per-hero-card::after {
+  content: ''; position: absolute;
+  right: -50px; top: -50px;
+  width: 200px; height: 200px; border-radius: 50%;
+  background: radial-gradient(circle, var(--per-sage-dim) 0%, transparent 65%);
+  pointer-events: none;
+}
+.per-hero-card-label {
+  font-size: .62rem; font-weight: 700;
+  color: var(--per-sage); letter-spacing: .12em;
+  text-transform: uppercase; margin-bottom: .65rem;
+}
+.per-hero-card-val {
+  font-family: var(--sans); font-size: clamp(2rem, 4vw, 2.8rem);
+  font-weight: 700; color: var(--per-deep);
+  letter-spacing: -.025em; line-height: 1;
+}
+.per-hero-card-val .accent { color: var(--per-sage) }
+.per-hero-card-sub {
+  margin-top: .65rem;
+  font-size: .82rem; color: var(--text-muted);
+  font-weight: 400; letter-spacing: -.01em; line-height: 1.55;
+  max-width: 75%;
+}
+.per-hero-card-sub strong { color: var(--text); font-weight: 600 }
+
+/* ── Métriques grid ── */
+.per-metrics {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: .65rem;
+}
+.per-metric {
+  background: var(--surface-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-sm);
+  padding: .95rem 1.1rem;
+  transition: box-shadow .2s ease, transform .2s ease;
+}
+.per-metric:hover { box-shadow: 0 4px 16px rgba(0,0,0,.06); transform: translateY(-1px) }
+.per-metric-label {
+  font-size: .58rem; font-weight: 700; color: var(--text-dim);
+  letter-spacing: .08em; text-transform: uppercase; margin-bottom: .3rem;
+}
+.per-metric-val {
+  font-family: var(--sans); font-size: 1.05rem; font-weight: 700;
+  color: var(--text); letter-spacing: -.025em;
+}
+.per-metric-val.sage   { color: var(--per-sage) }
+.per-metric-val.amber  { color: var(--per-amber) }
+.per-metric-val.muted  { color: var(--text-muted) }
+.per-metric-val.rose   { color: var(--per-rose) }
+.per-metric-sub {
+  margin-top: .15rem;
+  font-size: .68rem; color: var(--text-muted); font-weight: 400;
+}
+
+/* ── Jauge plafond PER ── */
+.per-gauge {
+  background: var(--surface-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-sm);
+  padding: 1.1rem 1.25rem;
+}
+.per-gauge-head {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-bottom: .9rem;
+}
+.per-gauge-title {
+  font-size: .68rem; font-weight: 700; color: var(--text);
+  letter-spacing: -.01em;
+}
+.per-gauge-pct {
+  font-family: var(--mono); font-size: .8rem; font-weight: 600;
+  color: var(--per-sage);
+}
+.per-gauge-bar {
+  height: 10px; background: var(--surface);
+  border-radius: 100px; overflow: hidden;
+  display: flex; gap: 2px;
+}
+.per-gauge-fill {
+  background: linear-gradient(90deg, var(--per-sage) 0%, var(--per-amber) 100%);
+  border-radius: 100px;
+  transition: width .55s cubic-bezier(.4,0,.2,1);
+}
+.per-gauge-fill.over {
+  background: linear-gradient(90deg, var(--per-amber) 0%, var(--per-rose) 100%);
+}
+.per-gauge-foot {
+  display: flex; justify-content: space-between;
+  margin-top: .7rem;
+  font-size: .68rem; color: var(--text-muted); font-weight: 400;
+}
+.per-gauge-foot strong { color: var(--text); font-family: var(--mono); font-weight: 600 }
+
+/* ── Timeline retraite ── */
+.per-timeline {
+  background: var(--surface-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-sm);
+  padding: 1.5rem 1.25rem 1.25rem;
+  position: relative;
+  overflow: hidden;
+}
+.per-timeline-title {
+  font-size: .58rem; font-weight: 700; color: var(--text-dim);
+  letter-spacing: .1em; text-transform: uppercase; margin-bottom: 1.4rem;
+}
+.per-timeline-track {
+  position: relative; height: 2px;
+  background: var(--border);
+  margin: .85rem 2.25rem 2.2rem;
+  border-radius: 1px;
+}
+.per-timeline-progress {
+  position: absolute; left: 0; top: 0; bottom: 0;
+  background: linear-gradient(90deg, var(--per-sage) 0%, var(--per-amber) 100%);
+  border-radius: 1px;
+  transition: width .55s cubic-bezier(.4,0,.2,1);
+  pointer-events: none;
+}
+.per-tl-node {
+  position: absolute; top: 50%; transform: translate(-50%, -50%);
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--surface-2); border: 2px solid var(--per-sage);
+  z-index: 1;
+  pointer-events: none;
+}
+.per-tl-node.future { border-color: var(--border); background: var(--surface) }
+.per-tl-node.target {
+  width: 18px; height: 18px;
+  border-color: var(--per-amber);
+  box-shadow: 0 0 0 4px var(--per-amber-light);
+}
+.per-tl-label {
+  position: absolute; top: 1.3rem; transform: translateX(-50%);
+  text-align: center; width: 92px;
+  pointer-events: none;
+}
+.per-tl-label-age {
+  font-family: var(--mono); font-size: .68rem;
+  color: var(--text-dim); font-weight: 600;
+}
+.per-tl-label-txt {
+  font-size: .68rem; font-weight: 600;
+  color: var(--text); margin-top: .15rem;
+}
+.per-tl-label-val {
+  font-family: var(--mono); font-size: .68rem;
+  color: var(--per-sage); font-weight: 600; margin-top: .15rem;
+}
+
+/* ── Canvas projection ── */
+.per-chart-wrap {
+  background: var(--surface-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r);
+  padding: 1.3rem 1.4rem 1rem;
+}
+.per-chart-head {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-bottom: .85rem;
+}
+.per-chart-title {
+  font-size: .82rem; font-weight: 600;
+  color: var(--text); letter-spacing: -.015em;
+}
+.per-chart-legend { display: flex; gap: 1rem; font-size: .68rem; color: var(--text-muted) }
+.per-chart-legend-dot {
+  display: inline-block; width: 8px; height: 8px;
+  border-radius: 50%; margin-right: .4rem;
+  vertical-align: middle;
+}
+.per-chart-canvas {
+  width: 100%; height: 220px;
+  display: block;
+}
+
+/* ── Sortie : grille 3 colonnes ── */
+.per-sortie-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: .7rem;
+}
+@media (max-width: 760px) {
+  .per-sortie-grid { grid-template-columns: 1fr }
+}
+.per-sortie-card {
+  background: var(--surface-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r);
+  padding: 1.15rem 1.2rem;
+  display: flex; flex-direction: column; gap: .6rem;
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+.per-sortie-card.recommended {
+  border-color: var(--per-sage);
+  background: linear-gradient(150deg, #fff 0%, var(--per-sage-light) 100%);
+  box-shadow: 0 4px 18px rgba(79,138,120,.12);
+}
+.per-sortie-card-head {
+  display: flex; align-items: center; justify-content: space-between;
+}
+.per-sortie-card-title {
+  font-size: .8rem; font-weight: 600;
+  color: var(--text); letter-spacing: -.015em;
+}
+.per-sortie-card-badge {
+  font-size: .55rem; font-weight: 700;
+  letter-spacing: .08em; text-transform: uppercase;
+  color: var(--per-sage); background: var(--per-sage-dim);
+  padding: .15rem .5rem; border-radius: 100px;
+}
+.per-sortie-card-main {
+  font-family: var(--sans); font-size: 1.45rem;
+  font-weight: 700; color: var(--per-deep);
+  letter-spacing: -.025em; line-height: 1.1;
+}
+.per-sortie-card-sub {
+  font-size: .7rem; color: var(--text-muted);
+  font-weight: 400; line-height: 1.5;
+}
+.per-sortie-breakdown {
+  margin-top: .55rem; padding-top: .65rem;
+  border-top: 1px solid var(--border-subtle);
+  display: flex; flex-direction: column; gap: .35rem;
+}
+.per-sortie-row {
+  display: flex; justify-content: space-between;
+  font-size: .72rem; color: var(--text-muted); font-weight: 400;
+}
+.per-sortie-row strong {
+  font-family: var(--mono); font-weight: 600;
+  color: var(--text);
+}
+.per-sortie-row.tax strong { color: var(--per-rose) }
+.per-sortie-row.net strong { color: var(--per-sage) }
+
+/* ── Tableau comparaison ── */
+.per-compare {
+  background: var(--surface-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r);
+  overflow-x: auto;
+  min-width: 0;
+  -webkit-overflow-scrolling: touch;
+}
+.per-compare table {
+  width: 100%; min-width: 440px;
+  border-collapse: collapse;
+  font-size: .74rem;
+  table-layout: auto;
+}
+.per-compare th, .per-compare td {
+  padding: .6rem .75rem;
+  text-align: left;
+  border-top: 1px solid var(--border-subtle);
+  font-family: var(--sans);
+  vertical-align: middle;
+}
+.per-compare thead th {
+  background: var(--surface);
+  font-size: .6rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .07em;
+  color: var(--text-dim);
+  border-top: none;
+  border-bottom: 1px solid var(--border-subtle);
+  white-space: nowrap;
+}
+.per-compare th:first-child {
+  width: auto; min-width: 130px;
+  color: var(--text); font-weight: 600;
+  white-space: normal;
+}
+.per-compare td { color: var(--text-muted); font-weight: 400 }
+.per-compare td.score {
+  font-family: var(--mono); font-weight: 600;
+  text-align: center;
+  white-space: nowrap;
+}
+.per-score-dot {
+  display: inline-flex; gap: 2px;
+}
+.per-score-dot span {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--border);
+}
+.per-score-dot span.on { background: var(--per-sage) }
+
+/* Radar SVG */
+.per-radar {
+  background: var(--surface-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r);
+  padding: 1.5rem;
+  display: flex; flex-direction: column; align-items: center;
+}
+.per-radar-svg {
+  width: 100%; max-width: 360px; height: 320px;
+}
+.per-radar-legend {
+  display: flex; flex-wrap: wrap; gap: 1rem;
+  margin-top: .85rem;
+  font-size: .7rem; color: var(--text-muted);
+}
+.per-radar-legend-dot {
+  display: inline-block; width: 9px; height: 9px;
+  border-radius: 2px; margin-right: .4rem;
+  vertical-align: middle;
+}
+/* Le tableau a 5 colonnes (Critère + PER + AV + CTO + Livret A). À l'intérieur */
+/* d'une sim-page cappée à 1080px, la zone résultats fait ~610px : le tableau */
+/* et le radar ne tiennent jamais côte à côte sans tronquer. On les empile     */
+/* systématiquement en pile verticale pour une lecture confortable.            */
+.per-compare-grid {
+  display: grid; grid-template-columns: 1fr; gap: 1rem;
+  align-items: start;
+}
+.per-radar-svg { max-width: 420px }
+
+/* ── Stack bar composition capital ── */
+.per-stack {
+  background: var(--surface-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-sm);
+  padding: 1.1rem 1.25rem;
+}
+.per-stack-head {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-bottom: .9rem;
+}
+.per-stack-title {
+  font-size: .68rem; font-weight: 700; color: var(--text);
+}
+.per-stack-bar {
+  display: flex; height: 22px; border-radius: 4px;
+  overflow: hidden; gap: 2px;
+}
+.per-stack-seg { height: 100%; transition: flex .5s ease }
+.per-stack-seg.deduits  { background: var(--per-sage) }
+.per-stack-seg.nondeduit{ background: var(--per-amber) }
+.per-stack-seg.gains    { background: linear-gradient(135deg, var(--per-amber) 0%, var(--per-sage) 100%) }
+.per-stack-legend {
+  display: flex; flex-wrap: wrap; gap: 1rem;
+  margin-top: .8rem; font-size: .7rem; color: var(--text-muted);
+}
+.per-stack-legend-dot {
+  display: inline-block; width: 9px; height: 9px;
+  border-radius: 2px; margin-right: .35rem; vertical-align: middle;
+}
+
+/* ── Aide contextuelle inputs ── */
+.per-help-text {
+  font-size: .68rem; color: var(--text-dim);
+  line-height: 1.5; letter-spacing: -.005em;
+  margin-top: .35rem;
+}
+.per-field-readout {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: .45rem .8rem;
+  background: var(--per-sage-light);
+  border: 1px solid rgba(79,138,120,.18);
+  border-radius: var(--r-sm);
+  font-size: .76rem; color: var(--text-muted);
+}
+.per-field-readout strong {
+  font-family: var(--sans); font-weight: 700;
+  color: var(--per-sage); font-size: .85rem;
+  letter-spacing: -.01em;
+}
+
+/* ── Carte "Écart de TMI" ── */
+.per-metric.per-spread-card {
+  grid-column: span 2;
+  background: linear-gradient(135deg, var(--per-sage-light) 0%, var(--per-amber-light) 100%);
+  border-color: rgba(79,138,120,.22);
+}
+.per-spread-card .per-metric-label { color: var(--per-sage) }
+.per-spread-flow {
+  display: flex; align-items: center; gap: .75rem;
+  font-family: var(--mono); font-size: 1rem; font-weight: 600;
+  color: var(--text);
+}
+.per-spread-flow .arrow {
+  color: var(--per-sage); font-weight: 400;
+}
+.per-spread-delta {
+  font-family: var(--sans); font-size: .68rem; font-weight: 600;
+  letter-spacing: -.005em;
+  padding: .2rem .55rem; border-radius: 100px;
+  margin-left: .35rem;
+}
+.per-spread-delta.favorable { color: var(--per-sage); background: var(--per-sage-dim) }
+.per-spread-delta.neutre    { color: var(--text-muted); background: var(--surface-3) }
+.per-spread-delta.defavorable { color: var(--per-rose); background: var(--per-rose-dim) }
+
+/* ── Pédagogie ── */
+.per-pedago-blocks {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+}
+@media(max-width: 760px) { .per-pedago-blocks { grid-template-columns: 1fr } }
+.per-pedago-block {
+  background: var(--surface-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r);
+  padding: 1.35rem 1.5rem;
+  display: flex; flex-direction: column; gap: .75rem;
+  transition: border-color .2s ease;
+}
+.per-pedago-block:hover { border-color: var(--per-sage-dim) }
+.per-pedago-block.full { grid-column: 1 / -1 }
+.per-pedago-block-head {
+  display: flex; align-items: center; gap: .65rem;
+  padding-bottom: .8rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.per-pedago-block-icon {
+  width: 26px; height: 26px;
+  background: var(--per-sage-light); color: var(--per-sage);
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.per-pedago-block-icon svg { width: 13px; height: 13px }
+.per-pedago-block-title {
+  font-size: .68rem; font-weight: 700; color: var(--per-sage);
+  letter-spacing: .07em; text-transform: uppercase;
+}
+.per-pedago-block p {
+  font-size: .82rem; line-height: 1.75;
+  color: var(--text-muted); margin: 0;
+  letter-spacing: -.012em;
+}
+.per-pedago-block p strong { color: var(--text); font-weight: 600 }
+.per-pedago-block p em { color: var(--per-sage); font-style: normal; font-weight: 500 }
+
+/* ── Disclosure ── */
+.per-disclosure {
+  background: var(--per-amber-light);
+  border: 1px solid rgba(184,134,11,.2);
+  border-radius: var(--r-sm);
+  padding: .8rem 1.1rem .8rem 2.1rem;
+  position: relative;
+  font-size: .76rem; color: var(--text-muted); line-height: 1.65;
+}
+.per-disclosure::before {
+  content: '!'; color: var(--per-amber); font-weight: 700;
+  position: absolute; left: .85rem; top: .78rem;
+}
+.per-disclosure strong { color: var(--per-amber); font-weight: 600 }
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="index.html" class="nav-logo">
+    <img src="logo.png?v=3" alt="PATRIMONIA.AI" class="nav-logo-img">
+  </a>
+  <div class="nav-right">
+    <a href="index.html" class="nav-back">
+      <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7.5 2L3.5 6l4 4"/></svg>
+      Accueil
+    </a>
+    <div class="nav-dropdown" id="mainDropdown">
+      <button class="nav-dropdown-btn" aria-expanded="false" aria-haspopup="true">
+        Simulateurs <svg class="nav-chevron" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.8" style="width:13px;height:8px;flex-shrink:0"><path d="M1 1l4 4 4-4"/></svg>
+      </button>
+      <div class="nav-dropdown-menu" id="navMenu" role="menu"></div>
+    </div>
+  </div>
+</nav>
+
+<div class="sim-page">
+
+  <!-- HERO -->
+  <div class="per-hero">
+    <div class="per-hero-titles">
+      <div class="per-hero-eyebrow">Retraite & Épargne</div>
+      <h1>PER — <em>Plan Épargne Retraite</em></h1>
+      <p>Économie fiscale immédiate, capitalisation long terme, arbitrage capital / rente : un moteur complet pour piloter votre épargne retraite et la confronter à vos autres dispositifs patrimoniaux.</p>
+    </div>
+    <div class="per-hero-aside">
+      <div class="per-hero-stat">
+        <div class="per-hero-stat-label">Plafond 2026</div>
+        <div class="per-hero-stat-val" id="per-hero-plafond">— €</div>
+      </div>
+      <div class="per-hero-stat">
+        <div class="per-hero-stat-label">Capital cible</div>
+        <div class="per-hero-stat-val" id="per-hero-capital">— €</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="per-tabs" role="tablist">
+    <button class="per-tab active" data-tab="fiscal" role="tab">
+      <svg class="per-tab-icon" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 1.5v11M3.5 4h7M2 7.5l1.5-3.5 1.5 3.5"/></svg>
+      Économie fiscale
+    </button>
+    <button class="per-tab" data-tab="capital" role="tab">
+      <svg class="per-tab-icon" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 11.5h10M3 9l2.5-3 2 2L11 4"/></svg>
+      Capitalisation
+    </button>
+    <button class="per-tab" data-tab="sortie" role="tab">
+      <svg class="per-tab-icon" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="5.5"/><path d="M7 4v3.5l2 1.5"/></svg>
+      Sortie retraite
+    </button>
+    <button class="per-tab" data-tab="compare" role="tab">
+      <svg class="per-tab-icon" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3h10M2 7h10M2 11h10M5 1v12M9 1v12"/></svg>
+      Comparaison
+    </button>
+    <button class="per-tab" data-tab="pedago" role="tab">
+      <svg class="per-tab-icon" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V3M2 3l5 3 5-3M2 3h10"/></svg>
+      Pédagogie
+    </button>
+  </div>
+
+  <!-- BODY -->
+  <div class="per-body">
+
+    <!-- INPUTS -->
+    <aside class="per-inputs">
+
+      <div class="per-sec">Profil fiscal</div>
+      <div class="per-field">
+        <div class="per-field-label"><label>Situation familiale</label></div>
+        <div class="per-pills" id="per-famille">
+          <button class="per-pill active" data-v="celib">Célibataire</button>
+          <button class="per-pill" data-v="couple">Couple</button>
+        </div>
+      </div>
+      <div class="per-field">
+        <div class="per-field-label"><label for="per-parts">Parts fiscales</label><span class="per-field-val" id="per-parts-disp">1 part</span></div>
+        <div class="per-inp-wrap"><input type="number" id="per-parts" value="1" min="1" max="6" step="0.25"></div>
+      </div>
+      <div class="per-field">
+        <div class="per-field-label"><label>Profession</label></div>
+        <select id="per-profession" class="per-sel">
+          <option value="salarie">Salarié</option>
+          <option value="dirigeant">Dirigeant assimilé salarié</option>
+          <option value="tns">TNS / Indépendant</option>
+          <option value="retraite">Retraité</option>
+        </select>
+      </div>
+      <div class="per-field">
+        <div class="per-field-label"><label for="per-age">Âge actuel</label><span class="per-field-val" id="per-age-disp">40 ans</span></div>
+        <div class="per-inp-wrap"><input type="number" id="per-age" value="40" min="18" max="80" step="1"><span class="per-unit">ans</span></div>
+      </div>
+      <div class="per-field">
+        <div class="per-field-label"><label for="per-age-ret">Âge retraite cible</label><span class="per-field-val" id="per-age-ret-disp">64 ans</span></div>
+        <div class="per-inp-wrap"><input type="number" id="per-age-ret" value="64" min="50" max="75" step="1"><span class="per-unit">ans</span></div>
+      </div>
+
+      <div class="per-sec">Revenus & TMI actuelle</div>
+      <div class="per-field">
+        <div class="per-field-label"><label for="per-revenu">Revenu net imposable annuel</label></div>
+        <div class="per-inp-wrap"><input type="text" inputmode="numeric" id="per-revenu" data-fmt value="60000"><span class="per-unit">€</span></div>
+      </div>
+      <div class="per-field">
+        <div class="per-field-readout">
+          <span>TMI actuelle (calculée auto)</span>
+          <strong id="per-tmi-actu-disp">— %</strong>
+        </div>
+        <div class="per-help-text">Déterminée par votre revenu et vos parts fiscales (barème 2026). Sert au calcul de l'<em>économie d'impôt immédiate</em>. À distinguer de la TMI estimée à la retraite (section Sortie).</div>
+      </div>
+
+      <div class="per-sec">Versement PER</div>
+      <div class="per-field">
+        <div class="per-field-label"><label for="per-versement">Versement annuel</label></div>
+        <div class="per-inp-wrap"><input type="text" inputmode="numeric" id="per-versement" data-fmt value="5000"><span class="per-unit">€</span></div>
+      </div>
+      <div class="per-field">
+        <div class="per-field-label"><label for="per-reports">Reports cumulés (3 dernières années)</label></div>
+        <div class="per-inp-wrap"><input type="text" inputmode="numeric" id="per-reports" data-fmt value="0"><span class="per-unit">€</span></div>
+      </div>
+      <div class="per-field">
+        <div class="per-field-label"><label for="per-capital">Capital PER actuel</label></div>
+        <div class="per-inp-wrap"><input type="text" inputmode="numeric" id="per-capital" data-fmt value="0"><span class="per-unit">€</span></div>
+      </div>
+
+      <div class="per-sec">Projection</div>
+      <div class="per-field">
+        <div class="per-field-label"><label>Profil de gestion</label></div>
+        <div class="per-pills" id="per-profil">
+          <button class="per-pill" data-v="prudent">Prudent</button>
+          <button class="per-pill active" data-v="equilibre">Équilibré</button>
+          <button class="per-pill" data-v="dynamique">Dynamique</button>
+        </div>
+      </div>
+      <div class="per-field">
+        <div class="per-field-label"><label for="per-rdt">Rendement annuel</label><span class="per-field-val" id="per-rdt-disp">4,0 %</span></div>
+        <div class="per-inp-wrap"><input type="number" id="per-rdt" value="4" min="0" max="12" step="0.1"><span class="per-unit">%</span></div>
+        <input type="range" id="per-rdt-s" class="per-range" min="0" max="10" step="0.1" value="4">
+      </div>
+      <div class="per-field">
+        <div class="per-field-label"><label for="per-fg">Frais de gestion</label><span class="per-field-val" id="per-fg-disp">1,0 %</span></div>
+        <div class="per-inp-wrap"><input type="number" id="per-fg" value="1" min="0" max="3" step="0.05"><span class="per-unit">%</span></div>
+      </div>
+      <div class="per-field">
+        <div class="per-field-label"><label for="per-infl">Inflation</label><span class="per-field-val" id="per-infl-disp">2,0 %</span></div>
+        <div class="per-inp-wrap"><input type="number" id="per-infl" value="2" min="0" max="6" step="0.1"><span class="per-unit">%</span></div>
+      </div>
+
+      <div class="per-sec">Sortie</div>
+      <div class="per-field">
+        <div class="per-field-label"><label>Mode de sortie</label></div>
+        <div class="per-pills" id="per-mode-sortie">
+          <button class="per-pill active" data-v="capital">Capital</button>
+          <button class="per-pill" data-v="rente">Rente</button>
+          <button class="per-pill" data-v="mixte">Mixte</button>
+        </div>
+      </div>
+      <div class="per-field" id="per-mixte-wrap" style="display:none">
+        <div class="per-field-label"><label for="per-pct-cap">Part en capital</label><span class="per-field-val" id="per-pct-cap-disp">50 %</span></div>
+        <input type="range" id="per-pct-cap" class="per-range" min="0" max="100" step="5" value="50">
+      </div>
+      <div class="per-field">
+        <div class="per-field-label"><label for="per-tmi-sortie">TMI estimée à la retraite</label><span class="per-field-val" id="per-tmi-sortie-disp">30 %</span></div>
+        <select id="per-tmi-sortie" class="per-sel">
+          <option value="0">0 % (non imposable)</option>
+          <option value="0.11">11 %</option>
+          <option value="0.30" selected>30 %</option>
+          <option value="0.41">41 %</option>
+          <option value="0.45">45 %</option>
+        </select>
+        <div class="per-help-text">Indépendante de votre TMI actuelle. Sert uniquement à l'<em>imposition future</em> lors du déblocage (capital ou rente). En général, les revenus baissent à la retraite : la TMI estimée est souvent inférieure à la TMI actuelle.</div>
+      </div>
+
+    </aside>
+
+    <!-- RESULTS -->
+    <main class="per-results">
+
+      <!-- TAB 1 : ÉCONOMIE FISCALE -->
+      <section class="per-pane active" data-pane="fiscal">
+        <div class="per-hero-card">
+          <div class="per-hero-card-label">Économie d'impôt immédiate</div>
+          <div class="per-hero-card-val">
+            <span class="accent" id="per-eco-val">— €</span>
+          </div>
+          <div class="per-hero-card-sub" id="per-eco-sub">— </div>
+        </div>
+
+        <div class="per-metrics">
+          <div class="per-metric">
+            <div class="per-metric-label">Versement saisi</div>
+            <div class="per-metric-val" id="per-vers-val">— €</div>
+          </div>
+          <div class="per-metric">
+            <div class="per-metric-label">Versement déductible</div>
+            <div class="per-metric-val sage" id="per-vers-deduc">— €</div>
+            <div class="per-metric-sub" id="per-vers-deduc-sub"></div>
+          </div>
+          <div class="per-metric">
+            <div class="per-metric-label">Coût réel net</div>
+            <div class="per-metric-val amber" id="per-cout-reel">— €</div>
+            <div class="per-metric-sub">après économie d'IR</div>
+          </div>
+          <div class="per-metric">
+            <div class="per-metric-label">Taux d'effort</div>
+            <div class="per-metric-val" id="per-effort">—</div>
+            <div class="per-metric-sub" id="per-effort-sub"></div>
+          </div>
+          <div class="per-metric">
+            <div class="per-metric-label">IR avant / après</div>
+            <div class="per-metric-val muted" id="per-ir-compare" style="font-size:.9rem">— → —</div>
+          </div>
+        </div>
+
+        <div class="per-metric per-spread-card">
+          <div class="per-metric-label">Écart de TMI — actuelle ↔ retraite</div>
+          <div class="per-spread-flow">
+            <span id="per-tmi-act-val">— %</span>
+            <span class="arrow">→</span>
+            <span id="per-tmi-srt-val">— %</span>
+            <span class="per-spread-delta neutre" id="per-tmi-delta">±0 pts</span>
+          </div>
+          <div class="per-metric-sub" id="per-tmi-spread-sub" style="margin-top:.4rem">—</div>
+        </div>
+
+        <div class="per-gauge">
+          <div class="per-gauge-head">
+            <div class="per-gauge-title">Plafond PER utilisé</div>
+            <div class="per-gauge-pct" id="per-gauge-pct">— %</div>
+          </div>
+          <div class="per-gauge-bar">
+            <div class="per-gauge-fill" id="per-gauge-fill" style="width:0%"></div>
+          </div>
+          <div class="per-gauge-foot">
+            <span>Utilisé : <strong id="per-gauge-used">0 €</strong></span>
+            <span>Plafond total : <strong id="per-gauge-total">0 €</strong></span>
+          </div>
+        </div>
+
+        <div class="per-disclosure" id="per-eco-alert" hidden>
+          <strong>Versement supérieur au plafond.</strong> <span id="per-eco-alert-txt"></span>
+        </div>
+      </section>
+
+      <!-- TAB 2 : CAPITALISATION -->
+      <section class="per-pane" data-pane="capital">
+        <div class="per-timeline">
+          <div class="per-timeline-title">Horizon retraite</div>
+          <div class="per-timeline-track" id="per-timeline-track">
+            <div class="per-timeline-progress" id="per-timeline-progress" style="width:0%"></div>
+            <!-- Nodes & labels rendus dynamiquement -->
+          </div>
+        </div>
+
+        <div class="per-chart-wrap">
+          <div class="per-chart-head">
+            <div class="per-chart-title">Projection de capital — versements vs gains</div>
+            <div class="per-chart-legend">
+              <span><span class="per-chart-legend-dot" style="background:var(--per-sage)"></span>Capital investi</span>
+              <span><span class="per-chart-legend-dot" style="background:var(--per-amber)"></span>Gains</span>
+            </div>
+          </div>
+          <canvas id="per-chart" class="per-chart-canvas"></canvas>
+        </div>
+
+        <div class="per-metrics">
+          <div class="per-metric">
+            <div class="per-metric-label">Capital projeté</div>
+            <div class="per-metric-val sage" id="per-cap-projete">— €</div>
+            <div class="per-metric-sub" id="per-cap-projete-sub"></div>
+          </div>
+          <div class="per-metric">
+            <div class="per-metric-label">Capital investi</div>
+            <div class="per-metric-val" id="per-cap-investi">— €</div>
+          </div>
+          <div class="per-metric">
+            <div class="per-metric-label">Gains cumulés</div>
+            <div class="per-metric-val amber" id="per-cap-gains">— €</div>
+            <div class="per-metric-sub" id="per-cap-gains-sub"></div>
+          </div>
+          <div class="per-metric">
+            <div class="per-metric-label">Pouvoir d'achat réel</div>
+            <div class="per-metric-val muted" id="per-cap-reel">— €</div>
+            <div class="per-metric-sub">corrigé de l'inflation</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3 : SORTIE RETRAITE -->
+      <section class="per-pane" data-pane="sortie">
+        <div class="per-sortie-grid" id="per-sortie-grid">
+          <div class="per-sortie-card" data-mode="capital">
+            <div class="per-sortie-card-head">
+              <div class="per-sortie-card-title">Sortie en capital</div>
+              <span class="per-sortie-card-badge">100 %</span>
+            </div>
+            <div class="per-sortie-card-main" id="per-cap-net">— €</div>
+            <div class="per-sortie-card-sub">Capital net après imposition</div>
+            <div class="per-sortie-breakdown" id="per-cap-detail"></div>
+          </div>
+          <div class="per-sortie-card" data-mode="rente">
+            <div class="per-sortie-card-head">
+              <div class="per-sortie-card-title">Rente viagère</div>
+              <span class="per-sortie-card-badge">à vie</span>
+            </div>
+            <div class="per-sortie-card-main" id="per-rente-net">— €/an</div>
+            <div class="per-sortie-card-sub">Rente nette annuelle</div>
+            <div class="per-sortie-breakdown" id="per-rente-detail"></div>
+          </div>
+          <div class="per-sortie-card" data-mode="mixte">
+            <div class="per-sortie-card-head">
+              <div class="per-sortie-card-title">Sortie mixte</div>
+              <span class="per-sortie-card-badge" id="per-mixte-badge">50 / 50</span>
+            </div>
+            <div class="per-sortie-card-main" id="per-mixte-net">— €</div>
+            <div class="per-sortie-card-sub">Capital net + rente nette/an</div>
+            <div class="per-sortie-breakdown" id="per-mixte-detail"></div>
+          </div>
+        </div>
+
+        <div class="per-stack">
+          <div class="per-stack-head">
+            <div class="per-stack-title">Composition du capital final</div>
+          </div>
+          <div class="per-stack-bar" id="per-stack-bar"></div>
+          <div class="per-stack-legend">
+            <span><span class="per-stack-legend-dot" style="background:var(--per-sage)"></span><strong id="per-stack-deduits">— €</strong> versements déduits</span>
+            <span><span class="per-stack-legend-dot" style="background:var(--per-amber)"></span><strong id="per-stack-nondeduit">— €</strong> versements non déduits</span>
+            <span><span class="per-stack-legend-dot" style="background:linear-gradient(135deg,var(--per-amber),var(--per-sage))"></span><strong id="per-stack-gains">— €</strong> gains</span>
+          </div>
+        </div>
+
+        <div class="per-disclosure">
+          <strong>Rente viagère théorique</strong> calculée sur une espérance de vie résiduelle moyenne (≈22 ans à 62 ans, INSEE). Les rentes réellement servies dépendent du taux technique et de la table de mortalité de l'assureur.
+        </div>
+      </section>
+
+      <!-- TAB 4 : COMPARAISON -->
+      <section class="per-pane" data-pane="compare">
+        <div class="per-compare-grid">
+          <div class="per-compare">
+            <table>
+              <thead>
+                <tr>
+                  <th>Critère</th>
+                  <th class="score">PER</th>
+                  <th class="score">Assurance-vie</th>
+                  <th class="score">CTO</th>
+                  <th class="score">Livret A</th>
+                </tr>
+              </thead>
+              <tbody id="per-compare-body"></tbody>
+            </table>
+          </div>
+          <div class="per-radar">
+            <svg class="per-radar-svg" viewBox="0 0 320 320" id="per-radar-svg"></svg>
+            <div class="per-radar-legend">
+              <span><span class="per-radar-legend-dot" style="background:var(--per-sage)"></span>PER</span>
+              <span><span class="per-radar-legend-dot" style="background:var(--per-amber)"></span>Assurance-vie</span>
+              <span><span class="per-radar-legend-dot" style="background:var(--text-dim)"></span>CTO</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="per-pedago-block">
+          <div class="per-pedago-block-head">
+            <div class="per-pedago-block-icon">
+              <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="7" cy="7" r="5.5"/><path d="M7 4v3.5l2 1.5"/></svg>
+            </div>
+            <div class="per-pedago-block-title">Synthèse stratégique</div>
+          </div>
+          <p id="per-compare-synth">—</p>
+        </div>
+      </section>
+
+      <!-- TAB 5 : PÉDAGOGIE -->
+      <section class="per-pane" data-pane="pedago">
+        <div class="per-pedago-blocks" id="per-pedago-blocks"></div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<footer>
+  Données indicatives — Sources : CGI art. 163 quatervicies · 154 bis · 158-6 · BOFiP · service-public.fr · BOSS · Urssaf.<br>
+  PASS 2026 officiel : 48 060 € · Plafond PER : 10 % du revenu pro plafonné à 8 PASS · TNS : assiette élargie art. 154 bis.<br>
+  Rentes viagères : fractions imposables CGI 158-6 selon l'âge d'entrée en jouissance.
+</footer>
+
+<script>
+'use strict';
+
+/* ════════════════════════════════════════════════════════
+   PER — logique métier
+   ════════════════════════════════════════════════════════ */
+const PROFILES = {
+  prudent:   { rdt: 2.2, fg: 0.75 },
+  equilibre: { rdt: 4.0, fg: 1.00 },
+  dynamique: { rdt: 6.5, fg: 1.20 }
+};
+
+const fmtEur = SP.fmtEur;
+const fmtPct = (v, d) => SP.fmtNumD(v * 100, d == null ? 1 : d) + ' %';
+const fmtNumD = SP.fmtNumD;
+const clamp = SP.clamp;
+
+/* ──── Initialisation des inputs ──── */
+SP.initFmt(document);
+
+/* Pills */
+function bindPills(rootId, onChange) {
+  const root = document.getElementById(rootId);
+  if (!root) return;
+  root.addEventListener('click', e => {
+    const btn = e.target.closest('.per-pill');
+    if (!btn) return;
+    root.querySelectorAll('.per-pill').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    if (onChange) onChange(btn.dataset.v);
+    renderAll();
+  });
+}
+function pillVal(rootId) {
+  const el = document.querySelector('#' + rootId + ' .per-pill.active');
+  return el ? el.dataset.v : '';
+}
+
+bindPills('per-famille');
+bindPills('per-profil', (v) => {
+  const p = PROFILES[v];
+  if (!p) return;
+  const rdtInp = document.getElementById('per-rdt');
+  const rdtSl  = document.getElementById('per-rdt-s');
+  const fgInp  = document.getElementById('per-fg');
+  rdtInp.value = p.rdt;
+  rdtSl.value  = p.rdt;
+  fgInp.value  = p.fg;
+  // Déclenche la sync interne (display + gradient track --pct + renderAll)
+  rdtInp.dispatchEvent(new Event('input', { bubbles: true }));
+  fgInp.dispatchEvent(new Event('input', { bubbles: true }));
+});
+bindPills('per-mode-sortie', (v) => {
+  document.getElementById('per-mixte-wrap').style.display = v === 'mixte' ? '' : 'none';
+});
+
+/* Sliders ↔ inputs */
+function sync(inputId, sliderId, dispId, fmt) {
+  const inp = document.getElementById(inputId);
+  const sl = sliderId ? document.getElementById(sliderId) : null;
+  const disp = dispId ? document.getElementById(dispId) : null;
+  function update(src) {
+    const v = +(src.value || 0);
+    if (inp && src !== inp) inp.value = v;
+    if (sl && src !== sl) sl.value = v;
+    if (disp) disp.textContent = fmt ? fmt(v) : v;
+    if (sl) {
+      const min = +sl.min || 0, max = +sl.max || 100;
+      sl.style.setProperty('--pct', ((v - min) / (max - min) * 100) + '%');
+    }
+    renderAll();
+  }
+  if (inp) inp.addEventListener('input', () => update(inp));
+  if (sl) sl.addEventListener('input', () => update(sl));
+  update(inp || sl);
+}
+sync('per-parts', null, 'per-parts-disp', v => v + (v > 1 ? ' parts' : ' part'));
+sync('per-age', null, 'per-age-disp', v => v + ' ans');
+sync('per-age-ret', null, 'per-age-ret-disp', v => v + ' ans');
+sync('per-rdt', 'per-rdt-s', 'per-rdt-disp', v => fmtNumD(v, 1) + ' %');
+sync('per-fg', null, 'per-fg-disp', v => fmtNumD(v, 2) + ' %');
+sync('per-infl', null, 'per-infl-disp', v => fmtNumD(v, 1) + ' %');
+sync('per-pct-cap', null, 'per-pct-cap-disp', v => v + ' %');
+
+document.getElementById('per-profession').addEventListener('change', renderAll);
+document.getElementById('per-tmi-sortie').addEventListener('change', () => {
+  const v = +document.getElementById('per-tmi-sortie').value;
+  document.getElementById('per-tmi-sortie-disp').textContent = (v * 100).toFixed(0) + ' %';
+  renderAll();
+});
+['per-revenu','per-versement','per-reports','per-capital'].forEach(id => {
+  document.getElementById(id).addEventListener('input', renderAll);
+});
+
+/* Tabs */
+const panes = document.querySelectorAll('.per-pane');
+const tabs = document.querySelectorAll('.per-tab');
+tabs.forEach(t => t.addEventListener('click', () => {
+  tabs.forEach(x => x.classList.remove('active'));
+  panes.forEach(p => p.classList.remove('active'));
+  t.classList.add('active');
+  const newPane = document.querySelector('[data-pane="' + t.dataset.tab + '"]');
+  newPane.classList.add('active');
+  /* Re-render après affichage : permet aux composants dimensionnés (canvas chart,
+     timeline absolue) d'utiliser leurs vraies dimensions une fois la pane visible. */
+  renderAll();
+}));
+
+/* ════════════════════════════════════════════════════════
+   Moteur métier
+   ════════════════════════════════════════════════════════ */
+function getInputs() {
+  return {
+    famille:     pillVal('per-famille'),                     // celib / couple
+    parts:       +document.getElementById('per-parts').value || 1,
+    profession:  document.getElementById('per-profession').value,
+    age:         +document.getElementById('per-age').value || 40,
+    ageRet:      +document.getElementById('per-age-ret').value || 64,
+    revenu:      SP.v('per-revenu'),
+    versement:   SP.v('per-versement'),
+    reports:     SP.v('per-reports'),
+    capital:     SP.v('per-capital'),
+    profil:      pillVal('per-profil'),
+    rdt:         (+document.getElementById('per-rdt').value || 0) / 100,
+    fg:          (+document.getElementById('per-fg').value  || 0) / 100,
+    inflation:   (+document.getElementById('per-infl').value || 0) / 100,
+    modeSortie:  pillVal('per-mode-sortie'),
+    pctCap:      (+document.getElementById('per-pct-cap').value || 0) / 100,
+    tmiSortie:   +document.getElementById('per-tmi-sortie').value || 0
+  };
+}
+
+function calcPlafond(d) {
+  const isTNS = d.profession === 'tns';
+  const annuel = SP.tax.plafondPER(d.revenu, isTNS);
+  const reports = Math.max(0, d.reports);
+  return { annuel, reports, total: annuel + reports, isTNS };
+}
+
+function calcFiscal(d, plaf) {
+  const versementDeduc = Math.min(d.versement, plaf.total);
+  const versementNonDeduc = Math.max(0, d.versement - plaf.total);
+  const irAvant = SP.tax.calcIR(d.revenu, d.parts);
+  const irApres = SP.tax.calcIR(Math.max(0, d.revenu - versementDeduc), d.parts);
+  const economie = Math.max(0, irAvant.impotBrut - irApres.impotBrut);
+  const coutReel = Math.max(0, d.versement - economie);
+  const tauxEffort = d.revenu > 0 ? coutReel / d.revenu : 0;
+  return {
+    versementDeduc, versementNonDeduc,
+    irAvant: irAvant.impotBrut, irApres: irApres.impotBrut,
+    economie, coutReel, tauxEffort,
+    tmi: irAvant.tmi,
+    pctUtil: plaf.total > 0 ? d.versement / plaf.total : 0
+  };
+}
+
+function calcCapital(d) {
+  const duree = Math.max(0, d.ageRet - d.age);
+  const rdtNet = d.rdt - d.fg;
+  let capital = d.capital;
+  let investi = d.capital;
+  const proj = [{ y: 0, age: d.age, capital, investi, gains: 0 }];
+  for (let y = 1; y <= duree; y++) {
+    capital = capital * (1 + rdtNet) + d.versement;
+    investi += d.versement;
+    proj.push({ y, age: d.age + y, capital, investi, gains: capital - investi });
+  }
+  const gains = Math.max(0, capital - investi);
+  const capitalReel = duree > 0 ? capital / Math.pow(1 + d.inflation, duree) : capital;
+  return { duree, capital, investi, gains, capitalReel, proj, rdtNet };
+}
+
+function calcSortie(d, cap, fiscal) {
+  // On suppose : versements cumulés futurs déduits chaque année ≤ plafond
+  // Versements déduits = total versements cumulés × ratio_déduit_année_courante
+  // Approximation : utilise le ratio du versement courant
+  const totalVersements = cap.investi - d.capital;
+  const ratioDeduc = d.versement > 0 ? fiscal.versementDeduc / d.versement : 1;
+  const versementsDeduits = (cap.investi - d.capital) * ratioDeduc + d.capital * ratioDeduc;
+  const versementsNonDeduits = cap.investi - versementsDeduits;
+
+  // SORTIE CAPITAL 100 %
+  const sCap = SP.tax.sortiePERCapital(cap.capital, versementsDeduits, versementsNonDeduits, d.tmiSortie);
+  // SORTIE RENTE 100 %
+  const sRente = SP.tax.sortiePERRente(cap.capital, d.ageRet, d.tmiSortie);
+  // SORTIE MIXTE selon pctCap
+  const pc = clamp(d.pctCap, 0, 1);
+  const capCedeCap = cap.capital * pc;
+  const capCedeRente = cap.capital * (1 - pc);
+  const partVD = versementsDeduits;
+  const partVND = versementsNonDeduits;
+  // On partage les versements proportionnellement
+  const sMixteCap = SP.tax.sortiePERCapital(
+    capCedeCap, partVD * pc, partVND * pc, d.tmiSortie
+  );
+  const sMixteRente = SP.tax.sortiePERRente(
+    capCedeRente, d.ageRet, d.tmiSortie
+  );
+
+  return {
+    versementsDeduits, versementsNonDeduits, gainsTotaux: cap.gains,
+    capital: sCap, rente: sRente,
+    mixte: { capital: sMixteCap, rente: sMixteRente, pc }
+  };
+}
+
+/* Solutions concurrentes — projection comparée sur même durée et même effort */
+function calcComparaison(d, cap, fiscal, sortie) {
+  const duree = cap.duree;
+  const effortAnnuel = fiscal.coutReel; // effort réel équivalent
+  const rdtNet = cap.rdtNet;
+  function project(initial, versementAnnuel, rendementNet) {
+    let c = initial;
+    for (let y = 1; y <= duree; y++) c = c * (1 + rendementNet) + versementAnnuel;
+    return c;
+  }
+
+  // PER : capital net après sortie (mode choisi)
+  let perNet;
+  if (d.modeSortie === 'capital') perNet = sortie.capital.capitalNet;
+  else if (d.modeSortie === 'rente') {
+    // Valeur actualisée approximative de la rente sur espérance de vie
+    const annees = SP.CONST.PER.ESPERANCE_VIE_RETRAITE;
+    perNet = sortie.rente.renteNetteAnnuelle * annees;
+  } else {
+    const annees = SP.CONST.PER.ESPERANCE_VIE_RETRAITE;
+    perNet = sortie.mixte.capital.capitalNet + sortie.mixte.rente.renteNetteAnnuelle * annees;
+  }
+
+  // AV : versement brut = versement (pas d'avantage entrée), rendement même, sortie après 8 ans
+  // Abattement 4600/9200 selon famille
+  const avCapBrut = project(d.capital, d.versement, rdtNet);
+  const avGains = Math.max(0, avCapBrut - (d.capital + d.versement * duree));
+  const abattAV = d.famille === 'couple' ? 9200 : 4600;
+  const gainsAprAbatt = Math.max(0, avGains - abattAV);
+  const irAV = gainsAprAbatt * 0.075; // après 8 ans, taux 7,5 % (simplifié, < 150k€)
+  const psAV = avGains * 0.172;
+  const avNet = avCapBrut - irAV - psAV;
+
+  // CTO : versement brut, rendement même, PFU 30 % sur gains
+  const ctoCapBrut = project(d.capital, d.versement, rdtNet);
+  const ctoGains = Math.max(0, ctoCapBrut - (d.capital + d.versement * duree));
+  const ctoNet = ctoCapBrut - ctoGains * 0.30;
+
+  // Livret : taux 3 % (Livret A 2026), exonération totale, plafond 22 950 €
+  const livretCapBrut = project(d.capital, d.versement, 0.03);
+  const livretNet = livretCapBrut;
+
+  return {
+    per: perNet,
+    av: avNet,
+    cto: ctoNet,
+    livret: livretNet,
+    effortPER: fiscal.coutReel * duree,
+    effortAutre: d.versement * duree
+  };
+}
+
+/* ════════════════════════════════════════════════════════
+   Rendu
+   ════════════════════════════════════════════════════════ */
+function setText(id, v) { const e = document.getElementById(id); if (e) e.textContent = v; }
+function setHtml(id, v) { const e = document.getElementById(id); if (e) e.innerHTML = v; }
+function setStyle(id, prop, v) { const e = document.getElementById(id); if (e) e.style[prop] = v; }
+
+function renderHero(d, plaf, cap) {
+  setText('per-hero-plafond', fmtEur(plaf.total));
+  setText('per-hero-capital', fmtEur(cap.capital));
+}
+
+function renderFiscal(d, plaf, fiscal) {
+  setText('per-eco-val', fmtEur(fiscal.economie));
+  setText('per-vers-val', fmtEur(d.versement));
+  setText('per-vers-deduc', fmtEur(fiscal.versementDeduc));
+  setText('per-vers-deduc-sub', fiscal.versementNonDeduc > 0 ? 'dont ' + fmtEur(fiscal.versementNonDeduc) + ' non déductibles' : '100 % déductible');
+  setText('per-cout-reel', fmtEur(fiscal.coutReel));
+  setText('per-effort', fmtNumD(fiscal.tauxEffort * 100, 1) + ' %');
+  setText('per-effort-sub', 'du revenu imposable');
+  setText('per-ir-compare', fmtEur(fiscal.irAvant) + ' → ' + fmtEur(fiscal.irApres));
+
+  // TMI actuelle (auto) — affichée dans les inputs en read-only
+  setText('per-tmi-actu-disp', (fiscal.tmi * 100).toFixed(0) + ' %');
+
+  // Carte "Écart de TMI" — comparaison actuelle vs sortie
+  const tmiAct = fiscal.tmi;
+  const tmiSrt = d.tmiSortie;
+  const delta = tmiAct - tmiSrt;
+  setText('per-tmi-act-val', (tmiAct * 100).toFixed(0) + ' %');
+  setText('per-tmi-srt-val', (tmiSrt * 100).toFixed(0) + ' %');
+  const deltaPts = Math.round(delta * 100);
+  const deltaEl = document.getElementById('per-tmi-delta');
+  let deltaCls, deltaTxt, spreadSub;
+  if (deltaPts > 5) {
+    deltaCls = 'favorable';
+    deltaTxt = '+' + deltaPts + ' pts favorables';
+    spreadSub = 'Vous déduisez aujourd\'hui à <strong>' + (tmiAct*100).toFixed(0) + ' %</strong> et serez imposé à la retraite à <strong>' + (tmiSrt*100).toFixed(0) + ' %</strong> : <em>scénario fiscalement favorable</em> — le PER joue pleinement son rôle d\'arbitrage temporel.';
+  } else if (deltaPts < -5) {
+    deltaCls = 'defavorable';
+    deltaTxt = deltaPts + ' pts défavorables';
+    spreadSub = 'TMI actuelle <strong>' + (tmiAct*100).toFixed(0) + ' %</strong> inférieure à la TMI de sortie <strong>' + (tmiSrt*100).toFixed(0) + ' %</strong> : l\'intérêt fiscal du PER est <em>limité</em> dans ce scénario, l\'AV ou le PEA peuvent être plus pertinents.';
+  } else {
+    deltaCls = 'neutre';
+    deltaTxt = (deltaPts >= 0 ? '+' : '') + deltaPts + ' pts';
+    spreadSub = 'TMI actuelle et future similaires : l\'intérêt vient principalement du <em>décalage d\'imposition</em> et de la capitalisation en franchise d\'impôt jusqu\'à la sortie.';
+  }
+  deltaEl.className = 'per-spread-delta ' + deltaCls;
+  deltaEl.textContent = deltaTxt;
+  setHtml('per-tmi-spread-sub', spreadSub);
+
+  // Sub explicatif (en hero) — focus sur l'économie immédiate
+  let sub;
+  if (fiscal.economie === 0) {
+    sub = '<strong>Aucune économie d\'impôt</strong> dans votre situation actuelle — la déductibilité du PER nécessite une TMI strictement positive.';
+  } else if (fiscal.tmi >= 0.41) {
+    sub = 'À <strong>' + (fiscal.tmi * 100).toFixed(0) + ' %</strong> de TMI actuelle, votre PER est particulièrement performant : chaque euro versé vous coûte réellement <strong>' + fmtEur(1 - fiscal.economie / Math.max(1, d.versement), 2).replace('€', '') + ' centimes</strong> après déduction.';
+  } else {
+    sub = 'À <strong>' + (fiscal.tmi * 100).toFixed(0) + ' %</strong> de TMI actuelle, le PER vous fait économiser <strong>' + fmtNumD(fiscal.economie / Math.max(1, d.versement) * 100, 0) + ' %</strong> de votre versement en impôt immédiat.';
+  }
+  setHtml('per-eco-sub', sub);
+
+  // Jauge plafond
+  const pct = Math.min(100, fiscal.pctUtil * 100);
+  setText('per-gauge-pct', fmtNumD(pct, 0) + ' %');
+  setStyle('per-gauge-fill', 'width', Math.min(100, pct) + '%');
+  document.getElementById('per-gauge-fill').classList.toggle('over', fiscal.pctUtil > 1);
+  setText('per-gauge-used', fmtEur(d.versement));
+  setText('per-gauge-total', fmtEur(plaf.total));
+
+  const alertEl = document.getElementById('per-eco-alert');
+  if (fiscal.versementNonDeduc > 0) {
+    alertEl.hidden = false;
+    document.getElementById('per-eco-alert-txt').textContent =
+      fmtEur(fiscal.versementNonDeduc) + ' au-delà du plafond restent versés mais non déductibles. Ils seront néanmoins exonérés d\'IR à la sortie.';
+  } else {
+    alertEl.hidden = true;
+  }
+}
+
+function renderCapital(d, cap) {
+  setText('per-cap-projete', fmtEur(cap.capital));
+  setText('per-cap-projete-sub', 'à ' + d.ageRet + ' ans (' + cap.duree + ' ans de capitalisation)');
+  setText('per-cap-investi', fmtEur(cap.investi));
+  setText('per-cap-gains', fmtEur(cap.gains));
+  const pctGains = cap.investi > 0 ? (cap.gains / cap.investi * 100) : 0;
+  setText('per-cap-gains-sub', '+' + fmtNumD(pctGains, 0) + ' % vs investi');
+  setText('per-cap-reel', fmtEur(cap.capitalReel));
+
+  // Timeline
+  renderTimeline(d, cap);
+
+  // Canvas
+  drawChart(cap, d);
+}
+
+function renderTimeline(d, cap) {
+  const track = document.getElementById('per-timeline-track');
+  // 3 nodes : Aujourd'hui (age), Retraite (ageRet), +20 ans (espérance)
+  const ageEnd = d.ageRet + SP.CONST.PER.ESPERANCE_VIE_RETRAITE;
+  const span = Math.max(1, ageEnd - d.age);
+  const posRet = ((d.ageRet - d.age) / span) * 100;
+  // Garde la progress bar à la retraite (objectif)
+  setStyle('per-timeline-progress', 'width', posRet + '%');
+
+  // Vider et reconstruire nodes/labels
+  track.querySelectorAll('.per-tl-node, .per-tl-label').forEach(n => n.remove());
+  const html =
+    '<div class="per-tl-node" style="left:0%"></div>' +
+    '<div class="per-tl-label" style="left:0%">' +
+      '<div class="per-tl-label-age">' + d.age + ' ans</div>' +
+      '<div class="per-tl-label-txt">Aujourd\'hui</div>' +
+      '<div class="per-tl-label-val">' + fmtEur(d.capital) + '</div>' +
+    '</div>' +
+    '<div class="per-tl-node target" style="left:' + posRet + '%"></div>' +
+    '<div class="per-tl-label" style="left:' + posRet + '%">' +
+      '<div class="per-tl-label-age">' + d.ageRet + ' ans</div>' +
+      '<div class="per-tl-label-txt">Retraite</div>' +
+      '<div class="per-tl-label-val">' + fmtEur(cap.capital) + '</div>' +
+    '</div>' +
+    '<div class="per-tl-node future" style="left:100%"></div>' +
+    '<div class="per-tl-label" style="left:100%">' +
+      '<div class="per-tl-label-age">' + ageEnd + ' ans</div>' +
+      '<div class="per-tl-label-txt">Espérance vie</div>' +
+      '<div class="per-tl-label-val">— </div>' +
+    '</div>';
+  track.insertAdjacentHTML('beforeend', html);
+}
+
+function drawChart(cap, d) {
+  const canvas = document.getElementById('per-chart');
+  if (!canvas) return;
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  if (rect.width === 0) return;
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0, 0, rect.width, rect.height);
+
+  const proj = cap.proj;
+  if (proj.length < 2) return;
+
+  const padL = 50, padR = 12, padT = 14, padB = 28;
+  const w = rect.width - padL - padR;
+  const h = rect.height - padT - padB;
+  const maxY = Math.max(...proj.map(p => p.capital), 1);
+  const xs = i => padL + (i / (proj.length - 1)) * w;
+  const ys = v => padT + h - (v / maxY) * h;
+
+  // Y-axis grid
+  ctx.strokeStyle = 'rgba(0,0,0,0.05)';
+  ctx.fillStyle = '#98989D';
+  ctx.font = '10px system-ui, -apple-system';
+  ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+  for (let i = 0; i <= 4; i++) {
+    const v = maxY * i / 4;
+    const y = ys(v);
+    ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(padL + w, y); ctx.stroke();
+    ctx.fillText(fmtEur(v, 0).replace(' €', '€'), padL - 8, y);
+  }
+
+  // X-axis labels (years)
+  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  const step = Math.max(1, Math.ceil(proj.length / 8));
+  for (let i = 0; i < proj.length; i += step) {
+    ctx.fillText(proj[i].age + '', xs(i), padT + h + 6);
+  }
+  if ((proj.length - 1) % step !== 0) {
+    ctx.fillText(proj[proj.length - 1].age + '', xs(proj.length - 1), padT + h + 6);
+  }
+
+  // Investi area
+  const gradInv = ctx.createLinearGradient(0, padT, 0, padT + h);
+  gradInv.addColorStop(0, 'rgba(79,138,120,.32)');
+  gradInv.addColorStop(1, 'rgba(79,138,120,.04)');
+  ctx.fillStyle = gradInv;
+  ctx.beginPath();
+  ctx.moveTo(xs(0), ys(proj[0].investi));
+  for (let i = 1; i < proj.length; i++) ctx.lineTo(xs(i), ys(proj[i].investi));
+  ctx.lineTo(xs(proj.length - 1), padT + h);
+  ctx.lineTo(xs(0), padT + h);
+  ctx.closePath(); ctx.fill();
+
+  // Gains area (entre investi et capital total)
+  const gradGain = ctx.createLinearGradient(0, padT, 0, padT + h);
+  gradGain.addColorStop(0, 'rgba(184,134,11,.30)');
+  gradGain.addColorStop(1, 'rgba(184,134,11,.05)');
+  ctx.fillStyle = gradGain;
+  ctx.beginPath();
+  for (let i = 0; i < proj.length; i++) ctx.lineTo(xs(i), ys(proj[i].capital));
+  for (let i = proj.length - 1; i >= 0; i--) ctx.lineTo(xs(i), ys(proj[i].investi));
+  ctx.closePath(); ctx.fill();
+
+  // Investi line
+  ctx.strokeStyle = '#4F8A78'; ctx.lineWidth = 1.8;
+  ctx.beginPath();
+  for (let i = 0; i < proj.length; i++) {
+    const x = xs(i), y = ys(proj[i].investi);
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+
+  // Capital line
+  ctx.strokeStyle = '#B8860B'; ctx.lineWidth = 2;
+  ctx.beginPath();
+  for (let i = 0; i < proj.length; i++) {
+    const x = xs(i), y = ys(proj[i].capital);
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+
+  // Marker point at end
+  const lastX = xs(proj.length - 1), lastY = ys(proj[proj.length - 1].capital);
+  ctx.fillStyle = '#B8860B';
+  ctx.beginPath(); ctx.arc(lastX, lastY, 4, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.arc(lastX, lastY, 4, 0, Math.PI * 2); ctx.stroke();
+}
+
+function renderSortie(d, sortie) {
+  // Sortie capital 100 %
+  const sC = sortie.capital;
+  setText('per-cap-net', fmtEur(sC.capitalNet));
+  setHtml('per-cap-detail',
+    '<div class="per-sortie-row"><span>Capital brut</span><strong>' + fmtEur(sC.capitalBrut) + '</strong></div>' +
+    '<div class="per-sortie-row"><span>IR sur versements déduits</span><strong>− ' + fmtEur(sC.irVersementsDeduits) + '</strong></div>' +
+    '<div class="per-sortie-row tax"><span>PFU 30 % sur gains</span><strong>− ' + fmtEur(sC.irGains + sC.psGains) + '</strong></div>' +
+    '<div class="per-sortie-row net"><span>Net après impôts</span><strong>' + fmtEur(sC.capitalNet) + '</strong></div>'
+  );
+
+  // Sortie rente 100 %
+  const sR = sortie.rente;
+  setText('per-rente-net', fmtEur(sR.renteNetteAnnuelle) + '/an');
+  setHtml('per-rente-detail',
+    '<div class="per-sortie-row"><span>Rente brute annuelle</span><strong>' + fmtEur(sR.renteAnnuelle) + '</strong></div>' +
+    '<div class="per-sortie-row"><span>Fraction imposable</span><strong>' + (sR.fraction * 100).toFixed(0) + ' %</strong></div>' +
+    '<div class="per-sortie-row tax"><span>IR + PS</span><strong>− ' + fmtEur(sR.irRente + sR.psRente) + '</strong></div>' +
+    '<div class="per-sortie-row net"><span>Net annuel</span><strong>' + fmtEur(sR.renteNetteAnnuelle) + '</strong></div>'
+  );
+
+  // Sortie mixte
+  const sM = sortie.mixte;
+  const pc = (sM.pc * 100).toFixed(0);
+  setText('per-mixte-badge', pc + ' / ' + (100 - pc));
+  setText('per-mixte-net', fmtEur(sM.capital.capitalNet) + ' + ' + fmtEur(sM.rente.renteNetteAnnuelle) + '/an');
+  setHtml('per-mixte-detail',
+    '<div class="per-sortie-row"><span>Capital net (' + pc + ' %)</span><strong>' + fmtEur(sM.capital.capitalNet) + '</strong></div>' +
+    '<div class="per-sortie-row"><span>Rente nette/an (' + (100 - pc) + ' %)</span><strong>' + fmtEur(sM.rente.renteNetteAnnuelle) + '</strong></div>' +
+    '<div class="per-sortie-row net"><span>Cumul nets</span><strong>= variable</strong></div>'
+  );
+
+  // Recommandation visuelle : carte recommandée selon mode actif
+  document.querySelectorAll('.per-sortie-card').forEach(c => c.classList.remove('recommended'));
+  const recCard = document.querySelector('.per-sortie-card[data-mode="' + d.modeSortie + '"]');
+  if (recCard) recCard.classList.add('recommended');
+
+  // Stack bar composition
+  const total = Math.max(1, sortie.versementsDeduits + sortie.versementsNonDeduits + sortie.gainsTotaux);
+  const bar = document.getElementById('per-stack-bar');
+  bar.innerHTML =
+    '<div class="per-stack-seg deduits" style="flex:' + (sortie.versementsDeduits / total) + '"></div>' +
+    '<div class="per-stack-seg nondeduit" style="flex:' + (sortie.versementsNonDeduits / total) + '"></div>' +
+    '<div class="per-stack-seg gains" style="flex:' + (sortie.gainsTotaux / total) + '"></div>';
+  setText('per-stack-deduits', fmtEur(sortie.versementsDeduits));
+  setText('per-stack-nondeduit', fmtEur(sortie.versementsNonDeduits));
+  setText('per-stack-gains', fmtEur(sortie.gainsTotaux));
+}
+
+function renderCompare(d, compa) {
+  const dot = (n) => '<span class="per-score-dot">' + [1,2,3,4,5].map(i => '<span class="' + (i <= n ? 'on' : '') + '"></span>').join('') + '</span>';
+  const rows = [
+    { critere: 'Avantage fiscal entrée', per: 5, av: 1, cto: 1, livret: 1 },
+    { critere: 'Fiscalité sortie',       per: 2, av: 4, cto: 3, livret: 5 },
+    { critere: 'Liquidité',              per: 1, av: 5, cto: 5, livret: 5 },
+    { critere: 'Rendement potentiel',    per: 4, av: 4, cto: 5, livret: 1 },
+    { critere: 'Transmission',           per: 3, av: 5, cto: 2, livret: 2 },
+    { critere: 'Préparation retraite',   per: 5, av: 4, cto: 3, livret: 2 }
+  ];
+  setHtml('per-compare-body', rows.map(r =>
+    '<tr><th>' + r.critere + '</th>' +
+    '<td class="score">' + dot(r.per) + '</td>' +
+    '<td class="score">' + dot(r.av) + '</td>' +
+    '<td class="score">' + dot(r.cto) + '</td>' +
+    '<td class="score">' + dot(r.livret) + '</td></tr>'
+  ).join(''));
+
+  // Radar
+  drawRadar(rows);
+
+  // Synthèse
+  let synth;
+  if (compa.per > compa.av && compa.per > compa.cto) {
+    synth = 'Dans votre configuration (TMI <em>' + ((compa.per / compa.av - 1) * 100).toFixed(0) + ' %</em>, durée ' + (d.ageRet - d.age) + ' ans), <strong>le PER reste le plus performant patrimonialement</strong> grâce à son effet de levier fiscal à l\'entrée. L\'assurance-vie demeure néanmoins indispensable pour la liquidité et la transmission.';
+  } else if (compa.av > compa.cto) {
+    synth = 'Dans votre configuration, <strong>l\'assurance-vie devance le PER</strong> sur l\'horizon retenu — la flexibilité et la fiscalité avantageuse après 8 ans compensent l\'avantage fiscal d\'entrée du PER. Stratégie complémentaire à étudier.';
+  } else {
+    synth = 'L\'analyse comparée suggère qu\'un mix <strong>PER + assurance-vie</strong> reste l\'approche la plus équilibrée : le PER pour l\'optimisation fiscale immédiate et la préparation retraite, l\'assurance-vie pour la liquidité et la transmission.';
+  }
+  setHtml('per-compare-synth', synth);
+}
+
+function drawRadar(rows) {
+  const svg = document.getElementById('per-radar-svg');
+  if (!svg) return;
+  const cx = 160, cy = 160, R = 110;
+  const n = rows.length;
+  const axes = rows.map((r, i) => {
+    const a = -Math.PI / 2 + (2 * Math.PI * i) / n;
+    return { a, x: cx + Math.cos(a) * R, y: cy + Math.sin(a) * R, label: r.critere };
+  });
+  function poly(scores, color, fill) {
+    const pts = scores.map((s, i) => {
+      const a = -Math.PI / 2 + (2 * Math.PI * i) / n;
+      const r = (s / 5) * R;
+      return (cx + Math.cos(a) * r) + ',' + (cy + Math.sin(a) * r);
+    });
+    return '<polygon points="' + pts.join(' ') + '" fill="' + fill + '" stroke="' + color + '" stroke-width="1.6" stroke-linejoin="round"/>';
+  }
+  let html = '';
+  // grid pentagons (3 levels)
+  for (let k = 1; k <= 3; k++) {
+    const f = k / 3;
+    const pts = axes.map(ax =>
+      (cx + (ax.x - cx) * f) + ',' + (cy + (ax.y - cy) * f)
+    ).join(' ');
+    html += '<polygon points="' + pts + '" fill="none" stroke="#E8E8ED" stroke-width="1"/>';
+  }
+  // axes
+  axes.forEach(ax => {
+    html += '<line x1="' + cx + '" y1="' + cy + '" x2="' + ax.x + '" y2="' + ax.y + '" stroke="#E8E8ED" stroke-width="1"/>';
+  });
+  // polygons
+  html += poly(rows.map(r => r.cto), '#98989D', 'rgba(152,152,157,.12)');
+  html += poly(rows.map(r => r.av),  '#B8860B', 'rgba(184,134,11,.16)');
+  html += poly(rows.map(r => r.per), '#4F8A78', 'rgba(79,138,120,.22)');
+  // labels
+  axes.forEach((ax, i) => {
+    const labX = cx + Math.cos(ax.a) * (R + 18);
+    const labY = cy + Math.sin(ax.a) * (R + 18);
+    const anchor = Math.abs(Math.cos(ax.a)) < 0.3 ? 'middle' : (Math.cos(ax.a) > 0 ? 'start' : 'end');
+    html += '<text x="' + labX + '" y="' + labY + '" text-anchor="' + anchor + '" dy="0.32em" font-size="10" fill="#6E6E73" font-family="system-ui">' + ax.label + '</text>';
+  });
+  svg.innerHTML = html;
+}
+
+function renderPedago(d, plaf, fiscal, cap, sortie) {
+  const blocks = [];
+  const tmiAct = fiscal.tmi;
+  const tmiSrt = d.tmiSortie;
+  const ecartPts = Math.round((tmiAct - tmiSrt) * 100);
+
+  // BLOC 1 : Économie fiscale immédiate (TMI actuelle)
+  let b1;
+  if (tmiAct === 0) {
+    b1 = 'Avec une <strong>TMI actuelle de 0 %</strong>, le mécanisme de déduction du PER n\'a pas d\'intérêt immédiat. Dans votre situation, mieux vaut privilégier l\'assurance-vie ou un PEA, plus liquides et sans blocage jusqu\'à la retraite.';
+  } else if (tmiAct >= 0.41) {
+    b1 = 'Votre <strong>TMI actuelle à ' + (tmiAct * 100).toFixed(0) + ' %</strong> rend le PER particulièrement performant : chaque euro versé vous coûte réellement ' + ((1 - fiscal.economie / Math.max(1, d.versement)) * 100).toFixed(0) + ' centimes. L\'État finance <em>' + (fiscal.economie / Math.max(1, d.versement) * 100).toFixed(0) + ' %</em> de votre épargne retraite.';
+  } else {
+    b1 = 'Avec une <strong>TMI actuelle à ' + (tmiAct * 100).toFixed(0) + ' %</strong>, votre PER vous fait économiser <strong>' + fmtEur(fiscal.economie) + '</strong> d\'impôt cette année. Sur ' + (d.ageRet - d.age) + ' ans de versements à ce rythme, l\'économie cumulée pourrait dépasser <em>' + fmtEur(fiscal.economie * (d.ageRet - d.age)) + '</em>.';
+  }
+  blocks.push({ icon: 'M7 1.5v11M3.5 4h7M2 7.5l1.5-3.5 1.5 3.5M2 7.5a1.5 1.5 0 0 0 3 0M9 7.5l1.5-3.5 1.5 3.5M9 7.5a1.5 1.5 0 0 0 3 0', title: 'Économie d\'impôt à l\'entrée', body: b1 });
+
+  // BLOC 1bis : Différentiel TMI actuelle / TMI sortie (cœur de l'arbitrage PER)
+  let bSpread;
+  if (tmiAct === 0) {
+    bSpread = 'Votre TMI actuelle est nulle : il n\'y a aucune <em>déduction à l\'entrée</em> à arbitrer contre une éventuelle imposition à la sortie. Le PER n\'a d\'intérêt qu\'en cas de remontée future de revenus.';
+  } else if (ecartPts >= 11) {
+    bSpread = 'Vous déduisez aujourd\'hui à <strong>' + (tmiAct*100).toFixed(0) + ' %</strong> et serez imposé à la retraite à <strong>' + (tmiSrt*100).toFixed(0) + ' %</strong>, soit un <em>écart favorable de ' + ecartPts + ' points</em>. C\'est le scénario type pour lequel le PER est le plus puissant : l\'arbitrage temporel de TMI joue à plein, en plus de la capitalisation en franchise d\'impôt.';
+  } else if (ecartPts > 0) {
+    bSpread = 'Écart favorable de <strong>+' + ecartPts + ' points</strong> entre la TMI actuelle (' + (tmiAct*100).toFixed(0) + ' %) et celle de la retraite (' + (tmiSrt*100).toFixed(0) + ' %). Le différentiel est modéré : l\'intérêt fiscal du PER reste réel mais limité. L\'effet de capitalisation devient un argument décisif.';
+  } else if (ecartPts === 0) {
+    bSpread = 'TMI actuelle et de sortie identiques (<strong>' + (tmiAct*100).toFixed(0) + ' %</strong>) : pas d\'arbitrage temporel possible. L\'avantage du PER se limite alors à la <em>capitalisation en franchise d\'impôt</em> jusqu\'au déblocage et à la fiscalité spécifique sur les gains. À comparer à l\'assurance-vie après 8 ans.';
+  } else {
+    bSpread = '<strong>Attention : TMI à la retraite (' + (tmiSrt*100).toFixed(0) + ' %) supérieure à la TMI actuelle (' + (tmiAct*100).toFixed(0) + ' %)</strong>. L\'arbitrage temporel joue <em>contre vous</em> : vous serez imposé à la sortie plus lourdement que vous n\'économisez à l\'entrée. Dans ce cas, AV après 8 ans, PEA ou CTO sont généralement plus pertinents que le PER.';
+  }
+  blocks.push({ icon: 'M2 7h10M5 4l-3 3 3 3M9 4l3 3-3 3', title: 'Écart de TMI : cœur de l\'arbitrage', body: bSpread });
+
+  // BLOC 2 : Plafond
+  let b2;
+  if (fiscal.pctUtil > 1) {
+    b2 = 'Votre versement <strong>dépasse votre plafond annuel</strong> de ' + fmtEur(d.versement - plaf.total) + '. Le surplus n\'est pas déductible mais reste utile : <em>en sortie, il sera exonéré d\'IR</em> (seuls les gains seront taxés au PFU 30 %). Pensez à utiliser vos reports des 3 années précédentes.';
+  } else if (fiscal.pctUtil < 0.5) {
+    b2 = 'Vous n\'utilisez que <strong>' + (fiscal.pctUtil * 100).toFixed(0) + ' %</strong> de votre plafond PER, soit ' + fmtEur(plaf.total - d.versement) + ' encore disponibles cette année. Le solde non utilisé est reportable pendant <em>3 ans</em>. En couple marié, vous pouvez également mutualiser les plafonds.';
+  } else {
+    b2 = 'Vous utilisez <strong>' + (fiscal.pctUtil * 100).toFixed(0) + ' %</strong> de votre plafond, ce qui constitue une stratégie équilibrée. Le solde restant pourra être reporté sur les <em>3 années suivantes</em> en cas de revenu exceptionnel.';
+  }
+  blocks.push({ icon: 'M2 7h10M2 4h10M2 10h10', title: 'Plafond et reports', body: b2 });
+
+  // BLOC 3 : Capitalisation
+  const tauxNet = (cap.rdtNet * 100).toFixed(2);
+  const partGains = cap.investi > 0 ? (cap.gains / cap.capital * 100).toFixed(0) : 0;
+  const b3 = 'Sur <strong>' + cap.duree + ' ans</strong> à un rendement net de frais de <strong>' + tauxNet + ' %</strong>, votre capital final atteint <em>' + fmtEur(cap.capital) + '</em>, dont ' + partGains + ' % proviennent des gains. Corrigé de l\'inflation, votre pouvoir d\'achat équivaut à <em>' + fmtEur(cap.capitalReel) + '</em> en euros d\'aujourd\'hui.';
+  blocks.push({ icon: 'M2 11.5h10M3 9l2.5-3 2 2L11 4', title: 'Effet boule de neige', body: b3 });
+
+  // BLOC 4 : Sortie
+  let b4;
+  if (d.modeSortie === 'capital') {
+    b4 = 'En <strong>sortie 100 % capital</strong>, votre PER versera <em>' + fmtEur(sortie.capital.capitalNet) + '</em> nets après imposition. Les <strong>versements déduits</strong> entrent au barème de l\'IR (TMI ' + (d.tmiSortie * 100).toFixed(0) + ' %), les <strong>gains</strong> subissent le PFU 30 % (12,8 IR + 17,2 PS). Modulez votre rachat sur plusieurs années pour lisser la fiscalité.';
+  } else if (d.modeSortie === 'rente') {
+    b4 = 'En <strong>rente viagère</strong>, vous percevrez <em>' + fmtEur(sortie.rente.renteNetteAnnuelle) + '</em> nets par an à vie. À ' + d.ageRet + ' ans d\'entrée en jouissance, seule la fraction <strong>' + (sortie.rente.fraction * 100).toFixed(0) + ' %</strong> est imposable (CGI art. 158-6). La rente sécurise un revenu durable mais limite la transmission.';
+  } else {
+    b4 = 'Le <strong>mode mixte</strong> combine capital pour des projets ponctuels (travaux, voyage, donation) et rente pour sécuriser un revenu mensuel. Avec ' + (d.pctCap * 100).toFixed(0) + ' % en capital, vous obtenez <em>' + fmtEur(sortie.mixte.capital.capitalNet) + '</em> + <em>' + fmtEur(sortie.mixte.rente.renteNetteAnnuelle) + '/an</em>.';
+  }
+  blocks.push({ icon: 'M7 1.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11zM7 4v3.5l2 1.5', title: 'Capital, rente ou mixte ?', body: b4 });
+
+  // BLOC 5 : Stratégie couple
+  let b5;
+  if (d.famille === 'couple') {
+    b5 = 'En couple marié ou pacsé soumis à imposition commune, vous pouvez <strong>mutualiser vos plafonds PER</strong> (case 6QR de la déclaration). Si l\'un des conjoints a une TMI élevée et peu de plafond, l\'autre peut <em>verser sur son propre PER en utilisant le plafond du conjoint</em>. Stratégie particulièrement efficace en cas d\'écart de revenus marqué.';
+  } else {
+    b5 = 'En cas de mariage ou de PACS, vous pourrez <strong>mutualiser les plafonds PER</strong> du foyer. Cela permet à un conjoint sans TMI ou à faible TMI de profiter du plafond non utilisé par l\'autre, augmentant l\'avantage fiscal global du couple.';
+  }
+  blocks.push({ icon: 'M3 4.5a2 2 0 1 1 4 0 2 2 0 0 1-4 0zM7 4.5a2 2 0 1 1 4 0 2 2 0 0 1-4 0zM1 11.5c0-2 2-3 4-3s4 1 4 3M5 11.5c0-2 2-3 4-3s4 1 4 3', title: 'Stratégie couple', body: b5 });
+
+  // BLOC 6 : Transmission
+  let b6;
+  if (d.age + cap.duree < 70) {
+    b6 = 'En cas de décès <strong>avant 70 ans</strong>, le capital PER est transmis aux bénéficiaires désignés <em>selon les règles de l\'assurance-vie</em> (art. 990 I : abattement de 152 500 € par bénéficiaire, taux 20 % puis 31,25 %). C\'est un puissant outil de transmission patrimoniale, complémentaire à l\'assurance-vie classique.';
+  } else {
+    b6 = 'En cas de décès <strong>après 70 ans</strong>, le PER reste <em>plus favorable que l\'assurance-vie</em> : l\'abattement art. 990 I de 152 500 € par bénéficiaire s\'applique sans la limite des 30 500 € de l\'art. 757 B. Conserver son PER au-delà de 70 ans peut donc présenter un intérêt successoral significatif.';
+  }
+  blocks.push({ icon: 'M7 2v3M7 5L4 8M7 5l3 3M3 8h2v4H3zM6 8h2v4H6zM9 8h2v4H9z', title: 'Transmission en cas de décès', body: b6 });
+
+  // BLOC 7 : Risques / vigilance (toujours présent)
+  const b7 = '<strong>Le PER est un placement bloqué</strong> jusqu\'à la retraite, sauf cas légaux de déblocage anticipé : achat de la résidence principale, décès du conjoint, invalidité, surendettement, fin de droits chômage ou cessation d\'activité non salariée. Avant tout versement important, sécurisez votre épargne de précaution sur livret ou assurance-vie liquide.';
+  blocks.push({ icon: 'M7 1.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11zM7 4.5v3M7 9.5v.5', title: 'Points de vigilance', body: b7 });
+
+  const html = blocks.map(b =>
+    '<div class="per-pedago-block">' +
+      '<div class="per-pedago-block-head">' +
+        '<div class="per-pedago-block-icon"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="' + b.icon + '"/></svg></div>' +
+        '<div class="per-pedago-block-title">' + b.title + '</div>' +
+      '</div>' +
+      '<p>' + b.body + '</p>' +
+    '</div>'
+  ).join('');
+  setHtml('per-pedago-blocks', html);
+}
+
+/* ════════════════════════════════════════════════════════
+   Boucle de rendu
+   ════════════════════════════════════════════════════════ */
+var _rafScheduled = false;
+function renderAll() {
+  if (_rafScheduled) return;
+  _rafScheduled = true;
+  requestAnimationFrame(() => {
+    _rafScheduled = false;
+    try {
+      const d = getInputs();
+      const plaf = calcPlafond(d);
+      const fiscal = calcFiscal(d, plaf);
+      const cap = calcCapital(d);
+      const sortie = calcSortie(d, cap, fiscal);
+      const compa = calcComparaison(d, cap, fiscal, sortie);
+
+      renderHero(d, plaf, cap);
+      renderFiscal(d, plaf, fiscal);
+      renderCapital(d, cap);
+      renderSortie(d, sortie);
+      renderCompare(d, compa);
+      renderPedago(d, plaf, fiscal, cap, sortie);
+    } catch (e) {
+      console.error('PER render error', e);
+    }
+  });
+}
+
+window.addEventListener('resize', renderAll);
+
+/* Init nav + premier rendu */
+SP.nav.init();
+renderAll();
+</script>
+</body>
+</html>

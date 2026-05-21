@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="favicon-64.png">
+  <link rel="shortcut icon" href="favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="favicon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Projection d'investissement — PATRIMONIA.AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css?v=19">
+<script src="shared.js?v=2"></script>
+  <script src="shared-nav.js?v=6"></script>
+<style></style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="index.html" class="nav-logo"><img src="logo.png?v=3" alt="PATRIMONIA.AI" class="nav-logo-img"></a>
+  <div class="nav-right">
+    <a href="index.html" class="nav-back">
+      <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7.5 1.5L3 6l4.5 4.5"/></svg>
+      Accueil
+    </a>
+    <div class="nav-dropdown" id="mainDropdown">
+      <button class="nav-dropdown-btn" aria-expanded="false" aria-haspopup="true">
+        Simulateurs <svg class="nav-chevron" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.8" style="width:13px;height:8px;flex-shrink:0"><path d="M1 1l4 4 4-4"/></svg>
+      </button>
+      <div class="nav-dropdown-menu" id="navMenu" role="menu"></div>
+    </div>
+  </div>
+</nav>
+
+<div class="sim-page">
+  <div class="sim-page-header">
+    <span class="sim-num-badge">04</span>
+    <div>
+      <div class="sim-eyebrow">Finance & Épargne</div><h1>Projection <em class="gradient-text">d'investissement</em></h1>
+      <p>Intérêts composés · Versements périodiques mensuels · Capital vs gains</p>
+    </div>
+  </div>
+
+  <div class="sim-card-wrap">
+    <div class="sim-body">
+      <div class="inputs-panel">
+        <div class="field">
+          <div class="field-label">
+            <label for="pj-capital">Capital initial</label>
+            <span class="field-val" id="pj-capital-disp">10 000 €</span>
+          </div>
+          <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="pj-capital" value="10000" min="0" max="5000000" step="1000"><span class="unit">€</span></div>
+          <input type="range" id="pj-capital-s" min="0" max="500000" step="1000" value="10000">
+        </div>
+        <div class="field">
+          <div class="field-label">
+            <label for="pj-versement">Versement mensuel complémentaire</label>
+            <span class="field-val" id="pj-versement-disp">200 €</span>
+          </div>
+          <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="pj-versement" value="200" min="0" max="50000" step="50"><span class="unit">€</span></div>
+          <input type="range" id="pj-versement-s" min="0" max="5000" step="50" value="200">
+          <div style="font-size:.68rem;color:var(--text-dim);margin-top:.3rem;font-family:var(--mono)">Laisser à 0 pour une simulation sans apport régulier</div>
+        </div>
+        <div class="field">
+          <div class="field-label">
+            <label for="pj-taux">Rendement annuel</label>
+            <span class="field-val" id="pj-taux-disp">5,00 %</span>
+          </div>
+          <div class="input-wrap"><input type="number" id="pj-taux" value="5" min="0" max="30" step="0.1"><span class="unit">%</span></div>
+          <input type="range" id="pj-taux-s" min="0" max="20" step="0.1" value="5">
+        </div>
+        <div class="field">
+          <div class="field-label">
+            <label for="pj-duree">Durée</label>
+            <span class="field-val" id="pj-duree-disp">10 ans</span>
+          </div>
+          <div class="input-wrap"><input type="number" id="pj-duree" value="10" min="1" max="50" step="1"><span class="unit">ans</span></div>
+          <input type="range" id="pj-duree-s" min="1" max="40" step="1" value="10">
+        </div>
+        <div class="section-sep"></div>
+        <div style="font-size:.72rem;color:var(--text-dim);line-height:1.8;font-family:var(--mono)">
+          <div>Capitalisation mensuelle des intérêts</div>
+          <div>Versements en fin de mois (annuité ordinaire)</div>
+          <div style="opacity:.6;margin-top:.2rem">Simulation avant fiscalité</div>
+        </div>
+      </div>
+      <div class="results-panel" id="projection-results"></div>
+    </div>
+    <div class="amort-section" style="display:grid">
+      <details class="amort-details">
+        <summary>Progression année par année</summary>
+        <div class="amort-table-wrap">
+          <table>
+            <thead><tr>
+              <th>Année</th>
+              <th>Capital investi cumulé</th>
+              <th>Valeur du portefeuille</th>
+              <th>Gains générés</th>
+              <th>Performance</th>
+            </tr></thead>
+            <tbody id="proj-body"></tbody>
+          </table>
+        </div>
+      </details>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <span>PATRIMONIA.AI</span> — Simulation indicative à titre informatif uniquement.<br>
+  Capitalisation mensuelle · Versements en annuité ordinaire · Simulation avant fiscalité.
+</footer>
+
+<script>
+const fmtNum = (v, d=0) => new Intl.NumberFormat('fr-FR',{minimumFractionDigits:d,maximumFractionDigits:d}).format(v).replace(/[\u202F\u00A0]/g, '\u0020');
+const fmtEur = (v, d=0) => fmtNum(v, d) + ' €';
+
+function syncSlider(numId, sldId, dispId, fmt) {
+  const num = document.getElementById(numId);
+  const sld = document.getElementById(sldId);
+  const disp = document.getElementById(dispId);
+  function setPct() {
+    const min=parseFloat(sld.min)||0, max=parseFloat(sld.max)||100;
+    const val=Math.min(Math.max(parseFloat(sld.value)||0,min),max);
+    sld.style.setProperty('--pct', ((val-min)/(max-min)*100).toFixed(1)+'%');
+  }
+  function onNum() {
+    const v = SP.parseNum(num.value);
+    sld.value = Math.min(Math.max(v, parseFloat(sld.min)||0), parseFloat(sld.max)||100);
+    setPct();
+    if(disp) disp.textContent = fmt(v);
+  }
+  function onSld() {
+    SP.setVal(num, parseFloat(sld.value)||0);
+    if(disp) disp.textContent = fmt(parseFloat(sld.value)||0);
+    setPct();
+  }
+  num.addEventListener('input', onNum);
+  sld.addEventListener('input', onSld);
+  setPct();
+  if(disp) disp.textContent = fmt(SP.parseNum(num.value)||0);
+}
+
+function calcProjection() {
+  const PV  = SP.parseNum(document.getElementById('pj-capital').value);
+  const PMT = SP.parseNum(document.getElementById('pj-versement').value);
+  const ra  = parseFloat(document.getElementById('pj-taux').value)||0;
+  const yrs = Math.round(parseFloat(document.getElementById('pj-duree').value)||1);
+
+  const r = ra / 100 / 12;
+  const N = yrs * 12;
+
+  let balance = PV;
+  for (let m = 0; m < N; m++) {
+    balance = balance * (1 + r) + PMT;
+  }
+  const FV           = balance;
+  const totalInvest  = PV + PMT * N;
+  const totalGains   = Math.max(0, FV - totalInvest);
+  const gainPct      = totalInvest > 0 ? totalGains / totalInvest * 100 : 0;
+  const capShare     = FV > 0 ? fmtNum(totalInvest / FV * 100, 1) : '0';
+  const gainShare    = FV > 0 ? fmtNum(totalGains  / FV * 100, 1) : '0';
+
+  const el = document.getElementById('projection-results');
+  el.innerHTML = `
+    <div class="key-result animate">
+      <div class="key-result-label">Valeur finale du portefeuille</div>
+      <div class="key-result-val">${fmtEur(FV,0)}</div>
+      <div class="key-result-sub">après ${fmtNum(yrs)} an${yrs>1?'s':''} à ${fmtNum(ra,1)} % / an</div>
+    </div>
+    <div class="proj-bar-box animate">
+      <div class="proj-bar-title">Répartition capital investi / gains</div>
+      <div class="proj-stack">
+        <div class="proj-stack-cap" style="flex:${totalInvest}"></div>
+        <div class="proj-stack-gain" style="flex:${totalGains||0.001}"></div>
+      </div>
+      <div class="proj-legend">
+        <div class="proj-legend-item">
+          <div class="proj-legend-dot" style="background:var(--accent)"></div>
+          Capital investi&nbsp;<strong style="color:var(--text);font-family:var(--mono)">${fmtEur(totalInvest,0)}</strong>&nbsp;<span style="color:var(--text-dim)">(${capShare} %)</span>
+        </div>
+        <div class="proj-legend-item">
+          <div class="proj-legend-dot" style="background:var(--success)"></div>
+          Gains générés&nbsp;<strong style="color:var(--success);font-family:var(--mono)">+${fmtEur(totalGains,0)}</strong>&nbsp;<span style="color:var(--text-dim)">(${gainShare} %)</span>
+        </div>
+      </div>
+    </div>
+    <div class="metrics-grid animate">
+      <div class="metric"><div class="metric-label">Apport initial</div><div class="metric-val">${fmtEur(PV,0)}</div></div>
+      <div class="metric"><div class="metric-label">Versements cumulés</div><div class="metric-val">${fmtEur(PMT*N,0)}</div></div>
+      <div class="metric"><div class="metric-label">Gains des intérêts composés</div><div class="metric-val success">+${fmtEur(totalGains,0)}</div></div>
+      <div class="metric"><div class="metric-label">Performance sur capital</div><div class="metric-val amber">+${fmtNum(gainPct,1)} %</div></div>
+    </div>`;
+
+  const tbody = document.getElementById('proj-body');
+  tbody.innerHTML = '';
+  let bal = PV;
+  for (let y = 1; y <= yrs; y++) {
+    for (let m = 0; m < 12; m++) bal = bal * (1 + r) + PMT;
+    const capY   = PV + PMT * y * 12;
+    const gainsY = Math.max(0, bal - capY);
+    const perfY  = capY > 0 ? gainsY / capY * 100 : 0;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>Année ${y}</td><td>${fmtEur(capY,0)}</td><td class="remaining">${fmtEur(bal,0)}</td><td class="capital">+${fmtEur(gainsY,0)}</td><td class="interest">+${fmtNum(perfY,1)} %</td>`;
+    tbody.appendChild(tr);
+  }
+
+  buildAnalysis(PV, PMT, ra, yrs, FV, totalInvest, totalGains);
+}
+
+function buildAnalysis(PV, PMT, ra, yrs, FV, totalInvest, totalGains) {
+  // Calculs dérivés
+  const gainSharePct   = FV > 0 ? totalGains / FV * 100 : 0;
+  const investSharePct = FV > 0 ? totalInvest / FV * 100 : 0;
+
+  // ── Phrase 1 : contexte général de la simulation ─────────────────────────
+  let p1 = '';
+  if (PMT === 0) {
+    p1 = `Avec un capital initial de <strong>${fmtEur(PV,0)}</strong> placé sans apport régulier, ` +
+         `votre portefeuille atteindrait <strong>${fmtEur(FV,0)}</strong> en ${yrs} an${yrs>1?'s':''} ` +
+         `à un rendement annuel de <strong>${fmtNum(ra,1)} %</strong>.`;
+  } else if (PV === 0) {
+    p1 = `En investissant <strong>${fmtEur(PMT,0)}/mois</strong> sans capital de départ, ` +
+         `votre portefeuille atteindrait <strong>${fmtEur(FV,0)}</strong> en ${yrs} an${yrs>1?'s':''} ` +
+         `à un rendement de <strong>${fmtNum(ra,1)} % par an</strong>.`;
+  } else {
+    p1 = `En démarrant avec <strong>${fmtEur(PV,0)}</strong> et en ajoutant ` +
+         `<strong>${fmtEur(PMT,0)}/mois</strong>, votre portefeuille atteindrait ` +
+         `<strong>${fmtEur(FV,0)}</strong> en ${yrs} an${yrs>1?'s':''} ` +
+         `à <strong>${fmtNum(ra,1)} % par an</strong>.`;
+  }
+
+  // ── Phrase 2 : capital investi vs gains ───────────────────────────────────
+  let p2 = '';
+  if (totalGains <= 0) {
+    p2 = `Sur cette période, vous n'auriez fait que conserver votre capital — ` +
+         `un rendement nul ne génère aucun intérêt composé.`;
+  } else {
+    p2 = `Vous auriez investi au total <strong>${fmtEur(totalInvest,0)}</strong> ` +
+         `(apport${PMT>0?' et versements':''}), et les intérêts composés auraient généré ` +
+         `<strong>+${fmtEur(totalGains,0)}</strong> de gains supplémentaires — ` +
+         `soit <strong>${fmtNum(gainSharePct,1)} %</strong> de la valeur finale produite ` +
+         `sans effort, par la seule force du temps et de la capitalisation.`;
+  }
+
+  // ── Phrase 3 : effet boule de neige / durée ───────────────────────────────
+  let p3 = '';
+  if (yrs <= 5) {
+    p3 = `Sur ${yrs} an${yrs>1?'s':''}, l'effet boule de neige commence à peine à se mettre en place. ` +
+         `Les intérêts composés ont besoin de temps pour s'emballer : prolonger la durée ` +
+         `de quelques années ferait croître vos gains de façon disproportionnée.`;
+  } else if (yrs <= 15) {
+    p3 = `Sur ${yrs} ans, l'effet boule de neige est bien visible : chaque année, ` +
+         `les intérêts générés viennent eux-mêmes produire de nouveaux intérêts, ` +
+         `créant une accélération progressive. La courbe s'incurve — c'est exactement ` +
+         `ce que recherche tout investisseur patient.`;
+  } else {
+    p3 = `Sur ${yrs} ans, la puissance des intérêts composés s'exprime pleinement. ` +
+         `L'accélération en fin de période est spectaculaire : les dernières années ` +
+         `génèrent à elles seules plus de richesse que les premières décennies réunies. ` +
+         `C'est l'effet boule de neige à son apogée — patience récompensée.`;
+  }
+
+  // ── Phrase 4 : versements réguliers ──────────────────────────────────────
+  let p4 = '';
+  if (PMT > 0) {
+    const versementsCumul = PMT * yrs * 12;
+    const versementShare  = totalInvest > 0 ? versementsCumul / totalInvest * 100 : 0;
+    p4 = `Vos versements mensuels de <strong>${fmtEur(PMT,0)}</strong> représentent ` +
+         `<strong>${fmtEur(versementsCumul,0)}</strong> cumulés sur la durée ` +
+         `(${fmtNum(versementShare,0)} % de votre capital total investi). ` +
+         `Chaque versement régulier amplifie l'effet des intérêts composés : ` +
+         `investir tôt et régulièrement est souvent plus puissant qu'investir une seule grosse somme.`;
+  }
+
+  // ── Phrase 5 : nature du rendement ───────────────────────────────────────
+  let p5 = '';
+  if (ra === 0) {
+    p5 = `Un rendement de 0 % correspond à garder l'argent sous un matelas. ` +
+         `Sans intérêts, il n'y a pas de capitalisation possible.`;
+  } else if (ra < 2) {
+    p5 = `Un rendement de <strong>${fmtNum(ra,1)} %</strong> correspond typiquement à celui d'un livret ` +
+         `d'épargne réglementé ou d'un fonds en euros. Sécurisé, mais la capitalisation ` +
+         `reste modeste — l'inflation peut rogner une partie des gains réels.`;
+  } else if (ra <= 4) {
+    p5 = `Un rendement de <strong>${fmtNum(ra,1)} %</strong> se situe dans la fourchette des placements ` +
+         `obligataires ou des fonds mixtes. Correct sur le long terme, il offre un bon ` +
+         `compromis entre sécurité et rendement.`;
+  } else if (ra <= 8) {
+    p5 = `Un rendement de <strong>${fmtNum(ra,1)} %</strong> est cohérent avec la performance historique ` +
+         `moyenne d'un portefeuille diversifié en bourse (ETF monde, actions). ` +
+         `Il implique une exposition aux marchés et une certaine tolérance à la volatilité, ` +
+         `mais c'est le moteur privilégié de la constitution de patrimoine sur le long terme.`;
+  } else {
+    p5 = `Un rendement de <strong>${fmtNum(ra,1)} %</strong> est élevé — au-delà des moyennes historiques ` +
+         `des marchés actions. Ce niveau peut exister sur certains actifs (private equity, ` +
+         `immobilier à fort levier, cryptoactifs), mais il s'accompagne d'une volatilité ` +
+         `et de risques importants. Simuler est utile, mais ce scénario suppose une prise ` +
+         `de risque significative.`;
+  }
+
+  // ── Construction du bloc HTML ─────────────────────────────────────────────
+  // p1 & p2 : paragraphes de contexte → .pedago-p
+  // p3 & p4 : conseils (durée, versements) → .pedago-tip
+  // p5 : alerte si rendement > 8 %, sinon .pedago-p
+  const p5Class = ra > 8 ? 'pedago-alert' : 'pedago-p';
+
+  const parts = [];
+  if (p1) parts.push(`<p class="pedago-p">${p1}</p>`);
+  if (p2) parts.push(`<p class="pedago-p">${p2}</p>`);
+  if (p3) parts.push(`<div class="pedago-tip">${p3}</div>`);
+  if (p4) parts.push(`<div class="pedago-tip">${p4}</div>`);
+  if (p5) parts.push(`<p class="${p5Class}">${p5}</p>`);
+
+  const html = `
+    <div class="pedago-card animate" style="margin-top:1.5rem">
+      <div class="pedago-card-header">
+        <div class="pedago-card-dot"></div>
+        <div class="pedago-card-title">Analyse de votre simulation</div>
+      </div>
+      <div class="pedago-card-body">
+        ${parts.join('\n        ')}
+        <p class="pedago-dim">Simulation avant fiscalité — les gains réels dépendent du régime fiscal applicable (PFU, IR, exonérations).</p>
+      </div>
+    </div>`;
+
+  // Insérer après la metrics-grid (fin du innerHTML existant)
+  const el = document.getElementById('projection-results');
+  el.insertAdjacentHTML('beforeend', html);
+}
+
+syncSlider('pj-capital',  'pj-capital-s',  'pj-capital-disp',  v=>fmtEur(v,0));
+syncSlider('pj-versement','pj-versement-s','pj-versement-disp',v=>fmtEur(v,0));
+syncSlider('pj-taux',     'pj-taux-s',     'pj-taux-disp',     v=>fmtNum(v,2)+' %');
+syncSlider('pj-duree',    'pj-duree-s',    'pj-duree-disp',    v=>Math.round(v)+' ans');
+
+['pj-capital','pj-versement','pj-taux','pj-duree',
+ 'pj-capital-s','pj-versement-s','pj-taux-s','pj-duree-s']
+  .forEach(id => document.getElementById(id).addEventListener('input', calcProjection));
+
+calcProjection();
+
+// Dropdown
+/* Menu déroulant catégorisé — voir shared-nav.js */
+SP.nav.init();
+</script>
+</body>
+</html>

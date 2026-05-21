@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="favicon-64.png">
+  <link rel="shortcut icon" href="favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="favicon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plus-values immobilières — PATRIMONIA.AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css?v=19">
+<script src="shared.js?v=2"></script>
+  <script src="shared-nav.js?v=6"></script>
+<style>
+
+/* ── RADIO TOGGLE ── */
+.radio-toggle {
+  display: flex; gap: .4rem; flex-wrap: wrap; margin-top: .5rem;
+}
+.radio-toggle label {
+  display: flex; align-items: center; gap: .45rem;
+  font-size: .74rem; font-weight: 500; color: var(--text-muted);
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 100px; padding: .28rem .9rem; cursor: pointer;
+  transition: all .18s; user-select: none;
+}
+.radio-toggle input[type=radio] { display: none }
+.radio-toggle input[type=radio]:checked + span {
+  color: var(--accent); font-weight: 600;
+}
+.radio-toggle label:has(input:checked) {
+  background: var(--accent-dim); border-color: var(--accent); color: var(--accent);
+}
+
+/* ── EXO BANNER ── */
+.pv-exo-banner {
+  background: rgba(59,140,90,.1); border: 1px solid rgba(59,140,90,.25);
+  border-radius: var(--r-sm); padding: 1.1rem 1.25rem;
+  display: flex; flex-direction: column; gap: .5rem;
+}
+.pv-exo-title {
+  font-size: .8rem; font-weight: 700; color: var(--success); letter-spacing: -.01em;
+}
+.pv-exo-sub {
+  font-size: .74rem; color: var(--text-muted); line-height: 1.65;
+}
+
+/* ── DURATION BADGE ── */
+.pv-duree-chip {
+  display: inline-flex; align-items: center; gap: .5rem;
+  font-size: .72rem; font-weight: 600; color: var(--accent);
+  background: var(--accent-dim); border: 1px solid rgba(79,138,120,.18);
+  border-radius: 100px; padding: .25rem .85rem; margin-top: .5rem;
+}
+
+/* ── ABATTEMENT GAUGE ── */
+.pv-abatt-gauges {
+  display: grid; grid-template-columns: 1fr 1fr; gap: .65rem;
+}
+.pv-gauge-card {
+  background: var(--surface-2); border: 1px solid var(--border-subtle);
+  border-radius: var(--r-sm); padding: .9rem 1rem;
+}
+.pv-gauge-label {
+  font-size: .6rem; font-weight: 600; color: var(--text-dim);
+  letter-spacing: .07em; text-transform: uppercase; margin-bottom: .55rem;
+}
+.pv-gauge-val {
+  font-family: var(--sans); font-size: 1.2rem; font-weight: 700;
+  color: var(--text); letter-spacing: -.04em; margin-bottom: .5rem;
+}
+.pv-gauge-track {
+  height: 5px; background: var(--border); border-radius: 3px; overflow: hidden;
+}
+.pv-gauge-fill {
+  height: 100%; border-radius: 3px;
+  transition: width .5s cubic-bezier(.4,0,.2,1);
+}
+.pv-gauge-fill.ir  { background: var(--accent) }
+.pv-gauge-fill.ps  { background: var(--amber) }
+.pv-gauge-sub {
+  font-size: .62rem; color: var(--text-dim); margin-top: .35rem;
+  font-family: var(--mono);
+}
+
+/* ── FISCAL BAR ── */
+.pv-fiscal-bar-wrap {
+  background: var(--surface-2); border: 1px solid var(--border-subtle);
+  border-radius: var(--r-sm); padding: 1.1rem 1.25rem;
+}
+.pv-fiscal-bar-title {
+  font-size: .63rem; font-weight: 600; color: var(--text-dim);
+  letter-spacing: .07em; text-transform: uppercase; margin-bottom: .85rem;
+}
+.pv-fiscal-bar {
+  height: 16px; border-radius: 8px; overflow: hidden;
+  display: flex; gap: 2px; margin-bottom: .75rem;
+}
+.pv-bar-seg {
+  height: 100%; transition: flex .5s cubic-bezier(.4,0,.2,1); min-width: 0;
+}
+.pv-bar-seg.net  { background: var(--success); border-radius: 8px 0 0 8px }
+.pv-bar-seg.ir   { background: var(--accent) }
+.pv-bar-seg.ps   { background: var(--amber) }
+.pv-bar-seg.surx { background: #9B5A3A; border-radius: 0 8px 8px 0 }
+.pv-fiscal-bar-legend {
+  display: flex; flex-wrap: wrap; gap: .6rem .95rem;
+}
+.pv-legend-item {
+  display: flex; align-items: center; gap: .38rem;
+  font-size: .7rem; color: var(--text-muted);
+}
+.pv-legend-dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+}
+.pv-legend-dot.net  { background: var(--success) }
+.pv-legend-dot.ir   { background: var(--accent) }
+.pv-legend-dot.ps   { background: var(--amber) }
+.pv-legend-dot.surx { background: #9B5A3A }
+
+/* ── MOINS-VALUE BANNER ── */
+.pv-moinsvalue {
+  background: var(--surface-2); border: 1px solid var(--border-subtle);
+  border-radius: var(--r-sm); padding: 1.1rem 1.25rem;
+  font-size: .8rem; color: var(--text-muted); line-height: 1.7;
+}
+.pv-moinsvalue strong { color: var(--amber) }
+
+/* ── DATE INPUT ── */
+input[type=date] {
+  width: 100%; background: var(--surface);
+  border: 1.5px solid var(--border); border-radius: var(--r-sm);
+  color: var(--text); font-family: var(--sans);
+  font-size: .87rem; font-weight: 400; padding: .6rem .9rem;
+  outline: none; cursor: pointer; transition: all 0.25s ease;
+  letter-spacing: -.01em;
+}
+input[type=date]:focus { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-dim) }
+
+/* ── SURTAXE BADGE ── */
+.surx-badge {
+  display: inline-flex; align-items: center; gap: .4rem;
+  font-size: .69rem; font-weight: 600; letter-spacing: .04em;
+  text-transform: uppercase; padding: .22rem .75rem;
+  border-radius: 100px;
+  background: rgba(155,90,58,.1); color: #9B5A3A;
+}
+.surx-badge::before { content:''; width:6px; height:6px; border-radius:50%; background:currentColor; flex-shrink:0 }
+
+/* ── DISCLAIMER ── */
+.pv-disclaimer {
+  font-size: .67rem; color: var(--text-dim); line-height: 1.7;
+  font-family: var(--mono); margin-top: 1rem; opacity: .75;
+}
+
+@media(max-width:760px){
+  .pv-abatt-gauges { grid-template-columns: 1fr }
+}
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="index.html" class="nav-logo"><img src="logo.png?v=3" alt="PATRIMONIA.AI" class="nav-logo-img"></a>
+  <div class="nav-right">
+    <a href="index.html" class="nav-back">
+      <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7.5 1.5L3 6l4.5 4.5"/></svg>
+      Accueil
+    </a>
+    <div class="nav-dropdown" id="mainDropdown">
+      <button class="nav-dropdown-btn" aria-expanded="false" aria-haspopup="true">
+        Simulateurs <svg class="nav-chevron" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.8" style="width:13px;height:8px;flex-shrink:0"><path d="M1 1l4 4 4-4"/></svg>
+      </button>
+      <div class="nav-dropdown-menu" id="navMenu" role="menu"></div>
+    </div>
+  </div>
+</nav>
+
+<div class="sim-page">
+  <div class="sim-page-header">
+    <span class="sim-num-badge">09</span>
+    <div>
+      <div class="sim-eyebrow">Fiscalité · Immobilier</div><h1>Plus-values <em class="gradient-text">immobilières</em></h1>
+      <p>IR 19 % · Prélèvements sociaux 17,2 % · Surtaxe · Abattements pour durée</p>
+    </div>
+  </div>
+
+  <div class="sim-card-wrap">
+    <div class="sim-body">
+
+      <!-- ════ INPUTS ════ -->
+      <div class="inputs-panel">
+
+        <!-- Nature du bien -->
+        <div class="field">
+          <div class="field-label"><label>Nature du bien cédé</label></div>
+          <div class="select-wrap">
+            <select id="pv-nature">
+              <option value="secondaire">Résidence secondaire</option>
+              <option value="locatif">Investissement locatif</option>
+              <option value="principale">Résidence principale</option>
+              <option value="terrain">Terrain</option>
+              <option value="autre">Autre bien immobilier</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="section-sep"></div>
+
+        <div style="font-size:.65rem;font-weight:600;color:var(--text-dim);letter-spacing:.06em;text-transform:uppercase;margin-bottom:1rem">
+          Acquisition
+        </div>
+
+        <div class="field">
+          <div class="field-label"><label>Prix d'achat</label></div>
+          <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="pv-prix-achat" placeholder="200 000"><span class="unit">€</span></div>
+        </div>
+
+        <div class="field">
+          <div class="field-label"><label>Date d'acquisition</label></div>
+          <input type="date" id="pv-date-acq">
+        </div>
+
+        <div class="field">
+          <div class="field-label"><label>Frais d'acquisition</label></div>
+          <div class="radio-toggle" id="frais-mode-wrap">
+            <label><input type="radio" name="frais-mode" value="reel" id="frais-reel"><span>Réels</span></label>
+            <label><input type="radio" name="frais-mode" value="forfait" id="frais-forfait" checked><span>Forfait 7,5 %</span></label>
+          </div>
+          <div id="frais-reel-wrap" style="display:none;margin-top:.6rem">
+            <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="pv-frais-acq" placeholder="0"><span class="unit">€</span></div>
+          </div>
+          <div id="frais-forfait-note" style="font-size:.63rem;color:var(--text-dim);font-family:var(--mono);margin-top:.4rem">
+            7,5 % du prix d'achat appliqué automatiquement
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label"><label>Travaux</label></div>
+          <div class="radio-toggle">
+            <label><input type="radio" name="trav-mode" value="aucun" id="trav-aucun" checked><span>Aucuns</span></label>
+            <label><input type="radio" name="trav-mode" value="reel" id="trav-reel"><span>Réels justifiés</span></label>
+            <label><input type="radio" name="trav-mode" value="forfait" id="trav-forfait"><span>Forfait 15 %</span></label>
+          </div>
+          <div id="trav-reel-wrap" style="display:none;margin-top:.6rem">
+            <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="pv-travaux" placeholder="0"><span class="unit">€</span></div>
+          </div>
+          <div id="trav-forfait-note" style="display:none;font-size:.63rem;color:var(--text-dim);font-family:var(--mono);margin-top:.4rem">
+            15 % du prix d'achat — applicable si détention &gt; 5 ans
+          </div>
+        </div>
+
+        <div class="section-sep"></div>
+
+        <div style="font-size:.65rem;font-weight:600;color:var(--text-dim);letter-spacing:.06em;text-transform:uppercase;margin-bottom:1rem">
+          Cession
+        </div>
+
+        <div class="field">
+          <div class="field-label"><label>Prix de vente</label></div>
+          <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="pv-prix-vente" placeholder="280 000"><span class="unit">€</span></div>
+        </div>
+
+        <div class="field">
+          <div class="field-label"><label>Date de vente</label></div>
+          <input type="date" id="pv-date-vente">
+        </div>
+
+        <div class="field">
+          <div class="field-label"><label>Frais de vente déductibles</label></div>
+          <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="pv-frais-vente" placeholder="0"><span class="unit">€</span></div>
+          <div style="font-size:.63rem;color:var(--text-dim);font-family:var(--mono);margin-top:.3rem">Frais d'agence à la charge du vendeur, diagnostics...</div>
+        </div>
+
+        <div class="pv-disclaimer">
+          Simulation indicative — résultats non contractuels
+        </div>
+
+      </div><!-- /inputs-panel -->
+
+      <!-- ════ RESULTS ════ -->
+      <div class="results-panel" id="results-pv">
+        <div class="result-empty">Renseignez le prix d'achat, le prix de vente et les dates pour simuler la fiscalité.</div>
+      </div>
+
+    </div><!-- /sim-body -->
+  </div><!-- /sim-card-wrap -->
+</div><!-- /sim-page -->
+
+<footer>
+  <span>PATRIMONIA.AI</span> — Simulation indicative et pédagogique.<br>
+  La fiscalité réelle peut dépendre de la nature exacte du bien, des justificatifs de travaux, des frais réellement supportés, des exonérations spécifiques et de la situation personnelle du vendeur.<br>
+  Sources : CGI art. 150 U, 150 VB, 150 VC, 150 VD, 1609 nonies G · BOFiP RFPI · impots.gouv.fr · service-public.fr
+</footer>
+
+<script>
+'use strict';
+
+/* ── Formatage ── */
+const fmtNum = (v, d=0) => new Intl.NumberFormat('fr-FR',{minimumFractionDigits:d,maximumFractionDigits:d}).format(v).replace(/[\u202F\u00A0]/g,' ');
+const fmtEur = (v, d=0) => fmtNum(v,d) + ' €';
+const fmtPct = (v, d=1) => fmtNum(v,d) + ' %';
+
+/* ── Durée de détention ── */
+function getDuree() {
+  const acqStr   = document.getElementById('pv-date-acq').value;
+  const venteStr = document.getElementById('pv-date-vente').value;
+  if (!acqStr || !venteStr) return null;
+  const acq   = new Date(acqStr);
+  const vente = new Date(venteStr);
+  if (isNaN(acq) || isNaN(vente) || vente <= acq) return null;
+
+  let annees = vente.getFullYear() - acq.getFullYear();
+  const mdVente = vente.getMonth() * 100 + vente.getDate();
+  const mdAcq   = acq.getMonth()   * 100 + acq.getDate();
+  if (mdVente < mdAcq) annees--;
+
+  let mois = vente.getMonth() - acq.getMonth();
+  if (vente.getDate() < acq.getDate()) mois--;
+  mois = ((mois % 12) + 12) % 12;
+
+  return { annees: Math.max(0, annees), mois };
+}
+
+/* ── Abattements (art. 150 VC CGI) ── */
+function calcAbattIR(annees) {
+  if (annees <= 5) return 0;
+  if (annees >= 22) return 100;
+  return (Math.min(annees, 21) - 5) * 6; // 6 %/an de 6e à 21e (max 96 %)
+}
+
+function calcAbattPS(annees) {
+  if (annees <= 5) return 0;
+  if (annees >= 30) return 100;
+  let pct = (Math.min(annees, 21) - 5) * 1.65; // 1,65 %/an de 6e à 21e
+  if (annees >= 22) pct += 1.60;                // 1,60 % la 22e
+  if (annees > 22)  pct += (Math.min(annees, 30) - 22) * 9; // 9 %/an de 23e à 30e
+  return Math.min(parseFloat(pct.toFixed(4)), 100);
+}
+
+/* ── Surtaxe (art. 1609 nonies G CGI) ── */
+function calcSurtaxe(pvNetIR, nature) {
+  if (nature === 'terrain') return 0; // surtaxe ne s'applique pas aux terrains à bâtir (régime TFB)
+  const pv = pvNetIR;
+  if (pv <= 50000) return 0;
+  let taux;
+  if      (pv <= 100000) taux = 0.02;
+  else if (pv <= 150000) taux = 0.03;
+  else if (pv <= 200000) taux = 0.04;
+  else if (pv <= 250000) taux = 0.05;
+  else                   taux = 0.06;
+  return Math.round(pv * taux);
+}
+
+function surtaxeTranche(pv) {
+  if (pv <= 50000)  return '—';
+  if (pv <= 100000) return '2 %';
+  if (pv <= 150000) return '3 %';
+  if (pv <= 200000) return '4 %';
+  if (pv <= 250000) return '5 %';
+  return '6 %';
+}
+
+/* ══════════════════════════════════════════
+   CALCUL PRINCIPAL
+══════════════════════════════════════════ */
+function calculate() {
+  const nature     = document.getElementById('pv-nature').value;
+  const prixAchat  = SP.parseNum(document.getElementById('pv-prix-achat').value);
+  const prixVente  = SP.parseNum(document.getElementById('pv-prix-vente').value);
+  const fraisVente = SP.parseNum(document.getElementById('pv-frais-vente').value);
+  const fraisMode  = document.querySelector('input[name="frais-mode"]:checked')?.value || 'forfait';
+  const travMode   = document.querySelector('input[name="trav-mode"]:checked')?.value || 'aucun';
+  const fraisReels = fraisMode === 'reel' ? SP.parseNum(document.getElementById('pv-frais-acq').value) : 0;
+  const travauxReels = travMode === 'reel' ? SP.parseNum(document.getElementById('pv-travaux').value) : 0;
+
+  const duree = getDuree();
+  const annees = duree ? duree.annees : null;
+
+  const el = document.getElementById('results-pv');
+
+  /* ── Résidence principale : exonération totale ── */
+  if (nature === 'principale') {
+    el.innerHTML = buildExoPrincipale(prixAchat, prixVente, fraisVente, duree);
+    return;
+  }
+
+  /* ── Frais d'acquisition retenus ── */
+  let fraisAcqRetenus;
+  if (fraisMode === 'forfait') {
+    fraisAcqRetenus = Math.round(prixAchat * 0.075);
+  } else {
+    fraisAcqRetenus = Math.round(fraisReels);
+  }
+
+  /* ── Travaux retenus ── */
+  let travauxRetenus;
+  if (travMode === 'aucun') {
+    travauxRetenus = 0;
+  } else if (travMode === 'reel') {
+    travauxRetenus = Math.round(travauxReels);
+  } else {
+    // forfait 15 % — applicable si détention > 5 ans
+    travauxRetenus = (annees !== null && annees > 5) ? Math.round(prixAchat * 0.15) : 0;
+  }
+
+  /* ── Prix corrigés et PV brute ── */
+  const prixAcqCorrige  = prixAchat + fraisAcqRetenus + travauxRetenus;
+  const prixVenteCorrige = Math.max(0, prixVente - fraisVente);
+  const pvBrute = prixVenteCorrige - prixAcqCorrige;
+
+  /* ── Moins-value (uniquement si l'utilisateur a saisi des données) ── */
+  if (pvBrute <= 0 && (prixAchat > 0 || prixVente > 0)) {
+    el.innerHTML = buildMoinsValue(pvBrute, prixAchat, prixVente, fraisAcqRetenus, travauxRetenus, fraisVente, duree);
+    return;
+  }
+
+  /* ── Abattements durée ── */
+  const abattIRpct = annees !== null ? calcAbattIR(annees) : 0;
+  const abattPSpct = annees !== null ? calcAbattPS(annees) : 0;
+
+  const abattIRmontant = Math.round(pvBrute * abattIRpct / 100);
+  const abattPSmontant = Math.round(pvBrute * abattPSpct / 100);
+
+  const baseTaxableIR = Math.max(0, pvBrute - abattIRmontant);
+  const baseTaxablePS = Math.max(0, pvBrute - abattPSmontant);
+
+  const exoIR = abattIRpct >= 100;
+  const exoPS = abattPSpct >= 100;
+
+  /* ── Impôts ── */
+  const IR     = exoIR ? 0 : Math.round(baseTaxableIR * 0.19);
+  const PS     = exoPS ? 0 : Math.round(baseTaxablePS * 0.172);
+  const surtax = (exoIR || baseTaxableIR <= 0) ? 0 : calcSurtaxe(baseTaxableIR, nature);
+
+  const totalFiscalite = IR + PS + surtax;
+  const pvNette = pvBrute - totalFiscalite;
+  const tauxMoyen = pvBrute > 0 ? totalFiscalite / pvBrute * 100 : 0;
+
+  /* ── Render ── */
+  el.innerHTML = buildResults({
+    nature, duree, annees,
+    prixAchat, prixVente, fraisVente, fraisAcqRetenus, fraisMode,
+    travauxRetenus, travMode,
+    prixAcqCorrige, prixVenteCorrige, pvBrute,
+    abattIRpct, abattPSpct, abattIRmontant, abattPSmontant,
+    baseTaxableIR, baseTaxablePS,
+    exoIR, exoPS,
+    IR, PS, surtax, totalFiscalite, pvNette, tauxMoyen
+  });
+}
+
+/* ══════════════════════════════════════════
+   RENDERERS
+══════════════════════════════════════════ */
+
+function fmtDuree(duree) {
+  if (!duree) return 'Durée non calculée';
+  const { annees, mois } = duree;
+  if (annees === 0) return mois > 0 ? `${mois} mois` : 'Moins d\'un mois';
+  return mois > 0 ? `${annees} an${annees>1?'s':''} et ${mois} mois` : `${annees} an${annees>1?'s':''}`;
+}
+
+function buildExoPrincipale(prixAchat, prixVente, fraisVente, duree) {
+  const pvBrute = Math.max(0, prixVente - fraisVente - prixAchat);
+  return `
+    <div class="pv-exo-banner animate">
+      <div class="pv-exo-title">Exonération totale — Résidence principale</div>
+      <div class="pv-exo-sub">La plus-value réalisée sur la cession de la résidence principale est <strong>exonérée d'impôt sur le revenu et de prélèvements sociaux</strong> (CGI art. 150 U II-1°). Cette exonération est de plein droit et ne requiert aucune condition de durée de détention.</div>
+    </div>
+    ${prixAchat && prixVente ? `
+    <div class="metrics-grid animate">
+      <div class="metric"><div class="metric-label">Prix de vente</div><div class="metric-val">${fmtEur(prixVente)}</div></div>
+      <div class="metric"><div class="metric-label">Prix d'achat</div><div class="metric-val">${fmtEur(prixAchat)}</div></div>
+      <div class="metric"><div class="metric-label">Plus-value brute estimée</div><div class="metric-val accent">${fmtEur(pvBrute)}</div></div>
+      <div class="metric"><div class="metric-label">Fiscalité</div><div class="metric-val success">0 €</div></div>
+    </div>` : ''}
+    ${duree ? `<div style="margin-top:.5rem"><span class="pv-duree-chip animate">Durée de détention : ${fmtDuree(duree)}</span></div>` : ''}
+    ${buildPedago({ nature:'principale', duree })}
+  `;
+}
+
+function buildMoinsValue(pvBrute, prixAchat, prixVente, fraisAcq, travaux, fraisVente, duree) {
+  return `
+    <div class="key-result animate">
+      <div class="key-result-label">Résultat de cession</div>
+      <div class="key-result-val" style="color:var(--text-muted)">${fmtEur(pvBrute)}</div>
+      <div class="key-result-sub">Moins-value — aucune fiscalité</div>
+    </div>
+    <div class="pv-moinsvalue animate">
+      <strong>Moins-value immobilière</strong> : la valeur de cession est inférieure au prix de revient corrigé. En immobilier privé, les moins-values ne s'imputent ni sur les plus-values d'autres actifs, ni sur le revenu global. Elles sont définitivement perdues fiscalement.
+    </div>
+    <div class="bracket-detail animate">
+      <div class="bracket-title">Détail du calcul</div>
+      <div class="bracket-row"><span class="rate-badge">Vente</span><span class="tranche">Prix de vente corrigé</span><span class="tax">${fmtEur(Math.max(0, prixVente - fraisVente))}</span></div>
+      <div class="bracket-row"><span class="rate-badge" style="background:var(--amber-dim);color:var(--amber)">Achat</span><span class="tranche">Prix d'acquisition corrigé</span><span class="tax">−${fmtEur(prixAchat + fraisAcq + travaux)}</span></div>
+      <div class="bracket-row"><span class="rate-badge" style="background:var(--surface-3);color:var(--text-muted)">Résultat</span><span class="tranche">Moins-value</span><span class="tax" style="color:var(--amber)">${fmtEur(pvBrute)}</span></div>
+    </div>
+    ${duree ? `<div><span class="pv-duree-chip animate">Durée de détention : ${fmtDuree(duree)}</span></div>` : ''}
+    ${buildPedago({ nature:'moinsvalue', duree })}
+  `;
+}
+
+function buildResults(d) {
+  const {
+    nature, duree, annees,
+    prixAchat, prixVente, fraisVente, fraisAcqRetenus, fraisMode,
+    travauxRetenus, travMode,
+    prixAcqCorrige, prixVenteCorrige, pvBrute,
+    abattIRpct, abattPSpct, abattIRmontant, abattPSmontant,
+    baseTaxableIR, baseTaxablePS,
+    exoIR, exoPS,
+    IR, PS, surtax, totalFiscalite, pvNette, tauxMoyen
+  } = d;
+
+  const totFisc = totalFiscalite;
+  const barNetW  = pvBrute > 0 ? Math.max(1, pvNette / pvBrute * 100)          : 100;
+  const barIRW   = pvBrute > 0 ? Math.max(0, IR / pvBrute * 100)               : 0;
+  const barPSW   = pvBrute > 0 ? Math.max(0, PS / pvBrute * 100)               : 0;
+  const barSurxW = pvBrute > 0 ? Math.max(0, surtax / pvBrute * 100)           : 0;
+
+  const noAbatt  = annees === null;
+  const abattNote = noAbatt ? ' (dates non renseignées — abattement = 0)' : '';
+
+  return `
+    <div class="key-result animate">
+      <div class="key-result-label">Plus-value brute</div>
+      <div class="key-result-val">${fmtEur(pvBrute)}</div>
+      ${duree ? `<div class="key-result-sub">Durée de détention : ${fmtDuree(duree)}</div>` : ''}
+      ${surtax > 0 ? `<span class="surx-badge" style="margin-top:.55rem">Surtaxe applicable</span>` : ''}
+    </div>
+
+    <div class="metrics-grid animate">
+      <div class="metric"><div class="metric-label">Fiscalité totale</div><div class="metric-val amber">${fmtEur(totFisc)}</div></div>
+      <div class="metric"><div class="metric-label">Plus-value nette</div><div class="metric-val success">${fmtEur(pvNette)}</div></div>
+      <div class="metric"><div class="metric-label">Taux moyen de taxation</div><div class="metric-val">${fmtPct(tauxMoyen)}</div></div>
+      <div class="metric"><div class="metric-label">Durée de détention</div><div class="metric-val">${duree ? `${annees} an${annees!==1?'s':''}` : '—'}</div></div>
+    </div>
+
+    <div class="pv-abatt-gauges animate">
+      <div class="pv-gauge-card">
+        <div class="pv-gauge-label">Abattement IR</div>
+        <div class="pv-gauge-val">${exoIR ? 'Exonéré' : fmtPct(abattIRpct)}</div>
+        <div class="pv-gauge-track"><div class="pv-gauge-fill ir" style="width:${abattIRpct}%"></div></div>
+        <div class="pv-gauge-sub">${exoIR ? 'Exo. après 22 ans' : abattIRpct === 0 ? (noAbatt ? 'Dates non renseignées' : 'Aucun — moins de 6 ans') : `−${fmtEur(abattIRmontant)}`}</div>
+      </div>
+      <div class="pv-gauge-card">
+        <div class="pv-gauge-label">Abattement PS</div>
+        <div class="pv-gauge-val">${exoPS ? 'Exonéré' : fmtPct(abattPSpct)}</div>
+        <div class="pv-gauge-track"><div class="pv-gauge-fill ps" style="width:${abattPSpct}%"></div></div>
+        <div class="pv-gauge-sub">${exoPS ? 'Exo. après 30 ans' : abattPSpct === 0 ? (noAbatt ? 'Dates non renseignées' : 'Aucun — moins de 6 ans') : `−${fmtEur(abattPSmontant)}`}</div>
+      </div>
+    </div>
+
+    <div class="bracket-detail animate">
+      <div class="bracket-title">Calcul de la plus-value</div>
+      <div class="bracket-row"><span class="rate-badge">Vente</span><span class="tranche">Prix de vente</span><span class="tax">${fmtEur(prixVente)}</span></div>
+      ${fraisVente>0?`<div class="bracket-row"><span class="rate-badge" style="background:var(--surface-3);color:var(--text-muted)">Frais</span><span class="tranche">Frais de vente déductibles</span><span class="tax">−${fmtEur(fraisVente)}</span></div>`:''}
+      <div class="bracket-row"><span class="rate-badge" style="background:var(--accent-dim);color:var(--accent)">Vente net</span><span class="tranche">Prix de vente corrigé</span><span class="tax">${fmtEur(prixVenteCorrige)}</span></div>
+      <div class="bracket-row"><span class="rate-badge" style="background:var(--surface-3);color:var(--text-muted)">Achat</span><span class="tranche">Prix d'achat</span><span class="tax">−${fmtEur(prixAchat)}</span></div>
+      ${fraisAcqRetenus>0?`<div class="bracket-row"><span class="rate-badge" style="background:var(--surface-3);color:var(--text-muted)">Frais acq.</span><span class="tranche">Frais d'acquisition (${fraisMode==='forfait'?'forfait 7,5 %':'réels'})</span><span class="tax">−${fmtEur(fraisAcqRetenus)}</span></div>`:''}
+      ${travauxRetenus>0?`<div class="bracket-row"><span class="rate-badge" style="background:var(--amber-dim);color:var(--amber)">Travaux</span><span class="tranche">Travaux (${travMode==='forfait'?'forfait 15 %':'réels'})</span><span class="tax">−${fmtEur(travauxRetenus)}</span></div>`:''}
+      <div class="bracket-row"><span class="rate-badge" style="background:var(--amber-dim);color:var(--amber)">PV brute</span><span class="tranche">Plus-value brute</span><span class="tax">${fmtEur(pvBrute)}</span></div>
+    </div>
+
+    <div class="bracket-detail animate">
+      <div class="bracket-title">Fiscalité de la plus-value${abattNote}</div>
+      <div class="bracket-row"><span class="rate-badge">PV brute</span><span class="tranche">Plus-value brute</span><span class="tax">${fmtEur(pvBrute)}</span></div>
+      ${abattIRpct>0?`<div class="bracket-row"><span class="rate-badge" style="background:var(--accent-dim);color:var(--accent)">Abatt. IR</span><span class="tranche">Abattement IR (${fmtPct(abattIRpct,0)})</span><span class="tax">−${fmtEur(abattIRmontant)}</span></div>`:''}
+      <div class="bracket-row"><span class="rate-badge" style="background:var(--accent-dim);color:var(--accent)">Base IR</span><span class="tranche">Base taxable IR</span><span class="tax">${exoIR?'Exonérée':fmtEur(baseTaxableIR)}</span></div>
+      ${abattPSpct>0?`<div class="bracket-row"><span class="rate-badge" style="background:var(--amber-dim);color:var(--amber)">Abatt. PS</span><span class="tranche">Abattement prélèvements sociaux (${fmtPct(abattPSpct,2)})</span><span class="tax">−${fmtEur(abattPSmontant)}</span></div>`:''}
+      <div class="bracket-row"><span class="rate-badge" style="background:var(--amber-dim);color:var(--amber)">Base PS</span><span class="tranche">Base taxable prélèvements sociaux</span><span class="tax">${exoPS?'Exonérée':fmtEur(baseTaxablePS)}</span></div>
+      <div class="bracket-row"><span class="rate-badge" style="background:var(--accent-dim);color:var(--accent)">IR</span><span class="tranche">Impôt sur le revenu (19 %)</span><span class="tax">${exoIR?'0 € — exonéré':'+'+fmtEur(IR)}</span></div>
+      <div class="bracket-row"><span class="rate-badge" style="background:var(--amber-dim);color:var(--amber)">PS</span><span class="tranche">Prélèvements sociaux (17,2 %)</span><span class="tax">${exoPS?'0 € — exonéré':'+'+fmtEur(PS)}</span></div>
+      ${surtax>0?`<div class="bracket-row"><span class="rate-badge" style="background:rgba(155,90,58,.1);color:#9B5A3A">Surtaxe</span><span class="tranche">Surtaxe art. 1609 nonies G (${surtaxeTranche(baseTaxableIR)})</span><span class="tax" style="color:#9B5A3A">+${fmtEur(surtax)}</span></div>`:''}
+      <div class="bracket-row"><span class="rate-badge" style="background:var(--amber-dim);color:var(--amber)">Total</span><span class="tranche">Fiscalité totale</span><span class="tax" style="color:var(--amber);font-size:.85rem;font-weight:700">+${fmtEur(totFisc)}</span></div>
+      <div class="bracket-row" style="border-bottom:none"><span class="rate-badge" style="background:rgba(59,140,90,.12);color:var(--success)">PV nette</span><span class="tranche">Plus-value nette après impôt</span><span class="tax" style="color:var(--success);font-size:.85rem;font-weight:700">${fmtEur(pvNette)}</span></div>
+    </div>
+
+    <div class="pv-fiscal-bar-wrap animate">
+      <div class="pv-fiscal-bar-title">Composition fiscale</div>
+      <div class="pv-fiscal-bar">
+        <div class="pv-bar-seg net"  style="flex:${barNetW}"></div>
+        <div class="pv-bar-seg ir"   style="flex:${barIRW}"></div>
+        <div class="pv-bar-seg ps"   style="flex:${barPSW}"></div>
+        ${surtax>0?`<div class="pv-bar-seg surx" style="flex:${barSurxW}"></div>`:''}
+      </div>
+      <div class="pv-fiscal-bar-legend">
+        <div class="pv-legend-item"><div class="pv-legend-dot net"></div>PV nette ${fmtEur(pvNette)} (${fmtPct(100-tauxMoyen)})</div>
+        ${IR>0?`<div class="pv-legend-item"><div class="pv-legend-dot ir"></div>IR ${fmtEur(IR)}</div>`:''}
+        ${PS>0?`<div class="pv-legend-item"><div class="pv-legend-dot ps"></div>PS ${fmtEur(PS)}</div>`:''}
+        ${surtax>0?`<div class="pv-legend-item"><div class="pv-legend-dot surx"></div>Surtaxe ${fmtEur(surtax)}</div>`:''}
+        ${exoIR?`<div class="pv-legend-item" style="color:var(--success)">IR exonéré (>22 ans)</div>`:''}
+        ${exoPS?`<div class="pv-legend-item" style="color:var(--success)">PS exonérés (>30 ans)</div>`:''}
+      </div>
+    </div>
+
+    ${buildPedago(d)}
+  `;
+}
+
+/* ══════════════════════════════════════════
+   SECTION PÉDAGOGIQUE
+══════════════════════════════════════════ */
+function buildPedago(d) {
+  const { nature, duree, annees, pvBrute, abattIRpct, abattPSpct, exoIR, exoPS,
+          baseTaxableIR, baseTaxablePS, IR, PS, surtax, totalFiscalite, pvNette,
+          fraisMode, travMode, travauxRetenus, fraisAcqRetenus } = d;
+
+  if (nature === 'principale') {
+    return `
+    <div class="pedago-card animate">
+      <div class="pedago-card-header">
+        <div class="pedago-card-dot"></div>
+        <div class="pedago-card-title">Exonération résidence principale</div>
+      </div>
+      <div class="pedago-card-body">
+        <p class="pedago-p">La <strong>résidence principale</strong> bénéficie d'une exonération totale de plus-value immobilière en application de l'<strong>article 150 U II-1° du CGI</strong>. Cette exonération est accordée de plein droit, sans condition de durée de détention ni de montant.</p>
+        <div class="pedago-tip">Le logement doit constituer la résidence principale <strong>au jour de la cession</strong>. Une occupation effective et habituelle est requise — résidence secondaire, pied-à-terre ou logement vacant ne sont pas éligibles. Le logement mis en location avant la cession peut perdre ce bénéfice si la location est trop proche de la vente.</div>
+        <p class="pedago-dim">Source : CGI art. 150 U II-1° · BOFiP RFPI - Exonérations - Résidence principale · impots.gouv.fr</p>
+      </div>
+    </div>`;
+  }
+
+  if (nature === 'moinsvalue') {
+    return `
+    <div class="pedago-card animate">
+      <div class="pedago-card-header">
+        <div class="pedago-card-dot"></div>
+        <div class="pedago-card-title">Moins-value immobilière</div>
+      </div>
+      <div class="pedago-card-body">
+        <p class="pedago-p">La cession génère une <strong>moins-value</strong> (prix de revient corrigé supérieur au prix de vente). En matière immobilière, les moins-values réalisées dans le cadre privé <strong>ne sont pas déductibles</strong> : elles ne s'imputent ni sur les plus-values d'autres biens, ni sur le revenu global, et ne sont pas reportables.</p>
+        <p class="pedago-dim">Source : CGI art. 150 VH · BOFiP RFPI - Moins-values</p>
+      </div>
+    </div>`;
+  }
+
+  const items = [];
+
+  // Durée
+  if (duree) {
+    const { annees: a, mois: m } = duree;
+    if (a >= 30) {
+      items.push(`Avec <strong>${fmtDuree(duree)} de détention</strong>, la plus-value est <strong>totalement exonérée d'IR et de prélèvements sociaux</strong>. Aucune fiscalité n'est due sur la cession.`);
+    } else if (a >= 22) {
+      items.push(`Après <strong>${fmtDuree(duree)} de détention</strong>, la plus-value est <strong>exonérée d'impôt sur le revenu</strong> (exonération IR totale après 22 ans). Les prélèvements sociaux restent dus sur la base taxable de <strong>${fmtEur(baseTaxablePS)}</strong> (abattement PS : ${fmtPct(abattPSpct, 2)}).`);
+    } else if (a >= 6) {
+      items.push(`Avec <strong>${fmtDuree(duree)} de détention</strong>, les abattements pour durée s'appliquent : <strong>${fmtPct(abattIRpct, 0)} pour l'IR</strong> et <strong>${fmtPct(abattPSpct, 2)} pour les prélèvements sociaux</strong>. Les bases taxables sont respectivement <strong>${fmtEur(baseTaxableIR)}</strong> (IR) et <strong>${fmtEur(baseTaxablePS)}</strong> (PS).`);
+    } else if (a > 0) {
+      items.push(`Avec <strong>${fmtDuree(duree)} de détention</strong>, aucun abattement pour durée ne s'applique encore. Les abattements commencent à courir à partir de la <strong>6e année révolue</strong> (6 % par an pour l'IR, 1,65 % par an pour les PS).`);
+    } else {
+      items.push(`La détention est inférieure à un an — aucun abattement pour durée. La fiscalité s'applique à taux plein sur la totalité de la plus-value brute.`);
+    }
+  } else {
+    items.push(`Sans dates de détention renseignées, les abattements pour durée n'ont pas pu être calculés. Renseignez les dates d'acquisition et de cession pour bénéficier du calcul automatique des abattements.`);
+  }
+
+  // Frais d'acquisition
+  if (fraisMode === 'forfait' && fraisAcqRetenus > 0) {
+    items.push(`Les <strong>frais d'acquisition</strong> ont été retenus au <strong>forfait de 7,5 %</strong> du prix d'achat (<strong>${fmtEur(fraisAcqRetenus)}</strong>). Ce forfait s'applique en lieu et place des frais réels (art. 150 VB II du CGI). Il est généralement représentatif des frais de notaire dans l'ancien. Si vos frais réels dépassent 7,5 %, il est préférable de les retenir effectivement — sur présentation de justificatifs.`);
+  } else if (fraisMode === 'reel' && fraisAcqRetenus > 0) {
+    items.push(`Les <strong>frais d'acquisition réels</strong> retenus sont de <strong>${fmtEur(fraisAcqRetenus)}</strong>. Seuls les frais directement liés à l'acquisition sont déductibles (notaire, droits d'enregistrement, frais d'agence à la charge de l'acquéreur, frais de voirie...). Des justificatifs seront exigés par le notaire.`);
+  }
+
+  // Travaux
+  if (travMode === 'forfait' && travauxRetenus > 0) {
+    items.push(`Les <strong>travaux</strong> ont été retenus au <strong>forfait de 15 %</strong> du prix d'achat (<strong>${fmtEur(travauxRetenus)}</strong>). Ce forfait est applicable si le bien est détenu depuis <strong>plus de 5 ans</strong> (art. 150 VB II du CGI). Il couvre tous les travaux sans justificatif. Attention : si vous optez pour le forfait, aucune charge réelle ne peut s'y ajouter.`);
+  } else if (travMode === 'forfait' && travauxRetenus === 0) {
+    items.push(`Le forfait travaux de 15 % a été sélectionné mais la détention est insuffisante (moins de 5 ans révolus). Ce forfait n'est applicable qu'au-delà de 5 ans de détention (art. 150 VB II du CGI). Aucun travaux n'a donc été retenu.`);
+  } else if (travMode === 'reel' && travauxRetenus > 0) {
+    items.push(`Les <strong>travaux réels</strong> retenus sont de <strong>${fmtEur(travauxRetenus)}</strong>. Seuls les travaux de construction, reconstruction, agrandissement ou amélioration sont déductibles — non les travaux d'entretien ni les réparations courantes. Des factures établies par des entreprises seront exigées.`);
+  }
+
+  // IR
+  if (exoIR) {
+    items.push(`<strong>Impôt sur le revenu (IR) : exonéré.</strong> Après 22 ans de détention, l'abattement IR est de 100 % : la base taxable est nulle et l'IR est dû à hauteur de <strong>0 €</strong>.`);
+  } else {
+    items.push(`L'<strong>impôt sur le revenu</strong> est calculé au taux forfaitaire de <strong>19 %</strong> sur la base taxable IR de <strong>${fmtEur(baseTaxableIR)}</strong>, soit <strong>${fmtEur(IR)}</strong>. Ce taux est fixe, indépendant du TMI du vendeur (art. 200 B du CGI).`);
+  }
+
+  // PS
+  if (exoPS) {
+    items.push(`<strong>Prélèvements sociaux : exonérés.</strong> Après 30 ans de détention, l'abattement PS atteint 100 % — aucun prélèvement social n'est dû.`);
+  } else {
+    items.push(`Les <strong>prélèvements sociaux</strong> (17,2 %) sont calculés sur une base différente de l'IR, car le barème d'abattement PS diffère. Base PS : <strong>${fmtEur(baseTaxablePS)}</strong> · PS dûs : <strong>${fmtEur(PS)}</strong>. Les PS se décomposent en CSG (9,2 %), CRDS (0,5 %), prélèvement solidarité (7,5 %).`);
+  }
+
+  // Surtaxe
+  if (surtax > 0) {
+    items.push(`La <strong>surtaxe</strong> (art. 1609 nonies G du CGI) s'applique car la base taxable IR dépasse <strong>50 000 €</strong>. Taux applicable : <strong>${surtaxeTranche(baseTaxableIR)}</strong> sur la totalité de la base taxable IR de <strong>${fmtEur(baseTaxableIR)}</strong>, soit une surtaxe de <strong>${fmtEur(surtax)}</strong>. Un mécanisme de tempérament s'applique entre 50 001 et 60 000 € pour lisser le seuil d'entrée.`);
+  } else if (baseTaxableIR > 0 && baseTaxableIR <= 50000) {
+    items.push(`La base taxable IR de <strong>${fmtEur(baseTaxableIR)}</strong> est inférieure ou égale à 50 000 € : la <strong>surtaxe art. 1609 nonies G du CGI ne s'applique pas</strong>. Elle ne déclenche qu'au-delà de ce seuil.`);
+  }
+
+  return `
+  <div class="pedago-card animate">
+    <div class="pedago-card-header">
+      <div class="pedago-card-dot"></div>
+      <div class="pedago-card-title">Analyse fiscale — Plus-value immobilière</div>
+    </div>
+    <div class="pedago-card-body">
+      ${items.map(t => `<p class="pedago-p">${t}</p>`).join('')}
+      <div class="pedago-block">
+        <div class="pedago-block-label">Barème abattement IR — art. 150 VC CGI</div>
+        <p class="pedago-block-text">0 % jusqu'à 5 ans révolus · <strong>6 %/an</strong> de la 6e à la 21e année · <strong>4 %</strong> la 22e année → <strong>exonération totale à partir de 22 ans</strong></p>
+      </div>
+      <div class="pedago-block">
+        <div class="pedago-block-label">Barème abattement prélèvements sociaux — art. 150 VC CGI</div>
+        <p class="pedago-block-text">0 % jusqu'à 5 ans révolus · <strong>1,65 %/an</strong> de la 6e à la 21e · <strong>1,60 %</strong> la 22e · <strong>9 %/an</strong> de la 23e à la 30e → <strong>exonération totale à partir de 30 ans</strong></p>
+      </div>
+      <p class="pedago-dim">Sources : CGI art. 150 U, 150 VB, 150 VC, 150 VD, 200 B, 1609 nonies G · BOFiP RFPI-PVIMMO · impots.gouv.fr · service-public.fr · notaires.fr</p>
+    </div>
+  </div>`;
+}
+
+/* ══════════════════════════════════════════
+   INIT
+══════════════════════════════════════════ */
+
+/* Radio toggles pour frais et travaux */
+document.querySelectorAll('input[name="frais-mode"]').forEach(r => {
+  r.addEventListener('change', () => {
+    const isReel = document.getElementById('frais-reel').checked;
+    document.getElementById('frais-reel-wrap').style.display    = isReel ? 'block' : 'none';
+    document.getElementById('frais-forfait-note').style.display = isReel ? 'none'  : 'block';
+    calculate();
+  });
+});
+
+document.querySelectorAll('input[name="trav-mode"]').forEach(r => {
+  r.addEventListener('change', () => {
+    const val = document.querySelector('input[name="trav-mode"]:checked').value;
+    document.getElementById('trav-reel-wrap').style.display    = val === 'reel'    ? 'block' : 'none';
+    document.getElementById('trav-forfait-note').style.display = val === 'forfait' ? 'block' : 'none';
+    calculate();
+  });
+});
+
+/* Listeners */
+['pv-nature','pv-date-acq','pv-date-vente']
+  .forEach(id => document.getElementById(id).addEventListener('change', calculate));
+
+['pv-prix-achat','pv-prix-vente','pv-frais-vente','pv-frais-acq','pv-travaux']
+  .forEach(id => { const e = document.getElementById(id); if (e) e.addEventListener('input', calculate); });
+
+/* Calcul initial pour afficher la structure des résultats au chargement */
+calculate();
+
+/* Dropdown nav */
+/* Menu déroulant catégorisé — voir shared-nav.js */
+SP.nav.init();
+</script>
+</body>
+</html>

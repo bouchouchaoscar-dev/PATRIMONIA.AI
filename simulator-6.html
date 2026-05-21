@@ -1,0 +1,1670 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="favicon-64.png">
+  <link rel="shortcut icon" href="favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="favicon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Droits de Succession 2026 — PATRIMONIA.AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css?v=19">
+<script src="shared.js?v=2"></script>
+  <script src="shared-nav.js?v=6"></script>
+<style>
+
+/* ── PILL GROUP ── */
+.pill-group{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.3rem}
+.pill{display:inline-flex;align-items:center;padding:.35rem .85rem;border:1.5px solid var(--border);border-radius:100px;font-size:.76rem;font-weight:500;color:var(--text-muted);cursor:pointer;background:var(--surface);transition:all .2s ease;user-select:none;letter-spacing:-.01em}
+.pill input[type=radio],.pill input[type=checkbox]{display:none}
+.pill:has(input:checked){background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
+
+/* ── SECTION LABEL ── */
+.section-label-small{font-size:.62rem;font-weight:700;color:var(--text-dim);letter-spacing:.08em;text-transform:uppercase;margin-bottom:.65rem}
+
+/* ── CARDS ── */
+.benef-card{background:var(--surface);border:1.5px solid var(--border-subtle);border-radius:var(--r-sm);margin-bottom:.7rem;overflow:hidden;transition:border-color .2s ease}
+.benef-card:focus-within{border-color:rgba(79,138,120,.35)}
+.benef-hd{display:flex;align-items:center;justify-content:space-between;padding:.55rem .9rem .55rem .75rem;background:var(--surface-2);border-bottom:1px solid var(--border-subtle)}
+.benef-hd-left{display:flex;align-items:center;gap:.55rem;min-width:0;flex:1}
+.benef-num{width:20px;height:20px;border-radius:50%;flex-shrink:0;background:var(--accent-dim);color:var(--accent);font-size:.65rem;font-weight:700;display:flex;align-items:center;justify-content:center}
+.benef-name-inp{background:transparent;border:none;outline:none;font-size:.8rem;font-weight:500;color:var(--text);font-family:var(--sans);width:130px;min-width:0;letter-spacing:-.01em}
+.benef-name-inp::placeholder{color:var(--text-dim)}
+.benef-lien-tag{font-size:.63rem;font-weight:500;color:var(--text-dim);background:var(--surface-3);padding:.1rem .5rem;border-radius:100px;flex-shrink:0;white-space:nowrap}
+.benef-rm{width:24px;height:24px;border-radius:50%;border:none;background:none;color:var(--text-dim);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.05rem;line-height:1;transition:all .15s ease;flex-shrink:0}
+.benef-rm:hover{background:rgba(155,90,58,.08);color:#9B5A3A}
+.benef-fields{padding:.8rem .85rem .7rem}
+.benef-row{display:grid;grid-template-columns:1fr 1fr;gap:.55rem;margin-bottom:.55rem}
+.benef-lbl{font-size:.63rem;font-weight:600;color:var(--text-dim);letter-spacing:.06em;text-transform:uppercase;margin-bottom:.28rem}
+.benef-iw{display:flex;align-items:center;gap:.35rem;background:var(--surface-2);border:1.5px solid var(--border);border-radius:var(--r-sm);padding:.42rem .7rem;transition:all .2s ease}
+.benef-iw:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
+.benef-iw input{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-family:var(--sans);font-size:.84rem;font-weight:500;width:100%;min-width:0}
+.benef-unit{font-size:.74rem;color:var(--text-dim);flex-shrink:0;font-weight:500}
+.benef-sw{position:relative}
+.benef-sw::after{content:'▾';position:absolute;right:.7rem;top:50%;transform:translateY(-50%);color:var(--text-dim);pointer-events:none;font-size:.72rem}
+.benef-sel{width:100%;background:var(--surface-2);border:1.5px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-family:var(--sans);font-size:.82rem;font-weight:400;padding:.42rem 1.8rem .42rem .7rem;outline:none;cursor:pointer;transition:all .2s ease;-webkit-appearance:none;appearance:none}
+.benef-sel:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
+.benef-ck{display:flex;align-items:center;gap:.48rem;font-size:.73rem;color:var(--text-muted);cursor:pointer;margin-top:.4rem;line-height:1.4}
+.benef-ck input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;cursor:pointer;flex-shrink:0}
+.benef-note{font-size:.62rem;color:var(--text-dim);margin-top:.2rem;font-family:var(--mono);line-height:1.5}
+
+/* ── ADD BUTTON ── */
+.add-benef-btn{display:flex;align-items:center;justify-content:center;gap:.5rem;width:100%;padding:.6rem 1rem;background:var(--accent-dim);border:1.5px dashed rgba(79,138,120,.3);border-radius:var(--r-sm);color:var(--accent);font-family:var(--sans);font-size:.78rem;font-weight:500;cursor:pointer;transition:all .2s ease;letter-spacing:-.01em}
+.add-benef-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+.add-benef-btn svg{width:13px;height:13px;flex-shrink:0}
+
+/* ── RESULTS ── */
+.benef-res-row{background:var(--surface-2);border:1px solid var(--border-subtle);border-radius:var(--r-sm);padding:.8rem 1rem;display:flex;flex-direction:column;gap:.28rem}
+.benef-res-top{display:flex;align-items:center;justify-content:space-between;gap:.5rem}
+.benef-res-name{font-size:.78rem;font-weight:600;color:var(--text);letter-spacing:-.01em;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.benef-res-droits{font-family:var(--mono);font-size:.9rem;font-weight:700;color:var(--accent);flex-shrink:0}
+.benef-res-droits.zero{color:var(--success)}
+.benef-res-sub{display:flex;gap:.4rem;flex-wrap:wrap}
+.benef-chip{font-size:.63rem;color:var(--text-dim);background:var(--surface);border:1px solid var(--border-subtle);padding:.1rem .45rem;border-radius:100px;white-space:nowrap}
+
+/* ── WARN / NOTE ── */
+.warn-box{background:var(--amber-dim);border-left:3px solid var(--amber);border-radius:var(--r-sm);padding:.65rem .85rem;font-size:.7rem;color:#5a3a00;line-height:1.65;margin-top:.45rem}
+.note-box{background:var(--surface-3);border-left:3px solid rgba(79,138,120,.25);border-radius:var(--r-sm);padding:.85rem 1rem;font-size:.72rem;color:var(--text-muted);line-height:1.75;margin-top:1rem}
+
+/* ── DÉTAIL ── */
+.detail-benef{margin-bottom:1.6rem;padding-bottom:1.6rem;border-bottom:1px solid var(--border-subtle)}
+.detail-benef:last-of-type{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.detail-benef-title{font-size:.8rem;font-weight:600;color:var(--text);letter-spacing:-.01em;margin-bottom:.8rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+.detail-tag{font-size:.63rem;color:var(--text-dim);background:var(--surface-3);padding:.12rem .55rem;border-radius:100px;font-weight:500}
+.detail-sub-title{font-size:.65rem;font-weight:700;color:var(--text-dim);letter-spacing:.06em;text-transform:uppercase;margin:.8rem 0 .4rem}
+.dl{display:flex;justify-content:space-between;align-items:center;padding:.32rem 0;font-size:.78rem;border-bottom:1px solid var(--border-subtle)}
+.dl:last-child{border-bottom:none}
+.dl span{color:var(--text-muted)}
+.dl strong{font-family:var(--mono);font-weight:600;color:var(--text)}
+.dl.acc strong{color:var(--accent)}.dl.suc strong{color:var(--success)}.dl.amb strong{color:var(--amber)}.dl.dim strong{color:var(--text-dim)}.dl.big strong{font-size:.9rem}
+
+/* ── NET BOX ── */
+.net-box{background:var(--surface-2);border:1px solid var(--border-subtle);border-radius:var(--r-sm);padding:1.1rem 1.25rem}
+.net-box-title{font-size:.63rem;font-weight:600;color:var(--text-dim);letter-spacing:.07em;text-transform:uppercase;margin-bottom:.5rem}
+.net-box-val{font-family:var(--sans);font-size:1.15rem;font-weight:700;color:var(--success);letter-spacing:-.03em;margin-bottom:.25rem}
+.net-box-note{font-size:.7rem;color:var(--text-dim);line-height:1.55}
+
+/* ── ENFANT ROWS ── */
+.enfant-row{padding:.7rem .85rem;border:1.5px solid var(--border-subtle);border-radius:var(--r-sm);margin-bottom:.5rem;background:var(--surface)}
+.enfant-row-title{font-size:.73rem;font-weight:600;color:var(--text);margin-bottom:.5rem;display:flex;align-items:center;gap:.4rem}
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="index.html" class="nav-logo"><img src="logo.png?v=3" alt="PATRIMONIA.AI" class="nav-logo-img"></a>
+  <div class="nav-right">
+    <a href="index.html" class="nav-back">
+      <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7.5 1.5L3 6l4.5 4.5"/></svg>
+      Accueil
+    </a>
+    <div class="nav-dropdown" id="mainDropdown">
+      <button class="nav-dropdown-btn" aria-expanded="false" aria-haspopup="true">
+        Simulateurs <svg class="nav-chevron" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l4 4 4-4"/></svg>
+      </button>
+      <div class="nav-dropdown-menu" id="navMenu" role="menu"></div>
+    </div>
+  </div>
+</nav>
+
+<div class="sim-page">
+  <div class="sim-page-header">
+    <span class="sim-num-badge">06</span>
+    <div>
+      <div class="sim-eyebrow">Transmission</div><h1>Droits de <em class="gradient-text">succession</em></h1>
+      <p>Barèmes 2026 · Régime matrimonial · Assurance-vie · Multi-héritiers · Abattements CGI</p>
+    </div>
+  </div>
+
+  <div class="sim-card-wrap">
+    <div class="sim-body">
+
+      <!-- ══ PANNEAU GAUCHE ══ -->
+      <div class="inputs-panel">
+
+        <!-- A. DÉFUNT -->
+        <div class="section-label-small">Situation du défunt</div>
+
+        <div class="field">
+          <div class="field-label"><label for="sit-statut">Situation matrimoniale</label></div>
+          <div class="select-wrap">
+            <select id="sit-statut">
+              <option value="celib">Célibataire</option>
+              <option value="marie" selected>Marié(e)</option>
+              <option value="pacs">Pacsé(e)</option>
+              <option value="concubin">Concubin(age)</option>
+              <option value="divorce">Divorcé(e)</option>
+              <option value="veuf">Veuf / Veuve</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Alerte PACS — dynamique -->
+        <div id="pacs-info" style="display:none;margin-top:.45rem"></div>
+
+        <!-- Régime matrimonial — uniquement si marié -->
+        <div class="field" id="regime-wrap">
+          <div class="field-label"><label>Régime matrimonial</label></div>
+          <div class="pill-group">
+            <label class="pill"><input type="radio" name="regime" value="cra" checked> Communauté réduite aux acquêts</label>
+            <label class="pill"><input type="radio" name="regime" value="sep"> Séparation de biens</label>
+            <label class="pill"><input type="radio" name="regime" value="universelle"> Communauté universelle</label>
+            <label class="pill"><input type="radio" name="regime" value="particip"> Participation aux acquêts</label>
+          </div>
+          <div id="regime-note" class="benef-note" style="margin-top:.4rem"></div>
+        </div>
+
+        <!-- Âge conjoint survivant -->
+        <div class="field" id="age-conjoint-wrap">
+          <div class="field-label">
+            <label for="age-conjoint">Âge du conjoint survivant</label>
+            <span class="field-val" id="age-conjoint-disp">60 ans</span>
+          </div>
+          <div class="input-wrap"><input type="number" id="age-conjoint" value="60" min="18" max="99" step="1"><span class="unit">ans</span></div>
+          <input type="range" id="age-conjoint-s" min="18" max="99" step="1" value="60">
+          <div class="benef-note" id="conjoint-usuf-note">Usufruit viager : 40 % · Nue-propriété : 60 % (art. 669 CGI)</div>
+        </div>
+
+        <!-- Donation entre époux -->
+        <div class="field" id="don-epoux-wrap">
+          <label class="check-item">
+            <input type="checkbox" id="don-epoux-ck">
+            Donation entre époux / donation au dernier vivant
+          </label>
+          <div id="don-epoux-note" class="warn-box" style="display:none">Une donation entre époux (ou au dernier vivant) peut modifier les droits du conjoint. Ce simulateur applique les règles légales de base. Consultez un notaire pour les options spécifiques (quotité disponible spéciale, choix par quotité, etc.).</div>
+        </div>
+
+        <!-- Testament -->
+        <div class="field">
+          <label class="check-item">
+            <input type="checkbox" id="testament-ck">
+            Testament ou dispositions particulières
+          </label>
+          <div id="testament-note" class="warn-box" style="display:none">Un testament peut modifier significativement la répartition légale. Ce simulateur calcule la dévolution légale. En présence d'un testament, seul un notaire peut déterminer la répartition exacte et l'impact fiscal.</div>
+        </div>
+
+        <div class="section-sep"></div>
+
+        <!-- Enfants -->
+        <div class="section-label-small">Enfants & héritiers directs</div>
+
+        <div class="field">
+          <div class="field-label">
+            <label for="nb-enfants">Nombre d'enfants</label>
+            <span class="field-val" id="nb-enfants-disp">2 enfants</span>
+          </div>
+          <div class="input-wrap"><input type="number" id="nb-enfants" value="2" min="0" max="12" step="1"><span class="unit">enfant(s)</span></div>
+          <input type="range" id="nb-enfants-s" min="0" max="12" step="1" value="2">
+          <div id="no-enfant-note" style="display:none;font-size:.7rem;color:var(--text-dim);margin-top:.4rem;font-family:var(--mono);line-height:1.6">En l'absence d'enfant, la succession est répartie selon les héritiers présents : conjoint survivant, parents, frères/sœurs ou bénéficiaires testamentaires.</div>
+        </div>
+
+        <!-- Communs ou non communs (si marié/pacsé) -->
+        <div class="field" id="enfants-type-wrap">
+          <div class="field-label"><label>Enfants du défunt</label></div>
+          <div class="pill-group">
+            <label class="pill"><input type="radio" name="enfants-type" value="communs" checked> Tous communs avec le conjoint</label>
+            <label class="pill"><input type="radio" name="enfants-type" value="noncommuns"> Au moins 1 non commun</label>
+          </div>
+          <div id="noncommuns-note" class="benef-note" style="margin-top:.3rem;display:none">Présence d'enfants non communs : le conjoint ne peut choisir que 1/4 PP (art. 757 C. civ.).</div>
+        </div>
+
+        <!-- Option conjoint (communs uniquement) -->
+        <div class="field" id="option-conjoint-wrap">
+          <div class="field-label"><label>Option choisie par le conjoint</label></div>
+          <div class="pill-group">
+            <label class="pill"><input type="radio" name="option-conjoint" value="usufruit" checked> 100 % usufruit</label>
+            <label class="pill"><input type="radio" name="option-conjoint" value="quartpp"> 1/4 pleine propriété</label>
+          </div>
+          <div class="benef-note" id="option-conjoint-note" style="margin-top:.3rem">Art. 757 C. civ. — Option uniquement disponible en présence d'enfants communs.</div>
+        </div>
+
+        <!-- Parents vivants (si pas d'enfants) -->
+        <div class="field" id="parents-wrap">
+          <div class="field-label"><label for="parents-vivants">Parents du défunt encore vivants</label></div>
+          <div class="select-wrap">
+            <select id="parents-vivants">
+              <option value="aucun" selected>Aucun</option>
+              <option value="un">Un seul parent (père ou mère)</option>
+              <option value="deux">Père et mère</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="section-sep"></div>
+
+        <!-- B. ACTIF SUCCESSORAL -->
+        <div class="section-label-small">Actif successoral</div>
+
+        <div id="biens-list"></div>
+
+        <button class="add-benef-btn" id="add-bien-btn" type="button">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="8" y1="3" x2="8" y2="13"/><line x1="3" y1="8" x2="13" y2="8"/></svg>
+          Ajouter un bien
+        </button>
+
+        <div style="margin-top:1rem">
+          <div class="field">
+            <label class="check-item">
+              <input type="checkbox" id="frais-fun-ck" checked>
+              Frais funéraires — forfait déductible de 1 500 € (art. 775 CGI)
+            </label>
+          </div>
+          <div class="field">
+            <div class="field-label"><label for="autres-dettes">Autres dettes déductibles</label></div>
+            <div class="benef-iw" style="background:var(--surface-2)">
+              <input type="text" inputmode="numeric" id="autres-dettes" value="0" placeholder="0">
+              <span class="benef-unit">€</span>
+            </div>
+            <div class="benef-note">Crédits, dettes fiscales, charges déductibles (art. 768 CGI)</div>
+          </div>
+        </div>
+
+        <div class="section-sep"></div>
+
+        <!-- C. ASSURANCE-VIE -->
+        <div class="section-label-small">Assurance-vie (traitement séparé)</div>
+        <div class="benef-note" style="margin-bottom:.65rem">L'assurance-vie est généralement hors succession civile. Sa fiscalité est régie par les art. 990I (primes avant 70 ans) et 757B CGI (primes après 70 ans).</div>
+
+        <div id="av-list"></div>
+
+        <button class="add-benef-btn" id="add-av-btn" type="button">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="8" y1="3" x2="8" y2="13"/><line x1="3" y1="8" x2="13" y2="8"/></svg>
+          Ajouter un contrat AV
+        </button>
+
+        <div class="section-sep"></div>
+
+        <!-- D. HÉRITIERS — PERSONNALISATION -->
+        <div class="section-label-small">Héritiers — paramètres individuels</div>
+
+        <div id="enfants-params"></div>
+
+        <!-- Autres héritiers additionnels -->
+        <div id="autres-heritiers-section">
+          <div style="font-size:.72rem;color:var(--text-muted);margin-bottom:.55rem;font-family:var(--mono)">Frères, sœurs, neveux, ou autres héritiers (legs, dévolution particulière…)</div>
+          <div id="autres-her-list"></div>
+          <button class="add-benef-btn" id="add-her-btn" type="button">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="8" y1="3" x2="8" y2="13"/><line x1="3" y1="8" x2="13" y2="8"/></svg>
+            Ajouter un autre héritier
+          </button>
+        </div>
+
+      </div><!-- /inputs-panel -->
+
+      <!-- ══ PANNEAU DROIT ══ -->
+      <div class="results-panel" id="succ-results">
+        <div class="result-empty">Renseignez la situation<br>pour lancer la simulation.</div>
+      </div>
+
+    </div><!-- /sim-body -->
+
+    <!-- ══ ACCORDÉON DÉTAIL ══ -->
+    <div class="amort-section" style="display:grid">
+      <details class="amort-details" id="detail-accordion" style="display:none">
+        <summary>Détail de calcul par héritier — barèmes, abattements et tranches</summary>
+        <div style="padding-top:1.25rem" id="detail-body"></div>
+      </details>
+    </div>
+
+  </div><!-- /sim-card-wrap -->
+</div><!-- /sim-page -->
+
+<footer>
+  <span>PATRIMONIA.AI</span> — Simulation indicative à titre informatif uniquement. Ne remplace pas l'analyse d'un notaire, avocat fiscaliste ou CGP.<br>
+  Barèmes CGI art. 777 · Abattements art. 779 · Exonération conjoint art. 796-0 bis · AV art. 990I &amp; 757B · Démembrement art. 669 · Valeurs 2026.
+</footer>
+
+<script>
+/* ══════════════════════════════════════════════════════════
+   CONSTANTES FISCALES SUCCESSION 2026
+   Sources : CGI art. 777, 779, 796-0 bis, 669, 990I, 757B, 775 — BOFiP
+   ══════════════════════════════════════════════════════════ */
+
+const ABATT_SUCC = {
+  'conjoint':              0,      // Exonéré totalement — art. 796-0 bis CGI
+  'pacs':                  0,      // Exonéré totalement — art. 796-0 bis CGI
+  'enfant':           100000,      // Art. 779 I CGI
+  'parent':           100000,      // Art. 779 I CGI (ligne directe ascendante)
+  'petit-enfant':       1594,      // Art. 779 I CGI
+  'arriere-petit-enfant': 1594,
+  'frere-soeur':        15932,     // Art. 779 III CGI
+  'neveu-niece':         7967,     // Art. 779 IV CGI
+  'oncle-tante':            0,
+  'cousin':                 0,
+  'concubin':               0,
+  'tiers':                  0
+};
+
+const ABATT_HANDI      = 159325;   // Art. 779 II — cumulable avec abattement du lien
+const FRAIS_FUN_FORFAIT =  1500;   // Art. 775 CGI — forfait frais funéraires
+const AV_ABATT_AVANT70 = 152500;   // Art. 990I CGI — par bénéficiaire
+const AV_SEUIL         = 700000;   // Seuil 20% → 31.25% (art. 990I)
+const AV_ABATT_APRES70 =  30500;   // Art. 757B CGI — global sur primes
+
+// Barème ligne directe (art. 777 I CGI)
+const BAREME_DIRECTE = [
+  { lim:     8072, t: .05 },
+  { lim:    12109, t: .10 },
+  { lim:    15932, t: .15 },
+  { lim:   552324, t: .20 },
+  { lim:   902838, t: .30 },
+  { lim:  1805677, t: .40 },
+  { lim: Infinity, t: .45 }
+];
+
+// Barème frères/sœurs (art. 777 II CGI)
+const BAREME_FRERES = [
+  { lim:  24430, t: .35 },
+  { lim: Infinity, t: .45 }
+];
+
+const LIEN_LABELS = {
+  'conjoint':'Conjoint (exonéré)','pacs':'Partenaire PACS (exonéré)',
+  'enfant':'Enfant','parent':'Parent','petit-enfant':'Petit-enfant',
+  'arriere-petit-enfant':'Arr.-petit-enfant','frere-soeur':'Frère / Sœur',
+  'neveu-niece':'Neveu / Nièce','oncle-tante':'Oncle / Tante',
+  'cousin':'Cousin·e','concubin':'Concubin(e)','tiers':'Tiers'
+};
+
+// Coefficients usufruit viager (art. 669 CGI) — retourne le coeff usufruit
+function coeffUsuf(age) {
+  if (age <  21) return .90;
+  if (age <  31) return .80;
+  if (age <  41) return .70;
+  if (age <  51) return .60;
+  if (age <  61) return .50;
+  if (age <  71) return .40;
+  if (age <  81) return .30;
+  if (age <  91) return .20;
+  return .10;
+}
+
+/* ══════════════════════════════════════════════════════════
+   FORMATAGE
+   ══════════════════════════════════════════════════════════ */
+const fmtN = (v, d=0) => new Intl.NumberFormat('fr-FR',{minimumFractionDigits:d,maximumFractionDigits:d}).format(v).replace(/[\u202F\u00A0]/g,' ');
+const fmtE = (v, d=0) => fmtN(v,d) + ' €';
+const fmtP = (v, d=1) => fmtN(v,d) + ' %';
+
+function attachMoneyInput(inp) { SP.attachFmt(inp); }
+const parseM = s => parseFloat(String(s).replace(/\s/g,'').replace(',','.')) || 0;
+
+/* ══════════════════════════════════════════════════════════
+   BARÈMES
+   ══════════════════════════════════════════════════════════ */
+function appliquer(base, bareme) {
+  let prev = 0, total = 0;
+  const tr = [];
+  for (const b of bareme) {
+    if (base <= prev) break;
+    const portion = Math.min(base, b.lim) - prev;
+    const impot   = portion * b.t;
+    tr.push({ de: prev, a: b.lim, taux: b.t, portion, impot });
+    total += impot;
+    prev = b.lim;
+  }
+  return { total, tr };
+}
+
+function calcDroits(base, lien) {
+  if (['conjoint','pacs'].includes(lien)) return { total: 0, tr: [], taux: 0 };
+  if (['enfant','parent','petit-enfant','arriere-petit-enfant'].includes(lien)) {
+    const r = appliquer(base, BAREME_DIRECTE);
+    return { ...r, taux: base > 0 ? r.total / base * 100 : 0 };
+  }
+  if (lien === 'frere-soeur') {
+    const r = appliquer(base, BAREME_FRERES);
+    return { ...r, taux: base > 0 ? r.total / base * 100 : 0 };
+  }
+  if (['neveu-niece','oncle-tante','cousin'].includes(lien)) {
+    return { total: base * .55, tr: [{ de:0, a:Infinity, taux:.55, portion:base, impot:base*.55 }], taux: 55 };
+  }
+  return { total: base * .60, tr: [{ de:0, a:Infinity, taux:.60, portion:base, impot:base*.60 }], taux: 60 };
+}
+
+function calcHer(montant, lien, abattConso, handi) {
+  const abattBase  = ABATT_SUCC[lien] ?? 0;
+  const abattHandi = handi ? ABATT_HANDI : 0;
+  const abattTheo  = abattBase + abattHandi;
+  const abattRestant = Math.max(0, abattTheo - abattConso);
+  const baseTaxable  = Math.max(0, montant - abattRestant);
+  const { total, tr, taux } = calcDroits(baseTaxable, lien);
+  return { montant, abattBase, abattHandi, abattTheo, abattConso, abattRestant, baseTaxable, droits: total, tr, tauxEff: taux };
+}
+
+/* ══════════════════════════════════════════════════════════
+   CATALOGUE DES TYPES DE BIENS — fiscalité & exonérations
+   Sources : CGI art. 787B, 793 bis, 150 VI, 1131 — BOFiP
+   ══════════════════════════════════════════════════════════ */
+const TYPE_BIEN_INFO = {
+  'immo-rp':      { tag:'Rés. principale', note:null, exoPct:0, exoLabel:null },
+  'immo-rs':      { tag:'Rés. secondaire', note:null, exoPct:0, exoLabel:null },
+  'immo-loc':     { tag:'Locatif', note:'<strong>Immobilier locatif</strong> — Valeur vénale au jour du décès. Décote possible pour bien loué. Si bail rural à long terme (≥ 18 ans), une exonération partielle de 75 % (art. 793 bis CGI) peut s\'appliquer. Vérifiez les conditions avec un notaire.', exoPct:0, exoLabel:null },
+  'sci':          { tag:'SCI/SCPI', note:null, exoPct:0, exoLabel:null },
+  'financier':    { tag:'Financier', note:null, exoPct:0, exoLabel:null },
+  'valeurs':      { tag:'Titres', note:null, exoPct:0, exoLabel:null },
+  'capitalisation':{ tag:'Capitalisation', note:'<strong>Contrat de capitalisation</strong> — Contrairement à l\'AV, ce contrat fait partie de la succession et est transmis aux héritiers à sa valeur de rachat. L\'héritier peut conserver le contrat sans le racheter : les gains accumulés seront soumis à prélèvements sociaux et IR uniquement lors du rachat effectif. Ce différé d\'imposition est un avantage patrimonial notable.', exoPct:0, exoLabel:null },
+  'dutreil':      { tag:'Dutreil',
+    note:'<strong>Pacte Dutreil — art. 787B CGI</strong> — Exonération de 75 % de la valeur des titres si : engagement collectif de conservation ≥ 2 ans + individuel 4 ans + exercice d\'une fonction de direction par le défunt ou un héritier. Conditions strictes vérifiées par l\'administration — attestation notariale requise. Si conditions remplies, cochez la case ci-dessous pour appliquer l\'exonération.',
+    exoPct:0.75, exoLabel:'Pacte Dutreil actif (art. 787B CGI) — exonération de 75 %' },
+  'holding':      { tag:'Holding',
+    note:'<strong>Holding patrimoniale</strong> — Peut bénéficier du pacte Dutreil (art. 787B CGI) si la holding anime une société opérationnelle. L\'administration est vigilante sur la qualification "animatrice". Sans pacte, taxé au barème de droit commun. Si éligible, cochez la case Dutreil.',
+    exoPct:0.75, exoLabel:'Pacte Dutreil holding animatrice (art. 787B CGI) — exonération 75 %' },
+  'societe-nc':   { tag:'Non coté', note:'<strong>Société non cotée</strong> — Valorisée à la valeur vénale. Un pacte Dutreil (art. 787B) réduit la base de 75 % si la société est opérationnelle et les conditions remplies. Décotes d\'illiquidité fréquentes en pratique.', exoPct:0.75, exoLabel:'Pacte Dutreil société non cotée (art. 787B CGI) — exonération 75 %' },
+  'forestier':    { tag:'Forestier',
+    note:'<strong>Groupement Forestier — art. 793 bis CGI</strong> — Exonération de <strong>75 %</strong> possible si : parts détenues depuis ≥ 2 ans, engagement de gestion forestière de 30 ans sous plan agréé CNPF/ONF ou certification PEFC/FSC. Le quart restant est taxé normalement. Si conditions remplies, cochez ci-dessous.',
+    exoPct:0.75, exoLabel:'Conditions art. 793 bis CGI remplies — exonération de 75 %' },
+  'viticole':     { tag:'Viticole', note:'<strong>Groupement Viticole (GFV)</strong> — Pas d\'exonération successorale analogue aux GFF. Taxé au barème de droit commun. Décotes d\'illiquidité et contraintes agronomiques possibles.', exoPct:0, exoLabel:null },
+  'cheptel':      { tag:'Agricole',
+    note:'<strong>Exploitation agricole / Baux ruraux — art. 793 bis CGI</strong> — Biens ruraux loués par bail à long terme (≥ 18 ans, bail rural) : exonération de 75 % possible. Conditions : engagement de conservation, type de bien éligible, plan de gestion. Consultez un notaire pour vérification.',
+    exoPct:0.75, exoLabel:'Bail rural à long terme (art. 793 bis CGI) — exonération 75 %' },
+  'fip-fcpi':     { tag:'FIP/FCPI', note:'<strong>FIP / FCPI</strong> — Aucune exonération successorale spécifique (avantages IR uniquement). Valeur liquidative au jour du décès. Illiquidité possible si fonds non en liquidation.', exoPct:0, exoLabel:null },
+  'pe':           { tag:'PE', note:'<strong>Private Equity / FCPR</strong> — Aucune exonération spécifique. Valeur liquidative retenue. Si actifs sous-jacents constituent une société opérationnelle, un pacte Dutreil (art. 787B) peut s\'appliquer — à analyser.', exoPct:0, exoLabel:null },
+  'or':           { tag:'Or / Métaux', note:'<strong>Or / métaux précieux</strong> — Aucune exonération successorale. Valeur vénale (cours de l\'or au jour du décès). À la revente par les héritiers, TCA de 11,5 % (art. 150 VI CGI) sauf option plus-value réelle.', exoPct:0, exoLabel:null },
+  'art':          { tag:'Art', note:'<strong>Œuvres d\'art / collection</strong> — Aucune exonération. Valeur vénale par expertise. Droits payables par dation en paiement (art. 1131 CGI — accord ministériel requis). Valorisation délicate : expertise contradictoire recommandée.', exoPct:0, exoLabel:null },
+  'meuble':       { tag:'Meuble', note:null, exoPct:0, exoLabel:null },
+  'autre':        { tag:'Autre', note:null, exoPct:0, exoLabel:null }
+};
+
+/* ══════════════════════════════════════════════════════════
+   UI DYNAMIQUE — BIENS
+   ══════════════════════════════════════════════════════════ */
+let bienCtr = 0, avCtr = 0, herCtr = 0;
+
+function createBienCard(id, num) {
+  const div = document.createElement('div');
+  div.className = 'benef-card';
+  div.dataset.bienId = id;
+  div.innerHTML = `
+    <div class="benef-hd">
+      <div class="benef-hd-left">
+        <div class="benef-num b-num">${num}</div>
+        <input class="benef-name-inp b-label" type="text" placeholder="Désignation du bien" maxlength="40">
+        <span class="benef-lien-tag b-type-tag">Rés. principale</span>
+      </div>
+      <button class="benef-rm" type="button" title="Supprimer">×</button>
+    </div>
+    <div class="benef-fields">
+      <div class="benef-row">
+        <div>
+          <div class="benef-lbl">Catégorie & type</div>
+          <div class="benef-sw">
+            <select class="benef-sel b-type">
+              <optgroup label="Immobilier">
+                <option value="immo-rp" selected>Résidence principale</option>
+                <option value="immo-rs">Résidence secondaire</option>
+                <option value="immo-loc">Immobilier locatif</option>
+                <option value="sci">Parts de SCI / SCPI</option>
+              </optgroup>
+              <optgroup label="Valeurs mobilières & financier">
+                <option value="financier">Comptes / Livrets / Épargne</option>
+                <option value="valeurs">Titres / PEA / CTO / Fonds</option>
+                <option value="capitalisation">Contrat de capitalisation</option>
+                <option value="fip-fcpi">FIP / FCPI</option>
+                <option value="pe">Private Equity / FCPR</option>
+              </optgroup>
+              <optgroup label="Entreprise & titres non cotés">
+                <option value="dutreil">Entreprise (pacte Dutreil — art. 787B)</option>
+                <option value="holding">Holding patrimoniale</option>
+                <option value="societe-nc">Parts de société non cotée</option>
+              </optgroup>
+              <optgroup label="Diversification patrimoniale">
+                <option value="forestier">Groupement Forestier (GFF / GFI)</option>
+                <option value="viticole">Groupement Viticole (GFV)</option>
+                <option value="cheptel">Exploitation agricole / Cheptel</option>
+              </optgroup>
+              <optgroup label="Biens mobiliers & objets de valeur">
+                <option value="or">Or / métaux précieux / lingots</option>
+                <option value="art">Œuvres d'art / objets de collection</option>
+                <option value="meuble">Meubles / véhicule / objets courants</option>
+              </optgroup>
+              <optgroup label="Autres">
+                <option value="autre">Autre actif</option>
+              </optgroup>
+            </select>
+          </div>
+          <div class="b-type-note benef-note" style="display:none;margin-top:.35rem"></div>
+        </div>
+        <div>
+          <div class="benef-lbl">Valeur vénale brute</div>
+          <div class="benef-iw">
+            <input type="text" inputmode="numeric" class="b-val" value="0" placeholder="0">
+            <span class="benef-unit">€</span>
+          </div>
+          <div class="b-fisc-note benef-note" style="display:none;margin-top:.25rem;color:var(--success)"></div>
+        </div>
+      </div>
+      <div class="b-exo-wrap" style="display:none;margin-bottom:.45rem">
+        <label class="benef-ck" style="background:var(--accent-dim);padding:.4rem .6rem;border-radius:var(--r-sm);border:1px solid rgba(79,138,120,.15)">
+          <input type="checkbox" class="b-exo">
+          <span class="b-exo-label" style="color:var(--accent);font-weight:500"></span>
+        </label>
+      </div>
+      <div class="benef-row">
+        <div>
+          <div class="benef-lbl">Crédit / dettes associées</div>
+          <div class="benef-iw">
+            <input type="text" inputmode="numeric" class="b-dette" value="0" placeholder="0">
+            <span class="benef-unit">€</span>
+          </div>
+        </div>
+        <div>
+          <div class="benef-lbl">Appartenance</div>
+          <div class="benef-sw">
+            <select class="benef-sel b-det">
+              <option value="propre" selected>Bien propre du défunt (100 %)</option>
+              <option value="commun">Bien commun (50 % si CRA)</option>
+              <option value="indivision">En indivision (quote-part ci-dessous)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="b-pct-wrap" style="display:none;margin-bottom:.4rem">
+        <div class="benef-lbl">Quote-part du défunt</div>
+        <div class="benef-iw" style="max-width:160px">
+          <input type="text" inputmode="numeric" class="b-pct" value="50" placeholder="50">
+          <span class="benef-unit">%</span>
+        </div>
+      </div>
+    </div>`;
+
+  ['.b-val','.b-dette'].forEach(s => attachMoneyInput(div.querySelector(s)));
+
+  function updateTypeUI() {
+    const v    = div.querySelector('.b-type').value;
+    const info = TYPE_BIEN_INFO[v] || { tag:'Bien', note:null, exoPct:0, exoLabel:null };
+    div.querySelector('.b-type-tag').textContent = info.tag || 'Bien';
+    const noteEl = div.querySelector('.b-type-note');
+    if (info.note) { noteEl.innerHTML = info.note; noteEl.style.display = 'block'; }
+    else noteEl.style.display = 'none';
+    const exoWrap = div.querySelector('.b-exo-wrap');
+    if (info.exoPct && info.exoLabel) {
+      div.querySelector('.b-exo-label').textContent = info.exoLabel;
+      exoWrap.style.display = 'block';
+    } else {
+      exoWrap.style.display = 'none';
+      div.querySelector('.b-exo').checked = false;
+    }
+    updateFiscNote();
+  }
+
+  function updateFiscNote() {
+    const v    = div.querySelector('.b-type').value;
+    const info = TYPE_BIEN_INFO[v] || {};
+    const exo  = div.querySelector('.b-exo')?.checked && info.exoPct > 0;
+    const val  = parseM(div.querySelector('.b-val').value);
+    const noteEl = div.querySelector('.b-fisc-note');
+    if (exo && val > 0) {
+      const fisc = val * (1 - info.exoPct);
+      noteEl.innerHTML = `Valeur fiscale retenue : <strong>${fmtE(Math.round(fisc))}</strong> (exo. ${fmtN(info.exoPct*100,0)} % = −${fmtE(Math.round(val * info.exoPct))})`;
+      noteEl.style.display = 'block';
+    } else {
+      noteEl.style.display = 'none';
+    }
+  }
+
+  div.querySelector('.b-type').addEventListener('change', () => { updateTypeUI(); calculate(); });
+  div.querySelector('.b-exo').addEventListener('change', () => { updateFiscNote(); calculate(); });
+  div.querySelector('.b-val').addEventListener('input', () => { updateFiscNote(); calculate(); });
+  div.querySelector('.b-det').addEventListener('change', function() {
+    div.querySelector('.b-pct-wrap').style.display = this.value === 'indivision' ? 'block' : 'none';
+    calculate();
+  });
+  div.querySelectorAll('input,select').forEach(el => el.addEventListener('input', calculate));
+  div.querySelector('.benef-rm').addEventListener('click', () => { div.remove(); renumberBiens(); calculate(); });
+  return div;
+}
+
+function renumberBiens() {
+  document.querySelectorAll('.benef-card[data-bien-id]').forEach((c,i) => {
+    const n = c.querySelector('.b-num');
+    if (n) n.textContent = i + 1;
+  });
+}
+
+function getBiens() {
+  return [...document.querySelectorAll('.benef-card[data-bien-id]')].map(c => {
+    const type = c.querySelector('.b-type').value;
+    const info = TYPE_BIEN_INFO[type] || {};
+    const exo  = (c.querySelector('.b-exo')?.checked && info.exoPct > 0) ? info.exoPct : 0;
+    const val  = parseM(c.querySelector('.b-val').value);
+    return {
+      type,
+      val,
+      valFisc: val * (1 - exo),
+      exoPct: exo,
+      dette: parseM(c.querySelector('.b-dette').value),
+      det:   c.querySelector('.b-det').value,
+      pct:   parseM(c.querySelector('.b-pct').value) || 50,
+      label: c.querySelector('.b-label').value.trim() || `Bien (${info.tag || type})`
+    };
+  });
+}
+
+/* ══════════════════════════════════════════════════════════
+   UI DYNAMIQUE — ASSURANCE-VIE
+   ══════════════════════════════════════════════════════════ */
+function createAVCard(id, num) {
+  const div = document.createElement('div');
+  div.className = 'benef-card';
+  div.dataset.avId = id;
+  div.innerHTML = `
+    <div class="benef-hd">
+      <div class="benef-hd-left">
+        <div class="benef-num av-num">${num}</div>
+        <input class="benef-name-inp av-label" type="text" placeholder="Contrat ${num}" maxlength="40">
+        <span class="benef-lien-tag" style="color:var(--blue)">Assurance-vie</span>
+      </div>
+      <button class="benef-rm" type="button">×</button>
+    </div>
+    <div class="benef-fields">
+      <div class="benef-row">
+        <div>
+          <div class="benef-lbl">Capital au décès (total)</div>
+          <div class="benef-iw">
+            <input type="text" inputmode="numeric" class="av-capital" value="0" placeholder="0">
+            <span class="benef-unit">€</span>
+          </div>
+        </div>
+        <div>
+          <div class="benef-lbl">Dont primes après 70 ans</div>
+          <div class="benef-iw">
+            <input type="text" inputmode="numeric" class="av-apres70" value="0" placeholder="0">
+            <span class="benef-unit">€</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="benef-lbl">Type de bénéficiaire désigné</div>
+        <div class="benef-sw">
+          <select class="benef-sel av-benef">
+            <option value="conjoint">Conjoint / PACS (exonéré art. 990I)</option>
+            <option value="enfant" selected>Enfant</option>
+            <option value="frere-soeur">Frère / Sœur</option>
+            <option value="tiers">Tiers / Autre</option>
+          </select>
+        </div>
+        <div class="benef-note" style="margin-top:.3rem">Art. 990I (avant 70 ans) · Art. 757B (après 70 ans) — Abattement 152 500 € / bénéficiaire (avant 70 ans)</div>
+      </div>
+    </div>`;
+
+  ['.av-capital','.av-apres70'].forEach(s => attachMoneyInput(div.querySelector(s)));
+  div.querySelectorAll('input,select').forEach(el => el.addEventListener('input', calculate));
+  div.querySelector('.benef-rm').addEventListener('click', () => { div.remove(); renumberAV(); calculate(); });
+  return div;
+}
+
+function renumberAV() {
+  document.querySelectorAll('.benef-card[data-av-id]').forEach((c,i) => {
+    const n = c.querySelector('.av-num');
+    if (n) n.textContent = i + 1;
+  });
+}
+
+function getAV() {
+  return [...document.querySelectorAll('.benef-card[data-av-id]')].map(c => ({
+    label:    c.querySelector('.av-label').value || 'Contrat AV',
+    capital:  parseM(c.querySelector('.av-capital').value),
+    apres70:  parseM(c.querySelector('.av-apres70').value),
+    benefType: c.querySelector('.av-benef').value
+  }));
+}
+
+/* ══════════════════════════════════════════════════════════
+   UI DYNAMIQUE — AUTRES HÉRITIERS
+   ══════════════════════════════════════════════════════════ */
+function createHerCard(id, num) {
+  const div = document.createElement('div');
+  div.className = 'benef-card';
+  div.dataset.herId = id;
+  div.innerHTML = `
+    <div class="benef-hd">
+      <div class="benef-hd-left">
+        <div class="benef-num her-num">${num}</div>
+        <input class="benef-name-inp her-label" type="text" placeholder="Héritier ${num}" maxlength="30">
+        <span class="benef-lien-tag her-tag">Frère / Sœur</span>
+      </div>
+      <button class="benef-rm" type="button">×</button>
+    </div>
+    <div class="benef-fields">
+      <div class="benef-row">
+        <div>
+          <div class="benef-lbl">Lien de parenté</div>
+          <div class="benef-sw">
+            <select class="benef-sel her-lien">
+              <option value="pacs">Partenaire PACS (exonéré — art. 796-0 bis)</option>
+              <option value="frere-soeur" selected>Frère / Sœur</option>
+              <option value="neveu-niece">Neveu / Nièce</option>
+              <option value="oncle-tante">Oncle / Tante</option>
+              <option value="cousin">Cousin / Cousine</option>
+              <option value="concubin">Concubin(e)</option>
+              <option value="tiers">Tiers sans lien</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <div class="benef-lbl">Part reçue</div>
+          <div class="benef-iw">
+            <input type="text" inputmode="numeric" class="her-part" value="0" placeholder="0">
+            <span class="benef-unit">€</span>
+          </div>
+        </div>
+      </div>
+      <div class="benef-row">
+        <div>
+          <div class="benef-lbl">Donations antér. &lt; 15 ans</div>
+          <div class="benef-iw">
+            <input type="text" inputmode="numeric" class="her-abatt-conso" value="0" placeholder="0">
+            <span class="benef-unit">€</span>
+          </div>
+        </div>
+      </div>
+      <label class="benef-ck">
+        <input type="checkbox" class="her-handi">
+        Personne handicapée — abattement supplémentaire 159 325 € (art. 779 II)
+      </label>
+    </div>`;
+
+  ['.her-part','.her-abatt-conso'].forEach(s => attachMoneyInput(div.querySelector(s)));
+  div.querySelector('.her-lien').addEventListener('change', function() {
+    div.querySelector('.her-tag').textContent = LIEN_LABELS[this.value] || this.value;
+    calculate();
+  });
+  div.querySelectorAll('input,select').forEach(el => el.addEventListener('input', calculate));
+  div.querySelector('.benef-rm').addEventListener('click', () => { div.remove(); renumberHer(); calculate(); });
+  return div;
+}
+
+function renumberHer() {
+  document.querySelectorAll('.benef-card[data-her-id]').forEach((c,i) => {
+    const n = c.querySelector('.her-num');
+    if (n) n.textContent = i + 1;
+  });
+}
+
+function getAutresHer() {
+  return [...document.querySelectorAll('.benef-card[data-her-id]')].map(c => ({
+    label: c.querySelector('.her-label').value.trim() || c.querySelector('.her-label').placeholder,
+    lien:  c.querySelector('.her-lien').value,
+    part:  parseM(c.querySelector('.her-part').value),
+    abattConso: parseM(c.querySelector('.her-abatt-conso').value),
+    handi: c.querySelector('.her-handi').checked
+  }));
+}
+
+/* ══════════════════════════════════════════════════════════
+   UI DYNAMIQUE — LIGNES ENFANTS (paramètres individuels)
+   ══════════════════════════════════════════════════════════ */
+function updateEnfantRows() {
+  const nb = Math.max(0, parseInt(document.getElementById('nb-enfants').value) || 0);
+  const container = document.getElementById('enfants-params');
+
+  const existing = [...container.querySelectorAll('.enfant-row')].map(r => ({
+    nom:   r.querySelector('.e-nom')?.value || '',
+    abatt: r.querySelector('.e-abatt')?.value || '0',
+    handi: r.querySelector('.e-handi')?.checked || false
+  }));
+
+  let html = '';
+  if (nb > 0) {
+    html += `<div style="font-size:.72rem;color:var(--text-muted);margin-bottom:.5rem;font-family:var(--mono)">Donations reçues du défunt &lt; 15 ans (art. 784 CGI) — réduisent l'abattement disponible</div>`;
+    for (let i = 0; i < nb; i++) {
+      const prev = existing[i] || {};
+      const nom   = prev.nom || '';
+      const abatt = prev.abatt || '0';
+      const handi = prev.handi || false;
+      const label = nb > 1 ? `Enfant ${i + 1}` : 'Enfant';
+      html += `<div class="enfant-row">
+        <div class="enfant-row-title">
+          <span style="width:18px;height:18px;border-radius:50%;background:var(--accent-dim);color:var(--accent);font-size:.6rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">${i+1}</span>
+          ${label}
+        </div>
+        <div class="benef-row">
+          <div>
+            <div class="benef-lbl">Prénom (optionnel)</div>
+            <div class="benef-iw"><input type="text" class="e-nom" value="${nom}" placeholder="${label}" maxlength="20" style="flex:1;background:transparent;border:none;outline:none;color:var(--text);font-family:var(--sans);font-size:.84rem;font-weight:500;width:100%;min-width:0"></div>
+          </div>
+          <div>
+            <div class="benef-lbl">Donations antér. &lt; 15 ans</div>
+            <div class="benef-iw">
+              <input type="text" inputmode="numeric" class="e-abatt" value="${abatt}" placeholder="0">
+              <span class="benef-unit">€</span>
+            </div>
+          </div>
+        </div>
+        <label class="benef-ck"><input type="checkbox" class="e-handi" ${handi ? 'checked' : ''}> Personne handicapée — abattement supplémentaire 159 325 € (art. 779 II)</label>
+      </div>`;
+    }
+  }
+  container.innerHTML = html;
+  container.querySelectorAll('.e-abatt').forEach(attachMoneyInput);
+  container.querySelectorAll('input').forEach(el => el.addEventListener('input', calculate));
+}
+
+function getEnfantParams() {
+  return [...document.querySelectorAll('.enfant-row')].map((r, i) => ({
+    nom:   r.querySelector('.e-nom')?.value.trim() || `Enfant ${i + 1}`,
+    abattConso: parseM(r.querySelector('.e-abatt')?.value),
+    handi: r.querySelector('.e-handi')?.checked || false
+  }));
+}
+
+/* ══════════════════════════════════════════════════════════
+   UI — SHOW/HIDE CHAMPS CONDITIONNELS
+   ══════════════════════════════════════════════════════════ */
+function updateSituationUI() {
+  const statut       = document.getElementById('sit-statut').value;
+  const hasConjointLegal = statut === 'marie';  // Seul le conjoint marié est héritier légal
+  const isPACS       = statut === 'pacs';
+  const hasTestament = document.getElementById('testament-ck').checked;
+  const nbEnf        = Math.max(0, parseInt(document.getElementById('nb-enfants').value) || 0);
+  const hasEnf       = nbEnf > 0;
+  const regime       = document.querySelector('[name="regime"]:checked')?.value || 'cra';
+  const enfType      = document.querySelector('[name="enfants-type"]:checked')?.value || 'communs';
+
+  // Régime, âge conjoint, donation entre époux : uniquement conjoint MARIÉ
+  document.getElementById('regime-wrap').style.display       = hasConjointLegal ? 'block' : 'none';
+  document.getElementById('age-conjoint-wrap').style.display = hasConjointLegal ? 'block' : 'none';
+  document.getElementById('don-epoux-wrap').style.display    = hasConjointLegal ? 'block' : 'none';
+
+  // Note pédagogique "0 enfant"
+  document.getElementById('no-enfant-note').style.display   = !hasEnf ? 'block' : 'none';
+
+  // "Enfants communs / non communs" : uniquement conjoint marié avec enfants
+  document.getElementById('enfants-type-wrap').style.display = (hasConjointLegal && hasEnf) ? 'block' : 'none';
+
+  // Option usufruit / 1/4 PP : uniquement conjoint marié + enfants communs
+  const showOptionConj = hasConjointLegal && hasEnf && enfType === 'communs';
+  document.getElementById('option-conjoint-wrap').style.display = showOptionConj ? 'block' : 'none';
+  document.getElementById('noncommuns-note').style.display = (hasConjointLegal && enfType === 'noncommuns') ? 'block' : 'none';
+
+  // Parents vivants : visible si pas d'enfants
+  document.getElementById('parents-wrap').style.display = hasEnf ? 'none' : 'block';
+
+  // ── Alerte pédagogique PACS ──
+  const pacsInfo = document.getElementById('pacs-info');
+  if (isPACS) {
+    pacsInfo.style.display = 'block';
+    if (!hasTestament) {
+      pacsInfo.className = 'warn-box';
+      pacsInfo.innerHTML = `<strong>Partenaire PACS — aucun droit légal automatique</strong><br>
+        Le partenaire PACS n'est <strong>pas héritier légal</strong> (art. 731 et s. C. civ.). Il ne peut recevoir une part de la succession que grâce à un <strong>testament</strong> ou via une clause bénéficiaire d'assurance-vie.<br><br>
+        Pour simuler le legs au partenaire PACS : cochez « Testament » ci-dessus, puis ajoutez-le dans la section <em>Héritiers additionnels</em> avec le lien « Partenaire PACS ». Il sera alors <strong>totalement exonéré</strong> de droits de succession (art. 796-0 bis CGI).`;
+    } else {
+      pacsInfo.className = 'note-box';
+      pacsInfo.style.marginTop = '0';
+      pacsInfo.innerHTML = `<strong style="color:var(--accent)">Partenaire PACS avec testament</strong> — Le partenaire PACS peut recevoir un legs et est <strong>totalement exonéré</strong> de droits de succession (art. 796-0 bis CGI). Ajoutez-le dans <em>Héritiers additionnels</em> (lien : « Partenaire PACS ») avec le montant du legs.`;
+    }
+  } else {
+    pacsInfo.style.display = 'none';
+  }
+
+  // Note régime (uniquement si marié)
+  const regimeNotes = {
+    cra: 'Les biens communs entrent pour moitié dans la succession.',
+    sep: 'Seuls les biens propres du défunt entrent dans la succession.',
+    universelle: 'La communauté universelle peut réduire l\'actif successoral — vérifiez la présence d\'une clause d\'attribution intégrale avec votre notaire.',
+    particip: 'Similaire à la séparation de biens pour la succession — seuls les biens propres du défunt sont pris en compte.'
+  };
+  document.getElementById('regime-note').textContent = hasConjointLegal ? (regimeNotes[regime] || '') : '';
+
+  // Note usufruit (uniquement si conjoint marié)
+  if (hasConjointLegal) {
+    const ageC = parseInt(document.getElementById('age-conjoint').value) || 60;
+    const usC  = coeffUsuf(ageC);
+    const npC  = 1 - usC;
+    document.getElementById('conjoint-usuf-note').textContent =
+      `Usufruit viager : ${fmtN(usC*100,0)} % · Nue-propriété : ${fmtN(npC*100,0)} % (art. 669 CGI — si option usufruit choisie)`;
+  }
+
+  // Avertissements testament / donation entre époux
+  document.getElementById('testament-note').style.display =
+    (hasTestament && !isPACS) ? 'block' : 'none';
+  document.getElementById('don-epoux-note').style.display =
+    document.getElementById('don-epoux-ck')?.checked ? 'block' : 'none';
+}
+
+/* ══════════════════════════════════════════════════════════
+   CALCUL PRINCIPAL
+   ══════════════════════════════════════════════════════════ */
+function calculate() {
+  updateSituationUI();
+  updateEnfantRows();
+
+  const statut   = document.getElementById('sit-statut').value;
+  const regime   = document.querySelector('[name="regime"]:checked')?.value || 'cra';
+  const ageConj  = parseInt(document.getElementById('age-conjoint').value) || 60;
+  const hasConjoint = statut === 'marie';
+  const hasTestament = document.getElementById('testament-ck').checked;
+  const nbEnf    = Math.max(0, parseInt(document.getElementById('nb-enfants').value) || 0);
+  const hasEnf   = nbEnf > 0;
+  const enfType  = document.querySelector('[name="enfants-type"]:checked')?.value || 'communs';
+  const optConj  = document.querySelector('[name="option-conjoint"]:checked')?.value || 'usufruit';
+  const parents  = document.getElementById('parents-vivants').value;
+  const fraisFun = document.getElementById('frais-fun-ck').checked ? FRAIS_FUN_FORFAIT : 0;
+  const autresDettes = parseM(document.getElementById('autres-dettes').value);
+
+  const biens = getBiens();
+  const avs   = getAV();
+  const enfParams = getEnfantParams();
+  const autresHer = getAutresHer();
+
+  // ─── 1. Actif successoral (brut et fiscal après exonérations) ───
+  let actifBrutGross = 0, actifExo = 0, actifBrut = 0;
+  biens.forEach(b => {
+    let pct = 1;
+    if (b.det === 'commun') {
+      pct = (regime === 'sep' || regime === 'particip') ? 0 : 0.5;
+    } else if (b.det === 'indivision') {
+      pct = Math.min(100, Math.max(0, b.pct)) / 100;
+    }
+    const gross = Math.max(0, b.val) * pct;
+    const fisc  = Math.max(0, b.valFisc) * pct;
+    actifBrutGross += gross;
+    actifExo       += gross - fisc;
+    actifBrut      += fisc;
+  });
+
+  // ─── 2. Passif successoral ───
+  let passif = fraisFun + autresDettes;
+  biens.forEach(b => {
+    let pct = 1;
+    if (b.det === 'commun') pct = (regime === 'sep' || regime === 'particip') ? 0 : 0.5;
+    else if (b.det === 'indivision') pct = Math.min(100, Math.max(0, b.pct)) / 100;
+    passif += Math.max(0, b.dette) * pct;
+  });
+
+  const actifNet = Math.max(0, actifBrut - passif);
+
+  // ─── 3. Assurance-vie ───
+  let avFiscal = { avant70: 0, apres70primes: 0, droitsAV: 0, detail: [] };
+  if (avs.length > 0) {
+    let abattUsedAvant70 = {}; // par type de bénéficiaire (simplifié : global pour cette version)
+    let primesApres70Total = 0;
+    let capitalAvant70Total = 0;
+
+    avs.forEach(av => {
+      const primes70 = Math.min(av.apres70, av.capital);
+      const capital70 = Math.max(0, av.capital - primes70); // capital "avant 70" = capital - primes après 70
+      capitalAvant70Total += capital70;
+      primesApres70Total  += primes70;
+
+      // AV avant 70 — art. 990I CGI
+      // Abattement par bénéficiaire. Pour simplification, on applique l'abattement par contrat/bénéficiaire
+      if (av.benefType !== 'conjoint') {
+        const abattDispo = Math.max(0, AV_ABATT_AVANT70); // 152 500 € par bénéficiaire
+        const base70 = Math.max(0, capital70 - abattDispo);
+        const imp70  = Math.min(base70, AV_SEUIL) * 0.20 + Math.max(0, base70 - AV_SEUIL) * 0.3125;
+        avFiscal.droitsAV  += imp70;
+        avFiscal.avant70   += capital70;
+        avFiscal.detail.push({ label: av.label, type: 'avant70', capital: capital70, base: base70, impot: imp70, benefType: av.benefType });
+      } else {
+        avFiscal.detail.push({ label: av.label, type: 'avant70-exo', capital: capital70, base: 0, impot: 0, benefType: 'conjoint' });
+      }
+    });
+
+    // AV après 70 — art. 757B CGI — abattement global 30 500 € sur les primes (hors conjoint exonéré)
+    if (primesApres70Total > 0) {
+      avFiscal.apres70primes = primesApres70Total;
+
+      // Séparer les primes bénéficiaire conjoint/PACS (exonérées) des autres
+      let primesApres70NonExo = 0;
+      const groupes757B = {}; // { [lien]: montant cumulé }
+      avs.forEach(av => {
+        const p70 = Math.min(av.apres70, av.capital);
+        if (p70 <= 0) return;
+        if (av.benefType === 'conjoint') {
+          avFiscal.detail.push({ label: av.label, type: 'apres70-conj-exo',
+            capital: p70, base: 0, impot: 0, benefType: 'conjoint' });
+        } else {
+          primesApres70NonExo += p70;
+          groupes757B[av.benefType] = (groupes757B[av.benefType] || 0) + p70;
+        }
+      });
+
+      // Abattement global 30 500 € sur le total des primes non-exonérées (art. 757B al. 1)
+      const abattGlobal757B = Math.min(primesApres70NonExo, AV_ABATT_APRES70);
+      const base757BTotal   = Math.max(0, primesApres70NonExo - abattGlobal757B);
+      avFiscal.base757B  = base757BTotal;
+      avFiscal.abatt757B = abattGlobal757B;
+
+      // Répartir la base taxable par type de bénéficiaire, proportionnellement aux primes reçues.
+      // L'abattement personnel art. 779 (ex : 100 000 € / enfant) s'applique, per BOFiP, sur le
+      // cumul de la part civile ET de la part 757B du même bénéficiaire. Dans ce simulateur, les
+      // deux flux sont traités séparément ; l'abattement personnel est donc imputé côté succession
+      // civile. On applique ici le barème directement sur la base 757B, sans abattement personnel
+      // additionnel, ce qui est fiscalement conservateur et évite tout double-emploi de l'abattement.
+      Object.entries(groupes757B).forEach(([lien, montant]) => {
+        const share     = primesApres70NonExo > 0 ? montant / primesApres70NonExo : 0;
+        const abattPart = Math.round(abattGlobal757B * share);
+        const basePart  = Math.round(base757BTotal * share);
+        const r757B     = calcDroits(basePart, lien);
+        avFiscal.droitsAV += r757B.total;
+        avFiscal.detail.push({
+          label: `Primes après 70 ans — ${LIEN_LABELS[lien] || lien}`,
+          type: 'apres70', capital: montant, base: basePart, impot: r757B.total,
+          benefType: lien, abattApres70: abattPart, totalAbatt757B: AV_ABATT_APRES70
+        });
+      });
+
+      // Cas où toutes les primes après 70 vont au conjoint → tout exonéré
+      if (primesApres70NonExo === 0 && primesApres70Total > 0) {
+        avFiscal.detail.push({ label: 'Primes après 70 ans — conjoint/PACS exonéré',
+          type: 'apres70-conj-exo', capital: primesApres70Total, base: 0, impot: 0 });
+      }
+    }
+  }
+
+  // ─── 4. Répartition successorale ───
+  const heritiers = []; // { who, lien, partBrute, partFiscale, exonere, note }
+
+  if (hasConjoint && hasEnf) {
+    const communs = enfType === 'communs';
+    if (communs && optConj === 'usufruit') {
+      const usC = coeffUsuf(ageConj);
+      const npC = 1 - usC;
+      heritiers.push({
+        who: 'Conjoint survivant', lien: 'conjoint',
+        partBrute: actifNet, partFiscale: actifNet * usC,
+        exonere: true, typePoste: 'usufruit',
+        note: `Usufruit total · ${fmtN(usC*100,0)} % de la PP (âge ${ageConj} ans · art. 669 CGI)`
+      });
+      for (let i = 0; i < nbEnf; i++) {
+        const ep = enfParams[i] || {};
+        const partNP = actifNet * npC / nbEnf;
+        heritiers.push({
+          who: ep.nom || `Enfant ${i + 1}`, lien: 'enfant',
+          partBrute: partNP, partFiscale: partNP,
+          exonere: false, typePoste: 'nue-propriete',
+          note: `NP ${fmtN(npC*100,0)} % × ${fmtE(actifNet)} / ${nbEnf}`,
+          abattConso: ep.abattConso || 0, handi: ep.handi || false
+        });
+      }
+    } else {
+      // 1/4 PP (communs avec choix, ou non communs obligatoire)
+      const noteConj = communs ? '1/4 PP (option choisie)' : '1/4 PP obligatoire — enfants non communs (art. 757 C. civ.)';
+      heritiers.push({
+        who: 'Conjoint survivant', lien: 'conjoint',
+        partBrute: actifNet / 4, partFiscale: actifNet / 4,
+        exonere: true, typePoste: 'pp', note: noteConj
+      });
+      for (let i = 0; i < nbEnf; i++) {
+        const ep = enfParams[i] || {};
+        heritiers.push({
+          who: ep.nom || `Enfant ${i + 1}`, lien: 'enfant',
+          partBrute: (actifNet * 3/4) / nbEnf, partFiscale: (actifNet * 3/4) / nbEnf,
+          exonere: false, typePoste: 'pp',
+          note: `3/4 de l'actif net / ${nbEnf}`,
+          abattConso: ep.abattConso || 0, handi: ep.handi || false
+        });
+      }
+    }
+  } else if (hasConjoint && !hasEnf) {
+    const lienConj = statut === 'pacs' ? 'pacs' : 'conjoint';
+    if (parents === 'deux') {
+      heritiers.push({ who: 'Conjoint survivant', lien: lienConj, partBrute: actifNet/2, partFiscale: actifNet/2, exonere: true, note: '1/2 PP — art. 757 C. civ. (parents du défunt vivants)' });
+      heritiers.push({ who: 'Père', lien: 'parent', partBrute: actifNet/4, partFiscale: actifNet/4, exonere: false, abattConso: 0, handi: false });
+      heritiers.push({ who: 'Mère', lien: 'parent', partBrute: actifNet/4, partFiscale: actifNet/4, exonere: false, abattConso: 0, handi: false });
+    } else if (parents === 'un') {
+      heritiers.push({ who: 'Conjoint survivant', lien: lienConj, partBrute: actifNet*3/4, partFiscale: actifNet*3/4, exonere: true, note: '3/4 PP — un seul parent du défunt vivant' });
+      heritiers.push({ who: 'Parent', lien: 'parent', partBrute: actifNet/4, partFiscale: actifNet/4, exonere: false, abattConso: 0, handi: false });
+    } else {
+      heritiers.push({ who: 'Conjoint survivant', lien: lienConj, partBrute: actifNet, partFiscale: actifNet, exonere: true, note: 'Totalité — aucun héritier réservataire' });
+    }
+  } else if (!hasConjoint && hasEnf) {
+    for (let i = 0; i < nbEnf; i++) {
+      const ep = enfParams[i] || {};
+      heritiers.push({
+        who: ep.nom || `Enfant ${i + 1}`, lien: 'enfant',
+        partBrute: actifNet / nbEnf, partFiscale: actifNet / nbEnf,
+        exonere: false, abattConso: ep.abattConso || 0, handi: ep.handi || false
+      });
+    }
+  } else {
+    // Pas de conjoint, pas d'enfants — dévolution légale selon parents + collatéraux
+    const hasFrSoeurInHer = autresHer.some(h => ['frere-soeur','neveu-niece'].includes(h.lien));
+    if (parents === 'deux') {
+      // Art. 738 C. civ. : avec fr./sœurs → 1/4 chacun · sans → 1/2 chacun (art. 738-2)
+      const frac    = hasFrSoeurInHer ? 1/4 : 1/2;
+      const noteP   = hasFrSoeurInHer ? '1/4 PP — art. 738 (collatéraux présents)' : '1/2 PP — art. 738-2 (aucun collatéral)';
+      heritiers.push({ who: 'Père', lien: 'parent', partBrute: actifNet*frac, partFiscale: actifNet*frac, exonere: false, abattConso: 0, handi: false, note: noteP });
+      heritiers.push({ who: 'Mère', lien: 'parent', partBrute: actifNet*frac, partFiscale: actifNet*frac, exonere: false, abattConso: 0, handi: false, note: noteP });
+    } else if (parents === 'un') {
+      // Avec collatéraux → 1/4 ; sans → 1/2 (le reste va aux collatéraux ordinaires)
+      const frac  = hasFrSoeurInHer ? 1/4 : 1/2;
+      const noteP = hasFrSoeurInHer ? '1/4 PP — art. 738 (collatéraux présents)' : '1/2 PP (aucun collatéral ajouté)';
+      heritiers.push({ who: 'Parent', lien: 'parent', partBrute: actifNet*frac, partFiscale: actifNet*frac, exonere: false, abattConso: 0, handi: false, note: noteP });
+      if (!hasFrSoeurInHer && autresHer.length === 0) {
+        heritiers.push({ who: 'Collatéraux (1/2 restant)', lien: 'tiers', partBrute: actifNet/2, partFiscale: actifNet/2, exonere: false, abattConso: 0, handi: false, note: 'Ajoutez les héritiers concernés ci-dessous' });
+      }
+    } else if (autresHer.length === 0) {
+      heritiers.push({ who: 'Héritiers à définir', lien: 'tiers', partBrute: actifNet, partFiscale: actifNet, exonere: false, abattConso: 0, handi: false, note: 'Ajoutez frères, sœurs, neveux ou autres héritiers ci-dessous' });
+    }
+  }
+
+  // Ajouter autres héritiers additionnels
+  autresHer.forEach(h => {
+    heritiers.push({
+      who: h.label, lien: h.lien, partBrute: h.part, partFiscale: h.part,
+      exonere: ['conjoint','pacs'].includes(h.lien),
+      abattConso: h.abattConso, handi: h.handi
+    });
+  });
+
+  // ─── 5. Droits par héritier ───
+  let sumDroits = 0, sumBase = 0, sumParts = 0;
+  const rows = heritiers.map(h => {
+    if (h.exonere) {
+      return { ...h, calc: { montant: h.partFiscale, abattBase: 0, abattHandi: 0, abattTheo: 0, abattConso: 0, abattRestant: 0, baseTaxable: 0, droits: 0, tr: [] } };
+    }
+    const calc = calcHer(h.partFiscale, h.lien, h.abattConso || 0, h.handi || false);
+    sumDroits += calc.droits;
+    sumBase   += calc.baseTaxable;
+    sumParts  += h.partBrute;
+    return { ...h, calc };
+  });
+
+  const totalTransmis = heritiers.reduce((s, h) => s + h.partBrute, 0) + avFiscal.avant70 + avFiscal.apres70primes;
+  const tauxMoyen = totalTransmis > 0 ? (sumDroits + avFiscal.droitsAV) / totalTransmis * 100 : 0;
+  const netTransmis = totalTransmis - sumDroits - avFiscal.droitsAV;
+
+  const ctx = { statut, regime, ageConj, hasConjoint, hasTestament, hasEnf, nbEnf, enfType, optConj, parents, biens, actifBrutGross, actifExo, actifBrut, passif, actifNet, avFiscal, rows, sumDroits, sumBase, tauxMoyen, netTransmis };
+  renderResults(ctx);
+  renderDetail(ctx);
+}
+
+/* ══════════════════════════════════════════════════════════
+   RENDU RÉSULTATS
+   ══════════════════════════════════════════════════════════ */
+function renderResults(ctx) {
+  const { actifBrutGross, actifExo, actifBrut, passif, actifNet, avFiscal, rows, sumDroits, tauxMoyen, netTransmis } = ctx;
+  const totalDroits = sumDroits + avFiscal.droitsAV;
+  const zero = totalDroits < 1;
+  const hasExo = actifExo > 0;
+
+  const miniRows = rows.map(r => {
+    const isZero = r.calc.droits < 1;
+    const isExo  = r.exonere;
+    const droitsLabel = isExo ? 'Exonéré' : (isZero ? '0 €' : fmtE(Math.round(r.calc.droits)));
+    return `<div class="benef-res-row animate">
+      <div class="benef-res-top">
+        <div class="benef-res-name">${r.who}</div>
+        <div class="benef-res-droits ${(isZero||isExo)?'zero':''}">${droitsLabel}</div>
+      </div>
+      <div class="benef-res-sub">
+        <span class="benef-chip">${LIEN_LABELS[r.lien] || r.lien}</span>
+        <span class="benef-chip">${fmtE(Math.round(r.partBrute))}</span>
+        ${!isExo && r.calc.baseTaxable > 0 ? `<span class="benef-chip">Base : ${fmtE(Math.round(r.calc.baseTaxable))}</span>` : ''}
+        ${(isExo || isZero) ? '<span class="benef-chip" style="color:var(--success)">Couvert / Exonéré</span>' : ''}
+      </div>
+    </div>`;
+  }).join('');
+
+  const avBlock = avFiscal.droitsAV > 0 ? `
+    <div class="metric"><div class="metric-label">Fiscalité assurance-vie</div><div class="metric-val amber">+${fmtE(Math.round(avFiscal.droitsAV))}</div></div>` : '';
+  const exoBlock = hasExo ? `
+    <div class="metric"><div class="metric-label">Exonérations partielles</div><div class="metric-val success">−${fmtE(Math.round(actifExo))}</div></div>` : '';
+
+  document.getElementById('succ-results').innerHTML = `
+    <div class="key-result animate">
+      <div class="key-result-label">Droits de succession estimés</div>
+      <div class="key-result-val" style="color:${zero?'var(--success)':'var(--accent)'}">${fmtE(Math.round(totalDroits))}</div>
+      <div class="key-result-sub">sur actif fiscal net de ${fmtE(Math.round(actifNet))} · ${rows.length} héritier${rows.length>1?'s':''}</div>
+      ${hasExo ? `<div style="font-size:.68rem;color:var(--success);margin-top:.3rem">Exonérations appliquées : −${fmtE(Math.round(actifExo))} (Dutreil / forestier / agricole)</div>` : ''}
+    </div>
+    <div class="metrics-grid animate">
+      <div class="metric"><div class="metric-label">Actif brut successoral</div><div class="metric-val">${fmtE(Math.round(actifBrutGross))}</div></div>
+      ${exoBlock}
+      <div class="metric"><div class="metric-label">Actif fiscal (après exo.)</div><div class="metric-val">${fmtE(Math.round(actifBrut))}</div></div>
+      <div class="metric"><div class="metric-label">Passif déductible</div><div class="metric-val accent">−${fmtE(Math.round(passif))}</div></div>
+      <div class="metric"><div class="metric-label">Actif net taxable</div><div class="metric-val ${actifNet>0?'':'success'}">${fmtE(Math.round(actifNet))}</div></div>
+      <div class="metric"><div class="metric-label">Taux moyen effectif</div><div class="metric-val">${fmtP(tauxMoyen)}</div></div>
+      ${avBlock}
+    </div>
+    <div class="net-box animate">
+      <div class="net-box-title">Patrimoine net transmis (après droits)</div>
+      <div class="net-box-val">${fmtE(Math.round(netTransmis))}</div>
+      <div class="net-box-note">Après paiement des droits de succession et de la fiscalité assurance-vie.</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:.5rem">${miniRows}</div>`;
+}
+
+/* ══════════════════════════════════════════════════════════
+   RENDU DÉTAIL ACCORDÉON
+   ══════════════════════════════════════════════════════════ */
+const BAREME_NAMES = {
+  directe: 'Barème ligne directe (art. 777 I CGI)',
+  freres:  'Barème frères/sœurs (art. 777 II CGI)',
+  fixe55:  'Taux fixe 55 % (art. 777 III CGI)',
+  fixe60:  'Taux fixe 60 % (art. 777 IV CGI)'
+};
+function baremeLabel(lien) {
+  if (['enfant','parent','petit-enfant','arriere-petit-enfant'].includes(lien)) return BAREME_NAMES.directe;
+  if (lien === 'frere-soeur') return BAREME_NAMES.freres;
+  if (['neveu-niece','oncle-tante','cousin'].includes(lien)) return BAREME_NAMES.fixe55;
+  return BAREME_NAMES.fixe60;
+}
+
+function renderDetail(ctx) {
+  const { actifBrutGross, actifExo, actifBrut, passif, actifNet, avFiscal, rows, sumDroits, biens } = ctx;
+  const acc  = document.getElementById('detail-accordion');
+  const body = document.getElementById('detail-body');
+  acc.style.display = 'block';
+
+  // Synthèse actif
+  const biensExones = (biens || []).filter(b => b.exoPct > 0);
+  const exoLines = biensExones.map(b => {
+    const info = TYPE_BIEN_INFO[b.type] || {};
+    return `<div class="dl suc"><span>Exonération ${info.tag || b.type} (${fmtN(b.exoPct*100,0)} %)</span><strong>− ${fmtE(Math.round(b.val * b.exoPct))}</strong></div>`;
+  }).join('');
+
+  let html = `<div class="detail-benef">
+    <div class="detail-benef-title">Actif successoral</div>
+    <div class="dl"><span>Valeur brute totale des actifs</span><strong>${fmtE(Math.round(actifBrutGross))}</strong></div>
+    ${exoLines}
+    ${actifExo > 0 ? `<div class="dl suc"><span>Total exonérations partielles (Dutreil / forestier / agricole)</span><strong>− ${fmtE(Math.round(actifExo))}</strong></div><div class="dl"><span>Actif successoral fiscal (après exonérations)</span><strong>${fmtE(Math.round(actifBrut))}</strong></div>` : ''}
+    <div class="dl dim"><span>Passif déductible (dettes, frais, crédits)</span><strong>− ${fmtE(Math.round(passif))}</strong></div>
+    <div class="dl acc big"><span>Actif net successoral taxable</span><strong>${fmtE(Math.round(actifNet))}</strong></div>
+  </div>`;
+
+  // Détail par héritier
+  rows.forEach(r => {
+    const isExo = r.exonere;
+    const c = r.calc;
+    const tranchesHtml = !isExo && c.baseTaxable > 0 && c.tr.length
+      ? `<div class="detail-sub-title" style="margin-top:.75rem">${baremeLabel(r.lien)}</div>
+         <div class="bracket-detail">
+           <div class="bracket-title">Décomposition par tranche</div>
+           ${c.tr.filter(t => t.portion > 0).map(t => `
+             <div class="bracket-row ${t.impot < .5 ? 'zero' : ''}">
+               <span class="rate-badge">${fmtN(t.taux*100,0)} %</span>
+               <span class="tranche">${fmtE(t.de)} → ${t.a === Infinity ? '∞' : fmtE(t.a)} · base : ${fmtE(Math.round(t.portion))}</span>
+               <span class="tax">+${fmtE(Math.round(t.impot))}</span>
+             </div>`).join('')}
+         </div>` : '';
+
+    html += `<div class="detail-benef">
+      <div class="detail-benef-title">
+        ${r.who}
+        <span class="detail-tag">${LIEN_LABELS[r.lien] || r.lien}</span>
+        ${isExo ? '<span class="detail-tag" style="color:var(--success);background:rgba(59,140,90,.1)">Exonéré art. 796-0 bis</span>' : ''}
+        ${r.handi ? '<span class="detail-tag" style="color:var(--blue);background:rgba(79,138,120,.08)">Handicap</span>' : ''}
+        ${r.note ? `<span class="detail-tag">${r.note}</span>` : ''}
+      </div>
+      <div class="dl"><span>Part successorale brute</span><strong>${fmtE(Math.round(r.partBrute))}</strong></div>
+      ${r.typePoste === 'nue-propriete' ? `<div class="dl dim"><span>Valeur fiscale nue-propriété transmise</span><strong>${fmtE(Math.round(r.partFiscale))}</strong></div>` : ''}
+      ${!isExo ? `
+      <div class="dl"><span>Abattement légal — ${LIEN_LABELS[r.lien] || r.lien}</span><strong>${c.abattBase > 0 ? fmtE(c.abattBase) : 'Aucun'}</strong></div>
+      ${c.abattHandi > 0 ? `<div class="dl" style="color:var(--blue)"><span>Abattement handicap (art. 779 II)</span><strong>+ ${fmtE(c.abattHandi)}</strong></div>` : ''}
+      ${c.abattConso > 0 ? `<div class="dl amb"><span>Donations antérieures rapportées (&lt; 15 ans)</span><strong>− ${fmtE(c.abattConso)}</strong></div>` : ''}
+      <div class="dl" style="color:var(--blue)"><span>Abattement restant disponible</span><strong>${fmtE(Math.round(c.abattRestant))}</strong></div>
+      <div class="dl ${c.baseTaxable < 1 ? 'suc' : 'amb'}"><span>Base taxable</span><strong>${fmtE(Math.round(c.baseTaxable))}</strong></div>
+      ${tranchesHtml}
+      <div class="dl acc big" style="margin-top:.4rem"><span>Droits de succession</span><strong>${fmtE(Math.round(c.droits))}</strong></div>
+      ` : '<div style="font-size:.75rem;color:var(--success);margin-top:.4rem;font-weight:500">✓ Totalement exonéré — art. 796-0 bis CGI</div>'}
+    </div>`;
+  });
+
+  // Détail assurance-vie
+  if (avFiscal.detail.length > 0) {
+    html += `<div class="detail-benef">
+      <div class="detail-benef-title">Assurance-vie — traitement fiscal séparé</div>`;
+    avFiscal.detail.forEach(av => {
+      if (av.type === 'avant70-exo') {
+        html += `<div class="dl suc"><span>${av.label} — primes avant 70 ans · bénéficiaire conjoint</span><strong>Exonéré</strong></div>`;
+      } else if (av.type === 'avant70') {
+        html += `<div class="dl"><span>${av.label} — capital avant 70 ans</span><strong>${fmtE(Math.round(av.capital))}</strong></div>
+        <div class="dl dim"><span>Abattement art. 990I (${fmtE(AV_ABATT_AVANT70)} / bénéficiaire)</span><strong>− ${fmtE(Math.round(Math.min(av.capital, AV_ABATT_AVANT70)))}</strong></div>
+        <div class="dl amb"><span>Base du prélèvement</span><strong>${fmtE(Math.round(av.base))}</strong></div>
+        <div class="dl acc"><span>Prélèvement (20 % → 31,25 % — art. 990I)</span><strong>+${fmtE(Math.round(av.impot))}</strong></div>`;
+      } else if (av.type === 'apres70') {
+        html += `
+          <div class="dl"><span>Primes après 70 ans — bénéficiaire : ${LIEN_LABELS[av.benefType] || av.benefType}</span><strong>${fmtE(Math.round(av.capital))}</strong></div>
+          <div class="dl dim"><span>Intérêts / plus-values sur ces primes (exonérés art. 757B)</span><strong>— exonérés</strong></div>
+          <div class="dl dim"><span>Abattement art. 757B imputé (quote-part sur ${fmtE(av.totalAbatt757B || AV_ABATT_APRES70)} global)</span><strong>− ${fmtE(Math.round(av.abattApres70))}</strong></div>
+          <div class="dl amb"><span>Base taxable art. 757B</span><strong>${fmtE(Math.round(av.base))}</strong></div>
+          <div class="dl dim" style="font-size:.71rem"><span>Abattement personnel art. 779 (${LIEN_LABELS[av.benefType] || av.benefType}) — imputé sur la part successorale civile</span><strong>Non déduit ici</strong></div>
+          <div class="dl acc"><span>Droits de succession 757B — ${LIEN_LABELS[av.benefType] || av.benefType}</span><strong>+${fmtE(Math.round(av.impot))}</strong></div>`;
+      } else if (av.type === 'apres70-conj-exo') {
+        html += `<div class="dl suc"><span>${av.label || 'Primes après 70 ans'} — bénéficiaire conjoint / partenaire PACS</span><strong>Exonéré (art. 796-0 bis CGI)</strong></div>`;
+      }
+    });
+    html += `<div class="dl acc big" style="margin-top:.4rem"><span>Total fiscalité assurance-vie</span><strong>${fmtE(Math.round(avFiscal.droitsAV))}</strong></div>
+    </div>`;
+  }
+
+  html += buildHowItWorks(ctx);
+  body.innerHTML = html;
+}
+
+/* ══════════════════════════════════════════════════════════
+   SECTION PÉDAGOGIQUE DYNAMIQUE
+   ══════════════════════════════════════════════════════════ */
+function buildHowItWorks(ctx) {
+  const { statut, regime, ageConj, hasConjoint, hasTestament, hasEnf, nbEnf, enfType, optConj, parents, biens, actifBrutGross, actifExo, actifBrut, passif, actifNet, avFiscal, rows, sumDroits } = ctx;
+  const items = [];
+
+  // ── 0. STATUT CONJUGAL — alerte contextuelle ──
+  if (statut === 'pacs') {
+    if (!hasTestament) {
+      items.push(`<strong>Partenaire PACS — aucun droit légal (art. 731 C. civ.)</strong> — Le partenaire pacsé n'est <em>pas héritier légal</em>. En l'absence de testament, il ne reçoit rien de la succession : l'actif net de ${fmtE(Math.round(actifNet))} sera intégralement réparti entre les enfants et/ou la famille du défunt. Pour lui transmettre une part, un <strong>testament</strong> ou une <strong>clause bénéficiaire d'assurance-vie</strong> est indispensable. Une fois désigné par testament, il sera totalement exonéré de droits (art. 796-0 bis CGI).`);
+    } else {
+      items.push(`<strong>Partenaire PACS avec testament — exonéré (art. 796-0 bis CGI)</strong> — Grâce au testament, le partenaire pacsé peut recevoir un legs et bénéficie d'une exonération totale des droits de succession, au même titre que le conjoint marié. Le legs ne peut excéder la quotité disponible ordinaire (réserve héréditaire des enfants protégée). Ajoutez-le dans <em>Héritiers additionnels</em> avec le lien « Partenaire PACS » pour que l'exonération soit prise en compte dans ce simulateur.`);
+    }
+  } else if (statut === 'concubin') {
+    items.push(`<strong>Concubin — aucune protection légale, fiscalité maximale</strong> — Le concubin n'a aucun droit successoral légal. Sans testament, il ne reçoit rien. Avec un testament, il est traité comme un tiers : les droits de succession s'élèvent à <strong>60 %</strong> sans abattement significatif. L'assurance-vie reste le principal outil de transmission pour un concubin.`);
+  } else if (statut === 'celib' || statut === 'divorce' || statut === 'veuf') {
+    const statutLabel = { celib: 'célibataire', divorce: 'divorcé(e)', veuf: 'veuf / veuve' }[statut] || statut;
+    items.push(`<strong>Défunt ${statutLabel} — pas de conjoint exonéré</strong> — En l'absence de conjoint marié, aucune exonération liée au mariage (art. 796-0 bis CGI) ne s'applique. L'actif net de ${fmtE(Math.round(actifNet))} est transmis directement${hasEnf ? ` aux ${nbEnf > 1 ? nbEnf + ' enfants' : 'enfant'}` : ' aux héritiers désignés'}, avec application des abattements et barèmes légaux.`);
+  }
+
+  // ── 1. ACTIF SUCCESSORAL & RÉGIME MATRIMONIAL ──
+  if (hasConjoint) {
+    if (regime === 'cra') {
+      items.push(`<strong>Régime de communauté réduite aux acquêts — actif brut : ${fmtE(Math.round(actifBrutGross))}</strong> — Sous ce régime, seuls les biens propres du défunt et <em>la moitié</em> des biens communs entrent dans la succession. L'autre moitié des biens communs appartient de plein droit au conjoint survivant, hors succession et sans droits à payer.${actifExo > 0 ? ` Après application des exonérations partielles (Dutreil, forestier, agricole) de ${fmtE(Math.round(actifExo))}, l'actif fiscal est de ${fmtE(Math.round(actifBrut))}.` : ''} L'actif net taxable s'établit à ${fmtE(Math.round(actifNet))} après déduction du passif.`);
+    } else if (regime === 'sep') {
+      items.push(`<strong>Régime de séparation de biens — actif brut : ${fmtE(Math.round(actifBrutGross))}</strong> — Chaque époux est propriétaire exclusif de ses biens. Seuls les biens propres du défunt constituent l'actif successoral. Les biens propres du conjoint survivant ne sont ni compris dans la succession, ni imposables.${actifExo > 0 ? ` Exonérations partielles appliquées : −${fmtE(Math.round(actifExo))} → actif fiscal ${fmtE(Math.round(actifBrut))}.` : ''}`);
+    } else if (regime === 'universelle') {
+      items.push(`<strong>Communauté universelle — actif brut : ${fmtE(Math.round(actifBrutGross))}</strong> — Tous les biens acquis avant et pendant le mariage sont communs. Si une clause d'attribution intégrale au conjoint survivant a été stipulée, celui-ci recueille la totalité hors succession, sans droits ni impôt. Cette situation doit être confirmée par un notaire.`);
+    } else if (regime === 'particip') {
+      items.push(`<strong>Participation aux acquêts — actif brut : ${fmtE(Math.round(actifBrutGross))}</strong> — En cas de dissolution par décès, ce régime fonctionne comme la séparation de biens pour la succession : seuls les biens propres du défunt constituent l'actif successoral. La créance de participation éventuelle est réglée entre époux hors succession.`);
+    }
+  } else {
+    items.push(`<strong>Actif successoral brut : ${fmtE(Math.round(actifBrutGross))}</strong> — En l'absence de conjoint marié, l'intégralité du patrimoine du défunt (biens propres et quotes-parts d'indivision) constitue l'actif brut.${actifExo > 0 ? ` Exonérations partielles appliquées (Dutreil, forestier, agricole) : −${fmtE(Math.round(actifExo))} → actif fiscal ${fmtE(Math.round(actifBrut))}.` : ''} Après déduction du passif déductible (${fmtE(Math.round(passif))}), l'actif net transmissible s'établit à <strong>${fmtE(Math.round(actifNet))}</strong>.`);
+  }
+
+  // ── 2. PASSIF SUCCESSORAL ──
+  if (passif > 0) {
+    const passifElevé = passif > actifBrut * 0.3;
+    if (passifElevé) {
+      items.push(`<strong>Passif déductible significatif : ${fmtE(Math.round(passif))} (art. 768 CGI)</strong> — Les dettes, crédits en cours, frais funéraires et charges déductibles viennent réduire substantiellement l'actif taxable. L'actif fiscal de ${fmtE(Math.round(actifBrut))} est ramené à un actif net de ${fmtE(Math.round(actifNet))}, ce qui diminue d'autant la base des droits de succession.`);
+    } else {
+      items.push(`<strong>Passif déductible : ${fmtE(Math.round(passif))} (art. 768 et 775 CGI)</strong> — Dettes, crédits associés aux biens et frais funéraires forfaitaires (1 500 €) sont déduits de l'actif fiscal, ramenant l'actif net taxable à ${fmtE(Math.round(actifNet))}.`);
+    }
+  }
+
+  // ── 3. DÉVOLUTION ET DROITS DU CONJOINT / HÉRITIERS PRINCIPAUX ──
+  if (hasConjoint) {
+    if (hasEnf && enfType === 'communs' && optConj === 'usufruit') {
+      const usC = coeffUsuf(ageConj);
+      const npC = 1 - usC;
+      const partConjFiscale = actifNet * usC;
+      const partEnfants = actifNet * npC;
+      items.push(`<strong>Option usufruit du conjoint — art. 757 C. civ.</strong> — Le conjoint survivant (${ageConj} ans) opte pour l'usufruit total de la succession. Selon le barème de l'art. 669 CGI, la valeur fiscale de cet usufruit est de <strong>${fmtN(usC*100,0)} %</strong> de la pleine propriété, soit ${fmtE(Math.round(partConjFiscale))}. Le conjoint est totalement exonéré (art. 796-0 bis CGI). Les ${nbEnf > 1 ? nbEnf + ' enfants reçoivent la nue-propriété' : 'enfant reçoit la nue-propriété'} (${fmtN(npC*100,0)} % = ${fmtE(Math.round(partEnfants))} à répartir${nbEnf > 1 ? ' en ' + nbEnf + ' parts égales' : ''}), sur laquelle s'applique le barème progressif après abattement de 100 000 € par enfant.`);
+    } else if (hasEnf && enfType === 'noncommuns') {
+      const partConj = Math.round(actifNet / 4);
+      const partEnfTotal = Math.round(actifNet * 3 / 4);
+      items.push(`<strong>Option 1/4 PP — obligatoire en présence d'enfants non communs (art. 757 C. civ.)</strong> — Lorsque le défunt laisse des enfants issus d'une autre union, le conjoint survivant ne peut choisir que le quart en pleine propriété (${fmtE(partConj)}). Il est totalement exonéré (art. 796-0 bis CGI). Les ${nbEnf > 1 ? nbEnf + ' enfants se partagent' : 'enfant reçoit'} les 3/4 restants (${fmtE(partEnfTotal)}${nbEnf > 1 ? ', soit ' + fmtE(Math.round(partEnfTotal/nbEnf)) + ' chacun' : ''}).`);
+    } else if (hasEnf) {
+      const partConj = Math.round(actifNet / 4);
+      const partEnfTotal = Math.round(actifNet * 3 / 4);
+      items.push(`<strong>Option 1/4 pleine propriété — art. 757 C. civ.</strong> — Le conjoint survivant opte pour 1/4 de l'actif net en pleine propriété (${fmtE(partConj)}), exonéré. Les ${nbEnf > 1 ? nbEnf + ' enfants se partagent' : 'enfant reçoit'} les 3/4 restants (${fmtE(partEnfTotal)}${nbEnf > 1 ? ', soit ' + fmtE(Math.round(partEnfTotal/nbEnf)) + ' chacun' : ''}), taxés après abattement de 100 000 € par enfant.`);
+    } else if (parents === 'deux') {
+      items.push(`<strong>Conjoint sans enfants — père et mère du défunt vivants (art. 738 C. civ.)</strong> — Le conjoint reçoit la moitié de l'actif net (${fmtE(Math.round(actifNet/2))}), totalement exonérée. Le père et la mère bénéficient du droit de retour légal et reçoivent chacun 1/4 (${fmtE(Math.round(actifNet/4))}). Chaque parent est taxé au barème progressif (5 % à 45 %) après abattement de 100 000 €.`);
+    } else if (parents === 'un') {
+      items.push(`<strong>Conjoint sans enfants — un parent du défunt vivant (art. 738 C. civ.)</strong> — Le conjoint reçoit 3/4 de l'actif net (${fmtE(Math.round(actifNet*3/4))}), exonéré. Le parent encore en vie reçoit 1/4 (${fmtE(Math.round(actifNet/4))}), taxé au barème progressif après abattement de 100 000 €.`);
+    } else {
+      items.push(`<strong>Conjoint sans enfants ni parents du défunt — héritier universel</strong> — En l'absence de tout héritier réservataire, le conjoint survivant hérite de la totalité de l'actif net (${fmtE(Math.round(actifNet))}) et est totalement exonéré de droits de succession (art. 796-0 bis CGI).`);
+    }
+  } else if (hasEnf) {
+    const partParEnf = actifNet > 0 ? fmtE(Math.round(actifNet / nbEnf)) : '0 €';
+    items.push(`<strong>Dévolution aux enfants — art. 734 C. civ.</strong> — En l'absence de conjoint survivant, les ${nbEnf > 1 ? nbEnf + ' enfants héritent en parts égales' : 'enfant hérite'} de l'intégralité de l'actif net (${fmtE(Math.round(actifNet))}${nbEnf > 1 ? `, soit ${partParEnf} chacun` : ''}). Chaque enfant bénéficie d'un abattement de <strong>100 000 €</strong> (art. 779 I CGI), réduit des donations reçues du défunt dans les 15 dernières années. Le barème progressif (5 % à 45 %) s'applique sur la base nette.`);
+  } else {
+    // Pas de conjoint marié, pas d'enfants — cascade légale
+    const hasFrSoeurRows = rows.some(r => ['frere-soeur','neveu-niece'].includes(r.lien));
+    if (parents === 'deux') {
+      if (hasFrSoeurRows) {
+        items.push(`<strong>Cascade légale — deux parents + collatéraux (art. 738 C. civ.)</strong> — En présence de frères, sœurs ou leurs descendants, chaque parent reçoit 1/4 de l'actif net (${fmtE(Math.round(actifNet/4))}), taxé au barème progressif après abattement de 100 000 €. La moitié restante (${fmtE(Math.round(actifNet/2))}) est répartie entre les frères et sœurs ou leurs représentants, avec abattement de 15 932 € et barème à 35 % puis 45 %.`);
+      } else {
+        items.push(`<strong>Cascade légale — deux parents, aucun collatéral (art. 738-2 C. civ.)</strong> — Le père et la mère héritent à parts égales de la totalité (${fmtE(Math.round(actifNet/2))} chacun). Chaque parent bénéficie d'un abattement de 100 000 € puis du barème progressif (5 % à 45 %). Si des frères et sœurs existent, ajoutez-les en héritiers additionnels : la part des parents sera automatiquement réduite à 1/4 chacun.`);
+      }
+    } else if (parents === 'un') {
+      const fracParent = hasFrSoeurRows ? 1/4 : 1/2;
+      items.push(`<strong>Cascade légale — un parent vivant (art. 738 C. civ.)</strong> — Le parent reçoit ${hasFrSoeurRows ? '1/4' : '1/2'} de l'actif net (${fmtE(Math.round(actifNet*fracParent))}), taxé après abattement de 100 000 €. ${hasFrSoeurRows ? 'Les 3/4 restants reviennent aux collatéraux ajoutés en héritiers additionnels.' : 'La moitié restante est dévolue aux collatéraux — ajoutez les frères, sœurs ou neveux dans Héritiers additionnels pour affiner.'}`);
+    } else {
+      items.push(`<strong>Cascade légale — collatéraux et tiers</strong> — Sans enfant, conjoint marié ni parents du défunt, la succession est dévolue aux collatéraux privilégiés (frères, sœurs, neveux, nièces) puis aux collatéraux ordinaires. Barème applicable : <strong>35 % puis 45 %</strong> pour frères et sœurs (abattement 15 932 €) · <strong>55 %</strong> pour neveux/nièces, oncles/tantes · <strong>60 %</strong> pour cousins et tiers sans lien. Ajoutez les héritiers dans la section <em>Héritiers additionnels</em>.`);
+    }
+  }
+
+  // ── 4. ABATTEMENTS EN LIGNE DIRECTE ──
+  const enfantsTaxes = rows.filter(r => r.lien === 'enfant' && !r.exonere);
+  if (enfantsTaxes.length > 0) {
+    const handiEnf = enfantsTaxes.filter(r => r.handi);
+    const abattLines = enfantsTaxes.map(r => {
+      const nom = r.who;
+      const abattDispo = r.calc.abattRestant;
+      const base = r.calc.baseTaxable;
+      const droits = r.calc.droits;
+      return `${nom} : abattement disponible ${fmtE(Math.round(abattDispo))}${r.calc.abattConso > 0 ? ` (${fmtE(r.calc.abattConso)} déjà consommés)` : ''}, base taxable ${fmtE(Math.round(base))}, droits ${fmtE(Math.round(droits))}`;
+    });
+    let enfTxt = `<strong>Abattement en ligne directe — art. 779 I CGI</strong> — Chaque enfant bénéficie d'un abattement de <strong>100 000 €</strong> sur sa part. Le barème progressif (5 % à 45 %) s'applique ensuite sur la base nette. Détail par enfant : ${abattLines.join(' · ')}.`;
+    if (handiEnf.length > 0) {
+      enfTxt += ` ${handiEnf.length > 1 ? handiEnf.map(r=>r.who).join(' et ') + ' bénéficient' : handiEnf[0].who + ' bénéficie'} d'un abattement supplémentaire de <strong>159 325 €</strong> (art. 779 II CGI — cumulable), portant l'abattement total à 259 325 €.`;
+    }
+    items.push(enfTxt);
+  }
+
+  // ── 5. ABATTEMENT PARENTS ──
+  const parentsTaxes = rows.filter(r => r.lien === 'parent');
+  if (parentsTaxes.length > 0) {
+    const parentsDetail = parentsTaxes.map(r => `${r.who} : part ${fmtE(Math.round(r.partBrute))}, base taxable ${fmtE(Math.round(r.calc.baseTaxable))}, droits ${fmtE(Math.round(r.calc.droits))}`).join(' · ');
+    items.push(`<strong>Abattement des parents (ligne directe ascendante) — art. 779 I CGI</strong> — Les parents du défunt bénéficient du même abattement de 100 000 € et du même barème progressif que les enfants (5 % à 45 %). ${parentsDetail}.`);
+  }
+
+  // ── 6. HÉRITIERS ADDITIONNELS (frères/sœurs, neveux, tiers) ──
+  const freresSoeurs = rows.filter(r => r.lien === 'frere-soeur');
+  if (freresSoeurs.length > 0) {
+    const fsDetail = freresSoeurs.map(r => `${r.who} : part ${fmtE(Math.round(r.partBrute))}, abattement ${fmtE(r.calc.abattRestant)}, droits ${fmtE(Math.round(r.calc.droits))}`).join(' · ');
+    items.push(`<strong>Frères et sœurs — art. 779 III et 777 II CGI</strong> — Abattement de <strong>15 932 €</strong> par héritier, puis barème à <strong>35 %</strong> jusqu'à 24 430 € et <strong>45 %</strong> au-delà. À noter : l'exonération prévue à l'art. 796 CGI peut s'appliquer aux frères/sœurs célibataires qui vivaient avec le défunt depuis au moins 5 ans. Détail : ${fsDetail}.`);
+  }
+
+  const neveuxNieces = rows.filter(r => r.lien === 'neveu-niece');
+  if (neveuxNieces.length > 0) {
+    const nnDetail = neveuxNieces.map(r => `${r.who} : part ${fmtE(Math.round(r.partBrute))}, droits ${fmtE(Math.round(r.calc.droits))}`).join(' · ');
+    items.push(`<strong>Neveux et nièces — art. 779 IV CGI</strong> — Abattement de <strong>7 967 €</strong>, puis taux fixe de <strong>55 %</strong> (art. 777 III CGI). Détail : ${nnDetail}.`);
+  }
+
+  const tiersRows = rows.filter(r => ['oncle-tante','cousin','concubin','tiers'].includes(r.lien));
+  if (tiersRows.length > 0) {
+    const tiersTypes = { 'oncle-tante': 'oncle/tante (55 %)', 'cousin': 'cousin·e (55 %)', 'concubin': 'concubin (60 %)', 'tiers': 'tiers sans lien (60 %)' };
+    const tiersDetail = tiersRows.map(r => `${r.who} [${tiersTypes[r.lien] || r.lien}] : part ${fmtE(Math.round(r.partBrute))}, droits ${fmtE(Math.round(r.calc.droits))}`).join(' · ');
+    items.push(`<strong>Héritiers éloignés et tiers — art. 777 CGI</strong> — Au-delà du 4e degré ou sans lien familial, les droits de succession sont particulièrement élevés : <strong>55 %</strong> pour les oncles/tantes et cousins, <strong>60 %</strong> pour les concubins et tiers sans lien de parenté. Aucun abattement significatif ne s'applique (hors handicap). Détail : ${tiersDetail}.`);
+  }
+
+  // ── 7. ASSURANCE-VIE ──
+  if (avFiscal.avant70 > 0 || avFiscal.apres70primes > 0) {
+    if (avFiscal.avant70 > 0) {
+      const taxeAV70 = avFiscal.detail.filter(d => d.type === 'avant70').reduce((s,d) => s+d.impot, 0);
+      items.push(`<strong>Assurance-vie — primes avant 70 ans (art. 990I CGI)</strong> — Les capitaux décès issus de primes versées avant 70 ans (${fmtE(Math.round(avFiscal.avant70))}) sont hors succession civile. Un abattement de <strong>152 500 €</strong> s'applique par bénéficiaire désigné. Au-delà, le prélèvement forfaitaire est de <strong>20 %</strong> jusqu'à 700 000 €, puis <strong>31,25 %</strong>. Le bénéficiaire conjoint ou partenaire pacsé est totalement exonéré. Prélèvement calculé : ${fmtE(Math.round(taxeAV70))}.`);
+    }
+    if (avFiscal.apres70primes > 0) {
+      const b757 = Math.round(avFiscal.base757B || 0);
+      const a757 = Math.round(avFiscal.abatt757B || 0);
+      const droits757 = Math.round(avFiscal.detail.filter(d => d.type === 'apres70').reduce((s,d) => s + d.impot, 0));
+      items.push(`<strong>Assurance-vie — primes après 70 ans (art. 757B CGI)</strong> — Les primes versées après 70 ans (${fmtE(Math.round(avFiscal.apres70primes))}) ne suivent pas le régime de l'art. 990I. Elles relèvent de l'<strong>article 757B du CGI</strong> : soumises aux droits de succession ordinaires, après un abattement global de <strong>30 500 €</strong> partagé entre tous les bénéficiaires concernés (hors conjoint/partenaire PACS totalement exonéré). Les <em>intérêts et plus-values</em> capitalisés sur ces primes sont, eux, totalement exonérés. Abattement 757B appliqué : ${fmtE(a757)} → base taxable : <strong>${fmtE(b757)}</strong>, taxée au barème des droits de succession selon le lien de parenté entre l'assuré et le bénéficiaire. <em>Note : l'abattement personnel (art. 779 CGI — 100 000 € par enfant, etc.) s'applique, per BOFiP, sur le cumul de la part successorale civile et de la part 757B reçue par le même bénéficiaire. Dans ce simulateur, il est imputé sur la part civile ; la base 757B est taxée directement après abattement global 30 500 €, sans double-emploi de l'abattement personnel.</em> Droits 757B calculés : ${fmtE(droits757)}.`);
+    }
+  }
+
+  // ── 8. RAPPEL FISCAL DES DONATIONS ANTÉRIEURES ──
+  const donationsRappel = rows.filter(r => r.abattConso > 0);
+  if (donationsRappel.length > 0) {
+    const donDetail = donationsRappel.map(r => `${r.who} : ${fmtE(r.calc.abattConso)} consommés, abattement résiduel ${fmtE(Math.round(r.calc.abattRestant))}`).join(' · ');
+    items.push(`<strong>Rappel fiscal des donations antérieures — art. 784 CGI</strong> — Les donations consenties par le défunt dans les <strong>15 dernières années</strong> sont rapportées à la succession pour le calcul des abattements. L'abattement de 100 000 € par enfant est réduit à hauteur des donations déjà reçues, ce qui peut augmenter la base taxable à la succession. La valeur de la part reçue, elle, n'est pas modifiée. Détail : ${donDetail}.`);
+  }
+
+  // ── 8b. ACTIFS PATRIMONIAUX SPÉCIFIQUES ──────────────────
+  if (biens && biens.length > 0) {
+    const typesPresents = [...new Set(biens.map(b => b.type))];
+
+    // Exonérations appliquées (Dutreil, forestier, agricole)
+    const biensExones = biens.filter(b => b.exoPct > 0);
+    if (biensExones.length > 0) {
+      const exoDetails = biensExones.map(b => {
+        const info = TYPE_BIEN_INFO[b.type] || {};
+        return `${info.tag || b.type} : valeur brute ${fmtE(Math.round(b.val))}, exonération ${fmtN(b.exoPct*100,0)} % = −${fmtE(Math.round(b.val * b.exoPct))}, base fiscale ${fmtE(Math.round(b.valFisc))}`;
+      });
+      items.push(`<strong>Exonérations partielles spécifiques (art. 787B / 793 bis CGI)</strong> — Les actifs éligibles bénéficient d'une exonération de 75 % de leur valeur successorale. Les conditions d'éligibilité sont strictes et contrôlées par l'administration fiscale. Détail : ${exoDetails.join(' · ')}. La base taxable est réduite d'autant avant application des abattements et du barème.`);
+    }
+
+    // Contrat de capitalisation
+    if (typesPresents.includes('capitalisation')) {
+      items.push(`<strong>Contrat de capitalisation</strong> — Contrairement à l'assurance-vie, ce contrat fait partie de la succession civile et est taxé au barème normal. L'héritier peut cependant conserver le contrat sans le racheter : la fiscalité sur les gains (PFU ou barème IR + 17,2 % de prélèvements sociaux) n'est exigible qu'au moment du rachat effectif par l'héritier. Ce mécanisme de différé d'imposition est un avantage patrimonial significatif à préserver dans une stratégie de transmission.`);
+    }
+
+    // Or / métaux
+    if (typesPresents.includes('or')) {
+      items.push(`<strong>Or / métaux précieux</strong> — Aucune exonération successorale spécifique. La valeur vénale retenue est le cours de l'or (ou la valeur de rachat pour les lingots/pièces) au jour du décès. Lors de la revente ultérieure par les héritiers, la taxe sur les cessions de métaux précieux (TCA, art. 150 VI CGI — taux de 11,5 %) s'appliquera de plein droit, sauf si les héritiers optent pour le régime de la plus-value réelle (nécessite la justification du prix d'acquisition).`);
+    }
+
+    // Œuvres d'art
+    if (typesPresents.includes('art')) {
+      items.push(`<strong>Œuvres d'art / objets de collection</strong> — Aucune exonération successorale. La valeur fiscale est déterminée par expertise (commissaire-priseur, expert agréé). Le règlement des droits par <em>dation en paiement</em> (remise de l'œuvre à l'État, art. 1131 CGI) est possible, sous réserve de l'accord préalable du ministre chargé du Budget. La valorisation est souvent délicate et peut faire l'objet de désaccord avec l'administration.`);
+    }
+
+    // Groupement viticole
+    if (typesPresents.includes('viticole')) {
+      items.push(`<strong>Groupement Viticole (GFV)</strong> — Contrairement aux groupements forestiers, les GFV ne bénéficient pas de l'exonération de 75 % de l'art. 793 bis CGI. Ils sont taxés au barème successoral de droit commun sur leur valeur vénale. Des décotes d'illiquidité peuvent réduire la valeur fiscale retenue selon les circonstances du marché et les clauses statutaires.`);
+    }
+
+    // FIP / FCPI / PE
+    if (typesPresents.some(t => ['fip-fcpi','pe'].includes(t))) {
+      items.push(`<strong>FIP / FCPI / Private Equity</strong> — Ces fonds ne disposent d'aucune exonération successorale spécifique (les avantages IR ne s'appliquent qu'au souscripteur). La valeur retenue est la valeur liquidative au jour du décès. L'illiquidité du fonds peut rendre la valorisation et la réalisation difficiles pour les héritiers. Si les actifs sous-jacents constituent une société opérationnelle, un pacte Dutreil (art. 787B) pourrait s'appliquer — à analyser avec un avocat fiscaliste.`);
+    }
+
+    // Holding
+    if (typesPresents.includes('holding')) {
+      const hasHoldingDutreil = biens.some(b => b.type === 'holding' && b.exoPct > 0);
+      if (!hasHoldingDutreil) {
+        items.push(`<strong>Holding patrimoniale</strong> — Une holding peut bénéficier du pacte Dutreil (art. 787B CGI) si elle anime effectivement une ou plusieurs sociétés opérationnelles — c'est-à-dire si elle participe activement à la conduite de la politique du groupe. L'administration et les tribunaux sont stricts sur cette qualification. Si les conditions ne sont pas réunies, les parts sont taxées au barème successoral sur leur valeur vénale sans réduction.`);
+      }
+    }
+
+    // Société non cotée (sans Dutreil)
+    if (typesPresents.includes('societe-nc')) {
+      const hasSNCDutreil = biens.some(b => b.type === 'societe-nc' && b.exoPct > 0);
+      if (!hasSNCDutreil) {
+        items.push(`<strong>Parts de société non cotée</strong> — Valorisées à leur valeur vénale au jour du décès (valeur de marché ou expertise contradictoire). En l'absence de pacte Dutreil, le barème successoral normal s'applique sur la totalité de la valeur. Des décotes d'illiquidité (parts minoritaires, clauses d'agrément) peuvent être négociées avec l'administration mais restent sujettes à contentieux.`);
+      }
+    }
+  }
+
+  // ── 9. SYNTHÈSE DES AVANTAGES FISCAUX UTILISÉS ──
+  const exonerations = [];
+  const exoConj = rows.find(r => r.exonere && ['conjoint','pacs'].includes(r.lien));
+  if (exoConj) {
+    exonerations.push(`Exonération totale ${exoConj.who} — ${fmtE(Math.round(exoConj.partFiscale))} (art. 796-0 bis CGI)`);
+  }
+  const abattEnfants = rows.filter(r => r.lien === 'enfant' && !r.exonere && r.calc.abattRestant > 0);
+  if (abattEnfants.length > 0) {
+    const totAbatt = abattEnfants.reduce((s,r) => s + r.calc.abattRestant, 0);
+    exonerations.push(`Abattements enfants utilisés : ${fmtE(Math.round(totAbatt))} au total (${abattEnfants.length} × art. 779 I CGI)`);
+  }
+  const handiRows = rows.filter(r => r.handi && r.calc.abattHandi > 0);
+  if (handiRows.length > 0) {
+    exonerations.push(`Abattement handicap : ${fmtE(ABATT_HANDI)} × ${handiRows.length} (art. 779 II CGI)`);
+  }
+  const avExo = avFiscal.detail.filter(d => d.type === 'avant70-exo');
+  if (avExo.length > 0) {
+    exonerations.push(`AV conjoint exonérée (art. 990I CGI)`);
+  }
+  if (exonerations.length > 0) {
+    items.push(`<strong>Avantages fiscaux appliqués dans cette simulation</strong> — ${exonerations.join(' · ')}.`);
+  }
+
+  const classifyItem = it => {
+    const lower = it.toLowerCase();
+    if (/⚠|aucun droit|aucune protection|60 %.*sans abattement|fiscalité maximale/.test(lower)) return 'pedago-alert';
+    if (/conseil|suggestion/.test(lower)) return 'pedago-tip';
+    return 'pedago-p';
+  };
+
+  const bodyHtml = items.map(it => `<p class="${classifyItem(it)}">${it}</p>`).join('');
+
+  return `<div class="pedago-card animate">
+    <div class="pedago-card-header">
+      <div class="pedago-card-dot"></div>
+      <div class="pedago-card-title">Comment fonctionne ce calcul</div>
+    </div>
+    <div class="pedago-card-body">
+      ${bodyHtml}
+      <p class="pedago-dim"><strong>Simulation indicative.</strong> Les droits réels dépendent de la situation personnelle, du régime matrimonial, des actes notariés (testament, donation entre époux), des biens précisément qualifiés et de la date exacte du décès. En présence de testament, de pacte Dutreil, de démembrement complexe, de biens professionnels ou d'une situation internationale, consultez impérativement un notaire ou un conseiller en gestion de patrimoine.</p>
+    </div>
+  </div>`;
+}
+
+/* ══════════════════════════════════════════════════════════
+   SLIDERS & SYNC
+   ══════════════════════════════════════════════════════════ */
+function syncSlider(numId, sldId, dispId, fmt) {
+  const num = document.getElementById(numId);
+  const sld = document.getElementById(sldId);
+  const disp = dispId ? document.getElementById(dispId) : null;
+  function setPct() {
+    const mn = parseFloat(sld.min)||0, mx = parseFloat(sld.max)||100;
+    const v  = Math.min(Math.max(parseFloat(sld.value)||0, mn), mx);
+    sld.style.setProperty('--pct', ((v-mn)/(mx-mn)*100).toFixed(1)+'%');
+  }
+  num.addEventListener('input', () => {
+    sld.value = Math.min(Math.max(parseFloat(num.value)||0, parseFloat(sld.min)||0), parseFloat(sld.max)||100);
+    setPct(); if(disp) disp.textContent = fmt(parseFloat(num.value)||0); calculate();
+  });
+  sld.addEventListener('input', () => {
+    num.value = sld.value;
+    if(disp) disp.textContent = fmt(parseFloat(sld.value)||0); setPct(); calculate();
+  });
+  setPct(); if(disp) disp.textContent = fmt(parseFloat(num.value)||0);
+}
+
+/* ══════════════════════════════════════════════════════════
+   INIT
+   ══════════════════════════════════════════════════════════ */
+syncSlider('age-conjoint', 'age-conjoint-s', 'age-conjoint-disp', v => Math.round(v) + ' ans');
+syncSlider('nb-enfants',   'nb-enfants-s',   'nb-enfants-disp',   v => { const n=Math.round(v); return n===0 ? 'Aucun' : n+' enfant'+(n>1?'s':''); });
+
+// Situation listeners
+document.getElementById('sit-statut').addEventListener('change', calculate);
+document.querySelectorAll('[name="regime"],[name="enfants-type"],[name="option-conjoint"]')
+  .forEach(el => el.addEventListener('change', calculate));
+document.getElementById('parents-vivants').addEventListener('change', calculate);
+document.getElementById('frais-fun-ck').addEventListener('change', calculate);
+document.getElementById('testament-ck').addEventListener('change', () => { updateSituationUI(); });
+document.getElementById('don-epoux-ck').addEventListener('change', () => { updateSituationUI(); });
+attachMoneyInput(document.getElementById('autres-dettes'));
+document.getElementById('autres-dettes').addEventListener('input', calculate);
+
+// Bien
+document.getElementById('add-bien-btn').addEventListener('click', () => {
+  const id = ++bienCtr;
+  const num = document.querySelectorAll('.benef-card[data-bien-id]').length + 1;
+  document.getElementById('biens-list').appendChild(createBienCard(id, num));
+  calculate();
+});
+
+// AV
+document.getElementById('add-av-btn').addEventListener('click', () => {
+  const id = ++avCtr;
+  const num = document.querySelectorAll('.benef-card[data-av-id]').length + 1;
+  document.getElementById('av-list').appendChild(createAVCard(id, num));
+  calculate();
+});
+
+// Autres héritiers
+document.getElementById('add-her-btn').addEventListener('click', () => {
+  const id = ++herCtr;
+  const num = document.querySelectorAll('.benef-card[data-her-id]').length + 1;
+  document.getElementById('autres-her-list').appendChild(createHerCard(id, num));
+  calculate();
+});
+
+// Calcul initial pour afficher la structure complète des résultats au chargement
+calculate();
+
+// Dropdown nav
+/* Menu déroulant catégorisé — voir shared-nav.js */
+SP.nav.init();
+</script>
+</body>
+</html>

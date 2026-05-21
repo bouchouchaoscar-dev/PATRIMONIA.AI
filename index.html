@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="favicon-64.png">
+  <link rel="shortcut icon" href="favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="favicon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PATRIMONIA.AI — Plateforme de Simulation Patrimoniale</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css?v=19">
+<style>
+/* ── HOMEPAGE HERO ── */
+.hero {
+  padding: 5.5rem 2.5rem 4.5rem;
+  background: linear-gradient(165deg, #fff 0%, var(--surface) 100%);
+  overflow: hidden;
+}
+.hero-inner {
+  max-width: 1080px; margin: 0 auto;
+  display: grid; grid-template-columns: 55fr 45fr;
+  gap: 4rem; align-items: center;
+}
+.hero-tag {
+  display: inline-flex; align-items: center; gap: .5rem;
+  font-size: .7rem; font-weight: 500; color: var(--text-muted);
+  letter-spacing: .04em; text-transform: uppercase;
+  border: 1px solid var(--border); padding: .3rem 1rem;
+  border-radius: 100px; background: var(--surface-2); margin-bottom: 1.5rem;
+}
+.hero-tag::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--accent); animation: pulse 2.5s infinite;
+}
+@keyframes pulse { 0%,100%{ opacity:1 } 50%{ opacity:.25 } }
+
+.hero h1 {
+  font-family: var(--sans); font-size: clamp(2.8rem, 5vw, 4.2rem);
+  font-weight: 700; letter-spacing: -.055em; line-height: 1.0;
+  color: var(--text); margin-bottom: 1.25rem;
+}
+.hero h1 .accent-dot { color: var(--accent) }
+.hero h1 em {
+  font-style: normal;
+  color: var(--accent);
+  background: linear-gradient(100deg, var(--accent) 0%, var(--amber) 60%, var(--accent) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.hero > .hero-inner > .hero-content > p {
+  font-size: 1rem; color: var(--text-muted); font-weight: 400;
+  max-width: 440px; line-height: 1.65; letter-spacing: -.015em;
+  margin-bottom: 2.5rem;
+}
+.hero-actions { display: flex; gap: .75rem; flex-wrap: wrap }
+.btn-primary {
+  display: inline-flex; align-items: center; gap: .5rem;
+  background: linear-gradient(105deg, var(--accent) 0%, var(--amber) 100%);
+  color: #fff;
+  font-family: var(--sans); font-size: .85rem; font-weight: 500;
+  padding: .75rem 1.5rem; border-radius: 100px;
+  text-decoration: none; letter-spacing: -.01em;
+  transition: filter 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 2px 16px rgba(79,138,120,.20), 0 1px 6px rgba(184,134,11,.10);
+}
+.btn-primary:hover {
+  filter: brightness(1.07);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 28px rgba(79,138,120,.28), 0 2px 10px rgba(184,134,11,.14);
+}
+.btn-secondary {
+  display: inline-flex; align-items: center; gap: .5rem;
+  background: var(--surface-2); color: var(--text-muted);
+  font-family: var(--sans); font-size: .85rem; font-weight: 500;
+  padding: .75rem 1.5rem; border-radius: 100px;
+  text-decoration: none; letter-spacing: -.01em;
+  border: 1px solid var(--border);
+  transition: all 0.2s ease;
+}
+.btn-secondary:hover { color: var(--accent); border-color: rgba(79,138,120,.28); background: var(--accent-dim) }
+
+/* Hero props — value propositions */
+.hero-props {
+  display: flex; flex-direction: column; gap: .72rem;
+}
+.hero-prop {
+  display: flex; align-items: flex-start; gap: .9rem;
+  background: var(--surface-2); border: 1px solid var(--border-subtle);
+  border-radius: 14px; padding: .95rem 1.2rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,.04);
+  animation: fadeInUp .45s ease both;
+  animation-delay: calc(var(--i) * 70ms + 280ms);
+}
+.hero-prop-icon {
+  width: 30px; height: 30px; min-width: 30px;
+  background: linear-gradient(135deg, var(--accent-dim) 0%, var(--amber-dim) 100%);
+  border: 1px solid rgba(184,134,11,.10);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--accent);
+}
+.hero-prop-icon svg { width: 14px; height: 14px }
+.hero-prop-title {
+  font-size: .82rem; font-weight: 600;
+  color: var(--text); letter-spacing: -.02em; margin-bottom: .18rem;
+}
+.hero-prop-desc {
+  font-size: .74rem; color: var(--text-muted);
+  font-weight: 400; letter-spacing: -.01em; line-height: 1.5;
+}
+
+/* ── SIMULATORS SECTION ── */
+.sims-section {
+  max-width: 1080px; margin: 0 auto;
+  padding: 3.5rem 2.5rem 6rem;
+}
+.section-label {
+  font-size: .7rem; font-weight: 600; color: var(--text-dim);
+  letter-spacing: .08em; text-transform: uppercase; margin-bottom: .75rem;
+}
+.section-title {
+  font-size: 1.25rem; font-weight: 700; letter-spacing: -.04em;
+  color: var(--text); margin-bottom: 2.5rem;
+}
+
+/* Bento grid — zigzag asymmetric layout */
+.sims-bento {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1.25rem;
+}
+.sim-card-home { grid-column: span 1 }
+.sim-card-home:nth-child(1) { grid-column: span 3 }
+.sim-card-home:nth-child(2) { grid-column: span 2 }
+.sim-card-home:nth-child(3) { grid-column: span 2 }
+.sim-card-home:nth-child(4) { grid-column: span 3 }
+.sim-card-home:nth-child(5) { grid-column: span 2 }
+.sim-card-home:nth-child(6) { grid-column: span 3 }
+.sim-card-home:nth-child(7) { grid-column: span 2 }
+.sim-card-home:nth-child(8) { grid-column: span 3 }
+.sim-card-home:nth-child(9) { grid-column: span 3 }
+.sim-card-home:nth-child(10) { grid-column: span 2 }
+.sim-card-home:nth-child(11) { grid-column: span 3 }
+.sim-card-home:nth-child(12) { grid-column: span 2 }
+.sim-card-home:nth-child(13) { grid-column: span 3 }
+.sim-card-home:nth-child(14) { grid-column: span 5 }
+
+.sim-card-home {
+  background: var(--surface-2); border: 1px solid var(--border-subtle);
+  border-radius: var(--r); padding: 1.9rem 2rem;
+  display: flex; flex-direction: column; gap: .85rem;
+  box-shadow: 0 2px 12px rgba(0,0,0,.04);
+  transition: box-shadow .25s ease, transform .25s ease, border-color .25s ease;
+  text-decoration: none; color: inherit; cursor: pointer;
+  position: relative; overflow: hidden;
+}
+.sim-card-home::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(79,138,120,.04) 0%, transparent 60%);
+  opacity: 0; transition: opacity .25s ease; pointer-events: none;
+}
+.sim-card-home:hover {
+  box-shadow: 0 10px 40px rgba(0,0,0,.09);
+  transform: translateY(-3px);
+  border-color: rgba(79,138,120,.18);
+}
+.sim-card-home:hover::after { opacity: 1 }
+
+.sim-card-top {
+  display: flex; align-items: center; justify-content: space-between;
+}
+.sim-card-title-row { display:flex; align-items:center; gap:.6rem }
+.sim-card-title-row h3 { margin:0 }
+.sim-card-num { display:block!important; width:10px; height:10px; min-width:10px; border-radius:50%; background:var(--accent); font-size:0 }
+.key-result-val { letter-spacing:-.02em!important }
+.sim-card-arrow {
+  font-size: .9rem; color: var(--text-dim);
+  transition: transform .2s ease, color .2s ease; line-height: 1;
+}
+.sim-card-home:hover .sim-card-arrow { transform: translate(3px,-3px); color: var(--accent) }
+.sim-card-home h3 {
+  font-size: 1.1rem; font-weight: 600; letter-spacing: -.03em;
+  color: var(--text); line-height: 1.25;
+}
+.sim-card-home p {
+  font-size: .81rem; color: var(--text-muted); font-weight: 400;
+  letter-spacing: -.01em; line-height: 1.55; flex: 1;
+}
+.sim-card-badge {
+  display: inline-flex; align-items: center;
+  font-family: var(--mono); font-size: .65rem; font-weight: 500;
+  color: var(--text-dim); background: var(--surface);
+  border: 1px solid var(--border-subtle); padding: .22rem .7rem;
+  border-radius: 100px; align-self: flex-start;
+  letter-spacing: .01em;
+}
+
+/* ── RESPONSIVE ── */
+@media(max-width:860px) {
+  .hero-inner { grid-template-columns: 1fr; gap: 2rem }
+  .hero-props { display: grid; grid-template-columns: 1fr 1fr; gap: .65rem }
+  .hero h1 { font-size: clamp(2.4rem,6vw,3.2rem) }
+}
+@media(max-width:760px) {
+  .hero { padding: 4rem 1.5rem 3.5rem }
+  .hero-props { grid-template-columns: 1fr }
+  .sims-section { padding: 2.5rem 1.5rem 4rem }
+  .sims-bento { grid-template-columns: 1fr }
+  .sim-card-home:nth-child(n) { grid-column: span 1 }
+  .sim-card-home:hover { transform: none }
+}
+</style>
+<style>
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="index.html" class="nav-logo"><img src="logo.png?v=3" alt="PATRIMONIA.AI" class="nav-logo-img"></a>
+  <div class="nav-right">
+    <div class="nav-dropdown" id="mainDropdown">
+      <button class="nav-dropdown-btn" aria-expanded="false" aria-haspopup="true">
+        Simulateurs <svg class="nav-chevron" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.8" style="width:13px;height:8px;flex-shrink:0"><path d="M1 1l4 4 4-4"/></svg>
+      </button>
+      <div class="nav-dropdown-menu" id="navMenu" role="menu"></div>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="hero-content">
+      <div class="hero-tag">Ingénierie patrimoniale · Barèmes 2026</div>
+      <h1>La plateforme<br><em>patrimoniale</em><span class="accent-dot">.</span></h1>
+      <p>Tous les simulateurs dont vous avez besoin, réunis dans une seule interface. Immobilier, fiscalité, transmission, investissement : des outils pointus, faciles à utiliser et pédagogiques, conçus pour les professionnels du patrimoine et les investisseurs exigeants.</p>
+      <div class="hero-actions">
+        <a href="simulator-1.html" class="btn-primary">Commencer une simulation</a>
+        <a href="#simulators" class="btn-secondary">Voir les outils</a>
+      </div>
+    </div>
+    <div class="hero-props">
+      <div class="hero-prop" style="--i:0">
+        <div class="hero-prop-icon">
+          <svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>
+        </div>
+        <div>
+          <div class="hero-prop-title">Interface centralisée</div>
+          <div class="hero-prop-desc">Crédit, fiscalité, transmission, investissement : tous les outils au même endroit, dans une interface claire et unifiée.</div>
+        </div>
+      </div>
+      <div class="hero-prop" style="--i:1">
+        <div class="hero-prop-icon">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M9.5 1L3 9h5L6 15l8-9H9.5z"/></svg>
+        </div>
+        <div>
+          <div class="hero-prop-title">Précision instantanée</div>
+          <div class="hero-prop-desc">Résultats immédiats, formules vérifiées, barèmes officiels 2026. Fini les tableurs et les calculs manuels.</div>
+        </div>
+      </div>
+      <div class="hero-prop" style="--i:2">
+        <div class="hero-prop-icon">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 1L2 4v4c0 3.5 2.5 6 6 6.5 3.5-.5 6-3 6-6.5V4z" fill="currentColor" stroke="none" opacity=".18"/><path d="M8 1L2 4v4c0 3.5 2.5 6 6 6.5 3.5-.5 6-3 6-6.5V4z"/><path d="M5.5 8.5l2 2 3-3.5"/></svg>
+        </div>
+        <div>
+          <div class="hero-prop-title">Pédagogie intégrée</div>
+          <div class="hero-prop-desc">Chaque simulation détaille ses calculs et son raisonnement. Pour mieux comprendre ce qu'on simule, et mieux conseiller.</div>
+        </div>
+      </div>
+      <div class="hero-prop" style="--i:3">
+        <div class="hero-prop-icon">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="5" width="14" height="9" rx="1.5"/><path d="M5 5V3.5A1.5 1.5 0 016.5 2h3A1.5 1.5 0 0111 3.5V5"/><line x1="8" y1="8" x2="8" y2="11"/><line x1="6.5" y1="9.5" x2="9.5" y2="9.5"/></svg>
+        </div>
+        <div>
+          <div class="hero-prop-title">Pensé pour les experts</div>
+          <div class="hero-prop-desc">CGP, juristes, banquiers, assureurs, conseillers patrimoniaux : des outils à la hauteur de votre expertise.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="sims-section" id="simulators">
+  <div class="section-label">Les simulateurs</div>
+  <div class="section-title">L'ingénierie patrimoniale, à portée de main.</div>
+
+  <div class="sims-bento">
+    <a href="simulator-1.html" class="sim-card-home">
+      <div class="sim-card-top">
+        <div class="sim-card-title-row">
+          <span class="sim-card-num">01</span>
+          <h3>Crédit Immobilier</h3>
+        </div>
+        <span class="sim-card-arrow">↗</span>
+      </div>
+      <p>Calculez votre mensualité, le coût total du crédit, le TAEG estimé et consultez le tableau d'amortissement mois par mois.</p>
+      <span class="sim-card-badge">Tableau d'amortissement · TAEG</span>
+    </a>
+
+    <a href="simulator-2.html" class="sim-card-home">
+      <div class="sim-card-top">
+        <div class="sim-card-title-row">
+          <span class="sim-card-num">02</span>
+          <h3>Impôt sur le Revenu 2026</h3>
+        </div>
+        <span class="sim-card-arrow">↗</span>
+      </div>
+      <p>Calcul par tranche, quotient familial, abattement 10 % et décote, sur la base du barème officiel indexé 2026.</p>
+      <span class="sim-card-badge">Revenus 2025 · Loi 2026-103</span>
+    </a>
+
+    <a href="simulator-3.html" class="sim-card-home">
+      <div class="sim-card-top">
+        <div class="sim-card-title-row">
+          <span class="sim-card-num">03</span>
+          <h3>IFI 2026</h3>
+        </div>
+        <span class="sim-card-arrow">↗</span>
+      </div>
+      <p>Estimez votre Impôt sur la Fortune Immobilière avec abattements légaux, dettes déductibles et décote progressive.</p>
+      <span class="sim-card-badge">Seuil 1 300 000 €</span>
+    </a>
+
+    <a href="simulator-4.html" class="sim-card-home">
+      <div class="sim-card-top">
+        <div class="sim-card-title-row">
+          <span class="sim-card-num">04</span>
+          <h3>Projection d'investissement</h3>
+        </div>
+        <span class="sim-card-arrow">↗</span>
+      </div>
+      <p>Simulez la croissance d'un capital avec intérêts composés et versements périodiques. Visualisez la part capital vs gains sur la durée choisie.</p>
+      <span class="sim-card-badge">Intérêts composés · Mensuel</span>
+    </a>
+
+    <a href="simulator-5.html" class="sim-card-home">
+      <div class="sim-card-top">
+        <div class="sim-card-title-row">
+          <span class="sim-card-num">05</span>
+          <h3>Droits de donation</h3>
+        </div>
+        <span class="sim-card-arrow">↗</span>
+      </div>
+      <p>Estimez les droits de donation pour un ou plusieurs bénéficiaires. Abattements par lien de parenté, don familial exonéré, démembrement de propriété et multi-donateurs.</p>
+      <span class="sim-card-badge">Multi-bénéficiaires · Art. 777 CGI · Barèmes 2026</span>
+    </a>
+
+    <a href="simulator-6.html" class="sim-card-home">
+      <div class="sim-card-top">
+        <div class="sim-card-title-row">
+          <span class="sim-card-num">06</span>
+          <h3>Droits de succession</h3>
+        </div>
+        <span class="sim-card-arrow">↗</span>
+      </div>
+      <p>Estimez les droits de succession selon la situation familiale, le régime matrimonial, l'actif successoral et les contrats d'assurance-vie. Abattements, barèmes 2026 et pédagogie fiscale.</p>
+      <span class="sim-card-badge">Régime matrimonial · AV art. 990I &amp; 757B · Barèmes 2026</span>
+    </a>
+
+    <a href="simulator-7.html" class="sim-card-home">
+      <div class="sim-card-top">
+        <div class="sim-card-title-row">
+          <span class="sim-card-num">07</span>
+          <h3>Taux d'endettement</h3>
+        </div>
+        <span class="sim-card-arrow">↗</span>
+      </div>
+      <p>Calculez votre taux d'endettement actuel, votre capacité d'emprunt supplémentaire avant 35 % et estimez le capital empruntable selon le taux et la durée. Revenus retenus, reste à vivre.</p>
+      <span class="sim-card-badge">Seuil HCSF 35 % · Revenus locatifs · Capacité d'emprunt</span>
+    </a>
+
+    <a href="simulator-8.html" class="sim-card-home">
+      <div class="sim-card-top">
+        <div class="sim-card-title-row">
+          <span class="sim-card-num">08</span>
+          <h3>Rentabilité Locative</h3>
+        </div>
+        <span class="sim-card-arrow">↗</span>
+      </div>
+      <p>Calculez la rentabilité brute, nette de frais et nette d'impôts de votre investissement locatif. Micro-foncier, micro-BIC, LMNP réel, réel foncier, cash-flow et analyse comparative.</p>
+      <span class="sim-card-badge">Brute · Nette de frais · Nette d'impôts · Cash-flow · LMNP</span>
+    </a>
+
+    <a href="simulator-9.html" class="sim-card-home">
+      <div class="sim-card-top">
+        <div class="sim-card-title-row">
+          <span class="sim-card-num">09</span>
+          <h3>Plus-values immobilières</h3>
+        </div>
+        <span class="sim-card-arrow">↗</span>
+      </div>
+      <p>Calculez la fiscalité d'une cession immobilière : IR 19 %, prélèvements sociaux 17,2 %, surtaxe et abattements pour durée de détention. Résidence principale, secondaire, locatif, terrain. Forfaits frais d'acquisition et travaux intégrés.</p>
+      <span class="sim-card-badge">IR · PS · Surtaxe · Abattements durée · CGI art. 150 U</span>
+    </a>
+
+    <a href="simulator-10.html" class="sim-card-home">
+      <div class="sim-card-top">
+        <div class="sim-card-title-row">
+          <span class="sim-card-num">10</span>
+          <h3>SCI IR · SCI IS · Nom propre</h3>
+        </div>
+        <span class="sim-card-arrow">↗</span>
+      </div>
+      <p>Comparez les 3 modes de détention immobilière : cash-flow net, fiscalité annuelle, fiscalité à la revente et trésorerie cumulée. Amortissement SCI IS, abattements plus-values particuliers, effet ciseau à la sortie, pédagogie intégrée.</p>
+      <span class="sim-card-badge">SCI IS · Amortissement · PV professionnelle · Comparatif 3 modes</span>
+    </a>
+
+    <a href="simulator-11.html" class="sim-card-home">
+      <div class="sim-card-top">
+        <div class="sim-card-title-row">
+          <span class="sim-card-num">11</span>
+          <h3>LMNP au réel</h3>
+        </div>
+        <span class="sim-card-arrow">↗</span>
+      </div>
+      <p>Simulez le résultat fiscal BIC, les amortissements (bâti, travaux, mobilier), la règle de plafonnement et les amortissements différés. Comparatif micro-BIC vs réel, cash-flow net, rentabilité nette nette et fiscalité à la revente avec abattements particuliers.</p>
+      <span class="sim-card-badge">Amortissements · Plafonnement CGI 39C · Micro-BIC vs Réel · PV particuliers</span>
+    </a>
+
+    <a href="simulator-12.html" class="sim-card-home">
+      <div class="sim-card-top">
+        <div class="sim-card-title-row">
+          <span class="sim-card-num">12</span>
+          <h3>Cash-flow Immobilier</h3>
+        </div>
+        <span class="sim-card-arrow">↗</span>
+      </div>
+      <p>Simulez le cash-flow réel d'un investissement locatif : rentabilité brute, nette et nette nette, effort d'épargne, enrichissement patrimonial, projection sur 25 ans et revente avec TRI. Tous les régimes fiscaux : micro-foncier, réel foncier, LMNP, SCI IS.</p>
+      <span class="sim-card-badge">Cash-flow · Projection · TRI · Tous régimes fiscaux</span>
+    </a>
+
+    <a href="simulator-13.html" class="sim-card-home">
+      <div class="sim-card-top">
+        <div class="sim-card-title-row">
+          <span class="sim-card-num">13</span>
+          <h3>Assurance-vie</h3>
+        </div>
+        <span class="sim-card-arrow">↗</span>
+      </div>
+      <p>Moteur patrimonial complet : capitalisation long terme avec graphique de croissance, fiscalité des rachats (PFU vs barème, avant/après 8 ans, seuil 150 000 €), transmission successorale (art. 990 I &amp; 757 B CGI), clause démembrée et pédagogie dynamique.</p>
+      <span class="sim-card-badge">Capitalisation · 990 I &amp; 757 B · Avant/après 8 ans · Démembrement · Transmission</span>
+    </a>
+
+    <a href="simulator-14.html" class="sim-card-home">
+      <div class="sim-card-top">
+        <div class="sim-card-title-row">
+          <span class="sim-card-num"></span>
+          <h3>PER — Plan Épargne Retraite</h3>
+        </div>
+        <span class="sim-card-arrow">↗</span>
+      </div>
+      <p>Moteur retraite premium : économie d'impôt immédiate selon la TMI, plafond annuel et reports (art. 163 quatervicies / 154 bis), capitalisation projetée jusqu'à la retraite, arbitrage capital vs rente viagère (fractions imposables art. 158-6) et comparateur PER / AV / CTO / Livret.</p>
+      <span class="sim-card-badge">Économie fiscale · Capitalisation · Rente viagère · TNS · Comparateur</span>
+    </a>
+
+  </div>
+</section>
+
+<footer>
+  <span>PATRIMONIA.AI</span> — Simulation indicative à titre informatif uniquement.<br>
+  Barèmes officiels 2026 (Loi n°2026-103 du 19 février 2026). Résultats non contractuels.<br>
+  IR : indexation 0,9% · Abattement 10% (min 495 € / max 14 171 €) · Décote appliquée.<br>
+  IFI : seuil 1 300 000 € · Abattement RP 30% · Décote si 1 300 000 ≤ P &lt; 1 400 000 €.
+</footer>
+
+<script src="shared.js?v=2"></script>
+<script src="shared-nav.js?v=6"></script>
+<script>SP.nav.init();</script>
+</body>
+</html>

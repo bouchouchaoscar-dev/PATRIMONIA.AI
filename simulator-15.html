@@ -1,0 +1,1834 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="favicon-64.png">
+  <link rel="shortcut icon" href="favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="favicon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PEA — Plan d'Épargne en Actions — PATRIMONIA.AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css?v=19">
+<script src="shared.js?v=2"></script>
+<script src="shared-nav.js?v=6"></script>
+<style>
+/* ═══════════════════════════════════════════════════
+   PEA — Plan d'Épargne en Actions · PATRIMONIA.AI
+   Préfixe CSS : .pea-
+═══════════════════════════════════════════════════ */
+:root {
+  --pea-cobalt:     #2C5282;
+  --pea-cobalt-dim: rgba(44,82,130,.08);
+  --pea-cobalt-mid: rgba(44,82,130,.18);
+  --pea-emerald:    #276749;
+  --pea-emerald-dim:rgba(39,103,73,.08);
+}
+
+/* ── LAYOUT ── */
+.pea-layout { display:grid; grid-template-columns:360px 1fr; min-height:600px }
+@media(max-width:960px){ .pea-layout { grid-template-columns:1fr } }
+
+.pea-inp {
+  padding:1.75rem 1.4rem 2rem;
+  background:var(--surface-2);
+  border-right:1px solid var(--border-subtle);
+}
+@media(max-width:960px){ .pea-inp { border-right:none; border-bottom:1px solid var(--border-subtle) } }
+
+.pea-main { background:var(--surface); display:flex; flex-direction:column; min-width:0 }
+
+/* ── TABS ── */
+.pea-tabs-nav {
+  display:flex; border-bottom:1px solid var(--border-subtle);
+  background:var(--surface-2); overflow-x:auto; flex-shrink:0;
+  scrollbar-width:none;
+}
+.pea-tabs-nav::-webkit-scrollbar { display:none }
+.pea-tab-btn {
+  flex-shrink:0; padding:.82rem 1.1rem;
+  font-family:var(--sans); font-size:.74rem; font-weight:500;
+  color:var(--text-muted); background:none;
+  border:none; border-bottom:2px solid transparent;
+  cursor:pointer; white-space:nowrap; letter-spacing:-.01em;
+  transition:color .18s, border-color .18s, background .18s;
+  display:flex; align-items:center; gap:.35rem;
+}
+.pea-tab-btn:hover { color:var(--text); background:var(--surface) }
+.pea-tab-btn.active { color:var(--accent); border-bottom-color:var(--accent); font-weight:600 }
+.pea-tab-icon { width:12px; height:12px; flex-shrink:0; opacity:.55 }
+.pea-tab-btn.active .pea-tab-icon { opacity:1 }
+
+/* ── PANELS ── */
+.pea-panel { display:none; flex:1; padding:1.4rem 1.5rem 2rem }
+.pea-panel.active { display:block }
+@media(max-width:960px){ .pea-panel { padding:1.1rem 1rem 1.5rem } }
+
+/* ── INPUT SECTION LABELS ── */
+.inp-sec {
+  font-size:.59rem; font-weight:700; color:var(--text-dim);
+  letter-spacing:.08em; text-transform:uppercase;
+  margin:1.35rem 0 .8rem;
+}
+.inp-sec:first-child { margin-top:0 }
+.field-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:.65rem }
+.range-row { display:flex; align-items:center; gap:.75rem }
+.range-inp { flex:1 }
+.range-disp {
+  font-family:var(--mono); font-size:.72rem; font-weight:600;
+  color:var(--accent); min-width:3.2rem; text-align:right; flex-shrink:0;
+}
+
+/* Plafond indicator strip */
+.pea-plafond {
+  background:var(--surface); border:1px solid var(--border-subtle);
+  border-radius:var(--r-sm); padding:.6rem .85rem; margin-top:.7rem;
+  display:flex; align-items:center; gap:.65rem;
+}
+.pea-plafond-label { font-size:.68rem; color:var(--text-muted); flex-shrink:0 }
+.pea-plafond-bar-wrap {
+  flex:1; height:5px; background:var(--surface-3); border-radius:3px; overflow:hidden;
+}
+.pea-plafond-fill {
+  height:100%; border-radius:3px;
+  background:linear-gradient(90deg,var(--accent),var(--amber));
+  transition:width .4s;
+}
+.pea-plafond-val {
+  font-family:var(--mono); font-size:.68rem; font-weight:600;
+  color:var(--text-muted); flex-shrink:0;
+}
+
+/* ── KPI GRID ── */
+.pea-kpi-row { display:grid; gap:.7rem; margin-bottom:1rem }
+.pea-kpi-row-3 { grid-template-columns:repeat(3,1fr) }
+.pea-kpi-row-2 { grid-template-columns:repeat(2,1fr) }
+.pea-kpi-row-4 { grid-template-columns:repeat(4,1fr) }
+@media(max-width:700px){
+  .pea-kpi-row-3,.pea-kpi-row-4 { grid-template-columns:1fr 1fr }
+}
+.pea-kpi {
+  background:var(--surface-2); border:1.5px solid var(--border-subtle);
+  border-radius:var(--r-sm); padding:.95rem 1.05rem .8rem;
+  transition:box-shadow .2s, transform .2s;
+}
+.pea-kpi:hover { box-shadow:0 4px 16px rgba(0,0,0,.08); transform:translateY(-1px) }
+.pea-kpi.accent { border-top:2px solid var(--accent) }
+.pea-kpi.amber  { border-top:2px solid var(--amber) }
+.pea-kpi.danger { border-top:2px solid var(--danger) }
+.pea-kpi.slate  { border-top:2px solid var(--slate) }
+.pea-kpi.cobalt { border-top:2px solid var(--pea-cobalt) }
+.pea-kpi.success{ border-top:2px solid var(--success) }
+.pea-kpi-label {
+  font-size:.57rem; font-weight:700; color:var(--text-dim);
+  letter-spacing:.08em; text-transform:uppercase; margin-bottom:.38rem;
+}
+.pea-kpi-val {
+  font-family:var(--sans); font-size:1.05rem; font-weight:700;
+  color:var(--text); letter-spacing:-.03em; line-height:1.1;
+}
+.pea-kpi-val.lg  { font-size:1.25rem }
+.pea-kpi-val.green  { color:var(--success) }
+.pea-kpi-val.amber  { color:var(--amber) }
+.pea-kpi-val.red    { color:var(--danger) }
+.pea-kpi-val.cobalt { color:var(--pea-cobalt) }
+.pea-kpi-sub { font-size:.63rem; color:var(--text-dim); margin-top:.22rem; letter-spacing:-.01em }
+.pea-delta {
+  display:inline-flex; align-items:center; gap:.2rem;
+  font-size:.62rem; font-weight:700; padding:.1rem .4rem;
+  border-radius:100px; margin-top:.3rem;
+}
+.pea-delta.up   { background:rgba(59,140,90,.1); color:var(--success) }
+.pea-delta.down { background:var(--danger-dim); color:var(--danger) }
+
+/* ── CHART WRAP ── */
+.pea-chart-wrap {
+  background:var(--surface-2); border:1px solid var(--border-subtle);
+  border-radius:var(--r); padding:1rem 1rem .75rem; margin-bottom:1rem;
+}
+.pea-chart-hdr {
+  display:flex; justify-content:space-between; align-items:flex-start;
+  margin-bottom:.8rem;
+}
+.pea-chart-title {
+  font-size:.59rem; font-weight:700; color:var(--text-dim);
+  letter-spacing:.07em; text-transform:uppercase;
+}
+.pea-chart-sub { font-size:.63rem; color:var(--text-dim); margin-top:.12rem }
+.pea-chart-badge {
+  font-size:.58rem; font-weight:700; padding:.12rem .45rem;
+  border-radius:100px; background:var(--accent-dim); color:var(--accent);
+}
+canvas.pea-canvas { width:100%; display:block }
+.pea-canvas-250 { height:250px }
+.pea-canvas-200 { height:200px }
+.pea-canvas-160 { height:160px }
+.pea-legend {
+  display:flex; flex-wrap:wrap; gap:.5rem .85rem; margin-top:.55rem;
+}
+.pea-legend-item { display:flex; align-items:center; gap:.35rem; font-size:.67rem; color:var(--text-muted) }
+.pea-legend-swatch { width:20px; height:3px; border-radius:2px; flex-shrink:0 }
+.pea-legend-area { width:10px; height:10px; border-radius:2px; flex-shrink:0; opacity:.55 }
+
+/* ── FISCAL TIMELINE ── */
+.pea-fisc-tl {
+  display:flex; border-radius:var(--r-sm); overflow:hidden;
+  height:36px; margin-bottom:1rem; border:1px solid var(--border-subtle);
+}
+.pea-fisc-zone {
+  display:flex; align-items:center; justify-content:center;
+  flex-direction:column; font-size:.59rem; font-weight:700;
+  text-transform:uppercase; letter-spacing:.05em; gap:1px;
+}
+.pea-fisc-zone small { font-weight:400; text-transform:none; font-size:.57rem; letter-spacing:0 }
+.pea-fisc-zone.bad  { flex:5; background:var(--danger-dim); color:var(--danger) }
+.pea-fisc-zone.good { flex:12; background:var(--accent-dim); color:var(--accent) }
+
+/* Fiscal scenario cards */
+.pea-fisc-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:.75rem; margin-bottom:1rem }
+@media(max-width:700px){ .pea-fisc-grid { grid-template-columns:1fr } }
+.pea-fisc-card {
+  background:var(--surface-2); border:1.5px solid var(--border-subtle);
+  border-radius:var(--r-sm); padding:1rem;
+}
+.pea-fisc-card.best {
+  border-color:rgba(79,138,120,.28);
+  background:linear-gradient(135deg,rgba(79,138,120,.04) 0%,rgba(184,134,11,.03) 100%);
+}
+.pea-fisc-badge {
+  font-size:.57rem; font-weight:700; letter-spacing:.07em; text-transform:uppercase;
+  padding:.12rem .5rem; border-radius:100px; display:inline-block; margin-bottom:.55rem;
+}
+.pea-fisc-badge.before { background:var(--danger-dim); color:var(--danger) }
+.pea-fisc-badge.after  { background:var(--accent-dim); color:var(--accent) }
+.pea-fisc-badge.cto    { background:var(--slate-dim); color:var(--slate) }
+.pea-fisc-badge.best   { background:linear-gradient(90deg,var(--accent),var(--amber)); color:#fff }
+.pea-fisc-name { font-size:.82rem; font-weight:700; color:var(--text); letter-spacing:-.02em; margin-bottom:.65rem }
+.pea-fisc-row {
+  display:flex; justify-content:space-between; align-items:baseline;
+  padding:.26rem 0; border-bottom:1px solid var(--border-subtle);
+  font-size:.73rem; color:var(--text-muted);
+}
+.pea-fisc-row:last-child { border-bottom:none }
+.pea-fisc-row.total {
+  font-weight:700; font-size:.8rem; color:var(--text);
+  border-top:2px solid var(--border-subtle); border-bottom:none;
+  margin-top:.2rem; padding-top:.38rem;
+}
+.pea-fisc-v { font-family:var(--mono); font-weight:600 }
+.pea-fisc-v.red   { color:var(--danger) }
+.pea-fisc-v.green { color:var(--success) }
+.pea-fisc-v.muted { color:var(--text-muted) }
+
+/* Advantage callout */
+.pea-advantage {
+  background:linear-gradient(135deg,rgba(79,138,120,.07),rgba(184,134,11,.05));
+  border:1px solid rgba(79,138,120,.2); border-radius:var(--r-sm);
+  padding:.85rem 1.1rem; display:flex; align-items:center;
+  justify-content:space-between; gap:1rem; margin-bottom:1rem;
+}
+.pea-advantage-left {}
+.pea-advantage-title { font-size:.78rem; font-weight:700; color:var(--text); letter-spacing:-.02em }
+.pea-advantage-sub   { font-size:.65rem; color:var(--text-muted); margin-top:.15rem }
+.pea-advantage-val {
+  font-family:var(--sans); font-size:1.2rem; font-weight:700;
+  color:var(--accent); letter-spacing:-.03em; text-align:right; flex-shrink:0;
+}
+
+/* ── CTO COMPARISON ── */
+.pea-cmp-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem }
+@media(max-width:600px){ .pea-cmp-grid { grid-template-columns:1fr } }
+.pea-cmp-col {
+  background:var(--surface-2); border:1.5px solid var(--border-subtle);
+  border-radius:var(--r); overflow:hidden;
+}
+.pea-cmp-col.winner { border-color:rgba(79,138,120,.3) }
+.pea-cmp-hdr {
+  padding:.8rem 1.05rem; border-bottom:1px solid var(--border-subtle);
+  display:flex; align-items:center; justify-content:space-between;
+  background:var(--surface);
+}
+.pea-cmp-label { font-size:.85rem; font-weight:700; color:var(--text); letter-spacing:-.02em }
+.pea-cmp-badge { font-size:.57rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; padding:.12rem .55rem; border-radius:100px }
+.pea-cmp-badge.win  { background:linear-gradient(90deg,var(--accent),var(--amber)); color:#fff }
+.pea-cmp-badge.lose { background:var(--surface-3); color:var(--text-dim) }
+.pea-cmp-body { padding:.8rem 1.05rem }
+.pea-cmp-row {
+  display:flex; justify-content:space-between; align-items:baseline;
+  padding:.3rem 0; border-bottom:1px solid var(--border-subtle);
+  font-size:.75rem; color:var(--text-muted);
+}
+.pea-cmp-row:last-child { border-bottom:none }
+.pea-cmp-row.hl { background:rgba(79,138,120,.05); margin:0 -.85rem; padding:.3rem .85rem }
+.pea-cmp-v { font-family:var(--mono); font-weight:600 }
+.pea-cmp-v.win  { color:var(--success) }
+.pea-cmp-v.lose { color:var(--danger) }
+.pea-cmp-v.muted{ color:var(--text-muted) }
+
+/* ── ALLOCATION ── */
+.pea-profile-pills { display:flex; flex-wrap:wrap; gap:.45rem; margin-bottom:1.2rem }
+.pea-profile-pill {
+  font-size:.72rem; font-weight:500; padding:.36rem .85rem;
+  border-radius:100px; background:var(--surface-3);
+  color:var(--text-muted); border:1.5px solid transparent;
+  cursor:pointer; transition:all .18s; letter-spacing:-.01em;
+}
+.pea-profile-pill:hover { background:var(--surface); color:var(--text) }
+.pea-profile-pill.active {
+  background:var(--accent-dim); color:var(--accent);
+  border-color:rgba(79,138,120,.25); font-weight:600;
+}
+.pea-alloc-layout { display:grid; grid-template-columns:1fr 200px; gap:1.1rem; align-items:start }
+@media(max-width:700px){ .pea-alloc-layout { grid-template-columns:1fr } }
+
+.pea-alloc-card {
+  background:var(--surface-2); border:1px solid var(--border-subtle);
+  border-radius:var(--r-sm); padding:1.1rem;
+}
+.pea-alloc-name { font-size:.98rem; font-weight:700; color:var(--text); letter-spacing:-.03em; margin-bottom:.25rem }
+.pea-alloc-desc { font-size:.73rem; color:var(--text-muted); margin-bottom:.9rem; line-height:1.55 }
+.pea-alloc-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:.6rem; margin-bottom:.9rem }
+.pea-alloc-stat {
+  text-align:center; padding:.6rem .4rem;
+  background:var(--surface); border-radius:var(--r-sm); border:1px solid var(--border-subtle);
+}
+.pea-alloc-stat-val {
+  font-family:var(--mono); font-size:.9rem; font-weight:700;
+  color:var(--text); letter-spacing:-.02em;
+}
+.pea-alloc-stat-lbl {
+  font-size:.57rem; font-weight:700; text-transform:uppercase; letter-spacing:.07em;
+  color:var(--text-dim); margin-top:.18rem;
+}
+.pea-alloc-list { display:flex; flex-direction:column; gap:.5rem }
+.pea-alloc-item { display:flex; align-items:center; gap:.6rem; font-size:.73rem; color:var(--text-muted) }
+.pea-alloc-item-name { min-width:120px }
+.pea-alloc-bar-wrap { flex:1; height:5px; background:var(--surface-3); border-radius:3px; overflow:hidden }
+.pea-alloc-bar-fill { height:100%; border-radius:3px; transition:width .4s cubic-bezier(.4,0,.2,1) }
+.pea-alloc-pct { font-family:var(--mono); font-size:.69rem; font-weight:600; color:var(--text-muted); min-width:2.5rem; text-align:right }
+
+.pea-donut-wrap {
+  background:var(--surface-2); border:1px solid var(--border-subtle);
+  border-radius:var(--r-sm); padding:1.1rem;
+  display:flex; flex-direction:column; align-items:center; gap:.7rem;
+}
+.pea-donut-canvas { width:160px; height:160px; display:block }
+
+/* ── TRANSMISSION ── */
+.pea-trans-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem }
+@media(max-width:660px){ .pea-trans-grid { grid-template-columns:1fr } }
+.pea-trans-card {
+  background:var(--surface-2); border:1.5px solid var(--border-subtle);
+  border-radius:var(--r-sm); overflow:hidden;
+}
+.pea-trans-card.best { border-color:rgba(79,138,120,.3) }
+.pea-trans-hdr {
+  padding:.7rem 1rem; border-bottom:1px solid var(--border-subtle);
+  display:flex; align-items:center; gap:.55rem; background:var(--surface);
+}
+.pea-trans-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0 }
+.pea-trans-title { font-size:.78rem; font-weight:700; color:var(--text); letter-spacing:-.02em }
+.pea-trans-body { padding:.8rem 1rem }
+.pea-trans-row {
+  display:flex; justify-content:space-between; align-items:baseline;
+  padding:.28rem 0; border-bottom:1px solid var(--border-subtle);
+  font-size:.73rem; color:var(--text-muted);
+}
+.pea-trans-row:last-child { border-bottom:none }
+.pea-trans-row.total {
+  font-weight:700; font-size:.8rem; color:var(--text);
+  border-top:2px solid var(--border); border-bottom:none;
+  margin-top:.2rem; padding-top:.45rem;
+}
+.pea-trans-v { font-family:var(--mono); font-weight:600 }
+.pea-trans-v.green { color:var(--success) }
+.pea-trans-v.red   { color:var(--danger) }
+
+/* Waterfall bar */
+.pea-wf-bar { height:16px; border-radius:4px; overflow:hidden; display:flex; gap:2px; margin:.55rem 0 }
+.pea-wf-seg { height:100%; transition:flex .5s; min-width:4px }
+.pea-wf-legend { display:flex; gap:.6rem; flex-wrap:wrap; margin-top:.3rem }
+.pea-wf-li { display:flex; align-items:center; gap:.3rem; font-size:.63rem; color:var(--text-muted) }
+.pea-wf-dot { width:7px; height:7px; border-radius:1px; flex-shrink:0 }
+
+/* ── PROJECTION TABLE ── */
+.pea-proj-wrap {
+  overflow-x:auto; border-radius:var(--r-sm);
+  border:1px solid var(--border-subtle); margin-bottom:1rem;
+}
+.pea-proj-tbl { width:100%; border-collapse:collapse; font-size:.73rem; min-width:440px }
+.pea-proj-tbl th {
+  padding:.48rem .8rem; font-size:.57rem; font-weight:700;
+  letter-spacing:.05em; text-transform:uppercase;
+  border-bottom:2px solid var(--border); text-align:right;
+  color:var(--text-dim); background:var(--surface-2);
+}
+.pea-proj-tbl th:first-child { text-align:left }
+.pea-proj-tbl td {
+  padding:.44rem .8rem; border-top:1px solid var(--border-subtle);
+  text-align:right; font-family:var(--mono); font-size:.73rem; color:var(--text-muted);
+}
+.pea-proj-tbl td:first-child {
+  text-align:left; font-family:var(--sans); font-size:.72rem; color:var(--text); font-weight:600;
+}
+.pea-proj-tbl tr.milestone td { background:var(--accent-dim) }
+.pea-proj-tbl tr.milestone td:first-child { color:var(--accent) }
+.pea-proj-tbl tr:last-child td { font-weight:700; color:var(--text) }
+
+/* ── PÉDAGOGIE ── */
+.pea-peda-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem }
+@media(max-width:700px){ .pea-peda-grid { grid-template-columns:1fr } }
+.pea-peda-full { grid-column:1/-1 }
+
+/* ── HERO PROPS ── */
+.pea-hero-props {
+  display:grid; grid-template-columns:repeat(4,1fr); gap:.75rem; margin-bottom:2rem;
+}
+@media(max-width:760px){ .pea-hero-props { grid-template-columns:1fr 1fr } }
+@media(max-width:480px){ .pea-hero-props { grid-template-columns:1fr } }
+.pea-hero-prop {
+  background:var(--surface); border:1px solid var(--border-subtle);
+  border-radius:var(--r-sm); padding:.85rem 1rem;
+  display:flex; align-items:flex-start; gap:.75rem;
+  transition:box-shadow .2s, transform .2s;
+}
+.pea-hero-prop:hover { box-shadow:0 4px 16px rgba(0,0,0,.06); transform:translateY(-1px) }
+.pea-hero-icon {
+  width:28px; height:28px; min-width:28px;
+  background:linear-gradient(135deg,var(--accent-dim),var(--amber-dim));
+  border:1px solid rgba(184,134,11,.1); border-radius:7px;
+  display:flex; align-items:center; justify-content:center;
+  color:var(--accent);
+}
+.pea-hero-icon svg { width:13px; height:13px }
+.pea-hero-prop-title { font-size:.78rem; font-weight:600; color:var(--text); letter-spacing:-.01em }
+.pea-hero-prop-desc  { font-size:.67rem; color:var(--text-muted); margin-top:.15rem; line-height:1.5 }
+</style>
+</head>
+<body>
+<div id="sp-nav-root"></div>
+
+<div class="sim-page">
+
+  <!-- ── HERO ── -->
+  <div class="sim-page-header">
+    <span class="sim-num-badge" style="background:linear-gradient(135deg,var(--accent),var(--amber));width:10px;height:10px"></span>
+    <div>
+      <div class="sim-eyebrow">Finance &amp; Capitalisation</div>
+      <h1>Plan d'Épargne <em class="gradient-text">en Actions</em></h1>
+      <p>Simulation complète de votre PEA — capitalisation long terme, optimisation fiscale après 5 ans, comparaison CTO, allocation stratégique et transmission patrimoniale.</p>
+    </div>
+  </div>
+
+  <div class="pea-hero-props">
+    <div class="pea-hero-prop">
+      <div class="pea-hero-icon">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+          <polyline points="1,11 5,7 8,9 15,3"/><polyline points="11,3 15,3 15,7"/>
+        </svg>
+      </div>
+      <div>
+        <div class="pea-hero-prop-title">Capitalisation long terme</div>
+        <div class="pea-hero-prop-desc">Projection du portefeuille sur 30 ans avec intérêts composés</div>
+      </div>
+    </div>
+    <div class="pea-hero-prop">
+      <div class="pea-hero-icon">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+          <rect x="2" y="2" width="12" height="12" rx="2"/>
+          <line x1="5" y1="8" x2="11" y2="8"/><line x1="8" y1="5" x2="8" y2="11"/>
+        </svg>
+      </div>
+      <div>
+        <div class="pea-hero-prop-title">Fiscalité optimisée</div>
+        <div class="pea-hero-prop-desc">Exonération d'IR après 5 ans — 17,2 % seulement</div>
+      </div>
+    </div>
+    <div class="pea-hero-prop">
+      <div class="pea-hero-icon">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+          <circle cx="5" cy="8" r="3"/><circle cx="11" cy="8" r="3"/>
+        </svg>
+      </div>
+      <div>
+        <div class="pea-hero-prop-title">PEA vs CTO</div>
+        <div class="pea-hero-prop-desc">Comparatif détaillé capital net et pression fiscale</div>
+      </div>
+    </div>
+    <div class="pea-hero-prop">
+      <div class="pea-hero-icon">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+          <path d="M8 2v12M4 6l4-4 4 4M4 10l4 4 4-4"/>
+        </svg>
+      </div>
+      <div>
+        <div class="pea-hero-prop-title">6 profils d'allocation</div>
+        <div class="pea-hero-prop-desc">ETF Monde, Dividendes, Croissance, Équilibré…</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CARD ── -->
+  <div class="sim-card-wrap">
+    <div class="pea-layout">
+
+      <!-- ═══ INPUTS ═══ -->
+      <aside class="pea-inp">
+
+        <div class="inp-sec">Versements</div>
+
+        <div class="field">
+          <div class="field-label">
+            <label for="pea-vi">Versement initial</label>
+            <span class="field-val" id="pea-vi-disp">10 000 €</span>
+          </div>
+          <div class="input-wrap">
+            <input type="text" inputmode="decimal" data-fmt id="pea-vi" value="10000">
+            <span class="unit">€</span>
+          </div>
+          <input type="range" id="pea-vi-sld" min="0" max="150000" step="500" value="10000">
+        </div>
+
+        <div class="field-grid-2">
+          <div class="field">
+            <div class="field-label"><label for="pea-vp">Versements réguliers</label></div>
+            <div class="input-wrap">
+              <input type="text" inputmode="decimal" data-fmt id="pea-vp" value="300">
+              <span class="unit">€</span>
+            </div>
+          </div>
+          <div class="field">
+            <div class="field-label"><label for="pea-freq">Fréquence</label></div>
+            <div class="select-wrap">
+              <select id="pea-freq">
+                <option value="12" selected>Mensuel</option>
+                <option value="4">Trimestriel</option>
+                <option value="1">Annuel</option>
+                <option value="0">Aucun</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Plafond PEA indicator -->
+        <div class="pea-plafond">
+          <span class="pea-plafond-label">Plafond 150 000 €</span>
+          <div class="pea-plafond-bar-wrap"><div class="pea-plafond-fill" id="pea-plafond-fill" style="width:6.7%"></div></div>
+          <span class="pea-plafond-val" id="pea-plafond-pct">6,7 %</span>
+        </div>
+
+        <div class="inp-sec">Rendement &amp; Durée</div>
+
+        <div class="field">
+          <div class="field-label"><label for="pea-rdt">Rendement annuel moyen</label></div>
+          <div class="range-row">
+            <input type="range" id="pea-rdt" class="range-inp" min="1" max="15" step="0.1" value="7">
+            <span class="range-disp" id="pea-rdt-disp">7,0 %</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label"><label for="pea-duree">Durée de placement</label></div>
+          <div class="range-row">
+            <input type="range" id="pea-duree" class="range-inp" min="1" max="30" step="1" value="20">
+            <span class="range-disp" id="pea-duree-disp">20 ans</span>
+          </div>
+        </div>
+
+        <div class="inp-sec">Paramètres avancés</div>
+
+        <div class="field">
+          <div class="field-label"><label for="pea-infl">Inflation annuelle</label></div>
+          <div class="range-row">
+            <input type="range" id="pea-infl" class="range-inp" min="0" max="5" step="0.1" value="2">
+            <span class="range-disp" id="pea-infl-disp">2,0 %</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label"><label for="pea-frais">Frais de gestion annuels</label></div>
+          <div class="range-row">
+            <input type="range" id="pea-frais" class="range-inp" min="0" max="2" step="0.05" value="0.3">
+            <span class="range-disp" id="pea-frais-disp">0,30 %</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label"><label for="pea-tmr">Tranche marginale IR</label></div>
+          <div class="select-wrap">
+            <select id="pea-tmr">
+              <option value="0">0 %</option>
+              <option value="11">11 %</option>
+              <option value="30" selected>30 %</option>
+              <option value="41">41 %</option>
+              <option value="45">45 %</option>
+            </select>
+          </div>
+        </div>
+
+      </aside>
+
+      <!-- ═══ MAIN ═══ -->
+      <section class="pea-main">
+
+        <!-- Tab nav -->
+        <nav class="pea-tabs-nav" role="tablist">
+          <button class="pea-tab-btn active" data-tab="capi" role="tab">
+            <svg class="pea-tab-icon" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6">
+              <polyline points="1,10 4,6 7,8 13,2"/>
+            </svg>
+            Capitalisation
+          </button>
+          <button class="pea-tab-btn" data-tab="fisc" role="tab">
+            <svg class="pea-tab-icon" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6">
+              <rect x="2" y="2" width="10" height="10" rx="2"/>
+              <line x1="5" y1="7" x2="9" y2="7"/>
+            </svg>
+            Fiscalité PEA
+          </button>
+          <button class="pea-tab-btn" data-tab="cmp" role="tab">
+            <svg class="pea-tab-icon" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6">
+              <circle cx="4.5" cy="7" r="3"/><circle cx="9.5" cy="7" r="3"/>
+            </svg>
+            PEA vs CTO
+          </button>
+          <button class="pea-tab-btn" data-tab="alloc" role="tab">
+            <svg class="pea-tab-icon" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6">
+              <circle cx="7" cy="7" r="5"/><line x1="7" y1="2" x2="7" y2="7"/><line x1="7" y1="7" x2="11" y2="9"/>
+            </svg>
+            Allocation
+          </button>
+          <button class="pea-tab-btn" data-tab="trans" role="tab">
+            <svg class="pea-tab-icon" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6">
+              <path d="M2 12 L7 3 L12 12"/><line x1="4" y1="9" x2="10" y2="9"/>
+            </svg>
+            Transmission
+          </button>
+          <button class="pea-tab-btn" data-tab="peda" role="tab">
+            <svg class="pea-tab-icon" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6">
+              <rect x="2" y="2" width="10" height="10" rx="1.5"/>
+              <line x1="4.5" y1="5" x2="9.5" y2="5"/>
+              <line x1="4.5" y1="7.5" x2="9.5" y2="7.5"/>
+              <line x1="4.5" y1="10" x2="7" y2="10"/>
+            </svg>
+            Pédagogie
+          </button>
+        </nav>
+
+        <!-- ── PANEL 1 : CAPITALISATION ── -->
+        <div class="pea-panel active" id="pea-p-capi" role="tabpanel">
+
+          <div class="pea-kpi-row pea-kpi-row-3">
+            <div class="pea-kpi accent">
+              <div class="pea-kpi-label">Valeur finale estimée</div>
+              <div class="pea-kpi-val lg green" id="kpi-final">—</div>
+              <div class="pea-kpi-sub" id="kpi-final-sub">après 20 ans</div>
+            </div>
+            <div class="pea-kpi amber">
+              <div class="pea-kpi-label">Capital investi</div>
+              <div class="pea-kpi-val" id="kpi-investi">—</div>
+              <div class="pea-kpi-sub">versements cumulés</div>
+            </div>
+            <div class="pea-kpi success">
+              <div class="pea-kpi-label">Gains cumulés</div>
+              <div class="pea-kpi-val green" id="kpi-gains">—</div>
+              <div class="pea-kpi-sub" id="kpi-gains-sub">intérêts composés</div>
+            </div>
+          </div>
+
+          <div class="pea-kpi-row pea-kpi-row-2" style="margin-bottom:1.1rem">
+            <div class="pea-kpi slate">
+              <div class="pea-kpi-label">Rendement annualisé net</div>
+              <div class="pea-kpi-val cobalt" id="kpi-twr">—</div>
+              <div class="pea-kpi-sub">après frais de gestion</div>
+            </div>
+            <div class="pea-kpi cobalt">
+              <div class="pea-kpi-label">Valeur réelle (après inflation)</div>
+              <div class="pea-kpi-val" id="kpi-reel">—</div>
+              <div class="pea-kpi-sub" id="kpi-reel-sub">pouvoir d'achat constant</div>
+            </div>
+          </div>
+
+          <!-- Chart -->
+          <div class="pea-chart-wrap">
+            <div class="pea-chart-hdr">
+              <div>
+                <div class="pea-chart-title">Évolution du portefeuille</div>
+                <div class="pea-chart-sub">Capital investi · Valeur totale · Seuil 5 ans</div>
+              </div>
+              <span class="pea-chart-badge" id="chart-badge">20 ans</span>
+            </div>
+            <canvas class="pea-canvas pea-canvas-250" id="pea-chart-capi"></canvas>
+            <div class="pea-legend">
+              <div class="pea-legend-item"><div class="pea-legend-swatch" style="background:var(--amber)"></div>Capital investi</div>
+              <div class="pea-legend-item"><div class="pea-legend-swatch" style="background:var(--accent)"></div>Valeur totale</div>
+              <div class="pea-legend-item"><div class="pea-legend-swatch" style="background:var(--slate);opacity:.6;border-top:1px dashed var(--slate)"></div>Seuil 5 ans (fiscal)</div>
+            </div>
+          </div>
+
+          <!-- Projection table -->
+          <div class="pea-proj-wrap">
+            <table class="pea-proj-tbl">
+              <thead>
+                <tr>
+                  <th>Année</th>
+                  <th>Capital investi</th>
+                  <th>Intérêts</th>
+                  <th>Valeur totale</th>
+                  <th>Gains nets</th>
+                </tr>
+              </thead>
+              <tbody id="pea-proj-body"></tbody>
+            </table>
+          </div>
+
+        </div><!-- /capi -->
+
+        <!-- ── PANEL 2 : FISCALITÉ ── -->
+        <div class="pea-panel" id="pea-p-fisc" role="tabpanel">
+
+          <!-- Timeline -->
+          <div class="pea-fisc-tl">
+            <div class="pea-fisc-zone bad">
+              <span>Avant 5 ans</span>
+              <small>PFU 30 %</small>
+            </div>
+            <div class="pea-fisc-zone good">
+              <span>Après 5 ans</span>
+              <small>PS 17,2 % uniquement</small>
+            </div>
+          </div>
+
+          <!-- 3 scenarios -->
+          <div class="pea-fisc-grid">
+            <div class="pea-fisc-card">
+              <span class="pea-fisc-badge before">PEA &lt; 5 ans</span>
+              <div class="pea-fisc-name">Clôture anticipée</div>
+              <div class="pea-fisc-row">
+                <span>Gains bruts</span>
+                <span class="pea-fisc-v muted" id="fisc-b5-gains">—</span>
+              </div>
+              <div class="pea-fisc-row">
+                <span>Prélèvements sociaux (17,2 %)</span>
+                <span class="pea-fisc-v red" id="fisc-b5-ps">—</span>
+              </div>
+              <div class="pea-fisc-row">
+                <span>Impôt IR (12,8 %)</span>
+                <span class="pea-fisc-v red" id="fisc-b5-ir">—</span>
+              </div>
+              <div class="pea-fisc-row total">
+                <span>Gains nets perçus</span>
+                <span class="pea-fisc-v" id="fisc-b5-net">—</span>
+              </div>
+            </div>
+
+            <div class="pea-fisc-card best">
+              <span class="pea-fisc-badge after">PEA &gt; 5 ans</span>
+              <span class="pea-fisc-badge best" style="margin-left:.35rem">Optimal</span>
+              <div class="pea-fisc-name">Sortie normale</div>
+              <div class="pea-fisc-row">
+                <span>Gains bruts</span>
+                <span class="pea-fisc-v muted" id="fisc-a5-gains">—</span>
+              </div>
+              <div class="pea-fisc-row">
+                <span>Prélèvements sociaux (17,2 %)</span>
+                <span class="pea-fisc-v red" id="fisc-a5-ps">—</span>
+              </div>
+              <div class="pea-fisc-row">
+                <span>IR exonéré</span>
+                <span class="pea-fisc-v green">0 €</span>
+              </div>
+              <div class="pea-fisc-row total">
+                <span>Gains nets perçus</span>
+                <span class="pea-fisc-v green" id="fisc-a5-net">—</span>
+              </div>
+            </div>
+
+            <div class="pea-fisc-card">
+              <span class="pea-fisc-badge cto">CTO (référence)</span>
+              <div class="pea-fisc-name">Compte-titres ordinaire</div>
+              <div class="pea-fisc-row">
+                <span>Gains bruts</span>
+                <span class="pea-fisc-v muted" id="fisc-cto-gains">—</span>
+              </div>
+              <div class="pea-fisc-row">
+                <span>Prélèvements sociaux (17,2 %)</span>
+                <span class="pea-fisc-v red" id="fisc-cto-ps">—</span>
+              </div>
+              <div class="pea-fisc-row">
+                <span>IR selon TMI</span>
+                <span class="pea-fisc-v red" id="fisc-cto-ir">—</span>
+              </div>
+              <div class="pea-fisc-row total">
+                <span>Gains nets perçus</span>
+                <span class="pea-fisc-v" id="fisc-cto-net">—</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Advantage callout -->
+          <div class="pea-advantage">
+            <div class="pea-advantage-left">
+              <div class="pea-advantage-title">Économie fiscale — PEA &gt; 5 ans vs CTO</div>
+              <div class="pea-advantage-sub">Impôt économisé sur la durée de simulation</div>
+            </div>
+            <div class="pea-advantage-val" id="fisc-economie">—</div>
+          </div>
+
+          <!-- Bar chart fiscal comparison -->
+          <div class="pea-chart-wrap">
+            <div class="pea-chart-hdr">
+              <div>
+                <div class="pea-chart-title">Pression fiscale comparée</div>
+                <div class="pea-chart-sub">Fiscalité totale selon le régime</div>
+              </div>
+            </div>
+            <canvas class="pea-canvas pea-canvas-160" id="pea-chart-fisc"></canvas>
+          </div>
+
+        </div><!-- /fisc -->
+
+        <!-- ── PANEL 3 : PEA vs CTO ── -->
+        <div class="pea-panel" id="pea-p-cmp" role="tabpanel">
+
+          <div class="pea-advantage" style="margin-bottom:1rem">
+            <div class="pea-advantage-left">
+              <div class="pea-advantage-title">Avantage PEA sur <span id="cmp-duree-label">20</span> ans</div>
+              <div class="pea-advantage-sub">Capital net supplémentaire vs compte-titres ordinaire</div>
+            </div>
+            <div class="pea-advantage-val" id="cmp-advantage">—</div>
+          </div>
+
+          <div class="pea-cmp-grid">
+            <div class="pea-cmp-col winner">
+              <div class="pea-cmp-hdr">
+                <span class="pea-cmp-label">PEA</span>
+                <span class="pea-cmp-badge win">Recommandé</span>
+              </div>
+              <div class="pea-cmp-body">
+                <div class="pea-cmp-row">
+                  <span>Capital investi</span>
+                  <span class="pea-cmp-v" id="cmp-pea-investi">—</span>
+                </div>
+                <div class="pea-cmp-row hl">
+                  <span>Valeur finale brute</span>
+                  <span class="pea-cmp-v" id="cmp-pea-brut">—</span>
+                </div>
+                <div class="pea-cmp-row">
+                  <span>Fiscalité totale</span>
+                  <span class="pea-cmp-v" id="cmp-pea-fisc">—</span>
+                </div>
+                <div class="pea-cmp-row hl">
+                  <span>Capital net perçu</span>
+                  <span class="pea-cmp-v win" id="cmp-pea-net">—</span>
+                </div>
+                <div class="pea-cmp-row">
+                  <span>Taux d'imposition effectif</span>
+                  <span class="pea-cmp-v win" id="cmp-pea-taux">—</span>
+                </div>
+                <div class="pea-cmp-row">
+                  <span>Gain net / capital investi</span>
+                  <span class="pea-cmp-v" id="cmp-pea-mult">—</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="pea-cmp-col">
+              <div class="pea-cmp-hdr">
+                <span class="pea-cmp-label">CTO</span>
+                <span class="pea-cmp-badge lose">Référence</span>
+              </div>
+              <div class="pea-cmp-body">
+                <div class="pea-cmp-row">
+                  <span>Capital investi</span>
+                  <span class="pea-cmp-v" id="cmp-cto-investi">—</span>
+                </div>
+                <div class="pea-cmp-row hl">
+                  <span>Valeur finale brute</span>
+                  <span class="pea-cmp-v" id="cmp-cto-brut">—</span>
+                </div>
+                <div class="pea-cmp-row">
+                  <span>Fiscalité totale</span>
+                  <span class="pea-cmp-v lose" id="cmp-cto-fisc">—</span>
+                </div>
+                <div class="pea-cmp-row hl">
+                  <span>Capital net perçu</span>
+                  <span class="pea-cmp-v" id="cmp-cto-net">—</span>
+                </div>
+                <div class="pea-cmp-row">
+                  <span>Taux d'imposition effectif</span>
+                  <span class="pea-cmp-v lose" id="cmp-cto-taux">—</span>
+                </div>
+                <div class="pea-cmp-row">
+                  <span>Gain net / capital investi</span>
+                  <span class="pea-cmp-v" id="cmp-cto-mult">—</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dual line chart -->
+          <div class="pea-chart-wrap">
+            <div class="pea-chart-hdr">
+              <div>
+                <div class="pea-chart-title">Capital net après impôt — évolution comparée</div>
+                <div class="pea-chart-sub">PEA (après 5 ans) vs CTO sur la durée simulée</div>
+              </div>
+            </div>
+            <canvas class="pea-canvas pea-canvas-200" id="pea-chart-cmp"></canvas>
+            <div class="pea-legend">
+              <div class="pea-legend-item"><div class="pea-legend-swatch" style="background:var(--accent)"></div>PEA net</div>
+              <div class="pea-legend-item"><div class="pea-legend-swatch" style="background:var(--slate)"></div>CTO net</div>
+            </div>
+          </div>
+
+        </div><!-- /cmp -->
+
+        <!-- ── PANEL 4 : ALLOCATION ── -->
+        <div class="pea-panel" id="pea-p-alloc" role="tabpanel">
+
+          <div class="pea-profile-pills" id="pea-profile-pills">
+            <button class="pea-profile-pill active" data-profile="etf_monde">ETF Monde</button>
+            <button class="pea-profile-pill" data-profile="dividendes">Dividendes</button>
+            <button class="pea-profile-pill" data-profile="croissance">Croissance</button>
+            <button class="pea-profile-pill" data-profile="equilibre">Équilibré</button>
+            <button class="pea-profile-pill" data-profile="prudent">Prudent</button>
+            <button class="pea-profile-pill" data-profile="dynamique">Dynamique</button>
+          </div>
+
+          <div class="pea-alloc-layout">
+            <div class="pea-alloc-card">
+              <div class="pea-alloc-name" id="alloc-name">ETF Monde</div>
+              <div class="pea-alloc-desc" id="alloc-desc">Exposition mondiale diversifiée, principalement marchés développés. Stratégie passive à faibles coûts, idéale pour le long terme.</div>
+              <div class="pea-alloc-stats">
+                <div class="pea-alloc-stat">
+                  <div class="pea-alloc-stat-val" id="alloc-rdt">7,5 %</div>
+                  <div class="pea-alloc-stat-lbl">Rendement</div>
+                </div>
+                <div class="pea-alloc-stat">
+                  <div class="pea-alloc-stat-val" id="alloc-vola">~15 %</div>
+                  <div class="pea-alloc-stat-lbl">Volatilité</div>
+                </div>
+                <div class="pea-alloc-stat">
+                  <div class="pea-alloc-stat-val" id="alloc-horizon">8+ ans</div>
+                  <div class="pea-alloc-stat-lbl">Horizon</div>
+                </div>
+              </div>
+              <div class="pea-alloc-list" id="alloc-list"></div>
+            </div>
+
+            <div class="pea-donut-wrap">
+              <canvas class="pea-donut-canvas" id="pea-chart-donut"></canvas>
+              <div id="alloc-donut-legend" style="width:100%"></div>
+            </div>
+          </div>
+
+          <!-- Simulation with selected profile -->
+          <div class="pea-chart-wrap" style="margin-top:1.1rem">
+            <div class="pea-chart-hdr">
+              <div>
+                <div class="pea-chart-title">Projection avec ce profil</div>
+                <div class="pea-chart-sub" id="alloc-proj-sub">Simulation sur votre durée paramétrée</div>
+              </div>
+              <div class="pea-kpi-row" style="margin:0">
+                <div style="text-align:right">
+                  <div style="font-family:var(--mono);font-size:.85rem;font-weight:700;color:var(--accent)" id="alloc-proj-final">—</div>
+                  <div style="font-size:.6rem;color:var(--text-dim);margin-top:.1rem">valeur finale</div>
+                </div>
+              </div>
+            </div>
+            <canvas class="pea-canvas pea-canvas-160" id="pea-chart-alloc"></canvas>
+          </div>
+
+        </div><!-- /alloc -->
+
+        <!-- ── PANEL 5 : TRANSMISSION ── -->
+        <div class="pea-panel" id="pea-p-trans" role="tabpanel">
+
+          <p class="pedago-p" style="margin-bottom:1rem">Le PEA se clôture au décès du titulaire. Les héritiers reçoivent le portefeuille après prélèvements sociaux sur les gains latents. Comparativement, l'assurance-vie offre une fiscalité successorale bien plus favorable.</p>
+
+          <div class="pea-trans-grid">
+            <div class="pea-trans-card">
+              <div class="pea-trans-hdr">
+                <div class="pea-trans-dot" style="background:var(--danger)"></div>
+                <span class="pea-trans-title">PEA — Succession</span>
+              </div>
+              <div class="pea-trans-body">
+                <div class="pea-trans-row">
+                  <span>Valeur du portefeuille</span>
+                  <span class="pea-trans-v" id="trans-pea-val">—</span>
+                </div>
+                <div class="pea-trans-row">
+                  <span>Capital investi</span>
+                  <span class="pea-trans-v" id="trans-pea-investi">—</span>
+                </div>
+                <div class="pea-trans-row">
+                  <span>Gains latents</span>
+                  <span class="pea-trans-v" id="trans-pea-gains">—</span>
+                </div>
+                <div class="pea-trans-row">
+                  <span>Prélèvements sociaux (17,2 %)</span>
+                  <span class="pea-trans-v red" id="trans-pea-ps">—</span>
+                </div>
+                <div class="pea-trans-row">
+                  <span>IR exonéré (plan &gt; 5 ans)</span>
+                  <span class="pea-trans-v" style="color:var(--text-dim)">0 €</span>
+                </div>
+                <div class="pea-trans-row total">
+                  <span>Capital transmis net</span>
+                  <span class="pea-trans-v green" id="trans-pea-net">—</span>
+                </div>
+                <!-- Waterfall -->
+                <div class="pea-wf-bar" id="trans-pea-wf">
+                  <div class="pea-wf-seg" style="background:var(--accent);flex:83"></div>
+                  <div class="pea-wf-seg" style="background:var(--danger);flex:17"></div>
+                </div>
+                <div class="pea-wf-legend">
+                  <div class="pea-wf-li"><div class="pea-wf-dot" style="background:var(--accent)"></div>Capital net</div>
+                  <div class="pea-wf-li"><div class="pea-wf-dot" style="background:var(--danger)"></div>PS (17,2 % sur gains)</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="pea-trans-card best">
+              <div class="pea-trans-hdr">
+                <div class="pea-trans-dot" style="background:var(--accent)"></div>
+                <span class="pea-trans-title">Assurance-vie — Succession</span>
+              </div>
+              <div class="pea-trans-body">
+                <div class="pea-trans-row">
+                  <span>Valeur du contrat</span>
+                  <span class="pea-trans-v" id="trans-av-val">—</span>
+                </div>
+                <div class="pea-trans-row">
+                  <span>Abattement / bénéficiaire</span>
+                  <span class="pea-trans-v green">152 500 €</span>
+                </div>
+                <div class="pea-trans-row">
+                  <span>Au-delà : prélèvement 20 %</span>
+                  <span class="pea-trans-v" id="trans-av-tax">—</span>
+                </div>
+                <div class="pea-trans-row">
+                  <span>Prélèvements sociaux (17,2 %)</span>
+                  <span class="pea-trans-v red" id="trans-av-ps">—</span>
+                </div>
+                <div class="pea-trans-row total">
+                  <span>Capital transmis net (1 bénef.)</span>
+                  <span class="pea-trans-v green" id="trans-av-net">—</span>
+                </div>
+                <div class="pea-wf-bar" id="trans-av-wf"></div>
+                <div class="pea-wf-legend">
+                  <div class="pea-wf-li"><div class="pea-wf-dot" style="background:var(--accent)"></div>Capital net</div>
+                  <div class="pea-wf-li"><div class="pea-wf-dot" style="background:var(--amber)"></div>Abattement utilisé</div>
+                  <div class="pea-wf-li"><div class="pea-wf-dot" style="background:var(--danger)"></div>Fiscalité résiduelle</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Avantage AV -->
+          <div class="pea-advantage">
+            <div class="pea-advantage-left">
+              <div class="pea-advantage-title">Avantage assurance-vie à la succession</div>
+              <div class="pea-advantage-sub">Capital transmis net supplémentaire vs PEA</div>
+            </div>
+            <div class="pea-advantage-val" id="trans-avantage">—</div>
+          </div>
+
+          <div class="pedago-alert">
+            <strong>À noter :</strong> cette simulation est simplifiée pour un bénéficiaire. La fiscalité successorale dépend de nombreux paramètres (date des versements, âge du souscripteur, nombre de bénéficiaires). Consultez un conseiller en gestion de patrimoine pour une analyse personnalisée.
+          </div>
+
+        </div><!-- /trans -->
+
+        <!-- ── PANEL 6 : PÉDAGOGIE ── -->
+        <div class="pea-panel" id="pea-p-peda" role="tabpanel">
+
+          <div class="pea-peda-grid">
+
+            <div class="pedago-card">
+              <div class="pedago-card-header">
+                <div class="pedago-card-dot"></div>
+                <div class="pedago-card-title">Qu'est-ce que le PEA ?</div>
+              </div>
+              <div class="pedago-card-body">
+                <p class="pedago-p">Le <strong>Plan d'Épargne en Actions</strong> est une enveloppe fiscale française permettant d'investir dans des actions européennes (ou des fonds y exposés) tout en bénéficiant d'une <em>exonération d'impôt sur le revenu</em> après 5 ans de détention.</p>
+                <p class="pedago-p">Il existe deux formes : le <strong>PEA bancaire</strong> (plafond 150 000 €) qui investit via un compte-titres, et le <strong>PEA assurance</strong> (plafond 150 000 €) qui investit via des unités de compte. Le <strong>PEA-PME</strong> offre un plafond additionnel de 225 000 €.</p>
+                <div class="pedago-tip"><strong>Plafond cumulé :</strong> PEA + PEA-PME = 375 000 € de versements maximum par foyer fiscal.</div>
+              </div>
+            </div>
+
+            <div class="pedago-card">
+              <div class="pedago-card-header">
+                <div class="pedago-card-dot"></div>
+                <div class="pedago-card-title">Fiscalité détaillée</div>
+              </div>
+              <div class="pedago-card-body">
+                <p class="pedago-p"><strong>Avant 5 ans :</strong> tout retrait entraîne la clôture du plan. Les gains sont soumis au Prélèvement Forfaitaire Unique (PFU) de 30 % = 12,8 % IR + 17,2 % prélèvements sociaux.</p>
+                <p class="pedago-p"><strong>Après 5 ans :</strong> les retraits partiels ou totaux sont exonérés d'IR. Seuls les prélèvements sociaux de <em>17,2 %</em> s'appliquent sur les gains. Le plan reste ouvert après un retrait partiel.</p>
+                <div class="pedago-alert"><strong>Exception :</strong> les dividendes perçus sur certains titres non cotés sont soumis aux prélèvements sociaux dès leur versement, même dans le PEA.</div>
+              </div>
+            </div>
+
+            <div class="pedago-card">
+              <div class="pedago-card-header">
+                <div class="pedago-card-dot"></div>
+                <div class="pedago-card-title">Avantages stratégiques</div>
+              </div>
+              <div class="pedago-card-body">
+                <p class="pedago-p"><strong>Capitalisation sans frottement fiscal :</strong> au sein du PEA, les plus-values et dividendes sont réinvestis librement, sans prélèvement annuel. Les intérêts composent sur la totalité du portefeuille.</p>
+                <p class="pedago-p"><strong>Sortie en rente :</strong> après 5 ans, il est possible de convertir le PEA en rente viagère défiscalisée — uniquement des prélèvements sociaux sur les arrérages.</p>
+                <div class="pedago-tip"><strong>Stratégie optimale :</strong> ouvrir le PEA le plus tôt possible pour faire courir le délai de 5 ans, même avec un investissement symbolique.</div>
+              </div>
+            </div>
+
+            <div class="pedago-card">
+              <div class="pedago-card-header">
+                <div class="pedago-card-dot"></div>
+                <div class="pedago-card-title">Risques &amp; Limites</div>
+              </div>
+              <div class="pedago-card-body">
+                <p class="pedago-p"><strong>Risque de marché :</strong> le PEA est investi en actions — actif risqué soumis aux fluctuations des marchés financiers. La valeur du portefeuille peut baisser, y compris en dessous du montant investi.</p>
+                <p class="pedago-p"><strong>Éligibilité géographique :</strong> les titres doivent être émis dans l'EEE (Espace Économique Européen). Les actions américaines, asiatiques ou émergentes ne sont pas directement éligibles — sauf via des ETF de droit européen.</p>
+                <div class="pedago-alert"><strong>Liquidité :</strong> avant 5 ans, tout retrait clôture définitivement le plan. La règle des 5 ans est contraignante — anticipez votre horizon avant d'investir.</div>
+              </div>
+            </div>
+
+            <div class="pedago-card pea-peda-full">
+              <div class="pedago-card-header">
+                <div class="pedago-card-dot"></div>
+                <div class="pedago-card-title">Stratégie d'investissement recommandée</div>
+              </div>
+              <div class="pedago-card-body">
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.85rem">
+                  <div class="pedago-block">
+                    <div class="pedago-block-label">Phase 1 — Démarrage (0-5 ans)</div>
+                    <p class="pedago-block-text">Versement régulier mensuel. Investissement progressif dans un ETF World diversifié. Objectif : laisser courir le délai fiscal et bâtir une base solide via le <strong>dollar-cost averaging</strong>.</p>
+                  </div>
+                  <div class="pedago-block">
+                    <div class="pedago-block-label">Phase 2 — Capitalisation (5-15 ans)</div>
+                    <p class="pedago-block-text">Le plan est fiscalement optimal. Maintien ou augmentation des versements. Les intérêts composés produisent leur effet de levier maximal sur la <strong>deuxième décennie</strong> de détention.</p>
+                  </div>
+                  <div class="pedago-block">
+                    <div class="pedago-block-label">Phase 3 — Sécurisation (15+ ans)</div>
+                    <p class="pedago-block-text">Rééquilibrage progressif vers des actifs moins volatils. Anticipation de la sortie : capital ou rente viagère. Possibilité de <strong>retraits partiels</strong> sans clôture après 5 ans de détention.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div><!-- /peda -->
+
+      </section><!-- /pea-main -->
+    </div><!-- /pea-layout -->
+  </div><!-- /sim-card-wrap -->
+
+</div><!-- /sim-page -->
+
+<footer>
+  <span>PATRIMONIA.AI</span> — Simulateur PEA — Calculs indicatifs basés sur le barème fiscal 2026. Prélèvements sociaux : 17,2 %. PFU : 30 % (12,8 % IR + 17,2 % PS). Plafond PEA : 150 000 €.<br>
+  Les projections de rendement ne constituent pas une garantie de performance future. Données à titre pédagogique uniquement — consultez un conseiller en gestion de patrimoine.
+</footer>
+
+<script>
+/* ════════════════════════════════════════════
+   PEA — Logique métier & rendu UI
+════════════════════════════════════════════ */
+
+/* ─── CONSTANTES FISCALES ─── */
+const PS   = 0.172;   // prélèvements sociaux
+const PFU  = 0.30;    // flat tax (IR 12.8% + PS 17.2%)
+const IR_PFU = 0.128;
+const PLAFOND = 150000;
+
+/* ─── PROFILS ALLOCATION ─── */
+const PROFILES = {
+  etf_monde:  { name:'ETF Monde', rendement:7.5, vola:'~15 %', horizon:'8+ ans',
+    desc:'Exposition mondiale diversifiée, principalement marchés développés. Stratégie passive à faibles coûts, idéale pour le long terme.',
+    segs:[{l:'Actions US & Canada',p:65,c:'#4F8A78'},{l:'Actions Europe',p:20,c:'#B8860B'},{l:'Marchés émergents',p:10,c:'#4A6B8C'},{l:'Liquidités',p:5,c:'#D2D2D7'}]},
+  dividendes: { name:'Dividendes', rendement:5.0, vola:'~10 %', horizon:'6+ ans',
+    desc:'Sélection d\'actions à dividendes élevés et réguliers. Génère un flux de revenus tout en limitant la volatilité globale.',
+    segs:[{l:'Actions dividendes EU',p:60,c:'#4F8A78'},{l:'REIT européens',p:20,c:'#B8860B'},{l:'Obligations corp.',p:15,c:'#4A6B8C'},{l:'Liquidités',p:5,c:'#D2D2D7'}]},
+  croissance: { name:'Croissance', rendement:9.0, vola:'~20 %', horizon:'10+ ans',
+    desc:'Portefeuille orienté croissance forte. Concentration sur la technologie, la santé et les secteurs innovants. Volatilité élevée assumée.',
+    segs:[{l:'Tech & Innovation',p:50,c:'#4F8A78'},{l:'Small & Mid Cap',p:25,c:'#B8860B'},{l:'EM Growth',p:20,c:'#4A6B8C'},{l:'Liquidités',p:5,c:'#D2D2D7'}]},
+  equilibre:  { name:'Équilibré', rendement:5.0, vola:'~9 %', horizon:'5+ ans',
+    desc:'Allocation classique 60/40 — actions et obligations. Profil modéré adapté à un horizon de 5 à 10 ans avec tolérance au risque intermédiaire.',
+    segs:[{l:'Actions européennes',p:60,c:'#4F8A78'},{l:'Obligations EU',p:30,c:'#B8860B'},{l:'Monétaire',p:5,c:'#4A6B8C'},{l:'Liquidités',p:5,c:'#D2D2D7'}]},
+  prudent:    { name:'Prudent', rendement:3.0, vola:'~5 %', horizon:'3+ ans',
+    desc:'Préservation du capital avec une faible exposition actions. Adapté aux profils défensifs ou à un horizon court.',
+    segs:[{l:'Obligations souv.',p:55,c:'#4A6B8C'},{l:'Actions défensives',p:25,c:'#4F8A78'},{l:'Monétaire',p:15,c:'#B8860B'},{l:'Liquidités',p:5,c:'#D2D2D7'}]},
+  dynamique:  { name:'Dynamique', rendement:8.5, vola:'~18 %', horizon:'8+ ans',
+    desc:'Forte conviction actions internationales. Surpondération marchés développés + small caps. Profil offensif pour investisseurs expérimentés.',
+    segs:[{l:'Actions monde',p:80,c:'#4F8A78'},{l:'Small & Mid Cap',p:15,c:'#B8860B'},{l:'Liquidités',p:5,c:'#D2D2D7'}]}
+};
+let currentProfile = 'etf_monde';
+
+/* ─── HELPERS ─── */
+const fmt = v => new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(v);
+const fmtPct = (v,dec=1) => v.toFixed(dec).replace('.',',') + ' %';
+const fmtX = (v,dec=1) => '×' + v.toFixed(dec).replace('.',',');
+const $ = id => document.getElementById(id);
+function setTxt(id, val) { const el=$(id); if(el) el.textContent=val; }
+function syncSlider(inp, sld) {
+  const min=+sld.min, max=+sld.max, val=+inp.value.replace(/\s/g,'');
+  const pct = Math.min(100,Math.max(0,(val-min)/(max-min)*100));
+  sld.value = val;
+  sld.style.setProperty('--pct', pct+'%');
+}
+
+/* ─── CALCUL PORTEFEUILLE ─── */
+function calcPortfolio(initial, monthly, freq, rate, fees, years) {
+  const netRate = (rate - fees) / 100;
+  const annualInflow = monthly * freq;
+  let portfolio = initial;
+  let invested = initial;
+  const data = [{year:0, invested, total:portfolio}];
+  for (let y=1; y<=years; y++) {
+    portfolio = portfolio * (1 + netRate) + annualInflow;
+    invested += annualInflow;
+    data.push({year:y, invested:Math.min(invested, PLAFOND + annualInflow*y), total:Math.max(0,portfolio)});
+  }
+  return data;
+}
+
+/* ─── LECTURE INPUTS ─── */
+function getInputs() {
+  const fmtToNum = id => {
+    const el=$(id); if(!el) return 0;
+    return parseFloat(el.value.replace(/\s/g,'').replace(',','.')) || 0;
+  };
+  return {
+    initial: fmtToNum('pea-vi'),
+    monthly: fmtToNum('pea-vp'),
+    freq:    +($('pea-freq').value),
+    rate:    +($('pea-rdt').value),
+    fees:    +($('pea-frais').value),
+    duree:   +($('pea-duree').value),
+    infl:    +($('pea-infl').value),
+    tmr:     +($('pea-tmr').value)
+  };
+}
+
+/* ─── MISE À JOUR PLAFOND ─── */
+function updatePlafond(initial) {
+  const pct = Math.min(100, initial / PLAFOND * 100);
+  const fill = $('pea-plafond-fill');
+  const val  = $('pea-plafond-pct');
+  if(fill) fill.style.width = pct.toFixed(1)+'%';
+  if(val)  val.textContent  = fmtPct(pct);
+}
+
+/* ─── ONGLET : CAPITALISATION ─── */
+function renderCapi(data, infl, duree) {
+  const last = data[data.length-1];
+  const gains = last.total - last.invested;
+  const realVal = last.total / Math.pow(1 + infl/100, duree);
+  // Annualized return on invested capital
+  const mult = last.invested > 0 ? last.total / last.invested : 1;
+  const annReturn = duree > 0 ? (Math.pow(mult, 1/duree)-1)*100 : 0;
+
+  setTxt('kpi-final', fmt(last.total));
+  setTxt('kpi-final-sub', `après ${duree} an${duree>1?'s':''}`);
+  setTxt('kpi-investi', fmt(last.invested));
+  setTxt('kpi-gains', fmt(gains));
+  setTxt('kpi-gains-sub', `${fmtPct(gains/last.invested*100)} du capital investi`);
+  setTxt('kpi-twr', fmtPct(annReturn));
+  setTxt('kpi-reel', fmt(realVal));
+  setTxt('kpi-reel-sub', `pouvoir d'achat en €${new Date().getFullYear()}`);
+  setTxt('chart-badge', `${duree} an${duree>1?'s':''}`);
+
+  // Projection table
+  const milestones = new Set([1,5,10,15,20,25,30].filter(y=>y<=duree));
+  milestones.add(duree);
+  const tbody = $('pea-proj-body');
+  if(!tbody) return;
+  tbody.innerHTML = '';
+  [...milestones].sort((a,b)=>a-b).forEach(y => {
+    const d = data[y] || data[data.length-1];
+    const g = d.total - d.invested;
+    const isMilestone = y===5||y===duree;
+    const tr = document.createElement('tr');
+    if(isMilestone) tr.className='milestone';
+    tr.innerHTML = `
+      <td>${y === duree && y!==5?'Fin ('+y+' ans)':y+' an'+(y>1?'s':'')+(y===5?' ★ fiscal':'')}</td>
+      <td>${fmt(d.invested)}</td>
+      <td>${fmt(g)}</td>
+      <td>${fmt(d.total)}</td>
+      <td>${g>0?'+':''} ${fmt(g)}</td>`;
+    tbody.appendChild(tr);
+  });
+
+  drawAreaChart($('pea-chart-capi'), data, {milestone5:true});
+}
+
+/* ─── ONGLET : FISCALITÉ ─── */
+function renderFisc(data, tmr) {
+  const last = data[data.length-1];
+  const gains = Math.max(0, last.total - last.invested);
+
+  // PEA < 5 ans
+  const b5_ps = gains * PS;
+  const b5_ir = gains * IR_PFU;
+  const b5_net = gains - b5_ps - b5_ir;
+
+  // PEA > 5 ans
+  const a5_ps = gains * PS;
+  const a5_net = gains - a5_ps;
+
+  // CTO — option PFU ou barème selon TMI
+  const cto_ir_rate = Math.min(tmr/100, IR_PFU); // PFU souvent plus favorable
+  const actual_ir = tmr <= 11 ? 0 : IR_PFU; // approximation: option barème si TMI 0/11%
+  const cto_ps = gains * PS;
+  const cto_ir = gains * actual_ir;
+  const cto_net = gains - cto_ps - cto_ir;
+
+  setTxt('fisc-b5-gains', fmt(gains));
+  setTxt('fisc-b5-ps', '−'+fmt(b5_ps));
+  setTxt('fisc-b5-ir', '−'+fmt(b5_ir));
+  setTxt('fisc-b5-net', fmt(b5_net));
+  setTxt('fisc-a5-gains', fmt(gains));
+  setTxt('fisc-a5-ps', '−'+fmt(a5_ps));
+  setTxt('fisc-a5-net', fmt(a5_net));
+  setTxt('fisc-cto-gains', fmt(gains));
+  setTxt('fisc-cto-ps', '−'+fmt(cto_ps));
+  setTxt('fisc-cto-ir', '−'+fmt(cto_ir));
+  setTxt('fisc-cto-net', fmt(cto_net));
+  setTxt('fisc-economie', '+'+fmt(a5_net - cto_net));
+
+  drawBarChart($('pea-chart-fisc'), [
+    {label:'PEA < 5 ans', tax:b5_ps+b5_ir, color:'var(--danger)'},
+    {label:'PEA > 5 ans', tax:a5_ps, color:'var(--accent)'},
+    {label:'CTO', tax:cto_ps+cto_ir, color:'var(--slate)'}
+  ], gains);
+}
+
+/* ─── ONGLET : PEA vs CTO ─── */
+function renderCmp(data, tmr, duree) {
+  const last = data[data.length-1];
+  const gains = Math.max(0, last.total - last.invested);
+  const a5_fisc = gains * PS;
+  const cto_fisc = gains * (PS + (tmr<=11?0:IR_PFU));
+  const pea_net = last.total - a5_fisc;
+  const cto_net = last.total - cto_fisc;
+  const advantage = pea_net - cto_net;
+
+  setTxt('cmp-duree-label', duree);
+  setTxt('cmp-advantage', '+'+fmt(advantage));
+  setTxt('cmp-pea-investi', fmt(last.invested));
+  setTxt('cmp-pea-brut', fmt(last.total));
+  setTxt('cmp-pea-fisc', '−'+fmt(a5_fisc));
+  setTxt('cmp-pea-net', fmt(pea_net));
+  setTxt('cmp-pea-taux', fmtPct(gains>0?a5_fisc/gains*100:0));
+  setTxt('cmp-pea-mult', fmtX(pea_net/last.invested));
+  setTxt('cmp-cto-investi', fmt(last.invested));
+  setTxt('cmp-cto-brut', fmt(last.total));
+  setTxt('cmp-cto-fisc', '−'+fmt(cto_fisc));
+  setTxt('cmp-cto-net', fmt(cto_net));
+  setTxt('cmp-cto-taux', fmtPct(gains>0?cto_fisc/gains*100:0));
+  setTxt('cmp-cto-mult', fmtX(cto_net/last.invested));
+
+  // Dual line chart: cumulative net (simplified — same gross, different exit tax)
+  drawDualLineChart($('pea-chart-cmp'), data, tmr);
+}
+
+/* ─── ONGLET : ALLOCATION ─── */
+function renderAlloc(profile, data, duree) {
+  const p = PROFILES[profile];
+  setTxt('alloc-name', p.name);
+  $('alloc-desc').textContent = p.desc;
+  setTxt('alloc-rdt', fmtPct(p.rendement));
+  setTxt('alloc-vola', p.vola);
+  setTxt('alloc-horizon', p.horizon);
+
+  // Allocation list
+  const list = $('alloc-list');
+  if(list) {
+    list.innerHTML = p.segs.map(s=>`
+      <div class="pea-alloc-item">
+        <span class="pea-alloc-item-name">${s.l}</span>
+        <div class="pea-alloc-bar-wrap">
+          <div class="pea-alloc-bar-fill" style="width:${s.p}%;background:${s.c}"></div>
+        </div>
+        <span class="pea-alloc-pct">${s.p} %</span>
+      </div>`).join('');
+  }
+
+  // Donut
+  drawDonut($('pea-chart-donut'), p.segs);
+
+  // Donut legend
+  const leg = $('alloc-donut-legend');
+  if(leg) {
+    leg.innerHTML = p.segs.map(s=>`
+      <div style="display:flex;align-items:center;gap:.35rem;font-size:.65rem;color:var(--text-muted);margin-bottom:.25rem">
+        <div style="width:8px;height:8px;border-radius:2px;background:${s.c};flex-shrink:0"></div>${s.l} — ${s.p} %
+      </div>`).join('');
+  }
+
+  // Profile-specific projection chart
+  const inp = getInputs();
+  const profData = calcPortfolio(inp.initial, inp.monthly, inp.freq, p.rendement, inp.fees, inp.duree);
+  const final = profData[profData.length-1];
+  setTxt('alloc-proj-final', fmt(final.total));
+  $('alloc-proj-sub') && ($('alloc-proj-sub').textContent = `Projection ${p.name} sur ${inp.duree} ans`);
+  drawAreaChart($('pea-chart-alloc'), profData, {milestone5:false, compact:true});
+}
+
+/* ─── ONGLET : TRANSMISSION ─── */
+function renderTrans(data) {
+  const last = data[data.length-1];
+  const val = last.total;
+  const inv = last.invested;
+  const gains = Math.max(0, val - inv);
+  const ps = gains * PS;
+  const pea_net = val - ps;
+
+  setTxt('trans-pea-val', fmt(val));
+  setTxt('trans-pea-investi', fmt(inv));
+  setTxt('trans-pea-gains', fmt(gains));
+  setTxt('trans-pea-ps', '−'+fmt(ps));
+  setTxt('trans-pea-net', fmt(pea_net));
+
+  // PEA waterfall bar
+  const wf = $('trans-pea-wf');
+  if(wf&&val>0) {
+    const netFlex = Math.round(pea_net/val*100);
+    const taxFlex = 100-netFlex;
+    wf.innerHTML = `<div class="pea-wf-seg" style="background:var(--accent);flex:${netFlex}"></div><div class="pea-wf-seg" style="background:var(--danger);flex:${taxFlex}"></div>`;
+  }
+
+  // AV simulation (même montant investi)
+  const abo = 152500;
+  const av_ps = gains * PS;
+  const taxable = Math.max(0, val - abo - inv); // simplified
+  const av_tax20 = taxable * 0.20;
+  const av_net = val - av_ps - av_tax20;
+  setTxt('trans-av-val', fmt(val));
+  setTxt('trans-av-tax', av_tax20>0?'−'+fmt(av_tax20):'0 €');
+  setTxt('trans-av-ps', '−'+fmt(av_ps));
+  setTxt('trans-av-net', fmt(av_net));
+
+  // AV waterfall bar
+  const avWf = $('trans-av-wf');
+  if(avWf&&val>0) {
+    const netF = Math.round(av_net/val*100);
+    const aboF = Math.round(Math.min(abo,val)/val*100);
+    const taxF = Math.max(0,100-netF-aboF);
+    avWf.innerHTML = `<div class="pea-wf-seg" style="background:var(--accent);flex:${netF}"></div><div class="pea-wf-seg" style="background:var(--amber);flex:${aboF}"></div>${taxF>0?`<div class="pea-wf-seg" style="background:var(--danger);flex:${taxF}"></div>`:''}`;
+  }
+
+  const avantage = av_net - pea_net;
+  setTxt('trans-avantage', avantage>=0?'+'+fmt(avantage):fmt(avantage));
+}
+
+/* ─── CHART : AREA (capitalisation) ─── */
+function drawAreaChart(canvas, data, opts={}) {
+  if(!canvas) return;
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.offsetWidth;
+  const H = canvas.offsetHeight;
+  canvas.width  = W * dpr;
+  canvas.height = H * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0,0,W,H);
+
+  if(data.length < 2) return;
+  const pad = opts.compact ? {t:14,r:14,b:32,l:52} : {t:18,r:18,b:38,l:62};
+  const cw = W - pad.l - pad.r;
+  const ch = H - pad.t - pad.b;
+  const maxY = Math.max(...data.map(d=>d.total)) * 1.08;
+  const n = data.length - 1;
+
+  const xS = i => pad.l + (i/n)*cw;
+  const yS = v => pad.t + ch - Math.max(0,Math.min(1,v/maxY))*ch;
+
+  // Grid
+  ctx.strokeStyle = 'rgba(0,0,0,.06)';
+  ctx.lineWidth = 1;
+  [.25,.5,.75,1].forEach(f=>{
+    const y = pad.t + ch*(1-f);
+    ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(pad.l+cw,y); ctx.stroke();
+    if(!opts.compact) {
+      ctx.fillStyle = '#98989D';
+      ctx.font = `500 ${dpr>1?9:9}px system-ui`;
+      ctx.textAlign = 'right';
+      ctx.fillText(fmtK(maxY*f), pad.l-6, y+3);
+    }
+  });
+
+  // Filled area: invested
+  ctx.beginPath();
+  ctx.moveTo(xS(0), yS(data[0].invested));
+  data.forEach((d,i) => ctx.lineTo(xS(i), yS(d.invested)));
+  ctx.lineTo(xS(n), yS(0)); ctx.lineTo(xS(0), yS(0)); ctx.closePath();
+  const g1 = ctx.createLinearGradient(0,pad.t,0,H);
+  g1.addColorStop(0,'rgba(184,134,11,.3)'); g1.addColorStop(1,'rgba(184,134,11,.04)');
+  ctx.fillStyle = g1; ctx.fill();
+
+  // Filled area: gains (between total and invested)
+  ctx.beginPath();
+  ctx.moveTo(xS(0), yS(data[0].total));
+  data.forEach((d,i) => ctx.lineTo(xS(i), yS(d.total)));
+  for(let i=n;i>=0;i--) ctx.lineTo(xS(i), yS(data[i].invested));
+  ctx.closePath();
+  const g2 = ctx.createLinearGradient(0,pad.t,0,H);
+  g2.addColorStop(0,'rgba(79,138,120,.35)'); g2.addColorStop(1,'rgba(79,138,120,.06)');
+  ctx.fillStyle = g2; ctx.fill();
+
+  // Line: invested
+  ctx.beginPath();
+  data.forEach((d,i) => i===0 ? ctx.moveTo(xS(i),yS(d.invested)) : ctx.lineTo(xS(i),yS(d.invested)));
+  ctx.strokeStyle = '#B8860B'; ctx.lineWidth = 1.5; ctx.stroke();
+
+  // Line: total
+  ctx.beginPath();
+  data.forEach((d,i) => i===0 ? ctx.moveTo(xS(i),yS(d.total)) : ctx.lineTo(xS(i),yS(d.total)));
+  ctx.strokeStyle = '#4F8A78'; ctx.lineWidth = 2.5; ctx.stroke();
+
+  // 5-year milestone
+  if(opts.milestone5 && n>=5) {
+    const mx = xS(5);
+    ctx.setLineDash([4,4]);
+    ctx.beginPath(); ctx.moveTo(mx,pad.t); ctx.lineTo(mx,pad.t+ch);
+    ctx.strokeStyle = 'rgba(74,107,140,.55)'; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#4A6B8C';
+    ctx.font = '600 9px system-ui';
+    ctx.textAlign = 'center';
+    ctx.fillText('5 ans', mx, pad.t-4);
+  }
+
+  // X labels
+  ctx.fillStyle = '#98989D';
+  ctx.font = '400 9px system-ui';
+  ctx.textAlign = 'center';
+  const step = n <= 10 ? 1 : n <= 20 ? 5 : 10;
+  for(let i=0;i<=n;i+=step) {
+    ctx.fillText(i+'a', xS(i), pad.t+ch+14);
+  }
+  ctx.fillText(n+'a', xS(n), pad.t+ch+14);
+}
+
+function fmtK(v) {
+  if(v>=1e6) return (v/1e6).toFixed(1).replace('.',',')+' M€';
+  if(v>=1e3) return Math.round(v/1e3)+'K€';
+  return Math.round(v)+'€';
+}
+
+/* ─── CHART : BAR (fiscalité) ─── */
+function drawBarChart(canvas, bars, maxGains) {
+  if(!canvas) return;
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.offsetWidth;
+  const H = canvas.offsetHeight;
+  canvas.width  = W * dpr;
+  canvas.height = H * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0,0,W,H);
+  if(!maxGains) return;
+
+  const pad = {t:16,r:20,b:32,l:60};
+  const cw = W - pad.l - pad.r;
+  const ch = H - pad.t - pad.b;
+  const maxTax = Math.max(...bars.map(b=>b.tax), 1);
+  const barW = cw/bars.length*0.55;
+  const gap  = cw/bars.length;
+
+  // Grid
+  [.5,1].forEach(f=>{
+    const y = pad.t + ch*(1-f);
+    ctx.strokeStyle='rgba(0,0,0,.06)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(pad.l+cw,y); ctx.stroke();
+    ctx.fillStyle='#98989D'; ctx.font='400 9px system-ui'; ctx.textAlign='right';
+    ctx.fillText(fmtK(maxTax*f), pad.l-6, y+3);
+  });
+
+  bars.forEach((b,i) => {
+    const x = pad.l + gap*i + gap/2 - barW/2;
+    const barH = ch * (b.tax/maxTax);
+    const y = pad.t + ch - barH;
+    const r = 4;
+    ctx.beginPath();
+    ctx.moveTo(x+r, y); ctx.lineTo(x+barW-r, y);
+    ctx.quadraticCurveTo(x+barW, y, x+barW, y+r);
+    ctx.lineTo(x+barW, y+barH); ctx.lineTo(x, y+barH); ctx.lineTo(x, y+r);
+    ctx.quadraticCurveTo(x, y, x+r, y);
+    ctx.closePath();
+
+    // Gradient fill
+    const bg = ctx.createLinearGradient(0, y, 0, y+barH);
+    const baseCol = b.color.startsWith('var(')
+      ? (b.color.includes('accent')?'rgba(79,138,120,1)':b.color.includes('danger')?'rgba(155,90,58,1)':'rgba(74,107,140,1)')
+      : b.color;
+    ctx.fillStyle = baseCol; ctx.globalAlpha=.85; ctx.fill(); ctx.globalAlpha=1;
+
+    ctx.fillStyle='#1D1D1F'; ctx.font='700 9px system-ui'; ctx.textAlign='center';
+    ctx.fillText(fmtK(b.tax), x+barW/2, y-5);
+    ctx.fillStyle='#6E6E73'; ctx.font='400 9px system-ui';
+    ctx.fillText(b.label, x+barW/2, pad.t+ch+16);
+  });
+}
+
+/* ─── CHART : DUAL LINE (PEA vs CTO) ─── */
+function drawDualLineChart(canvas, data, tmr) {
+  if(!canvas) return;
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.offsetWidth;
+  const H = canvas.offsetHeight;
+  canvas.width  = W * dpr;
+  canvas.height = H * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0,0,W,H);
+
+  const pad = {t:18,r:18,b:38,l:62};
+  const cw = W - pad.l - pad.r;
+  const ch = H - pad.t - pad.b;
+  const n = data.length - 1;
+
+  // Calculate net values at each point
+  const pea = data.map(d=>{
+    const g = Math.max(0,d.total-d.invested);
+    return d.total - g*PS;
+  });
+  const cto = data.map(d=>{
+    const g = Math.max(0,d.total-d.invested);
+    return d.total - g*(PS+(tmr<=11?0:IR_PFU));
+  });
+  const maxY = Math.max(...pea,...cto)*1.08;
+
+  const xS = i => pad.l+(i/n)*cw;
+  const yS = v => pad.t+ch-Math.max(0,Math.min(1,v/maxY))*ch;
+
+  // Grid
+  [.25,.5,.75,1].forEach(f=>{
+    const y=pad.t+ch*(1-f);
+    ctx.strokeStyle='rgba(0,0,0,.06)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(pad.l+cw,y); ctx.stroke();
+    ctx.fillStyle='#98989D'; ctx.font='400 9px system-ui'; ctx.textAlign='right';
+    ctx.fillText(fmtK(maxY*f), pad.l-6, y+3);
+  });
+
+  // CTO line
+  ctx.beginPath();
+  cto.forEach((v,i)=>i===0?ctx.moveTo(xS(i),yS(v)):ctx.lineTo(xS(i),yS(v)));
+  ctx.strokeStyle='#4A6B8C'; ctx.lineWidth=2; ctx.stroke();
+
+  // PEA fill area
+  ctx.beginPath();
+  pea.forEach((v,i)=>i===0?ctx.moveTo(xS(i),yS(v)):ctx.lineTo(xS(i),yS(v)));
+  for(let i=n;i>=0;i--) ctx.lineTo(xS(i),yS(cto[i]));
+  ctx.closePath();
+  const g3=ctx.createLinearGradient(0,pad.t,0,H);
+  g3.addColorStop(0,'rgba(79,138,120,.2)'); g3.addColorStop(1,'rgba(79,138,120,.03)');
+  ctx.fillStyle=g3; ctx.fill();
+
+  // PEA line
+  ctx.beginPath();
+  pea.forEach((v,i)=>i===0?ctx.moveTo(xS(i),yS(v)):ctx.lineTo(xS(i),yS(v)));
+  ctx.strokeStyle='#4F8A78'; ctx.lineWidth=2.5; ctx.stroke();
+
+  // X labels
+  ctx.fillStyle='#98989D'; ctx.font='400 9px system-ui'; ctx.textAlign='center';
+  const step=n<=10?1:n<=20?5:10;
+  for(let i=0;i<=n;i+=step) ctx.fillText(i+'a',xS(i),pad.t+ch+14);
+  ctx.fillText(n+'a',xS(n),pad.t+ch+14);
+}
+
+/* ─── CHART : DONUT ─── */
+function drawDonut(canvas, segs) {
+  if(!canvas) return;
+  const dpr = window.devicePixelRatio||1;
+  const size = canvas.offsetWidth || 160;
+  canvas.width = size*dpr; canvas.height = size*dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr,dpr);
+  const cx=size/2, cy=size/2, r=size/2-10, ir=r*0.58;
+  let angle = -Math.PI/2;
+
+  segs.forEach(s=>{
+    const sweep = (s.p/100)*Math.PI*2;
+    ctx.beginPath();
+    ctx.arc(cx,cy,r,angle,angle+sweep);
+    ctx.arc(cx,cy,ir,angle+sweep,angle,true);
+    ctx.closePath();
+    ctx.fillStyle = s.c; ctx.fill();
+    ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.stroke();
+    angle += sweep;
+  });
+
+  // Center text
+  ctx.fillStyle='#1D1D1F'; ctx.font='700 11px system-ui'; ctx.textAlign='center';
+  ctx.fillText('PEA', cx, cy-4);
+  ctx.fillStyle='#6E6E73'; ctx.font='400 9px system-ui';
+  ctx.fillText('Allocation', cx, cy+9);
+}
+
+/* ─── CHART : ALLOCATION MINI ─── */
+// Reuses drawAreaChart with compact flag
+
+/* ─── MISE À JOUR GLOBALE ─── */
+function update() {
+  const inp = getInputs();
+  updatePlafond(inp.initial);
+
+  const data = calcPortfolio(inp.initial, inp.monthly, inp.freq, inp.rate, inp.fees, inp.duree);
+
+  renderCapi(data, inp.infl, inp.duree);
+  renderFisc(data, inp.tmr);
+  renderCmp(data, inp.tmr, inp.duree);
+  renderAlloc(currentProfile, data, inp.duree);
+  renderTrans(data);
+}
+
+/* ─── WIRING INPUT ─── */
+function wireInput(inputId, sliderOrNull, dispId, format) {
+  const inp = $(inputId);
+  const sld = sliderOrNull ? $(sliderOrNull) : null;
+  const disp = dispId ? $(dispId) : null;
+
+  if(!inp) return;
+
+  function refreshDisp(val) {
+    if(!disp) return;
+    if(format==='eur') disp.textContent = SP.fmtEur(val);
+    else if(format==='pct') disp.textContent = fmtPct(val);
+    else if(format==='yr') disp.textContent = val+' an'+(val>1?'s':'');
+    else disp.textContent = val;
+  }
+
+  if(sld) {
+    sld.addEventListener('input', ()=>{
+      const v = +sld.value;
+      if(format==='eur') inp.value = SP.fmtNum(v);
+      else inp.value = v;
+      sld.style.setProperty('--pct', ((v-+sld.min)/(+sld.max-+sld.min)*100)+'%');
+      refreshDisp(v);
+      update();
+    });
+    // Init slider position
+    const v = +inp.value.replace(/\s/g,'');
+    sld.style.setProperty('--pct', ((v-+sld.min)/(+sld.max-+sld.min)*100)+'%');
+  }
+
+  inp.addEventListener('input', ()=>{
+    const v = parseFloat(inp.value.replace(/\s/g,'').replace(',','.')) || 0;
+    if(sld) { sld.value=v; sld.style.setProperty('--pct',((v-+sld.min)/(+sld.max-+sld.min)*100)+'%'); }
+    refreshDisp(v);
+    update();
+  });
+  inp.addEventListener('blur', ()=>{
+    if(inp.dataset.fmt!==undefined) {
+      const v = parseFloat(inp.value.replace(/\s/g,'').replace(',','.')) || 0;
+      inp.value = SP.fmtNum(v);
+    }
+  });
+
+  if(format==='pct') {
+    inp.addEventListener('input', ()=>{ refreshDisp(+inp.value); });
+  }
+
+  refreshDisp(parseFloat(inp.value.replace(/\s/g,'').replace(',','.')) || +inp.value || 0);
+}
+
+/* ─── TABS ─── */
+document.querySelectorAll('.pea-tab-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.pea-tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.pea-panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    const tab = btn.dataset.tab;
+    const panel = $('pea-p-'+tab);
+    if(panel) panel.classList.add('active');
+    // Redraw charts on tab switch (canvas may have been hidden)
+    setTimeout(update,10);
+  });
+});
+
+/* ─── ALLOCATION PILLS ─── */
+document.querySelectorAll('.pea-profile-pill').forEach(pill=>{
+  pill.addEventListener('click',()=>{
+    document.querySelectorAll('.pea-profile-pill').forEach(p=>p.classList.remove('active'));
+    pill.classList.add('active');
+    currentProfile = pill.dataset.profile;
+    const inp = getInputs();
+    const data = calcPortfolio(inp.initial, inp.monthly, inp.freq, inp.rate, inp.fees, inp.duree);
+    renderAlloc(currentProfile, data, inp.duree);
+  });
+});
+
+/* ─── INIT ─── */
+document.addEventListener('DOMContentLoaded', ()=>{
+  // Range sliders direct
+  ['pea-rdt','pea-duree','pea-infl','pea-frais'].forEach(id=>{
+    const sld = $(id);
+    if(!sld) return;
+    const dispId = id+'-disp';
+    const isYear = id==='pea-duree';
+    const v = +sld.value;
+    sld.style.setProperty('--pct',((v-+sld.min)/(+sld.max-+sld.min)*100)+'%');
+    sld.addEventListener('input',()=>{
+      const v2=+sld.value;
+      sld.style.setProperty('--pct',((v2-+sld.min)/(+sld.max-+sld.min)*100)+'%');
+      const d=$(dispId);
+      if(d) d.textContent = isYear ? v2+' an'+(v2>1?'s':'') : fmtPct(v2);
+      update();
+    });
+  });
+
+  // Text inputs with sliders
+  const vi=$(  'pea-vi');
+  const viSld=$('pea-vi-sld');
+  const vp=$(  'pea-vp');
+
+  if(vi&&viSld) {
+    viSld.addEventListener('input',()=>{
+      const v=+viSld.value;
+      vi.value=SP.fmtNum(v);
+      viSld.style.setProperty('--pct',((v-+viSld.min)/(+viSld.max-+viSld.min)*100)+'%');
+      $('pea-vi-disp').textContent=SP.fmtNum(v)+' €';
+      update();
+    });
+    vi.addEventListener('input',()=>{
+      const v=parseFloat(vi.value.replace(/\s/g,'').replace(',','.'))||0;
+      viSld.value=v;
+      viSld.style.setProperty('--pct',((v-+viSld.min)/(+viSld.max-+viSld.min)*100)+'%');
+      $('pea-vi-disp').textContent=SP.fmtNum(v)+' €';
+      update();
+    });
+    vi.addEventListener('blur',()=>{
+      const v=parseFloat(vi.value.replace(/\s/g,'').replace(',','.'))||0;
+      vi.value=SP.fmtNum(v);
+    });
+    const initV=+viSld.value;
+    viSld.style.setProperty('--pct',((initV-+viSld.min)/(+viSld.max-+viSld.min)*100)+'%');
+  }
+
+  if(vp) {
+    vp.addEventListener('input',()=>update());
+    vp.addEventListener('blur',()=>{
+      const v=parseFloat(vp.value.replace(/\s/g,'').replace(',','.'))||0;
+      vp.value=SP.fmtNum(v);
+    });
+  }
+
+  $('pea-freq') && $('pea-freq').addEventListener('change',update);
+  $('pea-tmr')  && $('pea-tmr').addEventListener('change',update);
+
+  update();
+});
+
+window.addEventListener('resize', ()=>{
+  // Redraw charts on resize
+  clearTimeout(window._peaResizeT);
+  window._peaResizeT = setTimeout(update, 120);
+});
+</script>
+</body>
+</html>

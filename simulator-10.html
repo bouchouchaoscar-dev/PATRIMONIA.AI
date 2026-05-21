@@ -1,0 +1,1457 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="favicon-64.png">
+  <link rel="shortcut icon" href="favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="favicon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCI IR vs IS vs Nom propre — PATRIMONIA.AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css?v=19">
+<script src="shared.js?v=2"></script>
+  <script src="shared-nav.js?v=6"></script>
+<style>
+
+/* ── LAYOUT ── */
+.sci-body {
+  display: grid;
+  grid-template-columns: 400px 1fr;
+}
+@media(max-width:900px){ .sci-body { grid-template-columns: 1fr } }
+
+/* ── INPUTS PANEL ── */
+.sci-inputs-panel {
+  padding: 1.75rem 1.75rem 2rem;
+  background: var(--surface-2);
+  border-right: 1px solid var(--border-subtle);
+}
+@media(max-width:900px){
+  .sci-inputs-panel { border-right:none; border-bottom:1px solid var(--border-subtle) }
+}
+
+/* ── RESULTS PANEL ── */
+.sci-results-panel {
+  padding: 1.5rem 1.5rem 2rem;
+  background: var(--surface);
+  overflow-x: auto;
+}
+
+/* ── INPUT SECTION TITLE ── */
+.inp-sec {
+  font-size: .6rem; font-weight: 700; color: var(--text-dim);
+  letter-spacing: .08em; text-transform: uppercase;
+  margin: 1.4rem 0 .85rem;
+}
+.inp-sec:first-child { margin-top: 0 }
+
+/* ── INNER TABS ── */
+.sci-tabs {
+  display: flex; gap: .32rem; margin-bottom: 1.25rem; flex-wrap: wrap;
+}
+.sci-tab {
+  font-family: var(--sans); font-size: .74rem; font-weight: 500;
+  color: var(--text-muted); background: var(--surface-2);
+  border: 1.5px solid var(--border); border-radius: 100px;
+  padding: .33rem 1rem; cursor: pointer;
+  transition: all .18s; user-select: none;
+}
+.sci-tab:hover { color: var(--accent); border-color: rgba(79,138,120,.3); background: var(--accent-dim) }
+.sci-tab.active { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600 }
+.sci-panel { display: none }
+.sci-panel.active { display: block }
+
+/* ── KEY CARDS (3 colonnes) ── */
+.sci-key-row {
+  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .7rem;
+  margin-bottom: 1.2rem;
+}
+.sci-key-card {
+  background: var(--surface-2); border: 1.5px solid var(--border-subtle);
+  border-radius: var(--r-sm); padding: .95rem 1rem;
+  text-align: center;
+}
+.sci-key-card.np { border-color: rgba(74,107,140,.3) }
+.sci-key-card.ir { border-color: rgba(59,140,90,.3) }
+.sci-key-card.is { border-color: rgba(79,138,120,.3) }
+.sci-key-badge {
+  font-size: .58rem; font-weight: 700; letter-spacing: .07em;
+  text-transform: uppercase; margin-bottom: .45rem; display: block;
+}
+.np .sci-key-badge, .sci-key-badge.np { color: #4A6B8C }
+.ir .sci-key-badge, .sci-key-badge.ir { color: var(--success) }
+.is .sci-key-badge, .sci-key-badge.is { color: var(--accent) }
+.sci-key-val {
+  font-size: 1.25rem; font-weight: 700; letter-spacing: -.04em; line-height: 1;
+}
+.np .sci-key-val { color: #4A6B8C }
+.ir .sci-key-val { color: var(--success) }
+.is .sci-key-val { color: var(--accent) }
+.sci-key-sub { font-size: .63rem; color: var(--text-dim); margin-top: .3rem; line-height: 1.4 }
+
+/* ── COMPARISON TABLE ── */
+.sci-tbl-wrap {
+  overflow-x: auto;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border-subtle);
+  margin-bottom: 1.1rem;
+}
+.sci-tbl {
+  width: 100%; border-collapse: collapse; font-size: .77rem; min-width: 420px;
+}
+.sci-tbl th {
+  padding: .65rem .9rem; font-size: .62rem; font-weight: 700;
+  letter-spacing: .05em; text-transform: uppercase; text-align: center;
+  border-bottom: 2px solid var(--border);
+}
+.sci-tbl th:first-child { text-align: left; color: var(--text-dim) }
+.sci-tbl th.h-np { color: #4A6B8C; background: rgba(74,107,140,.06) }
+.sci-tbl th.h-ir { color: var(--success); background: rgba(59,140,90,.06) }
+.sci-tbl th.h-is { color: var(--accent); background: rgba(79,138,120,.06) }
+.sci-tbl td {
+  padding: .52rem .9rem; border-top: 1px solid var(--border-subtle);
+  text-align: center; font-family: var(--mono); font-size: .77rem; color: var(--text-muted);
+}
+.sci-tbl td:first-child {
+  text-align: left; font-family: var(--sans); font-size: .75rem;
+  color: var(--text-muted); font-weight: 400;
+}
+.sci-tbl td.c-np { background: rgba(74,107,140,.04) }
+.sci-tbl td.c-ir { background: rgba(59,140,90,.04) }
+.sci-tbl td.c-is { background: rgba(79,138,120,.04) }
+.sci-tbl td.val-pos { color: var(--success); font-weight: 600 }
+.sci-tbl td.val-neg { color: #9B5A3A; font-weight: 600 }
+.sci-tbl td.val-hi  { color: var(--amber) }
+.sci-tbl td.val-acc { color: var(--accent); font-weight: 700 }
+.sci-tbl td.val-np  { color: #4A6B8C; font-weight: 700 }
+.sci-tbl td.val-ir  { color: var(--success); font-weight: 700 }
+.sci-tbl td.val-is  { color: var(--accent); font-weight: 700 }
+.sci-tbl tr.sect-head td {
+  background: var(--surface); font-family: var(--sans); font-size: .6rem;
+  font-weight: 700; color: var(--text-dim); letter-spacing: .07em;
+  text-transform: uppercase; padding: .45rem .9rem;
+  border-top: 2px solid var(--border-subtle);
+}
+.sci-tbl tr:hover td { background: rgba(0,0,0,.018) }
+.sci-tbl tr.sect-head:hover td { background: var(--surface) }
+.sci-tbl .winner::after {
+  content: ' ★'; color: var(--amber); font-size: .65rem;
+}
+
+/* ── BAR CHART ── */
+.sci-chart-wrap {
+  background: var(--surface-2); border: 1px solid var(--border-subtle);
+  border-radius: var(--r-sm); padding: 1.1rem 1.25rem;
+  margin-bottom: 1.1rem;
+}
+.sci-chart-title {
+  font-size: .6rem; font-weight: 700; color: var(--text-dim);
+  letter-spacing: .07em; text-transform: uppercase; margin-bottom: .9rem;
+}
+.sci-chart-row {
+  display: flex; align-items: center; gap: .7rem; margin-bottom: .6rem;
+}
+.sci-chart-lbl {
+  font-size: .71rem; color: var(--text-muted); width: 75px;
+  text-align: right; flex-shrink: 0; letter-spacing: -.01em;
+}
+.sci-chart-bar-bg {
+  flex: 1; height: 16px; border-radius: 4px; background: var(--surface-3); overflow: hidden;
+}
+.sci-chart-bar {
+  height: 100%; border-radius: 4px;
+  transition: width .55s cubic-bezier(.4,0,.2,1); min-width: 4px; max-width: 100%;
+}
+.sci-chart-bar.np { background: #4A6B8C }
+.sci-chart-bar.ir { background: var(--success) }
+.sci-chart-bar.is { background: var(--accent) }
+.sci-chart-val {
+  font-family: var(--mono); font-size: .7rem; font-weight: 600;
+  color: var(--text-muted); width: 90px; flex-shrink: 0;
+}
+
+/* ── SCORE TABLE ── */
+.sci-score-tbl { width: 100%; border-collapse: collapse; font-size: .77rem; margin-bottom: 1.1rem }
+.sci-score-tbl th {
+  padding: .55rem .8rem; font-size: .6rem; font-weight: 700;
+  letter-spacing: .05em; text-transform: uppercase;
+  border-bottom: 2px solid var(--border); text-align: center;
+}
+.sci-score-tbl th:first-child { text-align: left; color: var(--text-dim) }
+.sci-score-tbl td { padding: .5rem .8rem; border-top: 1px solid var(--border-subtle); text-align: center; font-size: .8rem }
+.sci-score-tbl td:first-child { text-align: left; font-family: var(--sans); font-size: .75rem; color: var(--text-muted) }
+.sci-score-tbl tr:hover td { background: var(--surface) }
+
+/* ── ADVANCED OPTIONS DETAILS ── */
+details.adv-opts {
+  margin-top: 1.4rem;
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 1.2rem;
+}
+details.adv-opts summary {
+  list-style: none;
+  display: flex; align-items: center; gap: .5rem;
+  font-size: .75rem; font-weight: 500; color: var(--text-muted);
+  cursor: pointer; padding: .4rem .65rem;
+  border-radius: var(--r-sm); transition: all .2s; user-select: none;
+  letter-spacing: -.01em;
+}
+details.adv-opts summary:hover { color: var(--accent); background: var(--accent-dim) }
+details.adv-opts summary::before { content: '▼'; font-size: .55rem; color: var(--accent); transition: transform .25s }
+details.adv-opts[open] summary::before { transform: rotate(180deg) }
+details.adv-opts summary::-webkit-details-marker { display: none }
+.adv-inner { padding-top: .75rem }
+
+/* ── ALERTE REVENTE IS ── */
+.is-exit-alert {
+  background: rgba(155,90,58,.07); border: 1px solid rgba(155,90,58,.2);
+  border-radius: var(--r-sm); padding: .8rem 1rem .8rem 2.1rem;
+  font-size: .78rem; line-height: 1.75; color: var(--text-muted);
+  position: relative; margin-bottom: 1rem;
+}
+.is-exit-alert::before {
+  content: '!'; color: #9B5A3A; font-weight: 700;
+  position: absolute; left: .8rem; top: .82rem;
+}
+.is-exit-alert strong { color: #9B5A3A; font-weight: 600 }
+
+/* ── 2-COL FIELDS GRID ── */
+.field-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem }
+@media(max-width:480px){ .field-grid-2 { grid-template-columns: 1fr } }
+
+/* ── DISCLAIMER ── */
+.sci-disclaimer {
+  font-size: .67rem; color: var(--text-dim); line-height: 1.75;
+  font-family: var(--mono); opacity: .8; margin-top: 1rem;
+}
+
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="index.html" class="nav-logo"><img src="logo.png?v=3" alt="PATRIMONIA.AI" class="nav-logo-img"></a>
+  <div class="nav-right">
+    <a href="index.html" class="nav-back">
+      <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7.5 1.5L3 6l4.5 4.5"/></svg>
+      Accueil
+    </a>
+    <div class="nav-dropdown" id="mainDropdown">
+      <button class="nav-dropdown-btn" aria-expanded="false" aria-haspopup="true">
+        Simulateurs <svg class="nav-chevron" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.8" style="width:13px;height:8px;flex-shrink:0"><path d="M1 1l4 4 4-4"/></svg>
+      </button>
+      <div class="nav-dropdown-menu" id="navMenu" role="menu"></div>
+    </div>
+  </div>
+</nav>
+
+<div class="sim-page">
+  <div class="sim-page-header">
+    <span class="sim-num-badge">10</span>
+    <div>
+      <div class="sim-eyebrow">Fiscalité · Immobilier</div><h1>SCI IR · <em class="gradient-text">SCI IS · Nom propre</em></h1>
+      <p>Comparaison fiscale, patrimoniale et financière des 3 modes de détention immobilière</p>
+    </div>
+  </div>
+
+  <div class="sim-card-wrap">
+    <div class="sci-body">
+
+      <!-- ═══════════════════════════════════
+           PANNEAU INPUTS
+      ═══════════════════════════════════ -->
+      <div class="sci-inputs-panel">
+
+        <!-- A. Bien immobilier -->
+        <div class="inp-sec">Bien immobilier</div>
+
+        <div class="field">
+          <div class="field-label"><label for="s-prix">Prix d'achat</label><span class="field-val" id="s-prix-disp">200 000 €</span></div>
+          <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="s-prix" value="200000"><span class="unit">€</span></div>
+          <input type="range" id="s-prix-sld" min="30000" max="2000000" step="5000" value="200000">
+        </div>
+
+        <div class="field">
+          <div class="field-label"><label for="s-prix-revente">Prix de revente estimé</label><span class="field-val" id="s-revente-disp">260 000 €</span></div>
+          <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="s-prix-revente" value="260000"><span class="unit">€</span></div>
+          <input type="range" id="s-revente-sld" min="30000" max="3000000" step="5000" value="260000">
+        </div>
+
+        <div class="field">
+          <div class="field-label"><label for="s-duree">Durée de détention prévue</label></div>
+          <div class="select-wrap">
+            <select id="s-duree">
+              <option value="5">5 ans</option>
+              <option value="10">10 ans</option>
+              <option value="15" selected>15 ans</option>
+              <option value="20">20 ans</option>
+              <option value="25">25 ans</option>
+              <option value="30">30 ans</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="section-sep"></div>
+
+        <!-- B. Revenus locatifs -->
+        <div class="inp-sec">Revenus locatifs</div>
+
+        <div class="field">
+          <div class="field-label"><label for="s-loyer">Loyer mensuel HC</label><span class="field-val" id="s-loyer-disp">900 €</span></div>
+          <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="s-loyer" value="900"><span class="unit">€/mois</span></div>
+          <input type="range" id="s-loyer-sld" min="200" max="10000" step="50" value="900">
+        </div>
+
+        <div class="section-sep"></div>
+
+        <!-- C. Charges annuelles -->
+        <div class="inp-sec">Charges annuelles</div>
+
+        <div class="field-grid-2">
+          <div class="field">
+            <div class="field-label"><label for="s-tf">Taxe foncière</label></div>
+            <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="s-tf" value="900"><span class="unit">€/an</span></div>
+          </div>
+          <div class="field">
+            <div class="field-label"><label for="s-copro">Charges copro</label></div>
+            <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="s-copro" value="800"><span class="unit">€/an</span></div>
+          </div>
+          <div class="field">
+            <div class="field-label"><label for="s-pno">Assurance PNO</label></div>
+            <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="s-pno" value="150"><span class="unit">€/an</span></div>
+          </div>
+          <div class="field">
+            <div class="field-label"><label for="s-entretien">Entretien</label></div>
+            <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="s-entretien" value="300"><span class="unit">€/an</span></div>
+          </div>
+          <div class="field">
+            <div class="field-label"><label for="s-gestion">Gestion locative</label></div>
+            <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="s-gestion" value="0"><span class="unit">€/an</span></div>
+          </div>
+          <div class="field">
+            <div class="field-label"><label for="s-autres-chg">Autres charges</label></div>
+            <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="s-autres-chg" value="0"><span class="unit">€/an</span></div>
+          </div>
+        </div>
+
+        <div class="section-sep"></div>
+
+        <!-- D. Financement -->
+        <div class="inp-sec">Financement</div>
+
+        <div class="field">
+          <div class="field-label"><label for="s-montant">Montant emprunté</label><span class="field-val" id="s-montant-disp">185 000 €</span></div>
+          <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="s-montant" value="185000"><span class="unit">€</span></div>
+          <input type="range" id="s-montant-sld" min="0" max="1500000" step="5000" value="185000">
+        </div>
+
+        <div class="field-grid-2">
+          <div class="field">
+            <div class="field-label"><label for="s-taux-cr">Taux</label></div>
+            <div class="input-wrap"><input type="number" id="s-taux-cr" value="3.5" min="0" max="10" step="0.05"><span class="unit">%</span></div>
+          </div>
+          <div class="field">
+            <div class="field-label"><label for="s-duree-cr">Durée</label></div>
+            <div class="select-wrap">
+              <select id="s-duree-cr">
+                <option value="10">10 ans</option>
+                <option value="15">15 ans</option>
+                <option value="20" selected>20 ans</option>
+                <option value="25">25 ans</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-sep"></div>
+
+        <!-- E. Fiscalité personnelle -->
+        <div class="inp-sec">Fiscalité personnelle</div>
+
+        <div class="field-grid-2">
+          <div class="field">
+            <div class="field-label"><label for="s-tmi">TMI</label></div>
+            <div class="select-wrap">
+              <select id="s-tmi">
+                <option value="0">0 %</option>
+                <option value="11">11 %</option>
+                <option value="30" selected>30 %</option>
+                <option value="41">41 %</option>
+                <option value="45">45 %</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <div class="field-label"><label for="s-objectif">Objectif</label></div>
+            <div class="select-wrap">
+              <select id="s-objectif">
+                <option value="revenus">Revenus</option>
+                <option value="capitalisation" selected>Capitalisation</option>
+                <option value="transmission">Transmission</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- OPTIONS AVANCÉES -->
+        <details class="adv-opts">
+          <summary>Options avancées</summary>
+          <div class="adv-inner">
+
+            <div class="inp-sec" style="margin-top:.2rem">Acquisition</div>
+
+            <div class="field-grid-2">
+              <div class="field">
+                <div class="field-label"><label for="s-notaire">Frais de notaire</label></div>
+                <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="s-notaire" value="15600"><span class="unit">€</span></div>
+              </div>
+              <div class="field">
+                <div class="field-label"><label for="s-agence">Frais d'agence</label></div>
+                <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="s-agence" value="0"><span class="unit">€</span></div>
+              </div>
+              <div class="field">
+                <div class="field-label"><label for="s-travaux">Travaux</label></div>
+                <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="s-travaux" value="0"><span class="unit">€</span></div>
+              </div>
+              <div class="field">
+                <div class="field-label"><label for="s-mobilier">Mobilier</label></div>
+                <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="s-mobilier" value="0"><span class="unit">€</span></div>
+              </div>
+            </div>
+
+            <div class="field">
+              <div class="field-label"><label for="s-terrain">Quote-part terrain (non amortissable)</label></div>
+              <div class="select-wrap">
+                <select id="s-terrain">
+                  <option value="10">10 %</option>
+                  <option value="15">15 %</option>
+                  <option value="20" selected>20 %</option>
+                  <option value="25">25 %</option>
+                  <option value="30">30 %</option>
+                </select>
+              </div>
+              <div style="font-size:.62rem;color:var(--text-dim);font-family:var(--mono);margin-top:.3rem">Utilisé pour le calcul d'amortissement SCI IS</div>
+            </div>
+
+            <div class="inp-sec">Revenus (avancé)</div>
+
+            <div class="field-grid-2">
+              <div class="field">
+                <div class="field-label"><label for="s-vacance">Vacance locative</label></div>
+                <div class="select-wrap">
+                  <select id="s-vacance">
+                    <option value="0">0 mois/an</option>
+                    <option value="0.5" selected>0,5 mois/an</option>
+                    <option value="1">1 mois/an</option>
+                    <option value="2">2 mois/an</option>
+                    <option value="3">3 mois/an</option>
+                  </select>
+                </div>
+              </div>
+              <div class="field">
+                <div class="field-label"><label for="s-type-loc">Type de location</label></div>
+                <div class="select-wrap">
+                  <select id="s-type-loc">
+                    <option value="nue" selected>Location nue</option>
+                    <option value="meublee">Location meublée</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="inp-sec">Financement (avancé)</div>
+
+            <div class="field-grid-2">
+              <div class="field">
+                <div class="field-label"><label for="s-apport">Apport personnel</label></div>
+                <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="s-apport" value="30000"><span class="unit">€</span></div>
+              </div>
+              <div class="field">
+                <div class="field-label"><label for="s-assur-empr">Assurance emprunteur</label></div>
+                <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="s-assur-empr" value="60"><span class="unit">€/mois</span></div>
+              </div>
+            </div>
+
+            <div class="inp-sec">Paramètres SCI</div>
+
+            <div class="field-grid-2">
+              <div class="field">
+                <div class="field-label"><label for="s-frais-creation">Frais de création SCI</label></div>
+                <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="s-frais-creation" value="2000"><span class="unit">€</span></div>
+              </div>
+              <div class="field">
+                <div class="field-label"><label for="s-frais-compta">Comptabilité / an</label></div>
+                <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="s-frais-compta" value="1200"><span class="unit">€/an</span></div>
+              </div>
+              <div class="field">
+                <div class="field-label"><label for="s-frais-jur">Frais juridiques / an</label></div>
+                <div class="input-wrap"><input type="text" inputmode="decimal" data-fmt id="s-frais-jur" value="300"><span class="unit">€/an</span></div>
+              </div>
+              <div class="field">
+                <div class="field-label"><label for="s-distrib">Distribution bénéfices IS</label></div>
+                <div class="select-wrap">
+                  <select id="s-distrib">
+                    <option value="0" selected>Non (capitalisation)</option>
+                    <option value="1">Oui (flat tax 30 %)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="field">
+              <div class="field-label"><label>Durées d'amortissement (SCI IS)</label></div>
+              <div class="field-grid-2" style="margin-top:.5rem">
+                <div class="field" style="margin-bottom:0">
+                  <div class="field-label"><label for="s-amort-bati" style="font-size:.68rem">Bâti</label></div>
+                  <div class="select-wrap">
+                    <select id="s-amort-bati">
+                      <option value="25">25 ans</option>
+                      <option value="30" selected>30 ans</option>
+                      <option value="40">40 ans</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="field" style="margin-bottom:0">
+                  <div class="field-label"><label for="s-amort-trav" style="font-size:.68rem">Travaux</label></div>
+                  <div class="select-wrap">
+                    <select id="s-amort-trav">
+                      <option value="5">5 ans</option>
+                      <option value="10" selected>10 ans</option>
+                      <option value="15">15 ans</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="field" style="margin-bottom:0">
+                  <div class="field-label"><label for="s-amort-mob" style="font-size:.68rem">Mobilier</label></div>
+                  <div class="select-wrap">
+                    <select id="s-amort-mob">
+                      <option value="5">5 ans</option>
+                      <option value="7" selected>7 ans</option>
+                      <option value="10">10 ans</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /adv-inner -->
+        </details>
+
+      </div><!-- /sci-inputs-panel -->
+
+      <!-- ═══════════════════════════════════
+           PANNEAU RÉSULTATS
+      ═══════════════════════════════════ -->
+      <div class="sci-results-panel">
+
+        <!-- TABS -->
+        <div class="sci-tabs">
+          <button class="sci-tab active" data-tab="annuel">Exploitation annuelle</button>
+          <button class="sci-tab" data-tab="revente">À la revente</button>
+          <button class="sci-tab" data-tab="global">Vision globale</button>
+          <button class="sci-tab" data-tab="pedago">Pédagogie</button>
+        </div>
+
+        <!-- ── TAB : ANNUEL ── -->
+        <div class="sci-panel active" id="panel-annuel">
+          <div class="sci-key-row" id="key-annuel"></div>
+
+          <div class="sci-chart-wrap">
+            <div class="sci-chart-title">Cash-flow annuel net (après impôt)</div>
+            <div id="chart-cashflow"></div>
+          </div>
+
+          <div class="sci-tbl-wrap">
+            <table class="sci-tbl" id="tbl-annuel"></table>
+          </div>
+
+          <div id="pedago-deficit" style="display:none"></div>
+        </div>
+
+        <!-- ── TAB : REVENTE ── -->
+        <div class="sci-panel" id="panel-revente">
+          <div class="sci-key-row" id="key-revente"></div>
+
+          <div class="sci-chart-wrap">
+            <div class="sci-chart-title">Net récupéré à la revente (après toute fiscalité)</div>
+            <div id="chart-revente"></div>
+          </div>
+
+          <div class="sci-tbl-wrap">
+            <table class="sci-tbl" id="tbl-revente"></table>
+          </div>
+
+          <div id="pedago-revente"></div>
+        </div>
+
+        <!-- ── TAB : GLOBAL ── -->
+        <div class="sci-panel" id="panel-global">
+          <div class="sci-key-row" id="key-global"></div>
+
+          <div class="sci-chart-wrap">
+            <div class="sci-chart-title">Trésorerie cumulée sur la durée de détention (CF nets + revente)</div>
+            <div id="chart-global"></div>
+          </div>
+
+          <div class="sci-tbl-wrap">
+            <table class="sci-tbl" id="tbl-global"></table>
+          </div>
+
+          <!-- Score tableau -->
+          <div class="sci-tbl-wrap">
+            <table class="sci-score-tbl">
+              <thead><tr>
+                <th style="color:var(--text-dim)">Critère</th>
+                <th style="color:#4A6B8C">Nom propre</th>
+                <th style="color:var(--success)">SCI à l'IR</th>
+                <th style="color:var(--accent)">SCI à l'IS</th>
+              </tr></thead>
+              <tbody id="tbl-score"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ── TAB : PÉDAGOGIE ── -->
+        <div class="sci-panel" id="panel-pedago">
+          <div id="pedago-full"></div>
+        </div>
+
+        <div class="sci-disclaimer" id="disclaimer-txt"></div>
+
+      </div><!-- /sci-results-panel -->
+
+    </div><!-- /sci-body -->
+  </div><!-- /sim-card-wrap -->
+</div><!-- /sim-page -->
+
+<footer>
+  <span>PATRIMONIA.AI</span> — Simulation indicative et pédagogique.<br>
+  SCI IS : IS 15 % ≤ 42 500 € / 25 % au-delà (CGI art. 219). Amortissement bâti hors terrain (PCG art. 214-1). PV particuliers : CGI art. 150 U à 150 VH. Abattements durée de détention : CGI art. 150 VC. Flat tax 30 % : CGI art. 200 A. Prélèvements sociaux 17,2 % : CSS art. L136-7.<br>
+  Résultats non contractuels. Consultez un notaire, expert-comptable ou conseil fiscal avant toute décision.
+</footer>
+
+<script>
+'use strict';
+
+/* ══════════════════════════════════════════════
+   UTILITAIRES
+══════════════════════════════════════════════ */
+const fmtN = (v,d=0) => new Intl.NumberFormat('fr-FR',{minimumFractionDigits:d,maximumFractionDigits:d}).format(+v||0).replace(/[  ]/g,' ');
+const eur  = (v,d=0) => fmtN(v,d) + ' €';
+const pct  = (v,d=1) => fmtN(v,d) + ' %';
+const gv   = id => { const e=document.getElementById(id); return e ? e.value : '' };
+const pN   = id => SP.parseNum(document.getElementById(id)?.value ?? '0');
+
+function colorVal(v, zero='—') {
+  if (!isFinite(v)) return `<span style="color:var(--text-dim)">${zero}</span>`;
+  const cls = v > 0 ? 'val-pos' : v < 0 ? 'val-neg' : '';
+  const sign = v > 0 ? '+' : '';
+  return `<span class="${cls}">${sign}${eur(v)}</span>`;
+}
+
+/* ══════════════════════════════════════════════
+   CALCULS FINANCIERS
+══════════════════════════════════════════════ */
+function calcMens(montant, taux, duree) {
+  if (!montant || !taux || !duree) return 0;
+  const r = taux / 100 / 12;
+  const n = duree * 12;
+  return montant * r * Math.pow(1+r,n) / (Math.pow(1+r,n) - 1);
+}
+
+function calcInterets1(montant, taux, duree) {
+  if (!montant || !taux || !duree) return 0;
+  const r = taux / 100 / 12;
+  const mens = calcMens(montant, taux, duree);
+  let solde = montant, total = 0;
+  for (let m = 0; m < 12; m++) {
+    const im = solde * r;
+    total += im;
+    solde -= (mens - im);
+    if (solde < 0) break;
+  }
+  return total;
+}
+
+function calcIS(base) {
+  if (base <= 0) return 0;
+  return Math.min(base, 42500) * 0.15 + Math.max(0, base - 42500) * 0.25;
+}
+
+/* Abattements PV particuliers – CGI art. 150 VC */
+function calcAbattements(duree) {
+  let abIR = 0, abPS = 0;
+  for (let y = 6; y <= duree; y++) {
+    if (y <= 21) abIR += 6;
+    else if (y === 22) abIR += 4;
+    if (y <= 11) abPS += 1.65;
+    else if (y === 12) abPS += 1.60;
+    else abPS += 9;
+  }
+  return { abIR: Math.min(abIR, 100), abPS: Math.min(abPS, 100) };
+}
+
+/* Surtaxe PV immobilières – CGI art. 1609 nonies G */
+function calcSurtaxe(pvNet) {
+  if (pvNet <= 50000) return 0;
+  let taux = 0;
+  if      (pvNet <= 100000) taux = 0.02;
+  else if (pvNet <= 150000) taux = 0.03;
+  else if (pvNet <= 200000) taux = 0.04;
+  else if (pvNet <= 250000) taux = 0.05;
+  else                      taux = 0.06;
+  return pvNet * taux;
+}
+
+/* ══════════════════════════════════════════════
+   LECTURE DES INPUTS
+══════════════════════════════════════════════ */
+function getInputs() {
+  return {
+    prix:        pN('s-prix'),
+    prixRevente: pN('s-prix-revente'),
+    duree:       parseInt(gv('s-duree')) || 15,
+    notaire:     pN('s-notaire'),
+    agence:      pN('s-agence'),
+    travaux:     pN('s-travaux'),
+    mobilier:    pN('s-mobilier'),
+    terrain:     parseFloat(gv('s-terrain')) || 20,
+
+    loyer:    pN('s-loyer'),
+    vacance:  parseFloat(gv('s-vacance')) || 0,
+    typeLoc:  gv('s-type-loc'),
+
+    tf:         pN('s-tf'),
+    copro:      pN('s-copro'),
+    pno:        pN('s-pno'),
+    entretien:  pN('s-entretien'),
+    gestion:    pN('s-gestion'),
+    autresChg:  pN('s-autres-chg'),
+
+    montant:   pN('s-montant'),
+    tauxCr:    parseFloat(gv('s-taux-cr')) || 0,
+    dureeCr:   parseInt(gv('s-duree-cr')) || 20,
+    apport:    pN('s-apport'),
+    assurEmpr: pN('s-assur-empr'),
+
+    tmi:      parseInt(gv('s-tmi')) || 0,
+    objectif: gv('s-objectif'),
+
+    fraisCreation: pN('s-frais-creation'),
+    fraisCompta:   pN('s-frais-compta'),
+    fraisJur:      pN('s-frais-jur'),
+    distribBenef:  gv('s-distrib') === '1',
+
+    dureeAmortBati: parseInt(gv('s-amort-bati')) || 30,
+    dureeAmortTrav: parseInt(gv('s-amort-trav')) || 10,
+    dureeAmortMob:  parseInt(gv('s-amort-mob')) || 7,
+  };
+}
+
+/* ══════════════════════════════════════════════
+   CALCUL PRINCIPAL
+══════════════════════════════════════════════ */
+function calcAll() {
+  const i = getInputs();
+
+  /* Communs */
+  const coutAcq       = i.prix + i.notaire + i.agence + i.travaux + i.mobilier;
+  const loyersBruts   = i.loyer * (12 - i.vacance);
+  const chargesNonFin = i.tf + i.copro + i.pno + i.entretien + i.gestion + i.autresChg;
+  const fraisExtraSCI = i.fraisCompta + i.fraisJur;
+
+  const mens       = calcMens(i.montant, i.tauxCr, i.dureeCr);
+  const mensTotal  = mens + i.assurEmpr;
+  const anneeCredit= mensTotal * 12;
+  const int1       = calcInterets1(i.montant, i.tauxCr, i.dureeCr);
+
+  /* ── NOM PROPRE ─────────────────────────────
+     Régime réel foncier (ou BIC si meublé, approximé de la même manière)
+  */
+  const chargesDedNP   = chargesNonFin + int1;
+  const revFoncierNP   = loyersBruts - chargesDedNP;
+  const deficitNP      = Math.max(0, -revFoncierNP);
+  const defImputableNP = Math.min(deficitNP, 10700);
+  const baseNP         = Math.max(0, revFoncierNP);
+  const irNP  = baseNP * i.tmi / 100;
+  const psNP  = baseNP * 0.172;
+  const impotNP = irNP + psNP;
+  const cashAvNP = loyersBruts - chargesNonFin - anneeCredit;
+  const cashApNP = cashAvNP - impotNP;
+
+  /* ── SCI IR ─────────────────────────────────
+     Transparence fiscale : même régime que NP + frais SCI
+  */
+  const chargesNonFinIR = chargesNonFin + fraisExtraSCI;
+  const chargesDedIR    = chargesNonFinIR + int1;
+  const revFoncierIR    = loyersBruts - chargesDedIR;
+  const baseIR          = Math.max(0, revFoncierIR);
+  const irIR  = baseIR * i.tmi / 100;
+  const psIR  = baseIR * 0.172;
+  const impotIR = irIR + psIR;
+  const cashAvIR = loyersBruts - chargesNonFinIR - anneeCredit;
+  const cashApIR = cashAvIR - impotIR;
+
+  /* ── SCI IS ─────────────────────────────────
+     IS société + amortissement
+  */
+  const chargesNonFinIS = chargesNonFin + fraisExtraSCI;
+  const valBati         = i.prix * (1 - i.terrain / 100);
+  const amortBati       = valBati / i.dureeAmortBati;
+  const amortTrav       = i.travaux > 0 ? i.travaux / i.dureeAmortTrav : 0;
+  const amortMob        = i.mobilier > 0 ? i.mobilier / i.dureeAmortMob : 0;
+  const amortTotal      = amortBati + amortTrav + amortMob;
+
+  const chargesDedIS    = chargesNonFinIS + int1 + amortTotal;
+  const resFiscIS       = Math.max(0, loyersBruts - chargesDedIS);
+  const isAnnuel        = calcIS(resFiscIS);
+  const resNetIS        = loyersBruts - chargesNonFinIS - int1 - amortTotal - isAnnuel;
+
+  const cashSociete     = loyersBruts - chargesNonFinIS - anneeCredit - isAnnuel;
+  const dividendes      = i.distribBenef ? Math.max(0, resNetIS) : 0;
+  const flatTaxDiv      = dividendes * 0.30;
+  const cashApIS        = cashSociete - flatTaxDiv;
+
+  /* ── REVENTE ─────────────────────────────── */
+  const { abIR, abPS } = calcAbattements(i.duree);
+  const prixRevientNP  = i.prix + i.notaire + i.agence + i.travaux; // forfait notaire+agence déductibles
+  const pvBruteNP      = Math.max(0, i.prixRevente - prixRevientNP);
+  const pvNegNP        = Math.min(0, i.prixRevente - prixRevientNP);
+  const pvTaxIR        = pvBruteNP * (1 - abIR / 100);
+  const pvTaxPS        = pvBruteNP * (1 - abPS / 100);
+  const irPV           = pvTaxIR * 0.19;
+  const psPV           = pvTaxPS * 0.172;
+  const surtaxe        = calcSurtaxe(pvTaxIR);
+  const fiscPVNP       = irPV + psPV + surtaxe;
+  const netReventeNP   = i.prixRevente - fiscPVNP + pvNegNP;
+  // SCI IR = même que NP (transparence)
+  const fiscPVIR       = fiscPVNP;
+  const netReventeIR   = netReventeNP;
+
+  // SCI IS : plus-value professionnelle
+  const baseAmort   = valBati + i.travaux + i.mobilier;
+  const amortCumul  = Math.min(amortTotal * i.duree, baseAmort);
+  // VNC = valeur bilan - amortissements
+  const prixBilan   = i.prix + i.travaux + i.mobilier; // terrain toujours comptabilisé
+  const vnc         = Math.max(0, prixBilan - amortCumul);
+  const pvBruteIS   = Math.max(0, i.prixRevente - vnc);
+  const pvNegIS     = Math.min(0, i.prixRevente - vnc);
+  const isVente     = calcIS(pvBruteIS);
+  const netSociete  = pvBruteIS - isVente;
+  const flatTaxVente= i.distribBenef ? netSociete * 0.30 : 0;
+  const fiscPVIS    = isVente + flatTaxVente;
+  const netReventeIS= i.prixRevente - fiscPVIS + pvNegIS;
+
+  /* ── TRÉSORERIE CUMULÉE (approximation linéaire an 1) ── */
+  const tresoNP = cashApNP * i.duree + netReventeNP;
+  const tresoIR = cashApIR * i.duree + netReventeIR - i.fraisCreation;
+  const tresoIS = cashApIS * i.duree + netReventeIS - i.fraisCreation;
+
+  return {
+    i, coutAcq, loyersBruts, chargesNonFin, int1, mens, mensTotal, anneeCredit, fraisExtraSCI,
+    np: { base: baseNP, ir: irNP, ps: psNP, impot: impotNP, cashAv: cashAvNP, cashAp: cashApNP,
+          deficit: deficitNP, defImputable: defImputableNP, chargesDed: chargesDedNP },
+    sciIR: { base: baseIR, ir: irIR, ps: psIR, impot: impotIR, cashAv: cashAvIR, cashAp: cashApIR,
+             chargesDed: chargesDedIR },
+    sciIS: { amortTotal, amortBati, amortTrav, amortMob, resFisc: resFiscIS, isAnnuel,
+             resNet: resNetIS, cashSociete, dividendes, flatTaxDiv, cashAp: cashApIS,
+             chargesDed: chargesDedIS },
+    revNP: { pvBrute: pvBruteNP, abIR, abPS, pvTaxIR, pvTaxPS, ir: irPV, ps: psPV,
+             surtaxe, fiscPV: fiscPVNP, net: netReventeNP },
+    revIR: { pvBrute: pvBruteNP, abIR, abPS, fiscPV: fiscPVIR, net: netReventeIR },
+    revIS: { pvBrute: pvBruteIS, vnc, amortCumul, isVente, netSociete, flatTaxVente, fiscPV: fiscPVIS, net: netReventeIS },
+    tresoNP, tresoIR, tresoIS,
+    valBati, amortTotal
+  };
+}
+
+/* ══════════════════════════════════════════════
+   RENDU
+══════════════════════════════════════════════ */
+function renderBarChart(containerId, rows) {
+  // rows: [{lbl, val, cls}]
+  const valid = rows.filter(r => isFinite(r.val));
+  const maxAbs = Math.max(...valid.map(r => Math.abs(r.val)), 1);
+  const html = rows.map(r => {
+    const w = Math.max(0, Math.min(100, Math.abs(r.val) / maxAbs * 100)).toFixed(1);
+    const sign = r.val >= 0 ? '+' : '−';
+    const display = eur(Math.abs(r.val));
+    const col = r.val < 0 ? 'background:#9B5A3A' : '';
+    return `
+      <div class="sci-chart-row">
+        <div class="sci-chart-lbl">${r.lbl}</div>
+        <div class="sci-chart-bar-bg">
+          <div class="sci-chart-bar ${r.cls}" style="width:${w}%;${col}"></div>
+        </div>
+        <div class="sci-chart-val" style="color:${r.val>=0?'var(--text-muted)':'#9B5A3A'}">${sign}${display}</div>
+      </div>`;
+  }).join('');
+  document.getElementById(containerId).innerHTML = html;
+}
+
+function winner(vals, inverse) {
+  // Returns index of best value (highest if !inverse, lowest if inverse)
+  if (vals.every(v => !isFinite(v))) return -1;
+  const fn = inverse
+    ? (a,b) => a - b
+    : (a,b) => b - a;
+  const sorted = [...vals].sort(fn);
+  return vals.indexOf(sorted[0]);
+}
+
+function wStar(idx, col) {
+  const cls = ['c-np','c-ir','c-is'][col];
+  return idx === col ? ' winner' : '';
+}
+
+function render(d) {
+  const { i, loyersBruts, chargesNonFin, int1, anneeCredit, fraisExtraSCI,
+          np, sciIR, sciIS, revNP, revIR, revIS, tresoNP, tresoIR, tresoIS, amortTotal } = d;
+
+  /* ── TAB ANNUEL ── */
+  const cfVals = [np.cashAp, sciIR.cashAp, sciIS.cashAp];
+  const cfW    = winner(cfVals, false);
+  document.getElementById('key-annuel').innerHTML = `
+    <div class="sci-key-card np">
+      <span class="sci-key-badge">Nom propre</span>
+      <div class="sci-key-val">${eur(np.cashAp)}</div>
+      <div class="sci-key-sub">Cash-flow net/an · Impôt ${eur(np.impot)}</div>
+    </div>
+    <div class="sci-key-card ir">
+      <span class="sci-key-badge">SCI à l'IR</span>
+      <div class="sci-key-val">${eur(sciIR.cashAp)}</div>
+      <div class="sci-key-sub">Cash-flow net/an · Impôt ${eur(sciIR.impot)}</div>
+    </div>
+    <div class="sci-key-card is">
+      <span class="sci-key-badge">SCI à l'IS</span>
+      <div class="sci-key-val">${eur(sciIS.cashAp)}</div>
+      <div class="sci-key-sub">Cash-flow net/an · IS ${eur(sciIS.isAnnuel)}${sciIS.flatTaxDiv>0?' · Flat tax '+eur(sciIS.flatTaxDiv):''}</div>
+    </div>`;
+
+  renderBarChart('chart-cashflow', [
+    { lbl: 'Nom propre', val: np.cashAp,    cls: 'np' },
+    { lbl: 'SCI à l\'IR', val: sciIR.cashAp, cls: 'ir' },
+    { lbl: 'SCI à l\'IS', val: sciIS.cashAp, cls: 'is' },
+  ]);
+
+  document.getElementById('tbl-annuel').innerHTML = `
+    <thead><tr>
+      <th class="lbl">Indicateur</th>
+      <th class="h-np">Nom propre</th>
+      <th class="h-ir">SCI à l'IR</th>
+      <th class="h-is">SCI à l'IS</th>
+    </tr></thead>
+    <tbody>
+      <tr class="sect-head"><td colspan="4">Revenus</td></tr>
+      <tr>
+        <td>Loyers bruts annuels</td>
+        <td class="c-np">${eur(loyersBruts)}</td>
+        <td class="c-ir">${eur(loyersBruts)}</td>
+        <td class="c-is">${eur(loyersBruts)}</td>
+      </tr>
+      <tr class="sect-head"><td colspan="4">Charges déductibles</td></tr>
+      <tr>
+        <td>Charges non financières</td>
+        <td class="c-np">${eur(chargesNonFin)}</td>
+        <td class="c-ir">${eur(chargesNonFin + fraisExtraSCI)}</td>
+        <td class="c-is">${eur(chargesNonFin + fraisExtraSCI)}</td>
+      </tr>
+      <tr>
+        <td>Intérêts d'emprunt (an 1)</td>
+        <td class="c-np">${eur(int1)}</td>
+        <td class="c-ir">${eur(int1)}</td>
+        <td class="c-is">${eur(int1)}</td>
+      </tr>
+      ${amortTotal>0?`<tr>
+        <td>Amortissement bâti/travaux/mobilier</td>
+        <td class="c-np" style="color:var(--text-dim)">Non déductible</td>
+        <td class="c-ir" style="color:var(--text-dim)">Non déductible</td>
+        <td class="c-is val-acc">${eur(amortTotal)}</td>
+      </tr>`:''}
+      <tr>
+        <td>Total charges déductibles</td>
+        <td class="c-np">${eur(np.chargesDed)}</td>
+        <td class="c-ir">${eur(sciIR.chargesDed)}</td>
+        <td class="c-is">${eur(sciIS.chargesDed)}</td>
+      </tr>
+      <tr class="sect-head"><td colspan="4">Résultat fiscal et impôt</td></tr>
+      <tr>
+        <td>Base imposable / Résultat fiscal</td>
+        <td class="c-np">${np.deficit>0?`<span style="color:#9B5A3A">Déficit ${eur(np.deficit)}</span>`:eur(np.base)}</td>
+        <td class="c-ir">${eur(sciIR.base)}</td>
+        <td class="c-is">${eur(sciIS.resFisc)}</td>
+      </tr>
+      <tr>
+        <td>Impôt (IR ou IS)</td>
+        <td class="c-np val-hi">${eur(np.ir)}</td>
+        <td class="c-ir val-hi">${eur(sciIR.ir)}</td>
+        <td class="c-is val-hi">${eur(sciIS.isAnnuel)}</td>
+      </tr>
+      <tr>
+        <td>Prélèvements sociaux (17,2 %)</td>
+        <td class="c-np val-hi">${eur(np.ps)}</td>
+        <td class="c-ir val-hi">${eur(sciIR.ps)}</td>
+        <td class="c-is" style="color:var(--text-dim)">Non applicable</td>
+      </tr>
+      ${sciIS.flatTaxDiv>0?`<tr>
+        <td>Flat tax dividendes (30 %)</td>
+        <td class="c-np" style="color:var(--text-dim)">—</td>
+        <td class="c-ir" style="color:var(--text-dim)">—</td>
+        <td class="c-is val-hi">${eur(sciIS.flatTaxDiv)}</td>
+      </tr>`:''}
+      <tr>
+        <td>Impôt total</td>
+        <td class="c-np val-hi">${eur(np.impot)}</td>
+        <td class="c-ir val-hi">${eur(sciIR.impot)}</td>
+        <td class="c-is val-hi">${eur(sciIS.isAnnuel + sciIS.flatTaxDiv)}</td>
+      </tr>
+      <tr class="sect-head"><td colspan="4">Cash-flow</td></tr>
+      <tr>
+        <td>Cash-flow avant impôt</td>
+        <td class="c-np ${np.cashAv>=0?'val-pos':'val-neg'}">${np.cashAv>=0?'+':''}${eur(np.cashAv)}</td>
+        <td class="c-ir ${sciIR.cashAv>=0?'val-pos':'val-neg'}">${sciIR.cashAv>=0?'+':''}${eur(sciIR.cashAv)}</td>
+        <td class="c-is ${sciIS.cashSociete>=0?'val-pos':'val-neg'}">${sciIS.cashSociete+sciIS.flatTaxDiv>=0?'+':''}${eur(sciIS.cashSociete+sciIS.flatTaxDiv)}</td>
+      </tr>
+      <tr>
+        <td>Cash-flow net après impôt${cfW>=0?` <span style="font-size:.6rem;color:var(--amber)">★ meilleur</span>`:''}</td>
+        <td class="c-np ${np.cashAp>=0?'val-pos':'val-neg'}${wStar(cfW,0)}">${np.cashAp>=0?'+':''}${eur(np.cashAp)}</td>
+        <td class="c-ir ${sciIR.cashAp>=0?'val-pos':'val-neg'}${wStar(cfW,1)}">${sciIR.cashAp>=0?'+':''}${eur(sciIR.cashAp)}</td>
+        <td class="c-is ${sciIS.cashAp>=0?'val-pos':'val-neg'}${wStar(cfW,2)}">${sciIS.cashAp>=0?'+':''}${eur(sciIS.cashAp)}</td>
+      </tr>
+      <tr>
+        <td>Cash-flow mensuel net</td>
+        <td class="c-np ${np.cashAp>=0?'val-pos':'val-neg'}">${np.cashAp>=0?'+':''}${eur(np.cashAp/12,0)}/mois</td>
+        <td class="c-ir ${sciIR.cashAp>=0?'val-pos':'val-neg'}">${sciIR.cashAp>=0?'+':''}${eur(sciIR.cashAp/12,0)}/mois</td>
+        <td class="c-is ${sciIS.cashAp>=0?'val-pos':'val-neg'}">${sciIS.cashAp>=0?'+':''}${eur(sciIS.cashAp/12,0)}/mois</td>
+      </tr>
+    </tbody>`;
+
+  /* Déficit foncier alert */
+  const defEl = document.getElementById('pedago-deficit');
+  if (np.deficit > 0) {
+    defEl.style.display = 'block';
+    defEl.innerHTML = `<div class="pedago-tip" style="margin-top:.75rem">
+      En nom propre et SCI IR, un <strong>déficit foncier de ${eur(np.deficit)}</strong> est généré.
+      ${np.defImputable > 0 ? `Jusqu'à <strong>${eur(np.defImputable)}</strong> sont imputables sur le revenu global de l'année (CGI art. 156), réduisant ainsi l'impôt global du foyer.` : ''}
+      Le surplus est reportable sur les revenus fonciers des 10 années suivantes.
+    </div>`;
+  } else {
+    defEl.style.display = 'none';
+  }
+
+  /* ── TAB REVENTE ── */
+  const netVals = [revNP.net, revIR.net, revIS.net];
+  const netW   = winner(netVals, false);
+  document.getElementById('key-revente').innerHTML = `
+    <div class="sci-key-card np">
+      <span class="sci-key-badge">Nom propre</span>
+      <div class="sci-key-val">${eur(revNP.net)}</div>
+      <div class="sci-key-sub">Net revente · Fiscalité ${eur(revNP.fiscPV)} · Détention ${i.duree} ans</div>
+    </div>
+    <div class="sci-key-card ir">
+      <span class="sci-key-badge">SCI à l'IR</span>
+      <div class="sci-key-val">${eur(revIR.net)}</div>
+      <div class="sci-key-sub">Net revente · Fiscalité ${eur(revIR.fiscPV)} · Détention ${i.duree} ans</div>
+    </div>
+    <div class="sci-key-card is">
+      <span class="sci-key-badge">SCI à l'IS</span>
+      <div class="sci-key-val">${eur(revIS.net)}</div>
+      <div class="sci-key-sub">Net revente · IS+${i.distribBenef?'flat tax':'rétention'} ${eur(revIS.fiscPV)} · VNC ${eur(revIS.vnc)}</div>
+    </div>`;
+
+  renderBarChart('chart-revente', [
+    { lbl: 'Nom propre',  val: revNP.net, cls: 'np' },
+    { lbl: 'SCI à l\'IR', val: revIR.net, cls: 'ir' },
+    { lbl: 'SCI à l\'IS', val: revIS.net, cls: 'is' },
+  ]);
+
+  const exoIR_label = revNP.abIR >= 100 ? '✓ Exonéré IR' : `Abatt. IR ${pct(revNP.abIR)}`;
+  const exoPS_label = revNP.abPS >= 100 ? '✓ Exonéré PS' : `Abatt. PS ${pct(revNP.abPS)}`;
+
+  document.getElementById('tbl-revente').innerHTML = `
+    <thead><tr>
+      <th class="lbl">Indicateur</th>
+      <th class="h-np">Nom propre</th>
+      <th class="h-ir">SCI à l'IR</th>
+      <th class="h-is">SCI à l'IS</th>
+    </tr></thead>
+    <tbody>
+      <tr class="sect-head"><td colspan="4">Prix et base de calcul</td></tr>
+      <tr>
+        <td>Prix de revente</td>
+        <td class="c-np">${eur(i.prixRevente)}</td>
+        <td class="c-ir">${eur(i.prixRevente)}</td>
+        <td class="c-is">${eur(i.prixRevente)}</td>
+      </tr>
+      <tr>
+        <td>Prix de revient / VNC</td>
+        <td class="c-np">${eur(i.prix + i.notaire + i.agence + i.travaux)}</td>
+        <td class="c-ir">${eur(i.prix + i.notaire + i.agence + i.travaux)}</td>
+        <td class="c-is val-acc" title="Valeur Nette Comptable après amortissements">${eur(revIS.vnc)} <span style="font-size:.6rem;color:var(--accent)">(VNC)</span></td>
+      </tr>
+      <tr>
+        <td>Plus-value brute</td>
+        <td class="c-np">${eur(revNP.pvBrute)}</td>
+        <td class="c-ir">${eur(revIR.pvBrute)}</td>
+        <td class="c-is">${eur(revIS.pvBrute)} <span style="font-size:.6rem;color:var(--text-dim)">(vs VNC)</span></td>
+      </tr>
+      <tr class="sect-head"><td colspan="4">Fiscalité de la plus-value</td></tr>
+      <tr>
+        <td>Régime applicable</td>
+        <td class="c-np" style="font-family:var(--sans);font-size:.73rem;color:var(--text-muted)">PV particuliers (CGI art. 150 U)</td>
+        <td class="c-ir" style="font-family:var(--sans);font-size:.73rem;color:var(--text-muted)">PV particuliers (transparence)</td>
+        <td class="c-is" style="font-family:var(--sans);font-size:.73rem;color:#9B5A3A">PV professionnelle IS</td>
+      </tr>
+      <tr>
+        <td>Abattement / durée</td>
+        <td class="c-np">${exoIR_label} · ${exoPS_label}</td>
+        <td class="c-ir">${exoIR_label} · ${exoPS_label}</td>
+        <td class="c-is" style="color:#9B5A3A">Aucun abattement</td>
+      </tr>
+      <tr>
+        <td>IR sur plus-value (19 %)</td>
+        <td class="c-np val-hi">${eur(revNP.ir)}</td>
+        <td class="c-ir val-hi">${eur(revNP.ir)}</td>
+        <td class="c-is" style="color:var(--text-dim)">—</td>
+      </tr>
+      <tr>
+        <td>Prélèvements sociaux (17,2 %)</td>
+        <td class="c-np val-hi">${eur(revNP.ps)}</td>
+        <td class="c-ir val-hi">${eur(revNP.ps)}</td>
+        <td class="c-is" style="color:var(--text-dim)">—</td>
+      </tr>
+      ${revNP.surtaxe>0?`<tr>
+        <td>Surtaxe PV (CGI art. 1609 nonies G)</td>
+        <td class="c-np val-hi">${eur(revNP.surtaxe)}</td>
+        <td class="c-ir val-hi">${eur(revNP.surtaxe)}</td>
+        <td class="c-is" style="color:var(--text-dim)">—</td>
+      </tr>`:''}
+      <tr>
+        <td>IS sur plus-value professionnelle</td>
+        <td class="c-np" style="color:var(--text-dim)">—</td>
+        <td class="c-ir" style="color:var(--text-dim)">—</td>
+        <td class="c-is val-hi">${eur(revIS.isVente)}</td>
+      </tr>
+      ${i.distribBenef?`<tr>
+        <td>Flat tax distribués (30 %)</td>
+        <td class="c-np" style="color:var(--text-dim)">—</td>
+        <td class="c-ir" style="color:var(--text-dim)">—</td>
+        <td class="c-is val-hi">${eur(revIS.flatTaxVente)}</td>
+      </tr>`:''}
+      <tr>
+        <td>Fiscalité totale revente</td>
+        <td class="c-np val-hi">${eur(revNP.fiscPV)}</td>
+        <td class="c-ir val-hi">${eur(revIR.fiscPV)}</td>
+        <td class="c-is val-hi">${eur(revIS.fiscPV)}</td>
+      </tr>
+      <tr>
+        <td><strong>Net récupéré</strong>${netW>=0?` <span style="font-size:.6rem;color:var(--amber)">★ meilleur</span>`:''}</td>
+        <td class="c-np val-np${wStar(netW,0)}">${eur(revNP.net)}</td>
+        <td class="c-ir val-ir${wStar(netW,1)}">${eur(revIR.net)}</td>
+        <td class="c-is val-is${wStar(netW,2)}">${eur(revIS.net)}</td>
+      </tr>
+    </tbody>`;
+
+  /* IS exit alert */
+  const reventeAlertEl = document.getElementById('pedago-revente');
+  if (revIS.pvBrute > revNP.pvBrute * 1.1 || revIS.fiscPV > revNP.fiscPV * 1.2) {
+    reventeAlertEl.innerHTML = `
+      <div class="is-exit-alert">
+        <strong>Attention — Effet ciseau SCI IS :</strong> Les amortissements ont réduit la base imposable pendant la détention, mais ils ont aussi réduit la VNC à ${eur(revIS.vnc)}. La plus-value professionnelle imposable à l'IS s'élève à <strong>${eur(revIS.pvBrute)}</strong> (vs ${eur(revNP.pvBrute)} en régime particulier). La fiscalité à la revente IS est de <strong>${eur(revIS.fiscPV)}</strong>, soit ${revNP.fiscPV>0?pct((revIS.fiscPV-revNP.fiscPV)/revNP.fiscPV*100,0)+' de plus':'significativement plus'} qu'en nom propre. Plus l'amortissement est élevé et plus la détention est longue, plus cet effet est amplifié.
+      </div>`;
+  } else {
+    reventeAlertEl.innerHTML = '';
+  }
+
+  /* ── TAB GLOBAL ── */
+  const tresoVals = [tresoNP, tresoIR, tresoIS];
+  const tresoW   = winner(tresoVals, false);
+  document.getElementById('key-global').innerHTML = `
+    <div class="sci-key-card np">
+      <span class="sci-key-badge">Nom propre</span>
+      <div class="sci-key-val">${eur(tresoNP)}</div>
+      <div class="sci-key-sub">CF cumulés + revente sur ${i.duree} ans</div>
+    </div>
+    <div class="sci-key-card ir">
+      <span class="sci-key-badge">SCI à l'IR</span>
+      <div class="sci-key-val">${eur(tresoIR)}</div>
+      <div class="sci-key-sub">CF cumulés + revente sur ${i.duree} ans</div>
+    </div>
+    <div class="sci-key-card is">
+      <span class="sci-key-badge">SCI à l'IS</span>
+      <div class="sci-key-val">${eur(tresoIS)}</div>
+      <div class="sci-key-sub">CF cumulés + revente sur ${i.duree} ans${!i.distribBenef?' · Bénéfices retenus':''}</div>
+    </div>`;
+
+  renderBarChart('chart-global', [
+    { lbl: 'Nom propre',   val: tresoNP, cls: 'np' },
+    { lbl: 'SCI à l\'IR', val: tresoIR, cls: 'ir' },
+    { lbl: 'SCI à l\'IS', val: tresoIS, cls: 'is' },
+  ]);
+
+  const taxAnnVals = [np.impot, sciIR.impot, sciIS.isAnnuel + sciIS.flatTaxDiv];
+  const taxAnnW   = winner(taxAnnVals, true); // lowest = best
+  const taxRevVals= [revNP.fiscPV, revIR.fiscPV, revIS.fiscPV];
+  const taxRevW   = winner(taxRevVals, true);
+
+  document.getElementById('tbl-global').innerHTML = `
+    <thead><tr>
+      <th class="lbl">Indicateur</th>
+      <th class="h-np">Nom propre</th>
+      <th class="h-ir">SCI à l'IR</th>
+      <th class="h-is">SCI à l'IS</th>
+    </tr></thead>
+    <tbody>
+      <tr class="sect-head"><td colspan="4">Synthèse annuelle</td></tr>
+      <tr>
+        <td>Cash-flow net annuel</td>
+        <td class="c-np ${np.cashAp>=0?'val-pos':'val-neg'}">${np.cashAp>=0?'+':''}${eur(np.cashAp)}</td>
+        <td class="c-ir ${sciIR.cashAp>=0?'val-pos':'val-neg'}">${sciIR.cashAp>=0?'+':''}${eur(sciIR.cashAp)}</td>
+        <td class="c-is ${sciIS.cashAp>=0?'val-pos':'val-neg'}">${sciIS.cashAp>=0?'+':''}${eur(sciIS.cashAp)}</td>
+      </tr>
+      <tr>
+        <td>Impôt annuel${taxAnnW>=0?' ★':''}</td>
+        <td class="c-np val-hi${wStar(taxAnnW,0)}">${eur(np.impot)}</td>
+        <td class="c-ir val-hi${wStar(taxAnnW,1)}">${eur(sciIR.impot)}</td>
+        <td class="c-is val-hi${wStar(taxAnnW,2)}">${eur(sciIS.isAnnuel + sciIS.flatTaxDiv)}</td>
+      </tr>
+      <tr class="sect-head"><td colspan="4">Revente après ${i.duree} ans</td></tr>
+      <tr>
+        <td>Fiscalité revente${taxRevW>=0?' ★':''}</td>
+        <td class="c-np val-hi${wStar(taxRevW,0)}">${eur(revNP.fiscPV)}</td>
+        <td class="c-ir val-hi${wStar(taxRevW,1)}">${eur(revIR.fiscPV)}</td>
+        <td class="c-is val-hi${wStar(taxRevW,2)}">${eur(revIS.fiscPV)}</td>
+      </tr>
+      <tr>
+        <td>Net récupéré à la revente</td>
+        <td class="c-np val-np">${eur(revNP.net)}</td>
+        <td class="c-ir val-ir">${eur(revIR.net)}</td>
+        <td class="c-is val-is">${eur(revIS.net)}</td>
+      </tr>
+      <tr>
+        <td><strong>Trésorerie totale cumulée${tresoW>=0?' ★':''}</strong></td>
+        <td class="c-np val-np${wStar(tresoW,0)}">${eur(tresoNP)}</td>
+        <td class="c-ir val-ir${wStar(tresoW,1)}">${eur(tresoIR)}</td>
+        <td class="c-is val-is${wStar(tresoW,2)}">${eur(tresoIS)}</td>
+      </tr>
+    </tbody>`;
+
+  /* Score tableau */
+  const simplScores  = ['★★★','★★','★'];
+  const transScores  = ['★','★★★','★★'];
+  const defisc = ['Patrimoine direct','Transmission / cession de parts','Capitalisation IS + amortissement'];
+  const piege  = ['Revenu global limité','Déficit foncier identique à NP','Forte fiscalité à la sortie'];
+  const adapt  = ['TMI faible, horizon court','Transmission familiale, multi-propriétaires','Capitalisation long terme, amortissement élevé'];
+
+  const impotLabel = [eur(np.impot)+'/an', eur(sciIR.impot)+'/an', eur(sciIS.isAnnuel+sciIS.flatTaxDiv)+'/an'];
+  const revLabel   = [eur(revNP.fiscPV), eur(revIR.fiscPV), eur(revIS.fiscPV)];
+
+  document.getElementById('tbl-score').innerHTML = `
+    <tr><td>Simplicité</td><td>${simplScores[0]}</td><td>${simplScores[1]}</td><td>${simplScores[2]}</td></tr>
+    <tr><td>Transmission patrimoniale</td><td>${transScores[0]}</td><td>${transScores[1]}</td><td>${transScores[2]}</td></tr>
+    <tr><td>Fiscalité annuelle</td><td>${impotLabel[0]}</td><td>${impotLabel[1]}</td><td>${impotLabel[2]}</td></tr>
+    <tr><td>Fiscalité revente</td><td>${revLabel[0]}</td><td>${revLabel[1]}</td><td>${revLabel[2]}</td></tr>
+    <tr><td>Comptabilité obligatoire</td><td>Non</td><td>Conseillée</td><td><strong>Oui</strong></td></tr>
+    <tr><td>Avantage principal</td><td style="font-family:var(--sans);font-size:.73rem;color:var(--text-muted)">${defisc[0]}</td><td style="font-family:var(--sans);font-size:.73rem;color:var(--text-muted)">${defisc[1]}</td><td style="font-family:var(--sans);font-size:.73rem;color:var(--text-muted)">${defisc[2]}</td></tr>
+    <tr><td>Piège principal</td><td style="font-family:var(--sans);font-size:.73rem;color:#9B5A3A">${piege[0]}</td><td style="font-family:var(--sans);font-size:.73rem;color:#9B5A3A">${piege[1]}</td><td style="font-family:var(--sans);font-size:.73rem;color:#9B5A3A">${piege[2]}</td></tr>
+    <tr><td>Adapté si</td><td style="font-family:var(--sans);font-size:.73rem;color:var(--text-muted)">${adapt[0]}</td><td style="font-family:var(--sans);font-size:.73rem;color:var(--text-muted)">${adapt[1]}</td><td style="font-family:var(--sans);font-size:.73rem;color:var(--text-muted)">${adapt[2]}</td></tr>`;
+
+  /* ── TAB PÉDAGOGIE ── */
+  document.getElementById('pedago-full').innerHTML = buildPedago(d);
+
+  /* Disclaimer */
+  document.getElementById('disclaimer-txt').textContent =
+    `Simulation basée sur an 1 pour le cash-flow, extrapolée sur ${i.duree} ans (taux fixe). IS : 15 % ≤ 42 500 € / 25 % au-delà. ` +
+    `Abattements PV : IR exonération à 22 ans, PS plafonnée à 100 % ≈ 22 ans pour l'immobilier résidentiel. ` +
+    `Amortissement SCI IS : bâti sur ${i.dureeAmortBati} ans, travaux ${i.dureeAmortTrav} ans, mobilier ${i.dureeAmortMob} ans. ` +
+    `Frais SCI inclus annuellement dans les charges déductibles. ` +
+    `Sources : CGI art. 150 U, 150 VC, 219, 239 ter ; BOFiP ; impots.gouv.fr ; service-public.fr.`;
+}
+
+/* ══════════════════════════════════════════════
+   PÉDAGOGIE DYNAMIQUE
+══════════════════════════════════════════════ */
+function buildPedago(d) {
+  const { i, np, sciIR, sciIS, revNP, revIS, amortTotal } = d;
+
+  const tmiNote = i.tmi >= 41
+    ? `<div class="pedago-alert">Avec une <strong>TMI de ${i.tmi} %</strong>, la fiscalité sur les revenus fonciers (IR + PS 17,2 %) représente un taux marginal effectif de <strong>${i.tmi + 17.2} %</strong> sur les revenus fonciers nets imposables. La SCI IS peut fortement alléger la fiscalité annuelle via l'amortissement, mais surveillez la sortie.</div>`
+    : i.tmi >= 30
+      ? `<p class="pedago-p">La <strong>TMI de ${i.tmi} %</strong> combinée aux PS 17,2 % donne un taux marginal effectif de <strong>${i.tmi + 17.2} %</strong> sur les revenus fonciers. C'est un niveau significatif : le choix du régime fiscal et du mode de détention peut faire une vraie différence sur le rendement net.</p>`
+      : `<p class="pedago-p">Avec une <strong>TMI de ${i.tmi} %</strong>, la fiscalité locative reste limitée. Le nom propre et la SCI IR sont souvent suffisants à ce niveau d'imposition — la complexité d'une SCI IS se justifie moins.</p>`;
+
+  const dureeNote = i.duree <= 7
+    ? `<div class="pedago-alert">Avec une <strong>durée de détention courte (${i.duree} ans)</strong>, les frais d'acquisition (notaire, agence) pèsent lourdement. Côté revente, les abattements pour durée de détention sont quasi nuls. En SCI IS, la VNC reste encore élevée et la plus-value professionnelle peut être très imposée. <strong>La sortie rapide pénalise tous les modes, mais surtout la SCI IS.</strong></div>`
+    : i.duree >= 22
+      ? `<p class="pedago-p">Avec <strong>${i.duree} ans de détention</strong>, les plus-values en nom propre et SCI IR bénéficient d'une <strong>exonération totale d'IR et de prélèvements sociaux</strong> (abattements à 100 %). La revente est fiscalement quasi neutre. En SCI IS, l'amortissement aura réduit la VNC et la plus-value professionnelle sera potentiellement très élevée — sans aucun abattement.</p>`
+      : `<p class="pedago-p">Avec <strong>${i.duree} ans de détention</strong>, les abattements PV particuliers atteignent <strong>IR : ${pct(revNP.abIR, 0)}</strong> et <strong>PS : ${pct(revNP.abPS, 0)}</strong>. La fiscalité de sortie est réduite mais pas nulle. La comparaison avec la SCI IS à la revente est donc encore défavorable à l'IS.</p>`;
+
+  const amortNote = amortTotal > 0
+    ? `<p class="pedago-p">En <strong>SCI IS</strong>, l'amortissement annuel total est de <strong>${eur(amortTotal)}</strong> (bâti ${eur(d.sciIS.amortBati)}, travaux ${eur(d.sciIS.amortTrav)}, mobilier ${eur(d.sciIS.amortMob)}). Cette charge comptable — <em>non décaissée</em> — réduit le résultat imposable à l'IS, parfois jusqu'à zéro. C'est le principal levier fiscal de la SCI IS pendant la détention.</p>`
+    : `<p class="pedago-p">En <strong>SCI IS</strong> avec un amortissement de base (bâti ${eur(d.sciIS.amortBati)}/an), le résultat fiscal est réduit à <strong>${eur(sciIS.resFisc)}</strong> après déduction des amortissements. L'IS dû est de <strong>${eur(sciIS.isAnnuel)}</strong> — significativement plus faible que l'IR+PS en nom propre${np.impot > 0 ? ' ('+eur(np.impot)+')':''}.`;
+
+  const objectifNote = i.objectif === 'transmission'
+    ? `<div class="pedago-tip"><strong>Objectif transmission :</strong> La SCI à l'IR est souvent recommandée. Elle permet de donner des parts sociales progressivement (abattements de 100 000 € / enfant / 15 ans), d'organiser un démembrement de propriété (usufruit/nue-propriété), et de faciliter la gestion indivise entre héritiers. La valeur des parts peut aussi bénéficier de décotes de minorité ou de gestion.</div>`
+    : i.objectif === 'capitalisation'
+      ? `<div class="pedago-tip"><strong>Objectif capitalisation :</strong> La SCI IS avec capitalisation des bénéfices (sans distribution) permet d'accumuler des réserves imposées seulement à l'IS (15-25 %). Les associés ne sont pas imposés tant que rien n'est distribué. C'est efficace à court terme, mais la fiscalité à la sortie (revente ou dissolution) peut être lourde.</div>`
+      : `<div class="pedago-tip"><strong>Objectif revenus immédiats :</strong> Le nom propre ou la SCI IR sont plus directs — les revenus fonciers arrivent directement dans le revenu de l'associé. La SCI IS nécessite de distribuer des dividendes (flat tax 30 %) pour récupérer les bénéfices, ce qui ajoute une couche de fiscalité.</div>`;
+
+  const exitNote = revIS.pvBrute > revNP.pvBrute
+    ? `<div class="is-exit-alert">
+        <strong>Le piège de la SCI IS à la sortie :</strong> Pendant ${i.duree} ans, les amortissements ont fiscalement réduit la valeur comptable du bien (VNC = ${eur(revIS.vnc)}). À la revente pour ${eur(i.prixRevente)}, la plus-value professionnelle est de <strong>${eur(revIS.pvBrute)}</strong> (contre ${eur(revNP.pvBrute)} en régime particulier). Cette PV est imposée à l'IS (15-25 %) <em>sans aucun abattement pour durée de détention</em>. La fiscalité totale de sortie en SCI IS est ici de <strong>${eur(revIS.fiscPV)}</strong>, contre <strong>${eur(revNP.fiscPV)}</strong> en nom propre. Plus l'amortissement a été fort, plus l'impôt de sortie le sera. Réfléchissez à l'horizon de détention avant de choisir la SCI IS.
+      </div>`
+    : '';
+
+  return `
+    <div class="pedago-card animate">
+      <div class="pedago-card-header">
+        <div class="pedago-card-dot"></div>
+        <div class="pedago-card-title">Nom propre — comment ça fonctionne</div>
+      </div>
+      <div class="pedago-card-body">
+        <p class="pedago-p">En <strong>nom propre</strong>, vous êtes directement propriétaire du bien. Les revenus locatifs sont déclarés comme revenus fonciers (location nue) ou BIC (meublé). Ils s'ajoutent à vos autres revenus et sont imposés à votre TMI. En régime réel, les charges réelles sont déductibles : taxe foncière, intérêts d'emprunt, travaux d'entretien, assurance, gestion. Un <strong>déficit foncier</strong> jusqu'à 10 700 €/an est imputable sur le revenu global (CGI art. 156).</p>
+        <p class="pedago-p">La revente est soumise au régime des <strong>plus-values des particuliers</strong> : IR 19 % + PS 17,2 %, avec des abattements croissants selon la durée de détention. À partir de 22 ans, la PV est totalement exonérée d'IR (et de PS pour l'immobilier résidentiel).</p>
+        ${tmiNote}
+      </div>
+    </div>
+
+    <div class="pedago-card animate" style="margin-top:1rem">
+      <div class="pedago-card-header">
+        <div class="pedago-card-dot" style="background:var(--success)"></div>
+        <div class="pedago-card-title" style="color:var(--success)">SCI à l'IR — transparence fiscale</div>
+      </div>
+      <div class="pedago-card-body">
+        <p class="pedago-p">La <strong>SCI à l'IR est fiscalement transparente</strong> : elle n'est pas imposée directement. Ses résultats sont "remontés" chez chaque associé à proportion de ses parts, et imposés dans sa déclaration personnelle, exactement comme en nom propre. Sur le plan fiscal annuel, la différence principale avec le nom propre est l'ajout de frais propres à la structure (comptabilité, actes juridiques).</p>
+        <p class="pedago-p">Son intérêt est <strong>avant tout patrimonial et successoral</strong> : facilité de transmission des parts, démembrement possible, organisation de la gouvernance entre associés, protection du bien de la liquidation d'un associé.</p>
+        <div class="pedago-tip"><strong>La SCI IR ne procure pas d'avantage fiscal annuel par rapport au nom propre.</strong> Elle peut même être légèrement moins avantageuse (frais de structure). Son intérêt est juridique et patrimonial.</div>
+      </div>
+    </div>
+
+    <div class="pedago-card animate" style="margin-top:1rem">
+      <div class="pedago-card-header">
+        <div class="pedago-card-dot"></div>
+        <div class="pedago-card-title">SCI à l'IS — amortissement et capitalisation</div>
+      </div>
+      <div class="pedago-card-body">
+        ${amortNote}
+        <p class="pedago-p">Autre particularité de la SCI IS : les intérêts d'emprunt sont déductibles (comme en NP et IR), mais les remboursements de capital ne le sont pas — ils sont "compensés" comptablement par l'amortissement. Résultat : le résultat fiscal IS peut être nul ou très faible en début de détention, surtout si l'emprunt est important et les amortissements élevés.</p>
+        ${exitNote}
+        ${objectifNote}
+      </div>
+    </div>
+
+    <div class="pedago-card animate" style="margin-top:1rem">
+      <div class="pedago-card-header">
+        <div class="pedago-card-dot" style="background:var(--amber)"></div>
+        <div class="pedago-card-title" style="color:var(--amber)">Durée de détention et fiscalité de sortie</div>
+      </div>
+      <div class="pedago-card-body">
+        ${dureeNote}
+        <p class="pedago-p">Les <strong>abattements pour durée de détention</strong> (CGI art. 150 VC) sont applicables en nom propre et SCI IR uniquement. Ils progressent jusqu'à exonération totale d'IR à 22 ans. En SCI IS, la plus-value professionnelle n'en bénéficie jamais — c'est le principal piège de ce régime pour les investisseurs qui souhaitent un jour revendre.</p>
+        <div class="pedago-alert"><strong>Règle pratique :</strong> Si la durée de détention est longue (≥ 15-20 ans) et que l'objectif est la revente finale, le nom propre et la SCI IR ont presque toujours une meilleure fiscalité globale (PV + IR + PS). La SCI IS est plus intéressante si l'objectif est la capitalisation à très long terme au sein de la société, sans revente ou avec transmission des parts.</div>
+      </div>
+    </div>`;
+}
+
+/* ══════════════════════════════════════════════
+   SLIDERS
+══════════════════════════════════════════════ */
+function syncSld(numId, sldId, dispId, fmt) {
+  const num = document.getElementById(numId);
+  const sld = document.getElementById(sldId);
+  const disp = dispId ? document.getElementById(dispId) : null;
+  if (!num || !sld) return;
+
+  function setPct() {
+    const mn = parseFloat(sld.min)||0, mx = parseFloat(sld.max)||100;
+    const v  = Math.min(Math.max(parseFloat(sld.value)||0, mn), mx);
+    sld.style.setProperty('--pct', ((v-mn)/(mx-mn)*100).toFixed(1)+'%');
+  }
+  function onNum() {
+    const v = SP.parseNum(num.value);
+    sld.value = Math.min(Math.max(v, parseFloat(sld.min)||0), parseFloat(sld.max)||100);
+    setPct();
+    if (disp) disp.textContent = fmt(v);
+  }
+  function onSld() {
+    SP.setVal(num, parseFloat(sld.value)||0);
+    if (disp) disp.textContent = fmt(parseFloat(sld.value)||0);
+    setPct();
+  }
+  num.addEventListener('input', onNum);
+  sld.addEventListener('input', onSld);
+  setPct();
+  if (disp) disp.textContent = fmt(SP.parseNum(num.value)||0);
+}
+
+/* ══════════════════════════════════════════════
+   INIT
+══════════════════════════════════════════════ */
+function calc() {
+  try {
+    const d = calcAll();
+    render(d);
+  } catch(e) {
+    console.error(e);
+  }
+}
+
+/* Sliders */
+const fmtEur = v => new Intl.NumberFormat('fr-FR',{maximumFractionDigits:0}).format(Math.round(+v||0)).replace(/[  ]/g,' ') + ' €';
+syncSld('s-prix',       's-prix-sld',    's-prix-disp',    fmtEur);
+syncSld('s-prix-revente','s-revente-sld','s-revente-disp', fmtEur);
+syncSld('s-loyer',      's-loyer-sld',   's-loyer-disp',   fmtEur);
+syncSld('s-montant',    's-montant-sld', 's-montant-disp', fmtEur);
+
+/* Auto-compute frais notaire when prix changes */
+document.getElementById('s-prix').addEventListener('input', function() {
+  const prix = SP.parseNum(this.value);
+  const notEl = document.getElementById('s-notaire');
+  if (notEl) SP.setVal(notEl, Math.round(prix * 0.078 / 100) * 100);
+});
+document.getElementById('s-prix-sld').addEventListener('input', function() {
+  const prix = parseFloat(this.value)||0;
+  const notEl = document.getElementById('s-notaire');
+  if (notEl) SP.setVal(notEl, Math.round(prix * 0.078 / 100) * 100);
+});
+
+/* All input listeners */
+const allIds = [
+  's-prix','s-prix-sld','s-prix-revente','s-revente-sld','s-duree',
+  's-loyer','s-loyer-sld','s-vacance','s-type-loc',
+  's-tf','s-copro','s-pno','s-entretien','s-gestion','s-autres-chg',
+  's-montant','s-montant-sld','s-taux-cr','s-duree-cr','s-apport','s-assur-empr',
+  's-tmi','s-objectif',
+  's-notaire','s-agence','s-travaux','s-mobilier','s-terrain',
+  's-frais-creation','s-frais-compta','s-frais-jur','s-distrib',
+  's-amort-bati','s-amort-trav','s-amort-mob',
+];
+allIds.forEach(id => {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.addEventListener('input', calc);
+  if (el.tagName === 'SELECT') el.addEventListener('change', calc);
+});
+
+/* Tabs */
+document.querySelectorAll('.sci-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.sci-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.sci-panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+  });
+});
+
+/* Calcul initial pour afficher la structure complète des résultats au chargement */
+calc();
+
+/* Nav dropdown */
+/* Menu déroulant catégorisé — voir shared-nav.js */
+SP.nav.init();
+</script>
+</body>
+</html>

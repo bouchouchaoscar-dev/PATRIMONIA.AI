@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="favicon-64.png">
+  <link rel="shortcut icon" href="favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="favicon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IFI 2026 — PATRIMONIA.AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css?v=19">
+<script src="shared.js?v=2"></script>
+  <script src="shared-nav.js?v=6"></script>
+<style>
+/* ── ASSET LIST ── */
+.asset-list { display:flex; flex-direction:column; gap:.5rem; margin-bottom:.75rem; min-height:2rem }
+.asset-empty {
+  font-size:.78rem; color:var(--text-dim); font-family:var(--mono);
+  text-align:center; padding:1.5rem 1rem;
+  border:1.5px dashed var(--border); border-radius:12px;
+}
+.asset-row {
+  display:flex; align-items:center; gap:.6rem;
+  background:var(--surface); border:1px solid var(--border-subtle);
+  border-radius:10px; padding:.55rem .75rem;
+}
+.asset-badge {
+  font-size:.6rem; font-weight:700; letter-spacing:.05em; text-transform:uppercase;
+  padding:.18rem .55rem; border-radius:100px; white-space:nowrap; flex-shrink:0;
+}
+.badge-rp  { background:rgba(79,138,120,.1); color:var(--accent) }
+.badge-rs  { background:rgba(255,159,10,.1); color:var(--amber) }
+.badge-loc { background:rgba(59,140,90,.12); color:#2E7A52 }
+.badge-scpi{ background:rgba(175,82,222,.1); color:#af52de }
+.badge-sci { background:rgba(155,90,58,.1);  color:#9B5A3A }
+.badge-av  { background:rgba(0,199,190,.1);  color:#00796b }
+.badge-dette{ background:rgba(142,142,147,.12); color:#636366 }
+.asset-label { flex:1; font-size:.78rem; color:var(--text); font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
+.asset-decote { font-size:.68rem; color:#2E7A52; font-family:var(--mono); white-space:nowrap }
+.asset-val { font-size:.78rem; font-weight:600; color:var(--text); font-family:var(--mono); white-space:nowrap; margin-left:auto }
+.asset-del {
+  width:22px; height:22px; border-radius:50%; border:none; cursor:pointer;
+  background:none; color:var(--text-dim); display:flex; align-items:center; justify-content:center;
+  flex-shrink:0; transition:background .15s, color .15s; font-size:.9rem; line-height:1;
+}
+.asset-del:hover { background:rgba(155,90,58,.1); color:#9B5A3A }
+
+/* ── ADD FORM ── */
+.add-btn {
+  width:100%; display:flex; align-items:center; justify-content:center; gap:.5rem;
+  background:none; border:1.5px dashed var(--border); border-radius:10px;
+  padding:.6rem; cursor:pointer; font-size:.78rem; font-weight:500;
+  color:var(--text-muted); font-family:var(--sans);
+  transition:border-color .2s, color .2s, background .2s;
+}
+.add-btn:hover { border-color:var(--accent); color:var(--accent); background:var(--accent-dim) }
+.add-btn svg { width:14px; height:14px; flex-shrink:0 }
+
+.add-form {
+  border:1px solid var(--border-subtle); border-radius:12px;
+  background:var(--surface-2); overflow:hidden;
+  animation:fadeInUp .2s ease both;
+}
+.add-form-inner { padding:.85rem }
+.type-grid {
+  display:grid; grid-template-columns:repeat(4,1fr); gap:.4rem; margin-bottom:.75rem;
+}
+@media(max-width:520px){ .type-grid { grid-template-columns:repeat(2,1fr) } }
+.type-btn {
+  font-size:.72rem; font-weight:600; padding:.42rem .4rem; border-radius:8px;
+  border:1.5px solid var(--border); background:var(--surface); cursor:pointer;
+  color:var(--text-muted); font-family:var(--sans); transition:all .15s; text-align:center;
+}
+.type-btn:hover { border-color:var(--accent); color:var(--accent); background:var(--accent-dim) }
+.type-btn.selected { border-color:var(--accent); background:var(--accent); color:#fff }
+.add-value-row { display:flex; flex-direction:column; gap:.5rem }
+.add-input-wrap { display:flex; align-items:center; gap:.5rem }
+.add-input-wrap input[type=number] {
+  flex:1; height:38px; border:1px solid var(--border); border-radius:8px;
+  padding:0 .75rem; font-size:.85rem; font-family:var(--sans);
+  background:var(--surface); color:var(--text);
+  outline:none; transition:border-color .15s;
+}
+.add-input-wrap input[type=number]:focus { border-color:var(--accent) }
+.add-input-wrap .unit { font-size:.8rem; color:var(--text-dim); font-family:var(--mono) }
+.add-hint { font-size:.67rem; color:var(--text-dim); font-family:var(--mono); line-height:1.5 }
+.add-actions { display:flex; gap:.5rem; margin-top:.5rem }
+.btn-confirm {
+  flex:1; height:36px; background:var(--accent); color:#fff;
+  border:none; border-radius:8px; font-size:.8rem; font-weight:600;
+  cursor:pointer; font-family:var(--sans); transition:background .15s;
+}
+.btn-confirm:hover { background:var(--accent-hover) }
+.btn-confirm:disabled { opacity:.4; cursor:not-allowed }
+.btn-cancel {
+  height:36px; padding:0 1rem; background:none; border:1px solid var(--border);
+  border-radius:8px; font-size:.8rem; font-weight:500; color:var(--text-muted);
+  cursor:pointer; font-family:var(--sans); transition:all .15s;
+}
+.btn-cancel:hover { border-color:var(--text-muted); color:var(--text) }
+
+/* Dettes section */
+.dettes-field { margin-top:.85rem }
+.dettes-field .field-label { margin-bottom:.35rem }
+
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="index.html" class="nav-logo"><img src="logo.png?v=3" alt="PATRIMONIA.AI" class="nav-logo-img"></a>
+  <div class="nav-right">
+    <a href="index.html" class="nav-back">
+      <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7.5 1.5L3 6l4.5 4.5"/></svg>
+      Accueil
+    </a>
+    <div class="nav-dropdown" id="mainDropdown">
+      <button class="nav-dropdown-btn" aria-expanded="false" aria-haspopup="true">
+        Simulateurs <svg class="nav-chevron" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.8" style="width:13px;height:8px;flex-shrink:0"><path d="M1 1l4 4 4-4"/></svg>
+      </button>
+      <div class="nav-dropdown-menu" id="navMenu" role="menu"></div>
+    </div>
+  </div>
+</nav>
+
+<div class="sim-page">
+  <div class="sim-page-header">
+    <span class="sim-num-badge">03</span>
+    <div>
+      <div class="sim-eyebrow">Fiscalité</div><h1>IFI — Impôt sur la <em class="gradient-text">Fortune Immobilière 2026</em></h1>
+      <p>Abattements légaux · Dettes déductibles · Barème progressif · Seuil 1 300 000 €</p>
+    </div>
+  </div>
+
+  <div class="sim-card-wrap">
+    <div class="sim-body">
+      <div class="inputs-panel">
+
+        <!-- Asset list -->
+        <div class="field-label" style="margin-bottom:.5rem">
+          <label>Actifs immobiliers</label>
+        </div>
+        <div class="asset-list" id="asset-list">
+          <div class="asset-empty" id="asset-empty">Aucun actif saisi. Commencez par ajouter un bien.</div>
+        </div>
+
+        <!-- Add button -->
+        <div id="add-btn-wrap">
+          <button class="add-btn" id="add-btn" onclick="openForm()">
+            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="7" y1="2" x2="7" y2="12"/><line x1="2" y1="7" x2="12" y2="7"/></svg>
+            Ajouter un actif
+          </button>
+        </div>
+
+        <!-- Add form (hidden by default) -->
+        <div class="add-form" id="add-form" style="display:none; margin-top:.5rem">
+          <div class="add-form-inner">
+            <div style="font-size:.72rem;font-weight:600;color:var(--text-muted);letter-spacing:.04em;text-transform:uppercase;margin-bottom:.6rem">Type d'actif</div>
+            <div class="type-grid">
+              <button class="type-btn" data-type="rp"   onclick="selectType('rp')">Rés. principale</button>
+              <button class="type-btn" data-type="rs"   onclick="selectType('rs')">Rés. secondaire</button>
+              <button class="type-btn" data-type="loc"  onclick="selectType('loc')">Bien locatif</button>
+              <button class="type-btn" data-type="scpi" onclick="selectType('scpi')">Parts SCPI</button>
+              <button class="type-btn" data-type="sci"  onclick="selectType('sci')">Parts SCI</button>
+              <button class="type-btn" data-type="av"   onclick="selectType('av')">Immo. AV</button>
+            </div>
+            <div class="add-value-row">
+              <div class="add-input-wrap">
+                <input type="text" inputmode="decimal" data-fmt id="add-val" min="0" step="10000" placeholder="Valeur du bien">
+                <span class="unit">€</span>
+              </div>
+              <div id="add-debt-wrap" style="display:none">
+                <div style="font-size:.72rem;font-weight:600;color:var(--text-muted);letter-spacing:.04em;text-transform:uppercase;margin:.6rem 0 .4rem">Crédit en cours sur ce bien</div>
+                <div class="add-input-wrap">
+                  <input type="text" inputmode="decimal" data-fmt id="add-debt" min="0" step="5000" placeholder="Capital restant dû (0 si aucun)">
+                  <span class="unit">€</span>
+                </div>
+              </div>
+              <div class="add-hint" id="add-hint">Sélectionnez un type d'actif pour continuer.</div>
+              <label class="check-item" id="decote-check" style="display:none">
+                <input type="checkbox" id="add-decote" checked> Décote de jouissance 20% (locatif conventionnel)
+              </label>
+            </div>
+            <div class="add-actions">
+              <button class="btn-cancel" onclick="closeForm()">Annuler</button>
+              <button class="btn-confirm" id="btn-confirm" onclick="addAsset()" disabled>Ajouter</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-sep"></div>
+
+        <!-- Autres dettes déductibles -->
+        <div class="field dettes-field">
+          <div class="field-label">
+            <label for="ifi-dettes">Autres dettes déductibles</label>
+            <span class="field-val" id="ifi-dettes-disp">0 €</span>
+          </div>
+          <div class="input-wrap">
+            <input type="text" inputmode="decimal" data-fmt id="ifi-dettes" value="0" min="0" max="10000000" step="5000">
+            <span class="unit">€</span>
+          </div>
+          <input type="range" id="ifi-dettes-s" min="0" max="3000000" step="5000" value="0">
+          <div style="font-size:.68rem;color:var(--text-dim);margin-top:.3rem;font-family:var(--mono)">Dettes non rattachées à un bien : taxes foncières dues au 1er janvier, dettes de travaux, autres emprunts liés à un actif taxable.</div>
+        </div>
+
+      </div>
+      <div class="results-panel" id="ifi-results"></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <span>PATRIMONIA.AI</span> — Simulation indicative à titre informatif uniquement.<br>
+  IFI 2026 : seuil 1 300 000 € · Abattement RP 30% (légal) · Décote si 1 300 000 ≤ P &lt; 1 400 000 €.<br>
+  Décote de jouissance 20% : usage conventionnel, accepté par la DGFIP (fourchette 10–20%).
+</footer>
+
+<script>
+const fmtNum = (v, d=0) => new Intl.NumberFormat('fr-FR',{minimumFractionDigits:d,maximumFractionDigits:d}).format(v).replace(/[\u202F\u00A0]/g,' ');
+const fmtEur = (v, d=0) => fmtNum(v, d) + ' €';
+const fmtPct = (v, d=2) => fmtNum(v*100, d) + ' %';
+
+// ── Asset store ──
+let assets = [];
+let selectedType = null;
+
+const TYPE_META = {
+  rp:   { label:'Résidence principale', badge:'badge-rp',   hint:'Valeur vénale brute. Abattement légal 30% appliqué automatiquement.', hasDebt:true  },
+  rs:   { label:'Résidence secondaire', badge:'badge-rs',   hint:'Valeur vénale brute. Aucun abattement légal.',                        hasDebt:true  },
+  loc:  { label:'Bien locatif',         badge:'badge-loc',  hint:'Valeur vénale brute. Décote de jouissance 20% optionnelle.',           hasDebt:true  },
+  scpi: { label:'Parts SCPI',           badge:'badge-scpi', hint:'Quote-part immobilière de la valeur de retrait ou de réalisation. Crédit d\'acquisition déductible si souscription à crédit.', hasDebt:true  },
+  sci:  { label:'Parts SCI',            badge:'badge-sci',  hint:'Valeur des parts représentative des actifs immobiliers.',              hasDebt:false },
+  av:   { label:'Immo. assurance-vie',  badge:'badge-av',   hint:'Quote-part immobilière des unités de compte au sein du contrat.',      hasDebt:false },
+};
+
+function selectType(type) {
+  selectedType = type;
+  const meta = TYPE_META[type];
+  document.querySelectorAll('.type-btn').forEach(b => b.classList.toggle('selected', b.dataset.type === type));
+  document.getElementById('add-hint').textContent = meta.hint;
+  document.getElementById('decote-check').style.display = type === 'loc' ? '' : 'none';
+  document.getElementById('add-debt-wrap').style.display = meta.hasDebt ? '' : 'none';
+  if (!meta.hasDebt) document.getElementById('add-debt').value = '';
+  document.getElementById('btn-confirm').disabled = false;
+  document.getElementById('add-val').focus();
+}
+
+function openForm() {
+  document.getElementById('add-form').style.display = '';
+  document.getElementById('add-btn-wrap').style.display = 'none';
+  selectedType = null;
+  document.getElementById('add-val').value = '';
+  document.getElementById('add-debt').value = '';
+  document.getElementById('add-debt-wrap').style.display = 'none';
+  document.getElementById('btn-confirm').disabled = true;
+  document.getElementById('add-hint').textContent = 'Sélectionnez un type d\'actif pour continuer.';
+  document.getElementById('decote-check').style.display = 'none';
+  document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('selected'));
+}
+
+function closeForm() {
+  document.getElementById('add-form').style.display = 'none';
+  document.getElementById('add-btn-wrap').style.display = '';
+}
+
+function addAsset() {
+  const val = SP.parseNum(document.getElementById('add-val').value);
+  if (!selectedType || val <= 0) return;
+  const decote = selectedType === 'loc' && document.getElementById('add-decote').checked;
+  const debt = TYPE_META[selectedType].hasDebt ? SP.parseNum(document.getElementById('add-debt').value) : 0;
+  assets.push({ id: Date.now() + Math.random(), type: selectedType, value: val, decote, debt });
+  closeForm();
+  renderList();
+  calcIFI();
+}
+
+function removeAsset(id) {
+  assets = assets.filter(a => a.id !== id);
+  renderList();
+  calcIFI();
+}
+
+function renderList() {
+  const list = document.getElementById('asset-list');
+  const empty = document.getElementById('asset-empty');
+  if (assets.length === 0) {
+    list.innerHTML = '';
+    list.appendChild(empty);
+    return;
+  }
+  list.innerHTML = assets.map(a => {
+    const meta = TYPE_META[a.type];
+    const decoteTag = a.decote ? `<span class="asset-decote">−20%</span>` : '';
+    const debtTag = a.debt > 0 ? `<span class="asset-decote" style="color:var(--text-dim)">crédit ${fmtEur(a.debt,0)}</span>` : '';
+    return `<div class="asset-row">
+      <span class="asset-badge ${meta.badge}">${meta.label}</span>
+      ${decoteTag}${debtTag}
+      <span class="asset-val">${fmtEur(a.value,0)}</span>
+      <button class="asset-del" onclick="removeAsset(${a.id})" title="Supprimer">×</button>
+    </div>`;
+  }).join('');
+}
+
+// ── IFI brackets ──
+const IFI_BRACKETS = [
+  {from:0,        to:800000,   rate:0},
+  {from:800000,   to:1300000,  rate:0.005},
+  {from:1300000,  to:2570000,  rate:0.007},
+  {from:2570000,  to:5000000,  rate:0.01},
+  {from:5000000,  to:10000000, rate:0.0125},
+  {from:10000000, to:Infinity, rate:0.015}
+];
+
+function applyBrackets(amount, brackets) {
+  let tax = 0; const details = [];
+  for (const b of brackets) {
+    if (amount <= b.from) break;
+    const taxable = Math.min(amount, b.to) - b.from;
+    const t = taxable * b.rate;
+    details.push({from:b.from, to:b.to===Infinity?null:b.to, rate:b.rate, taxable, tax:t});
+    tax += t;
+  }
+  return {tax, details};
+}
+
+// ── Sync slider (dettes) ──
+function syncSlider(numId, sldId, dispId, fmt) {
+  const num = document.getElementById(numId);
+  const sld = document.getElementById(sldId);
+  const disp = document.getElementById(dispId);
+  function setPct() {
+    const min=parseFloat(sld.min)||0, max=parseFloat(sld.max)||100;
+    const val=Math.min(Math.max(parseFloat(sld.value)||0,min),max);
+    sld.style.setProperty('--pct', ((val-min)/(max-min)*100).toFixed(1)+'%');
+  }
+  function onNum() {
+    const v = SP.parseNum(num.value);
+    sld.value = Math.min(Math.max(v, parseFloat(sld.min)||0), parseFloat(sld.max)||100);
+    setPct(); if(disp) disp.textContent = fmt(v);
+  }
+  function onSld() {
+    SP.setVal(num, parseFloat(sld.value)||0);
+    if(disp) disp.textContent = fmt(parseFloat(sld.value)||0);
+    setPct();
+  }
+  num.addEventListener('input', () => { onNum(); calcIFI(); });
+  sld.addEventListener('input', () => { onSld(); calcIFI(); });
+  setPct();
+  if(disp) disp.textContent = fmt(SP.parseNum(num.value)||0);
+}
+
+function calcIFI() {
+  const dettes = SP.parseNum(document.getElementById('ifi-dettes').value);
+
+  // Aggregate assets by type
+  let rpBrut=0, rsBrut=0, locBrut=0, locDecote=0, scpiBrut=0, sciBrut=0, avBrut=0, detteAssets=0;
+  const lineItems = [];
+
+  for (const a of assets) {
+    if (a.debt > 0) detteAssets += a.debt;
+    if (a.type === 'rp') {
+      const abatt = a.value * 0.30;
+      rpBrut += a.value;
+      lineItems.push({ label: 'Résidence principale (brute)', val: a.value });
+      lineItems.push({ label: 'Abattement légal RP 30%', val: -abatt, deduction: true });
+      if (a.debt > 0) lineItems.push({ label: 'Crédit rattaché', val: -a.debt, deduction: true });
+    } else if (a.type === 'rs') {
+      rsBrut += a.value;
+      lineItems.push({ label: 'Résidence secondaire', val: a.value });
+      if (a.debt > 0) lineItems.push({ label: 'Crédit rattaché', val: -a.debt, deduction: true });
+    } else if (a.type === 'loc') {
+      const dec = a.decote ? a.value * 0.20 : 0;
+      locBrut += a.value;
+      locDecote += dec;
+      lineItems.push({ label: 'Bien locatif' + (a.decote ? ' (décote −20%)' : ''), val: a.value, sub: a.decote ? -dec : 0 });
+      if (a.debt > 0) lineItems.push({ label: 'Crédit rattaché', val: -a.debt, deduction: true });
+    } else if (a.type === 'scpi') {
+      scpiBrut += a.value;
+      lineItems.push({ label: 'Parts SCPI', val: a.value });
+      if (a.debt > 0) lineItems.push({ label: 'Crédit d\'acquisition SCPI', val: -a.debt, deduction: true });
+    } else if (a.type === 'sci') {
+      sciBrut += a.value;
+      lineItems.push({ label: 'Parts SCI', val: a.value });
+    } else if (a.type === 'av') {
+      avBrut += a.value;
+      lineItems.push({ label: 'Immo. assurance-vie', val: a.value });
+    }
+  }
+
+  const abattRP   = rpBrut * 0.30;
+  const rpNet     = rpBrut * 0.70;
+  const locNet    = locBrut - locDecote;
+  const netBrut   = rpNet + rsBrut + locNet + scpiBrut + sciBrut + avBrut;
+  const totalDettes = dettes + detteAssets;
+  const netTax    = Math.max(0, netBrut - totalDettes);
+
+  const el = document.getElementById('ifi-results');
+
+  // Build patrimony summary lines
+  const liLines = lineItems.map(l => {
+    if (l.deduction) return `<div class="patri-line deduction"><span>${l.label}</span><strong>−${fmtEur(Math.abs(l.val),0)}</strong></div>`;
+    let html = `<div class="patri-line"><span>${l.label}</span><strong>${fmtEur(l.val,0)}</strong></div>`;
+    if (l.sub) html += `<div class="patri-line deduction"><span>Décote de jouissance 20%</span><strong>−${fmtEur(Math.abs(l.sub),0)}</strong></div>`;
+    return html;
+  }).join('');
+
+  const detteLines = totalDettes > 0
+    ? `<div class="patri-line deduction"><span>Dettes déductibles</span><strong>−${fmtEur(totalDettes,0)}</strong></div>`
+    : '';
+
+  if (netTax < 1300000) {
+    el.innerHTML = `
+      <div class="key-result animate">
+        <div class="key-result-label">IFI estimé 2026</div>
+        <div class="key-result-val" style="color:var(--success)">0 €</div>
+        <div class="key-result-sub">Non assujetti — patrimoine net taxable inférieur à 1 300 000 €</div>
+      </div>
+      ${assets.length > 0 ? `
+      <div class="patri-box animate">
+        <div class="patri-box-title">Composition du patrimoine</div>
+        ${liLines}
+        <div class="patri-line" style="margin-top:.5rem;padding-top:.5rem;border-top:1px solid var(--border-subtle)"><span>Patrimoine net après abattements</span><strong>${fmtEur(netBrut,0)}</strong></div>
+        ${detteLines}
+        <div class="patri-line total"><span>Patrimoine net taxable</span><strong>${fmtEur(netTax,0)}</strong></div>
+      </div>
+      <div style="font-size:.75rem;color:var(--text-dim);font-family:var(--mono);text-align:center;padding:1rem 0">Seuil d'assujettissement : 1 300 000 €<br>Écart : ${fmtEur(1300000-netTax,0)}</div>
+      ${buildPedagoHTMLSousSeui({netTax, netBrut, totalDettes, rpBrut, rsBrut, locBrut, locDecote, scpiBrut, sciBrut, avBrut, detteAssets, dettes})}
+      ` : `<div style="font-size:.78rem;color:var(--text-dim);font-family:var(--mono);text-align:center;padding:2rem 1rem">Ajoutez des actifs pour simuler votre patrimoine IFI.</div>`}`;
+    return;
+  }
+
+  const {tax: ifiBrut, details} = applyBrackets(netTax, IFI_BRACKETS);
+  let decote = 0;
+  if (netTax < 1400000) decote = Math.max(0, 17500 - 0.0125 * netTax);
+  const ifiNet = Math.max(0, ifiBrut - decote);
+  const tauxMoyen = netTax > 0 ? ifiNet/netTax : 0;
+
+  const bracketRows = details.filter(b=>b.rate>0).map(b => {
+    const toLabel = b.to ? fmtEur(b.to,0) : '∞';
+    return `<div class="bracket-row">
+      <span class="rate-badge">${fmtNum(b.rate*100,2)} %</span>
+      <span class="tranche">${fmtEur(b.from,0)} → ${toLabel}</span>
+      <span class="tax">${fmtEur(b.tax,2)}</span>
+    </div>`;
+  }).join('');
+
+  el.innerHTML = `
+    <div class="key-result animate">
+      <div class="key-result-label">IFI estimé 2026</div>
+      <div class="key-result-val">${fmtEur(ifiNet,0)}</div>
+      <div class="key-result-sub">Taux moyen : ${fmtPct(tauxMoyen,3)} sur ${fmtEur(netTax,0)}</div>
+    </div>
+    <div class="patri-box animate">
+      <div class="patri-box-title">Composition du patrimoine</div>
+      ${liLines}
+      <div class="patri-line" style="margin-top:.5rem;padding-top:.5rem;border-top:1px solid var(--border-subtle)"><span>Patrimoine après abattements</span><strong>${fmtEur(netBrut,0)}</strong></div>
+      ${detteLines}
+      <div class="patri-line total"><span>Patrimoine net taxable</span><strong>${fmtEur(netTax,0)}</strong></div>
+    </div>
+    <div class="bracket-detail animate">
+      <div class="bracket-title">Calcul par tranche</div>
+      ${bracketRows}
+      ${decote>0?`<div class="bracket-row"><span class="rate-badge" style="background:rgba(96,165,250,0.1);color:var(--blue)">Décote</span><span class="tranche">Décote progressive</span><span class="tax" style="color:var(--blue)">−${fmtEur(decote,2)}</span></div>`:''}
+      <div class="bracket-row" style="background:var(--accent-dim)"><span class="rate-badge">IFI NET</span><span class="tranche" style="font-weight:600;color:var(--text)">Impôt net final</span><span class="tax" style="color:var(--accent);font-size:.9rem">${fmtEur(ifiNet,0)}</span></div>
+    </div>
+    ${buildPedagoHTML({netTax, netBrut, totalDettes, ifiNet, ifiBrut, decote, tauxMoyen, details, rpBrut, rsBrut, locBrut, locDecote, scpiBrut, sciBrut, avBrut, detteAssets, dettes})}
+  `;
+}
+
+// ── Section pédagogique — cas sous seuil ──
+function buildPedagoHTMLSousSeui({netTax, netBrut, totalDettes, rpBrut, rsBrut, locBrut, locDecote, scpiBrut, sciBrut, avBrut, detteAssets, dettes}) {
+  if (netTax === 0 && netBrut === 0) return '';
+
+  const ecart = 1300000 - netTax;
+  const hasRP = rpBrut > 0;
+  const hasLoc = locBrut > 0;
+  const hasSCPI = scpiBrut > 0;
+  const hasSCI = sciBrut > 0;
+  const hasDettes = totalDettes > 0;
+
+  // Bloc 1 : pourquoi pas d'IFI
+  let base = `Votre patrimoine immobilier net taxable s'établit à <strong>${fmtEur(netTax,0)}</strong>, `;
+  if (netTax === 0 && totalDettes > 0) {
+    base += `intégralement absorbé par vos dettes déductibles (${fmtEur(totalDettes,0)}). `;
+  } else if (netTax === 0) {
+    base += `l'abattement légal de 30% sur votre résidence principale ramenant la base à zéro ou à une valeur nulle. `;
+  } else {
+    base += `soit <span class="vert">${fmtEur(ecart,0)} en dessous du seuil d'assujettissement à l'IFI</span> (1 300 000 €). `;
+  }
+  base += `Vous n'êtes donc <span class="vert">pas redevable de l'IFI en 2026</span>.`;
+
+  // Bloc 2 : composition
+  const composItems = [];
+  if (hasRP) composItems.push(`résidence principale (${fmtEur(rpBrut,0)} bruts, soit ${fmtEur(rpBrut*0.7,0)} après abattement légal 30%)`);
+  if (rsBrut > 0) composItems.push(`résidence secondaire (${fmtEur(rsBrut,0)})`);
+  if (hasLoc) composItems.push(`bien${locBrut > 0 ? ' locatif' : 's locatifs'} (${fmtEur(locBrut,0)} bruts${locDecote > 0 ? ', décote de jouissance déduite' : ''})`);
+  if (hasSCPI) composItems.push(`parts de SCPI (${fmtEur(scpiBrut,0)})`);
+  if (hasSCI) composItems.push(`parts de SCI (${fmtEur(sciBrut,0)})`);
+  if (avBrut > 0) composItems.push(`quote-part immobilière en assurance-vie (${fmtEur(avBrut,0)})`);
+  let composText = '';
+  if (composItems.length > 0) {
+    composText = `Votre patrimoine déclaré comprend : ${composItems.join(', ')}.`;
+    if (hasDettes) composText += ` Vos dettes déductibles totales (<strong>${fmtEur(totalDettes,0)}</strong>) réduisent encore la base taxable.`;
+  }
+
+  // Bloc 3 : points d'attention
+  const attentions = [];
+  if (hasSCI) attentions.push(`<strong>Parts de SCI :</strong> seule la valeur des parts représentative d'actifs immobiliers entre dans la base IFI. Une valorisation rigoureuse (décote de minorité, clause de démembrement) peut légitimement réduire l'assiette.`);
+  if (hasSCPI) attentions.push(`<strong>Parts de SCPI :</strong> la quote-part immobilière des SCPI est intégrée à la base IFI. Si les parts ont été acquises à crédit, le capital restant dû est déductible.`);
+  if (ecart < 200000 && netTax > 0) attentions.push(`<strong>Marge de sécurité :</strong> votre patrimoine net est à seulement <strong>${fmtEur(ecart,0)}</strong> du seuil. Toute acquisition ou revalorisation significative peut vous faire basculer dans l'IFI. Une revue annuelle est recommandée.`);
+
+  let blocksHTML = `
+    <div class="pedago-block">
+      <div class="pedago-block-label">Pourquoi aucun IFI n'est dû</div>
+      <p class="pedago-block-text">${base}</p>
+    </div>`;
+
+  if (composText) {
+    blocksHTML += `
+    <div class="pedago-block">
+      <div class="pedago-block-label">Composition de votre patrimoine déclaré</div>
+      <p class="pedago-block-text">${composText}</p>
+    </div>`;
+  }
+
+  if (attentions.length > 0) {
+    blocksHTML += `
+    <div class="pedago-block">
+      <div class="pedago-block-label">Points de vigilance</div>
+      ${attentions.map(a => `<p class="pedago-block-text">${a}</p>`).join('')}
+    </div>`;
+  }
+
+  return `
+    <div class="pedago-card animate">
+      <div class="pedago-card-header">
+        <div class="pedago-card-dot"></div>
+        <div class="pedago-card-title">Analyse de votre situation IFI</div>
+      </div>
+      <div class="pedago-card-body">${blocksHTML}</div>
+    </div>`;
+}
+
+// ── Section pédagogique — cas assujetti ──
+function buildPedagoHTML({netTax, netBrut, totalDettes, ifiNet, ifiBrut, decote, tauxMoyen, details, rpBrut, rsBrut, locBrut, locDecote, scpiBrut, sciBrut, avBrut, detteAssets, dettes}) {
+
+  const hasRP   = rpBrut > 0;
+  const hasLoc  = locBrut > 0;
+  const hasSCPI = scpiBrut > 0;
+  const hasSCI  = sciBrut > 0;
+  const hasDettes = totalDettes > 0;
+  const hasDecote = decote > 0;
+
+  // ── Bloc 1 : base taxable ──
+  let baseText = `Votre patrimoine immobilier net taxable est de <strong>${fmtEur(netTax,0)}</strong>, `;
+  if (hasRP) {
+    baseText += `dont la résidence principale (${fmtEur(rpBrut,0)} bruts) bénéficie de l'abattement légal de 30%, ramenant sa valeur IFI à <strong>${fmtEur(rpBrut*0.7,0)}</strong>. `;
+  }
+  if (hasDettes) {
+    baseText += `Vos dettes déductibles (${fmtEur(totalDettes,0)}) ont été soustraites du patrimoine brut (${fmtEur(netBrut + totalDettes,0)}) pour obtenir la base nette.`;
+  } else {
+    baseText += `Aucune dette déductible n'a été renseignée.`;
+  }
+
+  // ── Bloc 2 : types d'actifs spécifiques ──
+  const specificItems = [];
+  if (hasSCI) specificItems.push(`<strong>Parts de SCI (${fmtEur(sciBrut,0)}) :</strong> les parts sont intégrées dans la base IFI à hauteur de la quote-part représentative des actifs immobiliers de la société. Toute dette bancaire portée par la SCI est déductible au prorata de votre participation.`);
+  if (hasSCPI) specificItems.push(`<strong>Parts de SCPI (${fmtEur(scpiBrut,0)}) :</strong> seule la fraction immobilière (généralement proche de 100%) entre dans l'assiette IFI. Si l'acquisition a été financée à crédit, le capital restant dû est déductible.`);
+  if (hasLoc && locDecote > 0) specificItems.push(`<strong>Bien locatif avec décote de jouissance :</strong> une décote de 20% a été appliquée sur votre bien loué, réduisant sa valeur IFI de ${fmtEur(locDecote,0)}. Cette pratique est tolérée par la DGFIP (fourchette 10–20%) pour un bien conventionnellement occupé.`);
+
+  // ── Bloc 3 : barème appliqué ──
+  const activeBrackets = details.filter(b => b.rate > 0);
+  let baremeText = `L'IFI est calculé selon un barème progressif. `;
+  if (activeBrackets.length === 1) {
+    const b = activeBrackets[0];
+    baremeText += `Votre patrimoine net entre entièrement dans la tranche à <strong>${fmtNum(b.rate*100,2)} %</strong> (de ${fmtEur(b.from,0)} à ${b.to ? fmtEur(b.to,0) : '∞'}), générant un impôt brut de <strong>${fmtEur(b.tax,2)}</strong>.`;
+  } else {
+    const parts = activeBrackets.map(b =>
+      `<strong>${fmtEur(b.taxable,0)}</strong> taxés à ${fmtNum(b.rate*100,2)} % = ${fmtEur(b.tax,2)}`
+    );
+    baremeText += `Votre patrimoine est réparti sur ${activeBrackets.length} tranches : ${parts.join(' ; ')}. L'impôt brut total ressort à <strong>${fmtEur(ifiBrut,2)}</strong>.`;
+  }
+  if (hasDecote) {
+    baremeText += ` Une <strong>décote progressive</strong> de ${fmtEur(decote,2)} s'applique car votre patrimoine est compris entre 1 300 000 € et 1 400 000 € — elle lisse l'entrée dans le barème.`;
+  }
+
+  // ── Bloc 4 : synthèse ──
+  let synthText = `Après application du barème${hasDecote ? ' et de la décote' : ''}, votre IFI 2026 s'élève à <strong>${fmtEur(ifiNet,0)}</strong>, soit un taux moyen effectif de <strong>${fmtPct(tauxMoyen,3)}</strong> sur votre patrimoine net taxable de ${fmtEur(netTax,0)}.`;
+
+  // ── Bloc 5 (conditionnel) : conseil don ──
+  let tipHTML = '';
+  if (ifiNet >= 1500) {
+    const donMax = Math.round(ifiNet / 0.75);
+    tipHTML = `
+      <div class="pedago-tip"><strong>Don IFI — réduction de 75% :</strong> vous pouvez réduire votre IFI en effectuant des dons à des organismes agréés (fondations reconnues d'utilité publique, associations d'insertion, etc.). Pour effacer intégralement votre IFI de ${fmtEur(ifiNet,0)}, un don de <strong>${fmtEur(donMax,0)}</strong> suffit (plafond légal : 50 000 € de réduction par an). C'est un levier puissant pour optimiser votre fiscalité tout en soutenant des causes d'intérêt général.</div>`;
+  }
+
+  // ── Bloc 6 (conditionnel) : plafonnement ──
+  let plafText = '';
+  if (ifiNet >= 5000) {
+    plafText = `<strong>Mécanisme de plafonnement IFI :</strong> si votre IFI dépasse 75 % de vos revenus de l'année précédente (IR + prélèvements sociaux + IFI), vous pouvez demander un plafonnement réduisant l'IFI à due concurrence. Ce dispositif est à calculer avec vos revenus réels auprès d'un conseiller fiscal.`;
+  }
+
+  let blocksHTML = `
+    <div class="pedago-block">
+      <div class="pedago-block-label">Base taxable IFI</div>
+      <p class="pedago-block-text">${baseText}</p>
+    </div>`;
+
+  if (specificItems.length > 0) {
+    blocksHTML += `
+    <div class="pedago-block">
+      <div class="pedago-block-label">Traitement de vos actifs spécifiques</div>
+      ${specificItems.map(s => `<p class="pedago-block-text">${s}</p>`).join('')}
+    </div>`;
+  }
+
+  blocksHTML += `
+    <div class="pedago-block">
+      <div class="pedago-block-label">Barème progressif appliqué</div>
+      <p class="pedago-block-text">${baremeText}</p>
+    </div>
+    <div class="pedago-block">
+      <div class="pedago-block-label">Synthèse</div>
+      <p class="pedago-block-text">${synthText}</p>
+    </div>`;
+
+  if (plafText) {
+    blocksHTML += `
+    <div class="pedago-block">
+      <div class="pedago-block-label">Plafonnement IFI</div>
+      <p class="pedago-block-text">${plafText}</p>
+    </div>`;
+  }
+
+  if (tipHTML) blocksHTML += tipHTML;
+
+  return `
+    <div class="pedago-card animate">
+      <div class="pedago-card-header">
+        <div class="pedago-card-dot"></div>
+        <div class="pedago-card-title">Analyse de votre situation IFI</div>
+      </div>
+      <div class="pedago-card-body">${blocksHTML}</div>
+    </div>`;
+}
+
+// Enter key in value field confirms
+document.getElementById('add-val').addEventListener('keydown', e => {
+  if (e.key === 'Enter') addAsset();
+  if (e.key === 'Escape') closeForm();
+});
+
+syncSlider('ifi-dettes','ifi-dettes-s','ifi-dettes-disp', v=>fmtEur(v,0));
+calcIFI();
+
+// Dropdown
+/* Menu déroulant catégorisé — voir shared-nav.js */
+SP.nav.init();
+</script>
+</body>
+</html>

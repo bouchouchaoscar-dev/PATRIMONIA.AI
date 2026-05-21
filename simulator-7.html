@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="favicon-64.png">
+  <link rel="shortcut icon" href="favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="favicon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Taux d'endettement — PATRIMONIA.AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css?v=19">
+<script src="shared.js?v=2"></script>
+  <script src="shared-nav.js?v=6"></script>
+<style>
+
+/* ── CARTES REVENUS / CRÉDITS ── */
+.item-card {
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-sm);
+  padding: .85rem 1rem;
+  margin-bottom: .6rem;
+  position: relative;
+}
+.item-card-field { margin-top: .55rem }
+.item-card-field:first-child { margin-top: 0 }
+.item-card-field > label {
+  display: block;
+  font-size: .6rem; font-weight: 700;
+  color: var(--text-dim); letter-spacing: .07em;
+  text-transform: uppercase; margin-bottom: .3rem;
+}
+.item-card-field .input-wrap { padding: .42rem .75rem }
+.item-card-field select { padding: .42rem .75rem; font-size: .82rem }
+.item-card-row {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: .5rem; margin-top: .55rem;
+}
+.item-card-delete {
+  position: absolute; top: .55rem; right: .75rem;
+  background: none; border: none;
+  color: var(--text-dim); cursor: pointer;
+  font-size: 1rem; line-height: 1;
+  padding: .1rem .35rem; border-radius: 4px;
+  transition: color .15s, background .15s;
+}
+.item-card-delete:hover { color: #9B5A3A; background: rgba(155,90,58,.08) }
+.item-card-retenu {
+  font-family: var(--mono); font-size: .74rem;
+  font-weight: 600; color: var(--accent);
+  margin-top: .45rem; text-align: right;
+}
+
+/* ── BOUTON AJOUTER ── */
+.add-btn {
+  width: 100%;
+  display: flex; align-items: center; justify-content: center; gap: .45rem;
+  padding: .55rem 1rem;
+  background: var(--surface);
+  border: 1.5px dashed var(--border);
+  border-radius: var(--r-sm);
+  color: var(--text-muted);
+  font-family: var(--sans); font-size: .78rem; font-weight: 500;
+  cursor: pointer; transition: all .2s ease; letter-spacing: -.01em;
+}
+.add-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim) }
+
+/* ── SÉPARATEUR DE SECTION ── */
+.section-block-label {
+  font-size: .6rem; font-weight: 700;
+  color: var(--text-dim); letter-spacing: .08em;
+  text-transform: uppercase; margin-bottom: .7rem;
+  display: flex; align-items: center; gap: .5rem;
+}
+.section-block-label::after {
+  content: ''; flex: 1; height: 1px; background: var(--border-subtle);
+}
+
+/* ── JAUGE TAUX ── */
+.debt-gauge-wrap { margin: .9rem 0 .5rem }
+.debt-gauge-track {
+  position: relative; height: 10px;
+  border-radius: 5px; background: var(--border-subtle);
+  overflow: visible;
+}
+.debt-gauge-fill {
+  position: absolute; top: 0; left: 0; bottom: 0;
+  border-radius: 5px;
+  transition: width .55s cubic-bezier(.4,0,.2,1), background .4s ease;
+  max-width: 100%;
+}
+.debt-gauge-marker {
+  position: absolute; top: -5px;
+  width: 2px; height: 20px;
+  background: var(--text-dim); border-radius: 1px;
+}
+.debt-gauge-marker::after {
+  content: '35 %';
+  position: absolute; top: -17px; left: 50%;
+  transform: translateX(-50%);
+  font-size: .58rem; font-weight: 700;
+  color: var(--text-muted); white-space: nowrap;
+  font-family: var(--mono);
+}
+.debt-gauge-labels {
+  display: flex; justify-content: space-between; margin-top: .4rem;
+}
+.debt-gauge-labels span { font-size: .58rem; color: var(--text-dim); font-family: var(--mono) }
+
+/* ── ALERTES COULEUR ── */
+.debt-alert {
+  padding: .7rem .9rem; border-radius: var(--r-sm);
+  font-size: .78rem; line-height: 1.6; font-weight: 500;
+}
+.debt-alert.green {
+  background: rgba(59,140,90,.10); border: 1px solid rgba(59,140,90,.25); color: #2E7A52;
+}
+.debt-alert.orange {
+  background: var(--amber-dim); border: 1px solid rgba(255,159,10,.25); color: #7d5200;
+}
+.debt-alert.red {
+  background: rgba(155,90,58,.08); border: 1px solid rgba(155,90,58,.2); color: #9B5A3A;
+}
+
+/* ── RESTE À VIVRE ── */
+.rav-box {
+  background: var(--surface-2); border: 1px solid var(--border-subtle);
+  border-radius: var(--r-sm); padding: 1rem 1.1rem;
+}
+.rav-box-title {
+  font-size: .6rem; font-weight: 700; color: var(--text-dim);
+  letter-spacing: .07em; text-transform: uppercase; margin-bottom: .6rem;
+}
+.rav-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: .3rem 0; font-size: .78rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.rav-row:last-child { border-bottom: none }
+.rav-row span { color: var(--text-muted) }
+.rav-row strong { font-family: var(--mono); font-size: .78rem; font-weight: 600; color: var(--text) }
+.rav-row.rav-total strong { font-size: .9rem }
+
+/* ── CHECKBOX INLINE ── */
+.inline-check {
+  display: flex; align-items: center; gap: .5rem;
+  font-size: .75rem; color: var(--text-muted);
+  cursor: pointer; margin-top: .5rem;
+}
+.inline-check input { accent-color: var(--accent); width: 14px; height: 14px; cursor: pointer }
+
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="index.html" class="nav-logo"><img src="logo.png?v=3" alt="PATRIMONIA.AI" class="nav-logo-img"></a>
+  <div class="nav-right">
+    <a href="index.html" class="nav-back">
+      <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7.5 1.5L3 6l4.5 4.5"/></svg>
+      Accueil
+    </a>
+    <div class="nav-dropdown" id="mainDropdown">
+      <button class="nav-dropdown-btn" aria-expanded="false" aria-haspopup="true">
+        Simulateurs <svg class="nav-chevron" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.8" style="width:13px;height:8px;flex-shrink:0"><path d="M1 1l4 4 4-4"/></svg>
+      </button>
+      <div class="nav-dropdown-menu" id="navMenu" role="menu"></div>
+    </div>
+  </div>
+</nav>
+
+<div class="sim-page">
+  <div class="sim-page-header">
+    <span class="sim-num-badge">07</span>
+    <div>
+      <div class="sim-eyebrow">Immobilier</div><h1>Taux d'<em class="gradient-text">endettement</em></h1>
+      <p>Capacité d'emprunt · Seuil HCSF 35 % · Revenus retenus · Reste à vivre</p>
+    </div>
+  </div>
+
+  <div class="sim-card-wrap">
+    <div class="sim-body">
+
+      <!-- ══════════════ PANNEAU GAUCHE ══════════════ -->
+      <div class="inputs-panel">
+
+        <!-- A — REVENUS -->
+        <div class="section-block-label">A — Revenus du foyer</div>
+
+        <div id="rev-list"></div>
+        <button class="add-btn" id="add-rev-btn" type="button">+ Ajouter un revenu</button>
+
+        <div style="font-size:.63rem;color:var(--text-dim);font-family:var(--mono);margin-top:.7rem;line-height:1.65;opacity:.85">
+          Renseigner le <strong style="color:var(--text-muted)">net avant impôt sur le revenu</strong> (ligne "net à payer avant IR" sur la fiche de paie). C'est le revenu généralement retenu par les banques.
+        </div>
+
+        <div class="section-sep"></div>
+
+        <!-- B — CRÉDITS -->
+        <div class="section-block-label">B — Crédits et charges existants</div>
+
+        <div id="cred-list"></div>
+        <button class="add-btn" id="add-cred-btn" type="button">+ Ajouter un crédit / charge</button>
+
+        <div class="section-sep"></div>
+
+        <!-- C — PROJET D'EMPRUNT -->
+        <div class="section-block-label">C — Projet d'emprunt supplémentaire</div>
+
+        <div class="field">
+          <div class="field-label">
+            <label for="proj-duree">Durée du crédit envisagé</label>
+            <span class="field-val" id="proj-duree-disp">20 ans</span>
+          </div>
+          <div class="input-wrap"><input type="number" id="proj-duree" value="20" min="5" max="30" step="1"><span class="unit">ans</span></div>
+          <input type="range" id="proj-duree-s" min="5" max="30" step="1" value="20">
+        </div>
+
+        <div class="field">
+          <div class="field-label">
+            <label for="proj-taux">Taux nominal annuel</label>
+            <span class="field-val" id="proj-taux-disp">3,50 %</span>
+          </div>
+          <div class="input-wrap"><input type="number" id="proj-taux" value="3.50" min="0" max="12" step="0.01"><span class="unit">%</span></div>
+          <input type="range" id="proj-taux-s" min="0" max="8" step="0.01" value="3.50">
+          <div style="font-size:.61rem;color:var(--text-dim);font-family:var(--mono);margin-top:.3rem;opacity:.8">Taux indicatif marché 2026 · Hors assurance</div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">
+            <label for="proj-assur">Assurance emprunteur annuelle</label>
+            <span class="field-val" id="proj-assur-disp">0,36 %</span>
+          </div>
+          <div class="input-wrap"><input type="number" id="proj-assur" value="0.36" min="0" max="3" step="0.01"><span class="unit">%</span></div>
+          <input type="range" id="proj-assur-s" min="0" max="1.5" step="0.01" value="0.36">
+          <div style="font-size:.61rem;color:var(--text-dim);font-family:var(--mono);margin-top:.3rem;opacity:.8">Sur capital initial · Décès-invalidité</div>
+        </div>
+
+        <div style="font-size:.61rem;color:var(--text-dim);line-height:1.7;font-family:var(--mono);margin-top:.5rem;opacity:.7">
+          <div>HCSF · Recommandation 35 % assurance incluse</div>
+          <div>Simulation non contractuelle</div>
+        </div>
+
+      </div><!-- /inputs-panel -->
+
+      <!-- ══════════════ PANNEAU DROIT ══════════════ -->
+      <div class="results-panel" id="debt-results">
+        <div class="result-empty">Renseignez vos revenus<br>pour calculer votre taux d'endettement.</div>
+      </div>
+
+    </div><!-- /sim-body -->
+
+    <!-- SECTION PÉDAGOGIQUE -->
+    <div class="amort-section" style="display:grid">
+      <details class="amort-details" id="pedago-details">
+        <summary>Analyse pédagogique détaillée</summary>
+        <div id="pedago-body" style="padding-top:1.25rem"></div>
+      </details>
+    </div>
+
+  </div><!-- /sim-card-wrap -->
+</div><!-- /sim-page -->
+
+<footer>
+  <span>PATRIMONIA.AI</span> — Simulation indicative à titre informatif uniquement.<br>
+  Recommandation HCSF · Taux d'effort maximal 35 % assurance incluse · Résultats non contractuels.<br>
+  Les banques appliquent leurs propres critères : reste à vivre, apport, stabilité des revenus, garanties.
+</footer>
+
+<script>
+const fmtNum = (v, d=0) => new Intl.NumberFormat('fr-FR',{minimumFractionDigits:d,maximumFractionDigits:d}).format(v).replace(/[\u202F\u00A0]/g,' ');
+const fmtEur = (v, d=0) => fmtNum(v, d) + ' €';
+
+/* ══════════════════════════════════════════
+   CONSTANTES
+══════════════════════════════════════════ */
+const REV_TYPES = {
+  salaire:        { label: 'Salaire net avant IR',           locatif: false },
+  prime:          { label: 'Primes récurrentes',             locatif: false },
+  treizieme:      { label: '13e mois (annuel ÷ 12)',         locatif: false },
+  independant:    { label: 'Revenus indépendants / BIC-BNC', locatif: false },
+  dirigeant:      { label: 'Revenus de dirigeant',           locatif: false },
+  dividendes:     { label: 'Dividendes récurrents',          locatif: false },
+  retraite:       { label: 'Pension de retraite',            locatif: false },
+  allocations:    { label: 'Allocations régulières',         locatif: false },
+  locatif_nu:     { label: 'Loyers nus / revenus fonciers',  locatif: true  },
+  locatif_meuble: { label: 'Loyers meublés / LMNP / BIC',   locatif: true  },
+  scpi:           { label: 'SCPI',                           locatif: true  },
+  locatif_futur:  { label: 'Loyers futurs estimés',          locatif: true  },
+  pension_recue:  { label: 'Pension alimentaire reçue',      locatif: false },
+  financier:      { label: 'Revenus financiers récurrents',  locatif: false },
+  etranger:       { label: 'Revenus étrangers',              locatif: false },
+  autre:          { label: 'Autres revenus stables',         locatif: false },
+};
+
+const CRED_TYPES = {
+  rp:           'Résidence principale',
+  rs:           'Résidence secondaire',
+  locatif:      'Investissement locatif',
+  conso:        'Crédit consommation',
+  auto:         'Crédit auto',
+  etudiant:     'Prêt étudiant',
+  professionnel:'Prêt professionnel',
+  pension_vers: 'Pension alimentaire versée',
+  leasing:      'Leasing / LOA / LLD',
+  autre:        'Autre mensualité',
+};
+
+/* ══════════════════════════════════════════
+   HELPERS FINANCIERS
+══════════════════════════════════════════ */
+// Capital empruntable à partir d'une mensualité (taux + assurance inclus)
+function capitalFromMens(mens, tauxAnnuel, assurAnnuel, dureeAns) {
+  if (mens <= 0 || dureeAns <= 0) return 0;
+  const n = dureeAns * 12;
+  const r = tauxAnnuel / 100 / 12;
+  const a = assurAnnuel / 100 / 12;
+  if (r === 0 && a === 0) return mens * n;
+  if (r === 0) return mens / (a || 1);
+  const facteur = r / (1 - Math.pow(1 + r, -n)) + a;
+  return mens / facteur;
+}
+
+// Décomposition du coût pour un capital donné
+function coutPret(capital, tauxAnnuel, assurAnnuel, dureeAns) {
+  if (capital <= 0 || dureeAns <= 0) return { mens: 0, interet: 0, assurance: 0 };
+  const n = dureeAns * 12;
+  const r = tauxAnnuel / 100 / 12;
+  const a = assurAnnuel / 100 / 12;
+  const mensCredit = r === 0 ? capital / n : capital * r * Math.pow(1+r,n) / (Math.pow(1+r,n)-1);
+  const mensAssur  = capital * a;
+  return {
+    mens:      mensCredit + mensAssur,
+    interet:   mensCredit * n - capital,
+    assurance: mensAssur * n,
+  };
+}
+
+/* ══════════════════════════════════════════
+   CARTES DYNAMIQUES
+══════════════════════════════════════════ */
+let revCnt = 0, credCnt = 0;
+
+function addRevenu(type = 'salaire', montant = 3000) {
+  revCnt++;
+  const id = 'rev-' + revCnt;
+  const info = REV_TYPES[type];
+
+  const div = document.createElement('div');
+  div.className = 'item-card';
+  div.id = id;
+  div.innerHTML = `
+    <button class="item-card-delete" title="Supprimer" onclick="removeCard('${id}')">×</button>
+    <div class="item-card-field">
+      <label>Type de revenu</label>
+      <div class="select-wrap">
+        <select id="${id}-type" onchange="onRevChange('${id}')">
+          ${Object.entries(REV_TYPES).map(([k,v]) => `<option value="${k}"${k===type?' selected':''}>${v.label}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <div class="item-card-row">
+      <div class="item-card-field">
+        <label>Montant mensuel</label>
+        <div class="input-wrap">
+          <input type="text" inputmode="decimal" data-fmt id="${id}-montant" value="${montant}" min="0" step="50" oninput="calc()">
+          <span class="unit">€</span>
+        </div>
+      </div>
+      <div class="item-card-field" id="${id}-coeff-wrap" style="${info.locatif?'':'display:none'}">
+        <label>Coefficient retenu</label>
+        <div class="select-wrap">
+          <select id="${id}-coeff" onchange="calc()">
+            <option value="0.60">60 %</option>
+            <option value="0.70" selected>70 %</option>
+            <option value="0.80">80 %</option>
+            <option value="1.00">100 %</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="item-card-retenu" id="${id}-retenu"></div>`;
+
+  document.getElementById('rev-list').appendChild(div);
+  updateRevRetenu(id);
+  calc();
+}
+
+function onRevChange(id) {
+  const type = document.getElementById(id+'-type').value;
+  const info = REV_TYPES[type];
+  document.getElementById(id+'-coeff-wrap').style.display = info.locatif ? 'block' : 'none';
+  if (!info.locatif) document.getElementById(id+'-coeff').value = '1.00';
+  updateRevRetenu(id);
+  calc();
+}
+
+function updateRevRetenu(id) {
+  const montant = SP.parseNum(document.getElementById(id+'-montant').value);
+  const type    = document.getElementById(id+'-type').value;
+  const info    = REV_TYPES[type];
+  const coeff   = info.locatif ? (parseFloat(document.getElementById(id+'-coeff').value) || 0.70) : 1.00;
+  const retenu  = montant * coeff;
+  const el      = document.getElementById(id+'-retenu');
+  if (!el) return;
+  if (info.locatif && coeff < 1) {
+    el.textContent = `= ${fmtEur(retenu,0)} retenus (${fmtNum(coeff*100,0)} % × ${fmtEur(montant,0)})`;
+  } else {
+    el.textContent = montant > 0 ? `= ${fmtEur(retenu,0)} retenus` : '';
+  }
+}
+
+function addCredit(type = 'rp', mensualite = 0) {
+  credCnt++;
+  const id = 'cred-' + credCnt;
+
+  const div = document.createElement('div');
+  div.className = 'item-card';
+  div.id = id;
+  div.innerHTML = `
+    <button class="item-card-delete" title="Supprimer" onclick="removeCard('${id}')">×</button>
+    <div class="item-card-field">
+      <label>Type de crédit / charge</label>
+      <div class="select-wrap">
+        <select id="${id}-type" onchange="calc()">
+          ${Object.entries(CRED_TYPES).map(([k,v]) => `<option value="${k}"${k===type?' selected':''}>${v}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <div class="item-card-row">
+      <div class="item-card-field">
+        <label>Mensualité</label>
+        <div class="input-wrap">
+          <input type="text" inputmode="decimal" data-fmt id="${id}-mens" value="${mensualite}" min="0" step="10" oninput="calc()">
+          <span class="unit">€/mois</span>
+        </div>
+      </div>
+      <div class="item-card-field">
+        <label>Assurance</label>
+        <label class="inline-check">
+          <input type="checkbox" id="${id}-assur" checked onchange="calc()">
+          Incluse dans la mensualité
+        </label>
+      </div>
+    </div>`;
+
+  document.getElementById('cred-list').appendChild(div);
+  calc();
+}
+
+function removeCard(id) {
+  const el = document.getElementById(id);
+  if (el) el.remove();
+  calc();
+}
+
+/* ══════════════════════════════════════════
+   LECTURE DES DONNÉES
+══════════════════════════════════════════ */
+function getRevenus() {
+  return Array.from(document.querySelectorAll('#rev-list .item-card')).map(card => {
+    const id      = card.id;
+    const type    = document.getElementById(id+'-type').value;
+    const info    = REV_TYPES[type];
+    const montant = SP.parseNum(document.getElementById(id+'-montant').value);
+    const coeff   = info.locatif ? (parseFloat(document.getElementById(id+'-coeff').value) || 0.70) : 1.00;
+    updateRevRetenu(id);
+    return { id, type, label: info.label, montant, coeff, retenu: montant * coeff, locatif: info.locatif };
+  });
+}
+
+function getCredits() {
+  return Array.from(document.querySelectorAll('#cred-list .item-card')).map(card => {
+    const id   = card.id;
+    const type = document.getElementById(id+'-type').value;
+    const mens = SP.parseNum(document.getElementById(id+'-mens').value);
+    return { type, label: CRED_TYPES[type], mens };
+  });
+}
+
+/* ══════════════════════════════════════════
+   SECTION PÉDAGOGIQUE
+══════════════════════════════════════════ */
+function buildPedago({ revDeclare, revRetenu, mensTotal, taux, mensSupp, capital, projDuree, projTaux, projAssur, coutInt, coutAssur, revenus }) {
+  if (revRetenu <= 0) return '';
+
+  const tauxPct = fmtNum(taux, 1);
+
+  const tauxQual = taux <= 0
+    ? 'Vous n\'avez aucune charge de crédit déclarée. Votre capacité d\'emprunt est maximale.'
+    : taux < 15
+      ? `Votre taux d'endettement de <strong>${tauxPct} %</strong> est très confortable. Vous avez une large capacité d'emprunt supplémentaire.`
+      : taux < 25
+        ? `Votre taux d'endettement de <strong>${tauxPct} %</strong> est confortable. Vous conservez une bonne marge avant le seuil HCSF.`
+        : taux < 35
+          ? `Votre taux d'endettement de <strong>${tauxPct} %</strong> se situe dans une zone intermédiaire. La marge restante avant 35 % se réduit.`
+          : taux === 35
+            ? `Votre taux d'endettement est exactement à <strong>35 %</strong>, le seuil HCSF. Il n'y a plus de capacité d'emprunt supplémentaire théorique.`
+            : `Votre taux d'endettement de <strong>${tauxPct} %</strong> dépasse le seuil HCSF de 35 %. La plupart des établissements bancaires refuseront un crédit supplémentaire dans cette configuration.`;
+
+  const hasLocatif = revenus.some(r => r.locatif);
+  const locatifBrut   = revenus.filter(r => r.locatif).reduce((s,r) => s+r.montant, 0);
+  const locatifRetenu = revenus.filter(r => r.locatif).reduce((s,r) => s+r.retenu, 0);
+
+  const locatifBlock = hasLocatif ? `
+    <div class="pedago-alert">
+      <strong>Revenus locatifs retenus partiellement :</strong> Les banques intègrent généralement les loyers à 70 % (parfois 60 % à 80 % selon les établissements). Cette décote compense le risque de vacance locative, les charges de copropriété, la fiscalité et les impayés potentiels. Vos loyers bruts déclarés (${fmtEur(locatifBrut,0)}/mois) sont ainsi ramenés à <strong>${fmtEur(locatifRetenu,0)}/mois</strong> retenus.
+    </div>` : '';
+
+  let margeBlock = '';
+  if (mensSupp > 0 && capital > 0) {
+    margeBlock = `<p class="pedago-p">Avec une mensualité supplémentaire disponible de <strong>${fmtEur(mensSupp,0)}/mois</strong>, vous pouvez théoriquement emprunter environ <em>${fmtEur(capital,0)}</em> sur <strong>${projDuree} ans</strong>, au taux nominal de <strong>${fmtNum(projTaux,2)} %</strong> (assurance ${fmtNum(projAssur,2)} % incluse). Le coût total estimé de ce crédit supplémentaire serait de <strong>${fmtEur(coutInt+coutAssur,0)}</strong>, dont <strong>${fmtEur(coutInt,0)} d'intérêts</strong> et <strong>${fmtEur(coutAssur,0)} d'assurance</strong>.</p>`;
+  } else if (mensSupp <= 0 && taux > 0) {
+    margeBlock = `<div class="pedago-tip"><strong>Pour retrouver une capacité d'emprunt</strong>, deux leviers existent : augmenter les revenus retenus (changement de poste, revenus complémentaires, intégration d'un co-emprunteur) ou réduire les charges existantes (remboursement anticipé d'un crédit conso, fin d'un leasing).</div>`;
+  }
+
+  return `
+    <div class="pedago-card animate">
+      <div class="pedago-card-header">
+        <div class="pedago-card-dot"></div>
+        <div class="pedago-card-title">Analyse du taux d'endettement</div>
+      </div>
+      <div class="pedago-card-body">
+        <p class="pedago-p">${tauxQual}</p>
+        <div class="pedago-block">
+          <div class="pedago-block-label">Comment ce taux est calculé</div>
+          <p class="pedago-block-text">
+            Taux d'endettement = <strong>mensualités totales ÷ revenus retenus × 100</strong><br>
+            Soit : <strong>${fmtEur(mensTotal,0)}</strong> ÷ <strong>${fmtEur(revRetenu,0)}</strong> = <em>${tauxPct} %</em><br>
+            ${revDeclare !== revRetenu ? `Vos revenus déclarés (${fmtEur(revDeclare,0)}) diffèrent des revenus retenus (${fmtEur(revRetenu,0)}) en raison des coefficients appliqués aux loyers.` : ''}
+          </p>
+        </div>
+        ${locatifBlock}
+        ${margeBlock}
+        <div class="pedago-block">
+          <div class="pedago-block-label">Pourquoi le seuil de 35 % ?</div>
+          <p class="pedago-block-text">
+            Le Haut Conseil de Stabilité Financière (HCSF) impose aux banques de respecter ce seuil pour au moins 80 % des dossiers octroyés depuis janvier 2022. Ce taux inclut <strong>l'assurance emprunteur</strong>. Au-delà, les banques peuvent légalement accorder un crédit (quota de 20 % de dérogations), mais elles le font rarement sans profil exceptionnel (apport élevé, reste à vivre confortable, CDI senior, patrimoine significatif).
+          </p>
+        </div>
+        <p class="pedago-dim">
+          <strong>Limites de cette simulation :</strong> les banques ne se limitent pas au taux d'endettement. Elles analysent aussi le reste à vivre (plancher de 800 à 1 200 €/personne selon les établissements), la stabilité des revenus (CDI vs indépendant vs gérant), l'apport personnel, la durée maximale du crédit (25 ans en règle générale, 27 ans pour une VEFA), le saut de charges, l'âge à l'échéance, et leur politique commerciale propre. Les taux d'intérêt varient selon le marché obligataire et le profil emprunteur.
+        </p>
+      </div>
+    </div>`;
+}
+
+/* ══════════════════════════════════════════
+   CALCUL PRINCIPAL
+══════════════════════════════════════════ */
+function calc() {
+  const revenus  = getRevenus();
+  const credits  = getCredits();
+
+  const revDeclare = revenus.reduce((s,r) => s+r.montant, 0);
+  const revRetenu  = revenus.reduce((s,r) => s+r.retenu, 0);
+  const mensTotal  = credits.reduce((s,c) => s+c.mens, 0);
+
+  const projDuree = parseFloat(document.getElementById('proj-duree').value) || 20;
+  const projTaux  = parseFloat(document.getElementById('proj-taux').value)  || 3.50;
+  const projAssur = parseFloat(document.getElementById('proj-assur').value) || 0.36;
+
+  const el = document.getElementById('debt-results');
+
+  if (revRetenu <= 0) {
+    el.innerHTML = `<div class="result-empty">Renseignez vos revenus<br>pour calculer votre taux d'endettement.</div>`;
+    document.getElementById('pedago-body').innerHTML = '';
+    return;
+  }
+
+  const taux     = mensTotal / revRetenu * 100;
+  const seuil35  = revRetenu * 0.35;
+  const marge    = seuil35 - mensTotal;
+  const mensSupp = Math.max(0, marge);
+
+  const capital   = capitalFromMens(mensSupp, projTaux, projAssur, projDuree);
+  const pret      = coutPret(capital, projTaux, projAssur, projDuree);
+
+  // Couleur et alerte
+  const tauxColor = taux < 25 ? 'var(--success)' : taux < 35 ? 'var(--amber)' : '#9B5A3A';
+  const alertCls  = taux < 25 ? 'green' : taux < 35 ? 'orange' : 'red';
+  const alertMsg  = mensSupp > 0
+    ? `Marge disponible : <strong>${fmtEur(mensSupp,0)}/mois</strong> avant le seuil HCSF de 35 %`
+    : marge === 0
+      ? `Taux exactement à 35 % — aucune marge supplémentaire`
+      : `Taux dépassé de <strong>${fmtNum(taux-35,1)} point${taux-35>=2?'s':''}</strong> — réduire les charges ou augmenter les revenus`;
+
+  // Jauge : la piste représente 0 % → 50 % de taux d'endettement
+  const gaugeFill   = Math.min(taux / 50 * 100, 100).toFixed(1);
+  const gaugeMarker = (35 / 50 * 100).toFixed(1); // = 70 %
+
+  // Reste à vivre
+  const ravActuel = revRetenu - mensTotal;
+  const ravApres  = capital > 0 ? revRetenu - mensTotal - pret.mens : null;
+
+  let html = '';
+
+  // ── Taux clé + jauge ──
+  html += `
+    <div class="key-result animate">
+      <div class="key-result-label">Taux d'endettement actuel</div>
+      <div class="key-result-val" style="color:${tauxColor}">${fmtNum(taux,1)} %</div>
+      <div class="key-result-sub">Seuil HCSF de référence : 35 % assurance incluse</div>
+      <div class="debt-gauge-wrap">
+        <div class="debt-gauge-track">
+          <div class="debt-gauge-fill" style="width:${gaugeFill}%;background:${tauxColor}"></div>
+          <div class="debt-gauge-marker" style="left:${gaugeMarker}%"></div>
+        </div>
+        <div class="debt-gauge-labels"><span>0 %</span><span>25 %</span><span>50 %</span></div>
+      </div>
+      <div class="debt-alert ${alertCls}" style="margin-top:.6rem;text-align:left">${alertMsg}</div>
+    </div>`;
+
+  // ── Métriques revenus / charges ──
+  html += `
+    <div class="metrics-grid animate">
+      <div class="metric">
+        <div class="metric-label">Revenus déclarés</div>
+        <div class="metric-val">${fmtEur(revDeclare,0)}</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Revenus retenus</div>
+        <div class="metric-val accent">${fmtEur(revRetenu,0)}</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Mensualités actuelles</div>
+        <div class="metric-val" style="color:${taux>35?'#9B5A3A':taux>25?'var(--amber)':'var(--text)'}">${fmtEur(mensTotal,0)}</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Plafond à 35 %</div>
+        <div class="metric-val">${fmtEur(seuil35,0)}</div>
+      </div>
+    </div>`;
+
+  // ── Capacité d'emprunt ──
+  html += `
+    <div class="bracket-detail animate">
+      <div class="bracket-title">Capacité d'emprunt supplémentaire</div>
+      <div class="bracket-row">
+        <span class="rate-badge" style="background:${mensSupp>0?'var(--accent-dim)':'rgba(155,90,58,.08)'};color:${mensSupp>0?'var(--accent)':'#9B5A3A'}">Marge</span>
+        <span class="tranche">Mensualité supplémentaire possible</span>
+        <span class="tax" style="color:${mensSupp>0?'var(--success)':'#9B5A3A'}">${mensSupp>0?'+ ':''} ${fmtEur(mensSupp,0)}</span>
+      </div>`;
+
+  if (mensSupp > 0) {
+    html += `
+      <div class="bracket-row">
+        <span class="rate-badge">Durée</span>
+        <span class="tranche">Durée envisagée</span>
+        <span class="tax">${fmtNum(projDuree,0)} ans</span>
+      </div>
+      <div class="bracket-row">
+        <span class="rate-badge" style="background:var(--amber-dim);color:var(--amber)">Taux</span>
+        <span class="tranche">Taux nominal indicatif</span>
+        <span class="tax" style="color:var(--amber)">${fmtNum(projTaux,2)} %</span>
+      </div>
+      <div class="bracket-row">
+        <span class="rate-badge" style="background:var(--amber-dim);color:var(--amber)">Assur.</span>
+        <span class="tranche">Assurance emprunteur</span>
+        <span class="tax" style="color:var(--amber)">${fmtNum(projAssur,2)} %</span>
+      </div>
+      <div class="bracket-row">
+        <span class="rate-badge" style="background:var(--surface-3);color:var(--text-muted)">Capital</span>
+        <span class="tranche">Capital empruntable estimé</span>
+        <span class="tax" style="color:var(--accent);font-size:.92rem;font-weight:700">${fmtEur(capital,0)}</span>
+      </div>
+      <div class="bracket-row">
+        <span class="rate-badge" style="background:var(--surface-3);color:var(--text-muted)">Intérêts</span>
+        <span class="tranche">Coût estimé des intérêts</span>
+        <span class="tax" style="color:var(--amber)">${fmtEur(pret.interet,0)}</span>
+      </div>
+      <div class="bracket-row">
+        <span class="rate-badge" style="background:var(--surface-3);color:var(--text-muted)">Assurance</span>
+        <span class="tranche">Coût estimé de l'assurance</span>
+        <span class="tax">${fmtEur(pret.assurance,0)}</span>
+      </div>
+      <div class="bracket-row">
+        <span class="rate-badge" style="background:var(--surface-3);color:var(--text-muted)">Total</span>
+        <span class="tranche">Coût total estimé (int. + ass.)</span>
+        <span class="tax">${fmtEur(pret.interet+pret.assurance,0)}</span>
+      </div>`;
+  } else {
+    html += `
+      <div class="bracket-row">
+        <span class="rate-badge" style="background:rgba(155,90,58,.08);color:#9B5A3A">—</span>
+        <span class="tranche" style="color:var(--text-dim)">Aucune capacité d'emprunt supplémentaire disponible</span>
+        <span class="tax" style="color:#9B5A3A">0 €</span>
+      </div>`;
+  }
+  html += `</div>`;
+
+  // ── Reste à vivre ──
+  const ravColor = (rav) => rav < 800 ? '#9B5A3A' : rav < 1200 ? 'var(--amber)' : 'var(--success)';
+
+  html += `
+    <div class="rav-box animate">
+      <div class="rav-box-title">Reste à vivre</div>
+      <div class="rav-row">
+        <span>Revenus retenus</span>
+        <strong>${fmtEur(revRetenu,0)}</strong>
+      </div>
+      <div class="rav-row">
+        <span>− Mensualités actuelles</span>
+        <strong>− ${fmtEur(mensTotal,0)}</strong>
+      </div>
+      <div class="rav-row rav-total">
+        <span>Reste à vivre actuel</span>
+        <strong style="color:${ravColor(ravActuel)}">${fmtEur(ravActuel,0)}</strong>
+      </div>
+      ${ravApres !== null ? `
+      <div class="rav-row">
+        <span>− Mensualité nouveau crédit</span>
+        <strong>− ${fmtEur(pret.mens,0)}</strong>
+      </div>
+      <div class="rav-row rav-total">
+        <span>Reste à vivre après nouveau crédit</span>
+        <strong style="color:${ravColor(ravApres)}">${fmtEur(ravApres,0)}</strong>
+      </div>` : ''}
+    </div>`;
+
+  html += `<p style="font-size:.64rem;color:var(--text-dim);line-height:1.7;font-family:var(--mono);opacity:.8">Simulation indicative. Les taux varient selon le profil, l'apport, la banque et le marché. Résultats non contractuels.</p>`;
+
+  el.innerHTML = html;
+
+  // Pédagogie
+  document.getElementById('pedago-body').innerHTML = buildPedago({
+    revDeclare, revRetenu, mensTotal, taux, mensSupp,
+    capital, projDuree, projTaux, projAssur,
+    coutInt: pret.interet, coutAssur: pret.assurance,
+    revenus,
+  });
+}
+
+/* ══════════════════════════════════════════
+   SLIDERS
+══════════════════════════════════════════ */
+function syncSlider(numId, sldId, dispId, fmt) {
+  const num  = document.getElementById(numId);
+  const sld  = document.getElementById(sldId);
+  const disp = document.getElementById(dispId);
+  function setPct() {
+    const min=parseFloat(sld.min)||0, max=parseFloat(sld.max)||100;
+    const val=Math.min(Math.max(parseFloat(sld.value)||0,min),max);
+    sld.style.setProperty('--pct', ((val-min)/(max-min)*100).toFixed(1)+'%');
+  }
+  function onNum() {
+    const v=parseFloat(num.value)||0;
+    sld.value=Math.min(Math.max(v,parseFloat(sld.min)||0),parseFloat(sld.max)||100);
+    setPct(); if(disp) disp.textContent=fmt(v); calc();
+  }
+  function onSld() {
+    num.value=sld.value;
+    if(disp) disp.textContent=fmt(parseFloat(sld.value)||0);
+    setPct(); calc();
+  }
+  num.addEventListener('input', onNum);
+  sld.addEventListener('input', onSld);
+  setPct();
+  if(disp) disp.textContent=fmt(parseFloat(num.value)||0);
+}
+
+/* ══════════════════════════════════════════
+   INIT
+══════════════════════════════════════════ */
+document.getElementById('add-rev-btn').addEventListener('click',  () => addRevenu());
+document.getElementById('add-cred-btn').addEventListener('click', () => addCredit());
+
+syncSlider('proj-duree', 'proj-duree-s', 'proj-duree-disp', v => Math.round(v) + ' ans');
+syncSlider('proj-taux',  'proj-taux-s',  'proj-taux-disp',  v => fmtNum(v,2) + ' %');
+syncSlider('proj-assur', 'proj-assur-s', 'proj-assur-disp', v => fmtNum(v,2) + ' %');
+
+// État initial : 1 revenu salarié par défaut
+addRevenu('salaire', 3000);
+
+/* ── Dropdown ── */
+/* Menu déroulant catégorisé — voir shared-nav.js */
+SP.nav.init();
+</script>
+</body>
+</html>

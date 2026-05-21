@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="favicon-64.png">
+  <link rel="shortcut icon" href="favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="favicon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Droits de Donation 2026 — PATRIMONIA.AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css?v=19">
+<script src="shared.js?v=2"></script>
+  <script src="shared-nav.js?v=6"></script>
+<style>
+
+/* ── PILL GROUP (radios stylisés) ── */
+.pill-group { display:flex; gap:.4rem; flex-wrap:wrap; margin-top:.3rem }
+.pill {
+  display:inline-flex; align-items:center;
+  padding:.35rem .85rem; border:1.5px solid var(--border);
+  border-radius:100px; font-size:.76rem; font-weight:500;
+  color:var(--text-muted); cursor:pointer; background:var(--surface);
+  transition:all .2s ease; user-select:none; letter-spacing:-.01em;
+}
+.pill input[type=radio],.pill input[type=checkbox]{ display:none }
+.pill:has(input:checked){
+  background:var(--accent-dim); border-color:var(--accent); color:var(--accent);
+}
+
+/* ── SECTION LABEL ── */
+.section-label-small{
+  font-size:.62rem; font-weight:700; color:var(--text-dim);
+  letter-spacing:.08em; text-transform:uppercase;
+  margin-bottom:.65rem;
+}
+
+/* ── DONATAIRE CARD ── */
+.benef-card{
+  background:var(--surface); border:1.5px solid var(--border-subtle);
+  border-radius:var(--r-sm); margin-bottom:.7rem; overflow:hidden;
+  transition:border-color .2s ease;
+}
+.benef-card:focus-within{ border-color:rgba(79,138,120,.35) }
+.benef-hd{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:.55rem .9rem .55rem .75rem;
+  background:var(--surface-2); border-bottom:1px solid var(--border-subtle);
+}
+.benef-hd-left{ display:flex; align-items:center; gap:.55rem; min-width:0; flex:1 }
+.benef-num{
+  width:20px; height:20px; border-radius:50%; flex-shrink:0;
+  background:var(--accent-dim); color:var(--accent);
+  font-size:.65rem; font-weight:700;
+  display:flex; align-items:center; justify-content:center;
+}
+.benef-name-inp{
+  background:transparent; border:none; outline:none;
+  font-size:.8rem; font-weight:500; color:var(--text);
+  font-family:var(--sans); width:120px; min-width:0;
+  letter-spacing:-.01em;
+}
+.benef-name-inp::placeholder{ color:var(--text-dim) }
+.benef-lien-tag{
+  font-size:.63rem; font-weight:500; color:var(--text-dim);
+  background:var(--surface-3); padding:.1rem .5rem;
+  border-radius:100px; flex-shrink:0; white-space:nowrap;
+}
+.benef-rm{
+  width:24px; height:24px; border-radius:50%; border:none;
+  background:none; color:var(--text-dim); cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.05rem; line-height:1; transition:all .15s ease; flex-shrink:0;
+}
+.benef-rm:hover{ background:rgba(155,90,58,.08); color:#9B5A3A }
+.benef-fields{ padding:.8rem .85rem .7rem }
+.benef-row{ display:grid; grid-template-columns:1fr 1fr; gap:.55rem; margin-bottom:.55rem }
+.benef-lbl{
+  font-size:.63rem; font-weight:600; color:var(--text-dim);
+  letter-spacing:.06em; text-transform:uppercase; margin-bottom:.28rem;
+}
+.benef-iw{
+  display:flex; align-items:center; gap:.35rem;
+  background:var(--surface-2); border:1.5px solid var(--border);
+  border-radius:var(--r-sm); padding:.42rem .7rem; transition:all .2s ease;
+}
+.benef-iw:focus-within{ border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-dim) }
+.benef-iw input{
+  flex:1; background:transparent; border:none; outline:none;
+  color:var(--text); font-family:var(--sans); font-size:.84rem;
+  font-weight:500; width:100%; min-width:0;
+}
+.benef-unit{ font-size:.74rem; color:var(--text-dim); flex-shrink:0; font-weight:500 }
+.benef-sw{ position:relative }
+.benef-sw::after{
+  content:'▾'; position:absolute; right:.7rem; top:50%;
+  transform:translateY(-50%); color:var(--text-dim);
+  pointer-events:none; font-size:.72rem;
+}
+.benef-sel{
+  width:100%; background:var(--surface-2);
+  border:1.5px solid var(--border); border-radius:var(--r-sm);
+  color:var(--text); font-family:var(--sans); font-size:.82rem;
+  font-weight:400; padding:.42rem 1.8rem .42rem .7rem;
+  outline:none; cursor:pointer; transition:all .2s ease;
+  -webkit-appearance:none; appearance:none;
+}
+.benef-sel:focus{ border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-dim) }
+.benef-ck{
+  display:flex; align-items:center; gap:.48rem;
+  font-size:.73rem; color:var(--text-muted); cursor:pointer;
+  margin-top:.4rem; line-height:1.4;
+}
+.benef-ck input[type=checkbox]{ accent-color:var(--accent); width:14px; height:14px; cursor:pointer; flex-shrink:0 }
+.benef-note{
+  font-size:.62rem; color:var(--text-dim); margin-top:.2rem;
+  font-family:var(--mono); line-height:1.5;
+}
+
+/* ── ADD BUTTON ── */
+.add-benef-btn{
+  display:flex; align-items:center; justify-content:center; gap:.5rem;
+  width:100%; padding:.6rem 1rem;
+  background:var(--accent-dim); border:1.5px dashed rgba(79,138,120,.3);
+  border-radius:var(--r-sm); color:var(--accent);
+  font-family:var(--sans); font-size:.78rem; font-weight:500;
+  cursor:pointer; transition:all .2s ease; letter-spacing:-.01em;
+}
+.add-benef-btn:hover{ background:var(--accent); color:#fff; border-color:var(--accent) }
+.add-benef-btn svg{ width:13px; height:13px; flex-shrink:0 }
+
+/* ── RESULTS ── */
+.benef-res-row{
+  background:var(--surface-2); border:1px solid var(--border-subtle);
+  border-radius:var(--r-sm); padding:.8rem 1rem;
+  display:flex; flex-direction:column; gap:.28rem;
+}
+.benef-res-top{ display:flex; align-items:center; justify-content:space-between; gap:.5rem }
+.benef-res-name{ font-size:.78rem; font-weight:600; color:var(--text); letter-spacing:-.01em; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
+.benef-res-droits{ font-family:var(--mono); font-size:.9rem; font-weight:700; color:var(--accent); flex-shrink:0 }
+.benef-res-droits.zero{ color:var(--success) }
+.benef-res-sub{ display:flex; gap:.4rem; flex-wrap:wrap }
+.benef-chip{
+  font-size:.63rem; color:var(--text-dim); background:var(--surface);
+  border:1px solid var(--border-subtle); padding:.1rem .45rem;
+  border-radius:100px; white-space:nowrap;
+}
+
+/* ── WARNING / NOTE ── */
+.warn-box{
+  background:var(--amber-dim); border-left:3px solid var(--amber);
+  border-radius:var(--r-sm); padding:.65rem .85rem;
+  font-size:.7rem; color:#5a3a00; line-height:1.65; margin-top:.45rem;
+}
+.note-box{
+  background:var(--surface-3); border-left:3px solid rgba(79,138,120,.25);
+  border-radius:var(--r-sm); padding:.85rem 1rem;
+  font-size:.72rem; color:var(--text-muted); line-height:1.75; margin-top:1rem;
+}
+
+/* ── DÉTAIL PAR DONATAIRE ── */
+.detail-benef{ margin-bottom:1.6rem; padding-bottom:1.6rem; border-bottom:1px solid var(--border-subtle) }
+.detail-benef:last-of-type{ border-bottom:none; margin-bottom:0; padding-bottom:0 }
+.detail-benef-title{
+  font-size:.8rem; font-weight:600; color:var(--text); letter-spacing:-.01em;
+  margin-bottom:.8rem; display:flex; align-items:center; gap:.5rem; flex-wrap:wrap;
+}
+.detail-tag{
+  font-size:.63rem; color:var(--text-dim); background:var(--surface-3);
+  padding:.12rem .55rem; border-radius:100px; font-weight:500;
+}
+.detail-sub-title{
+  font-size:.65rem; font-weight:700; color:var(--text-dim);
+  letter-spacing:.06em; text-transform:uppercase; margin:.8rem 0 .4rem;
+}
+.dl{ display:flex; justify-content:space-between; align-items:center; padding:.32rem 0; font-size:.78rem; border-bottom:1px solid var(--border-subtle) }
+.dl:last-child{ border-bottom:none }
+.dl span{ color:var(--text-muted) }
+.dl strong{ font-family:var(--mono); font-weight:600; color:var(--text) }
+.dl.acc strong{ color:var(--accent) }
+.dl.suc strong{ color:var(--success) }
+.dl.amb strong{ color:var(--amber) }
+.dl.blu strong{ color:var(--blue) }
+.dl.dim strong{ color:var(--text-dim) }
+.dl.big strong{ font-size:.9rem }
+
+/* ── NET TRANSMIS BOX ── */
+.net-box{
+  background:var(--surface-2); border:1px solid var(--border-subtle);
+  border-radius:var(--r-sm); padding:1.1rem 1.25rem;
+}
+.net-box-title{
+  font-size:.63rem; font-weight:600; color:var(--text-dim);
+  letter-spacing:.07em; text-transform:uppercase; margin-bottom:.5rem;
+}
+.net-box-val{
+  font-family:var(--sans); font-size:1.15rem; font-weight:700;
+  color:var(--success); letter-spacing:-.03em; margin-bottom:.25rem;
+}
+.net-box-note{ font-size:.7rem; color:var(--text-dim); line-height:1.55 }
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="index.html" class="nav-logo"><img src="logo.png?v=3" alt="PATRIMONIA.AI" class="nav-logo-img"></a>
+  <div class="nav-right">
+    <a href="index.html" class="nav-back">
+      <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7.5 1.5L3 6l4.5 4.5"/></svg>
+      Accueil
+    </a>
+    <div class="nav-dropdown" id="mainDropdown">
+      <button class="nav-dropdown-btn" aria-expanded="false" aria-haspopup="true">
+        Simulateurs <svg class="nav-chevron" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.8" style="width:13px;height:8px;flex-shrink:0"><path d="M1 1l4 4 4-4"/></svg>
+      </button>
+      <div class="nav-dropdown-menu" id="navMenu" role="menu"></div>
+    </div>
+  </div>
+</nav>
+
+<div class="sim-page">
+  <div class="sim-page-header">
+    <span class="sim-num-badge">05</span>
+    <div>
+      <div class="sim-eyebrow">Transmission</div><h1>Droits de <em class="gradient-text">donation</em></h1>
+      <p>Barèmes 2026 · Multi-donataires · Abattements CGI · Démembrement · Don familial art. 790G</p>
+    </div>
+  </div>
+
+  <div class="sim-card-wrap">
+    <div class="sim-body">
+
+      <!-- ══ PANNEAU GAUCHE ══ -->
+      <div class="inputs-panel">
+
+        <!-- A. DONATEUR -->
+        <div class="section-label-small">Donateur</div>
+
+        <div class="field">
+          <div class="field-label"><label>Nombre de donateurs</label></div>
+          <div class="pill-group">
+            <label class="pill"><input type="radio" name="don-nb" value="1" checked> 1 donateur</label>
+            <label class="pill"><input type="radio" name="don-nb" value="2"> 2 donateurs (couple)</label>
+          </div>
+          <div class="benef-note" id="note-2don" style="display:none">Chaque donateur applique ses propres abattements sur la moitié transmise.</div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">
+            <label for="don-age">Âge du donateur</label>
+            <span class="field-val" id="don-age-disp">60 ans</span>
+          </div>
+          <div class="input-wrap"><input type="number" id="don-age" value="60" min="18" max="99" step="1"><span class="unit">ans</span></div>
+          <input type="range" id="don-age-s" min="18" max="99" step="1" value="60">
+        </div>
+
+        <div class="field">
+          <div class="field-label"><label for="don-bien">Nature du bien donné</label></div>
+          <div class="select-wrap">
+            <select id="don-bien">
+              <optgroup label="Immobilier">
+                <option value="immo" selected>Bien immobilier (résidence, secondaire)</option>
+                <option value="immo-loc">Immobilier locatif</option>
+                <option value="sci">Parts de SCI / SCPI</option>
+              </optgroup>
+              <optgroup label="Financier & valeurs mobilières">
+                <option value="argent">Somme d'argent / virement</option>
+                <option value="titres">Titres / actions / portefeuille</option>
+                <option value="per">PER / épargne retraite (après déblocage)</option>
+              </optgroup>
+              <optgroup label="Entreprise & professionnel">
+                <option value="dutreil">Entreprise (pacte Dutreil possible)</option>
+                <option value="holding">Holding patrimoniale</option>
+                <option value="societe-nc">Parts de société non cotée</option>
+              </optgroup>
+              <optgroup label="Assurance & capitalisation">
+                <option value="av">Assurance-vie (hors champ)</option>
+                <option value="capitalisation">Contrat de capitalisation</option>
+              </optgroup>
+              <optgroup label="Diversification patrimoniale">
+                <option value="forestier">Groupement Forestier (GFF / GFI)</option>
+                <option value="viticole">Groupement Viticole (GFV)</option>
+                <option value="fip-fcpi">FIP / FCPI</option>
+                <option value="pe">Private Equity / FCPR</option>
+              </optgroup>
+              <optgroup label="Biens mobiliers & objets de valeur">
+                <option value="or">Or / métaux précieux</option>
+                <option value="art">Œuvres d'art / objets de collection</option>
+                <option value="autre">Autre bien meuble</option>
+              </optgroup>
+            </select>
+          </div>
+          <div id="bien-warn" class="warn-box" style="display:none"></div>
+        </div>
+
+        <div class="field">
+          <div class="field-label"><label>Nature de la donation</label></div>
+          <div class="pill-group">
+            <label class="pill"><input type="radio" name="don-nature" value="pp" checked> Pleine propriété</label>
+            <label class="pill"><input type="radio" name="don-nature" value="np"> Nue-propriété</label>
+            <label class="pill"><input type="radio" name="don-nature" value="us"> Usufruit</label>
+          </div>
+          <div id="np-info" class="benef-note" style="display:none"></div>
+        </div>
+
+        <div class="field" id="usuf-field" style="display:none">
+          <div class="field-label"><label>Type d'usufruit</label></div>
+          <div class="pill-group" style="margin-bottom:.6rem">
+            <label class="pill"><input type="radio" name="usuf-type" value="viager" checked> Usufruit viager</label>
+            <label class="pill"><input type="radio" name="usuf-type" value="temp"> Usufruit temporaire</label>
+          </div>
+
+          <!-- Viager : barème âge art. 669 CGI -->
+          <div id="usuf-viager-wrap">
+            <div class="field-label">
+              <label for="don-age-usuf">Âge de l'usufruitier</label>
+              <span class="field-val" id="don-age-usuf-disp">60 ans</span>
+            </div>
+            <div class="input-wrap"><input type="number" id="don-age-usuf" value="60" min="1" max="99" step="1"><span class="unit">ans</span></div>
+            <input type="range" id="don-age-usuf-s" min="1" max="99" step="1" value="60">
+            <div class="benef-note" id="usuf-viager-note">Usufruit : 40 % · Nue-propriété : 60 % (art. 669 CGI)</div>
+          </div>
+
+          <!-- Temporaire : 23 % par tranche de 10 ans art. 669 CGI -->
+          <div id="usuf-temp-wrap" style="display:none">
+            <div class="field-label">
+              <label for="usuf-duree">Durée de l'usufruit</label>
+              <span class="field-val" id="usuf-duree-disp">10 ans</span>
+            </div>
+            <div class="input-wrap"><input type="number" id="usuf-duree" value="10" min="1" max="30" step="1"><span class="unit">ans</span></div>
+            <input type="range" id="usuf-duree-s" min="1" max="30" step="1" value="10">
+            <div class="benef-note" id="usuf-temp-note">1 tranche × 23 % = 23 % · Nue-propriété : 77 % (art. 669 CGI)</div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="check-item">
+            <input type="checkbox" id="don-droits-charge">
+            Droits pris en charge par le donateur
+          </label>
+          <div style="font-size:.68rem;color:var(--text-dim);margin-top:.3rem;font-family:var(--mono)">Fiscalement neutre pour le donataire (art. 1712 CGI)</div>
+        </div>
+
+        <div class="section-sep"></div>
+
+        <!-- B. DONATAIRES -->
+        <div class="section-label-small">Donataires</div>
+        <div id="benef-list"></div>
+        <button class="add-benef-btn" id="add-benef-btn" type="button">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="8" y1="3" x2="8" y2="13"/><line x1="3" y1="8" x2="13" y2="8"/></svg>
+          Ajouter un donataire
+        </button>
+      </div>
+
+      <!-- ══ PANNEAU DROIT ══ -->
+      <div class="results-panel" id="don-results">
+        <div class="result-empty">Ajoutez un donataire<br>pour lancer la simulation.</div>
+      </div>
+
+    </div><!-- /sim-body -->
+
+    <!-- ══ DÉTAIL ACCORDÉON ══ -->
+    <div class="amort-section" style="display:grid">
+      <details class="amort-details" id="detail-accordion" style="display:none">
+        <summary>Détail de calcul par donataire — barèmes et tranches</summary>
+        <div style="padding-top:1.25rem" id="detail-body"></div>
+      </details>
+    </div>
+
+  </div><!-- /sim-card-wrap -->
+</div><!-- /sim-page -->
+
+<footer>
+  <span>PATRIMONIA.AI</span> — Simulation indicative à titre informatif uniquement. Ne remplace pas un notaire ou un conseiller fiscal.<br>
+  Barèmes CGI art. 777 · Abattements art. 779 · Don familial art. 790G · Démembrement art. 669 · Valeurs 2026.
+</footer>
+
+<script>
+/* ══════════════════════════════════════════════════════════
+   CONSTANTES FISCALES 2026
+   Sources : CGI art. 777, 779, 669, 790G — BOFiP
+   ══════════════════════════════════════════════════════════ */
+
+// Abattements par lien donateur/donataire (par donateur, renouvelables tous les 15 ans)
+const ABATT = {
+  'enfant':               100000,  // art. 779 I
+  'petit-enfant':          31865,  // art. 779 I
+  'arriere-petit-enfant':   5310,  // art. 779 I
+  'parent':               100000,  // art. 779 I (ligne directe ascendante)
+  'grand-parent':          31865,
+  'arriere-grand-parent':   5310,
+  'conjoint':              80724,  // époux & partenaire PACS — art. 790E-F
+  'frere-soeur':           15932,  // art. 779 III
+  'neveu-niece':            7967,  // art. 779 IV
+  'oncle-tante':               0,
+  'cousin':                    0,
+  'concubin':                  0,
+  'tiers':                     0
+};
+
+const ABATT_HANDICAP   = 159325; // art. 779 II — cumulable avec abattement du lien
+const EXO_DON_FAMILIAL =  31865; // art. 790G — somme d'argent, donateur < 80 ans, bénéf majeur
+
+// Liens éligibles au don familial de sommes d'argent
+const LIEN_DON_FAM = new Set(['enfant','petit-enfant','arriere-petit-enfant','neveu-niece']);
+
+// Barème ligne directe + époux/PACS (art. 777 I CGI)
+const BAREME_DIRECTE = [
+  { lim:     8072, t: .05 },
+  { lim:    12109, t: .10 },
+  { lim:    15932, t: .15 },
+  { lim:   552324, t: .20 },
+  { lim:   902838, t: .30 },
+  { lim:  1805677, t: .40 },
+  { lim: Infinity, t: .45 }
+];
+
+// Barème frères/sœurs (art. 777 II)
+const BAREME_FRERES = [
+  { lim:  24430, t: .35 },
+  { lim: Infinity, t: .45 }
+];
+
+// Coefficient nue-propriété — usufruit VIAGER selon âge (art. 669 CGI)
+// Complément à 100 % = coefficient usufruit viager
+function coeffNPViager(age) {
+  if (age <  21) return .10; // usuf 90 %
+  if (age <  31) return .20; // usuf 80 %
+  if (age <  41) return .30; // usuf 70 %
+  if (age <  51) return .40; // usuf 60 %
+  if (age <  61) return .50; // usuf 50 %
+  if (age <  71) return .60; // usuf 40 %
+  if (age <  81) return .70; // usuf 30 %
+  if (age <  91) return .80; // usuf 20 %
+  return .90;                // usuf 10 %
+}
+
+// Coefficient usufruit TEMPORAIRE : 23 % par tranche de 10 ans commencée (art. 669 CGI)
+// Exemples : 10 ans = 23 %, 15 ans = 46 %, 20 ans = 46 %, 30 ans = 69 %
+// Arithmétique entière (tranches * 23 / 100) pour éviter les erreurs IEEE 754 de 0.23
+function coeffUsufTemp(duree) {
+  const tranches = Math.ceil(Math.max(1, duree) / 10);
+  return Math.min(100, tranches * 23) / 100; // ex. 3*23=69 → 69/100=0.69 (exact)
+}
+
+// Type de barème selon lien
+function typeBareme(lien) {
+  if (['enfant','petit-enfant','arriere-petit-enfant','parent',
+       'grand-parent','arriere-grand-parent','conjoint'].includes(lien)) return 'directe';
+  if (lien === 'frere-soeur') return 'freres';
+  if (['neveu-niece','oncle-tante','cousin'].includes(lien)) return 'fixe55';
+  return 'fixe60';
+}
+
+// Application d'un barème progressif à une base taxable
+function appliquer(base, bareme) {
+  let prev = 0, total = 0;
+  const tr = [];
+  for (const b of bareme) {
+    if (base <= prev) break;
+    const portion = Math.min(base, b.lim) - prev;
+    const impot   = portion * b.t;
+    tr.push({ de: prev, a: b.lim, taux: b.t, portion, impot });
+    total += impot;
+    prev = b.lim;
+  }
+  return { total, tr };
+}
+
+/* ══════════════════════════════════════════════════════════
+   FORMATAGE
+   ══════════════════════════════════════════════════════════ */
+const fmtN = (v, d=0) => new Intl.NumberFormat('fr-FR',{minimumFractionDigits:d,maximumFractionDigits:d}).format(v).replace(/[\u202F\u00A0]/g,' ');
+const fmtE = (v, d=0) => fmtN(v,d) + ' €';
+const fmtP = (v, d=1) => fmtN(v,d) + ' %';
+
+function attachMoneyInput(inp) { SP.attachFmt(inp); }
+
+/* ══════════════════════════════════════════════════════════
+   CALCUL D'UN DONATAIRE (pour un seul donateur)
+   ══════════════════════════════════════════════════════════ */
+function calcUnDonateur(montantFisc, lien, abattConso, handicap,
+                        donFamActif, donFamConso, majeur) {
+  const abattBase     = ABATT[lien] ?? 0;
+  const abattHandi    = handicap ? ABATT_HANDICAP : 0;
+  const abattTheo     = abattBase + abattHandi;
+  const abattRestant  = Math.max(0, abattTheo - abattConso);
+
+  // Exonération don familial (distincte de l'abattement général)
+  let exoFam = 0;
+  if (donFamActif && majeur) {
+    const dispo = Math.max(0, EXO_DON_FAMILIAL - donFamConso);
+    exoFam = Math.min(montantFisc, dispo);
+  }
+
+  const apresExo    = Math.max(0, montantFisc - exoFam);
+  const baseTaxable = Math.max(0, apresExo - abattRestant);
+
+  // Barème
+  const tb = typeBareme(lien);
+  let barem;
+  if (tb === 'directe') barem = appliquer(baseTaxable, BAREME_DIRECTE);
+  else if (tb === 'freres') barem = appliquer(baseTaxable, BAREME_FRERES);
+  else if (tb === 'fixe55') barem = { total: baseTaxable * .55, tr: [{ de:0, a:Infinity, taux:.55, portion:baseTaxable, impot:baseTaxable*.55 }] };
+  else barem = { total: baseTaxable * .60, tr: [{ de:0, a:Infinity, taux:.60, portion:baseTaxable, impot:baseTaxable*.60 }] };
+
+  return {
+    montantFisc, abattBase, abattHandi, abattTheo,
+    abattConso, abattRestant, exoFam, apresExo,
+    baseTaxable, droits: barem.total, tranches: barem.tr, tb
+  };
+}
+
+/* ══════════════════════════════════════════════════════════
+   GESTION DYNAMIQUE DES DONATAIRES
+   ══════════════════════════════════════════════════════════ */
+let ctr = 0;
+
+const LIEN_LABELS = {
+  'enfant':'Enfant','petit-enfant':'Petit-enfant',
+  'arriere-petit-enfant':'Arr.-petit-enfant','parent':'Parent',
+  'grand-parent':'Grand-parent','arriere-grand-parent':'Arr.-grand-parent',
+  'conjoint':'Époux / PACS','frere-soeur':'Frère / Sœur',
+  'neveu-niece':'Neveu / Nièce','oncle-tante':'Oncle / Tante',
+  'cousin':'Cousin·e','concubin':'Concubin(e)','tiers':'Tiers'
+};
+const LIEN_LABELS_LONG = {
+  'enfant':'Enfant','petit-enfant':'Petit-enfant',
+  'arriere-petit-enfant':'Arrière-petit-enfant','parent':'Parent (ligne directe ascendante)',
+  'grand-parent':'Grand-parent','arriere-grand-parent':'Arrière-grand-parent',
+  'conjoint':'Époux ou Partenaire PACS','frere-soeur':'Frère ou Sœur',
+  'neveu-niece':'Neveu ou Nièce','oncle-tante':'Oncle ou Tante',
+  'cousin':'Cousin ou Cousine','concubin':'Concubin(e)','tiers':'Tiers sans lien'
+};
+
+function getBenefIds() {
+  return [...document.querySelectorAll('.benef-card')].map(el => el.dataset.id);
+}
+
+function readBenef(id) {
+  const c = document.querySelector(`.benef-card[data-id="${id}"]`);
+  if (!c) return null;
+  const parseM = s => parseFloat(String(s).replace(/\s/g,'')) || 0;
+  return {
+    label:          c.querySelector('.b-name').value.trim(),
+    lien:           c.querySelector('.b-lien').value,
+    montant:        parseM(c.querySelector('.b-montant').value),
+    abattConso:     parseM(c.querySelector('.b-abatt').value),
+    donFamConso:    parseM(c.querySelector('.b-dfconso').value),
+    handicap:       c.querySelector('.b-handi').checked,
+    donFamActif:    c.querySelector('.b-df').checked,
+    majeur:         c.querySelector('.b-majeur').checked
+  };
+}
+
+function createCard(id, num) {
+  const div = document.createElement('div');
+  div.className = 'benef-card';
+  div.dataset.id = id;
+  div.innerHTML = `
+    <div class="benef-hd">
+      <div class="benef-hd-left">
+        <div class="benef-num b-num">${num}</div>
+        <input class="benef-name-inp b-name" type="text" placeholder="Donataire ${num}" maxlength="30">
+        <span class="benef-lien-tag b-tag">Enfant</span>
+      </div>
+      <button class="benef-rm" type="button" title="Supprimer">×</button>
+    </div>
+    <div class="benef-fields">
+      <div class="benef-row">
+        <div>
+          <div class="benef-lbl">Lien de parenté</div>
+          <div class="benef-sw">
+            <select class="benef-sel b-lien">
+              <optgroup label="Ligne directe">
+                <option value="enfant">Enfant</option>
+                <option value="petit-enfant">Petit-enfant</option>
+                <option value="arriere-petit-enfant">Arrière-petit-enfant</option>
+                <option value="parent">Parent / Ascendant</option>
+                <option value="grand-parent">Grand-parent</option>
+                <option value="arriere-grand-parent">Arrière-grand-parent</option>
+              </optgroup>
+              <optgroup label="Époux / PACS">
+                <option value="conjoint">Époux / Partenaire PACS</option>
+              </optgroup>
+              <optgroup label="Collatéraux">
+                <option value="frere-soeur">Frère / Sœur</option>
+                <option value="neveu-niece">Neveu / Nièce</option>
+                <option value="oncle-tante">Oncle / Tante</option>
+                <option value="cousin">Cousin / Cousine</option>
+              </optgroup>
+              <optgroup label="Autres">
+                <option value="concubin">Concubin(e)</option>
+                <option value="tiers">Tiers sans lien</option>
+              </optgroup>
+            </select>
+          </div>
+        </div>
+        <div>
+          <div class="benef-lbl">Montant reçu</div>
+          <div class="benef-iw">
+            <input type="text" inputmode="numeric" class="b-montant" value="0" placeholder="0">
+            <span class="benef-unit">€</span>
+          </div>
+        </div>
+      </div>
+      <div class="benef-row">
+        <div>
+          <div class="benef-lbl">Abattement consommé</div>
+          <div class="benef-iw">
+            <input type="text" inputmode="numeric" class="b-abatt" value="0" placeholder="0">
+            <span class="benef-unit">€</span>
+          </div>
+          <div class="benef-note">Donations du même donateur &lt; 15 ans</div>
+        </div>
+        <div class="b-df-conso-wrap" style="display:none">
+          <div class="benef-lbl">Exo. 790G consommée</div>
+          <div class="benef-iw">
+            <input type="text" inputmode="numeric" class="b-dfconso" value="0" placeholder="0">
+            <span class="benef-unit">€</span>
+          </div>
+          <div class="benef-note">Don familial déjà utilisé &lt; 15 ans</div>
+        </div>
+      </div>
+      <label class="benef-ck">
+        <input type="checkbox" class="b-handi">
+        Personne handicapée — abattement supplémentaire de 159 325 € (art. 779 II)
+      </label>
+      <label class="benef-ck b-df-label" style="display:none">
+        <input type="checkbox" class="b-df">
+        Don familial de sommes d'argent (art. 790G) — exonération jusqu'à 31 865 €
+      </label>
+      <label class="benef-ck b-majeur-label" style="display:none">
+        <input type="checkbox" class="b-majeur" checked>
+        Donataire majeur (condition obligatoire art. 790G)
+      </label>
+    </div>`;
+
+  // Formatage milliers en temps réel
+  ['.b-montant', '.b-abatt', '.b-dfconso'].forEach(sel => attachMoneyInput(div.querySelector(sel)));
+
+  // Events
+  div.querySelectorAll('input,select').forEach(el => {
+    el.addEventListener('input', () => { syncTag(id); syncDonFam(id); calculate(); });
+    el.addEventListener('change', () => { syncTag(id); syncDonFam(id); calculate(); });
+  });
+  div.querySelector('.benef-rm').addEventListener('click', () => {
+    div.remove(); renumber(); calculate();
+  });
+  return div;
+}
+
+function syncTag(id) {
+  const c = document.querySelector(`.benef-card[data-id="${id}"]`);
+  if (!c) return;
+  c.querySelector('.b-tag').textContent = LIEN_LABELS[c.querySelector('.b-lien').value] || '—';
+}
+
+function syncDonFam(id) {
+  const c = document.querySelector(`.benef-card[data-id="${id}"]`);
+  if (!c) return;
+  const lien       = c.querySelector('.b-lien').value;
+  const bien       = document.getElementById('don-bien').value;
+  const ageDon     = parseInt(document.getElementById('don-age').value) || 60;
+  const eligible   = LIEN_DON_FAM.has(lien) && bien === 'argent' && ageDon < 80;
+  c.querySelector('.b-df-label').style.display    = eligible ? 'flex' : 'none';
+  c.querySelector('.b-majeur-label').style.display= eligible ? 'flex' : 'none';
+  c.querySelector('.b-df-conso-wrap').style.display = (eligible && c.querySelector('.b-df').checked) ? 'block' : 'none';
+  if (!eligible) {
+    c.querySelector('.b-df').checked = false;
+    c.querySelector('.b-majeur').checked = true;
+  }
+}
+
+function syncAllDonFam() { getBenefIds().forEach(syncDonFam); }
+
+function renumber() {
+  document.querySelectorAll('.benef-card').forEach((c, i) => {
+    const n = c.querySelector('.b-num');
+    const inp = c.querySelector('.b-name');
+    if (n) n.textContent = i + 1;
+    if (inp && !inp.value) inp.placeholder = `Donataire ${i + 1}`;
+  });
+}
+
+/* ══════════════════════════════════════════════════════════
+   CALCUL PRINCIPAL
+   ══════════════════════════════════════════════════════════ */
+function calculate() {
+  const ageDon    = parseInt(document.getElementById('don-age').value)     || 60;
+  const nbDon     = parseInt(document.querySelector('[name="don-nb"]:checked')?.value) || 1;
+  const nature    = document.querySelector('[name="don-nature"]:checked')?.value || 'pp';
+  const usufType  = document.querySelector('[name="usuf-type"]:checked')?.value || 'viager';
+  const ageUsuf   = parseInt(document.getElementById('don-age-usuf').value) || 60;
+  const usufDuree = parseInt(document.getElementById('usuf-duree').value)   || 10;
+  const bien      = document.getElementById('don-bien').value;
+  const droitsCh  = document.getElementById('don-droits-charge').checked;
+
+  // Note 2 donateurs
+  document.getElementById('note-2don').style.display = nbDon === 2 ? 'block' : 'none';
+
+  // "usuf-field" (viager/temporaire) uniquement pour "donation en usufruit"
+  // Pour NP : le donateur conserve l'usufruit → âge usufruitier = âge du donateur (art. 669 CGI)
+  const showUsuf = (nature === 'us');
+  document.getElementById('usuf-field').style.display = showUsuf ? 'block' : 'none';
+
+  // Calcul des coefficients fiscaux (art. 669 CGI)
+  let coeff, npCoeff = 0, usCoeff = 0;
+  if (nature === 'np') {
+    // Donateur conserve l'usufruit viager → barème CGI 669 selon son propre âge
+    npCoeff = coeffNPViager(ageDon);
+    usCoeff = 1 - npCoeff;
+    coeff   = npCoeff;
+    document.getElementById('np-info').style.display = 'block';
+    document.getElementById('np-info').textContent =
+      `Saisissez la valeur en pleine propriété — le donateur conserve l'usufruit (${ageDon} ans)`
+      + ` · Usufruit : ${fmtN(usCoeff*100,0)} % · Nue-propriété transmise : ${fmtN(npCoeff*100,0)} % (art. 669 CGI)`;
+  } else if (nature === 'us') {
+    if (usufType === 'temp') {
+      usCoeff = coeffUsufTemp(usufDuree);
+    } else {
+      usCoeff = 1 - coeffNPViager(ageUsuf);
+    }
+    npCoeff = 1 - usCoeff;
+    coeff   = usCoeff;
+    document.getElementById('np-info').style.display = 'none';
+  } else {
+    coeff = 1;
+    document.getElementById('np-info').style.display = 'none';
+  }
+
+  if (showUsuf) {
+    const isTemp = usufType === 'temp';
+    document.getElementById('usuf-viager-wrap').style.display = isTemp ? 'none' : 'block';
+    document.getElementById('usuf-temp-wrap').style.display   = isTemp ? 'block' : 'none';
+    if (isTemp) {
+      const tr = Math.ceil(Math.max(1, usufDuree) / 10);
+      document.getElementById('usuf-temp-note').textContent =
+        `${tr} tranche${tr > 1 ? 's' : ''} de 10 ans × 23 % = ${fmtN(usCoeff*100,0)} %`
+        + ` · nue-propriété : ${fmtN((1-usCoeff)*100,0)} % — art. 669 CGI`;
+    } else {
+      document.getElementById('usuf-viager-note').textContent =
+        `Usufruit : ${fmtN(usCoeff*100,0)} % · Nue-propriété : ${fmtN((1-usCoeff)*100,0)} %`
+        + ` de la pleine propriété — art. 669 CGI`;
+    }
+  }
+
+  // Avertissements / notes selon nature du bien
+  const bw = document.getElementById('bien-warn');
+  const BIEN_WARN_INFO = {
+    'av':              { cls:'warn-box',  text:"L'assurance-vie se transmet via clause bénéficiaire, hors droits de donation classiques (art. 990I / 757B CGI). Ce simulateur n'est pas applicable aux contrats d'AV." },
+    'dutreil':         { cls:'warn-box',  text:"<strong>Pacte Dutreil — art. 787B/C CGI</strong> — Exonération de 75 % de la valeur des titres sous conditions strictes (engagement collectif ≥ 2 ans, individuel 4 ans, fonction de direction). Ce simulateur applique le barème standard sans réduction Dutreil : les droits réels peuvent être très inférieurs." },
+    'holding':         { cls:'note-box',  text:"<strong>Holding patrimoniale</strong> — Peut bénéficier du pacte Dutreil (art. 787B CGI) si la holding anime effectivement une société opérationnelle. L'administration est vigilante sur ce point. Sans pacte, les parts sont taxées à leur valeur vénale au barème de droit commun." },
+    'societe-nc':      { cls:'note-box',  text:"<strong>Société non cotée</strong> — Valorisée à sa valeur vénale. Un pacte Dutreil (art. 787B) peut réduire la base taxable de 75 % si la société est opérationnelle et les conditions remplies. Des décotes d'illiquidité s'appliquent souvent en pratique." },
+    'capitalisation':  { cls:'note-box',  text:"<strong>Contrat de capitalisation</strong> — Contrairement à l'assurance-vie, ce contrat peut être donné par voie civile. Le donataire peut conserver le contrat sans le racheter, reportant la fiscalité sur les gains au moment du rachat effectif. La valeur fiscale retenue est la valeur de rachat au jour de la donation." },
+    'forestier':       { cls:'note-box',  text:"<strong>Groupement Forestier — art. 793 bis CGI</strong> — Exonération possible de <strong>75 %</strong> de la valeur si : parts détenues depuis ≥ 2 ans, engagement de gestion forestière 30 ans sous plan agréé CNPF/ONF. Ce simulateur applique le barème standard sur la valeur saisie. Si éligible, la base taxable réelle n'est que 25 % de la valeur des parts." },
+    'viticole':        { cls:'note-box',  text:"<strong>Groupement Viticole (GFV)</strong> — Pas d'exonération successorale analogue aux GFF. Les parts sont taxées au barème de droit commun. Des décotes d'illiquidité et de contraintes agronomiques peuvent réduire la valeur vénale retenue." },
+    'fip-fcpi':        { cls:'note-box',  text:"<strong>FIP / FCPI</strong> — Les avantages fiscaux de ces fonds (déduction IR, IFI) ne s'appliquent pas aux droits de donation. Les parts entrent dans l'assiette à leur valeur de liquidation. L'illiquidité du fonds peut compliquer la valorisation." },
+    'pe':              { cls:'note-box',  text:"<strong>Private Equity / FCPR</strong> — Aucune exonération spécifique au titre des droits de donation. Si les actifs sous-jacents constituent une société opérationnelle, un pacte Dutreil (art. 787B) pourrait s'appliquer — à analyser avec un avocat fiscaliste." },
+    'or':              { cls:'note-box',  text:"<strong>Or / métaux précieux</strong> — Aucune exonération spécifique. Assiette : valeur vénale (cours de l'or au jour de la donation). À la revente ultérieure par le donataire, la taxe sur les cessions de métaux précieux (TCA, art. 150 VI CGI — taux de 11 %) s'appliquera, sauf option pour la plus-value réelle." },
+    'art':             { cls:'note-box',  text:"<strong>Œuvres d'art / objets de collection</strong> — Aucune exonération spécifique à la donation. Valeur vénale déterminée par expertise. Les droits peuvent être acquittés par dation en paiement (remise de l'œuvre à l'État, art. 1131 CGI — accord ministériel préalable requis)." },
+    'per':             { cls:'warn-box',  text:"<strong>PER / Épargne retraite</strong> — Le PER assurantiel n'est généralement pas transmissible par donation avant sa liquidation (retraite ou cas exceptionnels de déblocage anticipé). Ce simulateur s'applique si les fonds ont été débloqués et sont disponibles en numéraire." },
+    'immo-loc':        { cls:'note-box',  text:"<strong>Immobilier locatif</strong> — La valeur fiscale retenue est la valeur vénale au jour de la donation. Une décote pour bien loué peut être admise. Si le bien est sous bail rural à long terme (≥ 18 ans), une exonération partielle (art. 793 bis CGI) peut s'appliquer — à vérifier avec un notaire." }
+  };
+  const warnInfo = BIEN_WARN_INFO[bien] || (bien === 'argent' && nature === 'np' ? { cls:'warn-box', text:"<strong>Quasi-usufruit — art. 587 C. civ.</strong> — Une somme d'argent est un bien consomptible. Le démembrement prend la forme d'un quasi-usufruit : l'usufruitier peut utiliser librement les fonds et une créance de restitution d'égal montant naît au profit du nu-propriétaire, exigible à son décès. Ce mécanisme a des incidences successorales spécifiques — consultez un notaire avant toute opération." } : null);
+  if (warnInfo) {
+    bw.style.display = 'block';
+    bw.className = warnInfo.cls;
+    bw.innerHTML = warnInfo.text;
+  } else {
+    bw.style.display = 'none';
+  }
+
+  const ids = getBenefIds();
+  if (ids.length === 0) {
+    document.getElementById('don-results').innerHTML = '<div class="result-empty">Ajoutez un donataire<br>pour lancer la simulation.</div>';
+    document.getElementById('detail-accordion').style.display = 'none';
+    return;
+  }
+
+  syncAllDonFam();
+
+  let sumMontantPP = 0, sumAbatt = 0, sumExo = 0, sumBase = 0, sumDroits = 0;
+  const rows = [];
+
+  ids.forEach(id => {
+    const d = readBenef(id);
+    if (!d) return;
+
+    const montantFisc = d.montant * coeff;
+    let droitsTotal = 0, baseTotal = 0, abattTotal = 0, exoTotal = 0;
+    const calcParts = [];
+
+    if (nbDon === 1) {
+      const r = calcUnDonateur(montantFisc, d.lien, d.abattConso, d.handicap,
+                               d.donFamActif, d.donFamConso, d.majeur);
+      droitsTotal = r.droits;
+      baseTotal   = r.baseTaxable;
+      abattTotal  = Math.min(r.abattRestant, r.apresExo);
+      exoTotal    = r.exoFam;
+      calcParts.push({ lbl: '', ...r });
+    } else {
+      // Chaque donateur transmet la moitié — abattements indépendants
+      const half = montantFisc / 2;
+      ['Donateur 1','Donateur 2'].forEach(lbl => {
+        const r = calcUnDonateur(half, d.lien, d.abattConso, d.handicap,
+                                 d.donFamActif, d.donFamConso, d.majeur);
+        droitsTotal += r.droits;
+        baseTotal   += r.baseTaxable;
+        abattTotal  += Math.min(r.abattRestant, r.apresExo);
+        exoTotal    += r.exoFam;
+        calcParts.push({ lbl, ...r });
+      });
+    }
+
+    sumMontantPP += d.montant;
+    sumAbatt     += abattTotal;
+    sumExo       += exoTotal;
+    sumBase      += baseTotal;
+    sumDroits    += droitsTotal;
+
+    const name = d.label ||
+      document.querySelector(`.benef-card[data-id="${id}"] .b-name`)?.placeholder || 'Donataire';
+    rows.push({ id, d, name, montantPP: d.montant, montantFisc, coeff, calcParts,
+                droitsTotal, baseTotal, abattTotal, exoTotal });
+  });
+
+  const tauxMoyen = sumMontantPP > 0 ? sumDroits / sumMontantPP * 100 : 0;
+  const net = droitsCh ? sumMontantPP : Math.max(0, sumMontantPP - sumDroits);
+
+  const dem = { nature, usufType, ageDon, ageUsuf, usufDuree, coeff, npCoeff, usCoeff };
+  renderResults(rows, sumMontantPP, sumAbatt + sumExo, sumBase, sumDroits, tauxMoyen, net, droitsCh, dem);
+  renderDetail(rows, nbDon, droitsCh, dem, bien);
+}
+
+/* ══════════════════════════════════════════════════════════
+   RENDU : PANNEAU RÉSULTATS
+   ══════════════════════════════════════════════════════════ */
+function renderResults(rows, totalPP, totalRedu, totalBase, totalDroits,
+                       tauxMoyen, net, droitsCh, dem) {
+  const zero = totalDroits < 1;
+  const couleur = zero ? 'var(--success)' : 'var(--accent)';
+
+  let coeffNote = '';
+  if (dem.nature === 'np') {
+    coeffNote = `<div style="font-size:.68rem;color:var(--text-dim);margin-top:.3rem">Nue-propriété · donateur ${dem.ageDon} ans · usufruit conservé : ${fmtN(dem.usCoeff*100,0)} % · valeur fiscale NP = ${fmtN(dem.npCoeff*100,0)} % PP (art. 669 CGI)</div>`;
+  } else if (dem.nature === 'us') {
+    const trUs   = Math.ceil(Math.max(1, dem.usufDuree) / 10);
+    const pctUs  = fmtN(dem.usCoeff * 100, 0);
+    const pctNp  = fmtN((1 - dem.usCoeff) * 100, 0);
+    const usufDesc = dem.usufType === 'temp'
+      ? `temporaire ${dem.usufDuree} an${dem.usufDuree > 1 ? 's' : ''} · ${trUs} tranche${trUs > 1 ? 's' : ''} × 23 %`
+      : `viager · usufruitier ${dem.ageUsuf} ans`;
+    coeffNote = `<div style="font-size:.68rem;color:var(--text-dim);margin-top:.3rem">Usufruit ${usufDesc} · usufruit = ${pctUs} % · nue-propriété = ${pctNp} % PP (art. 669 CGI)</div>`;
+  }
+
+  const miniRows = rows.map(r => {
+    const isZero = r.droitsTotal < 1;
+    return `<div class="benef-res-row animate">
+      <div class="benef-res-top">
+        <div class="benef-res-name">${r.name}</div>
+        <div class="benef-res-droits ${isZero ? 'zero' : ''}">${isZero ? '0 €' : fmtE(Math.round(r.droitsTotal))}</div>
+      </div>
+      <div class="benef-res-sub">
+        <span class="benef-chip">${LIEN_LABELS[r.d.lien] || r.d.lien}</span>
+        <span class="benef-chip">${fmtE(r.montantPP)}</span>
+        ${r.baseTotal > 0 ? `<span class="benef-chip">Base : ${fmtE(Math.round(r.baseTotal))}</span>` : '<span class="benef-chip" style="color:var(--success)">Exonéré</span>'}
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('don-results').innerHTML = `
+    <div class="key-result animate">
+      <div class="key-result-label">Droits de donation estimés</div>
+      <div class="key-result-val" style="color:${couleur}">${fmtE(Math.round(totalDroits))}</div>
+      <div class="key-result-sub">sur ${fmtE(totalPP)} · ${rows.length} donataire${rows.length > 1 ? 's' : ''}</div>
+      ${coeffNote}
+    </div>
+    <div class="metrics-grid animate">
+      <div class="metric"><div class="metric-label">Montant total donné</div><div class="metric-val">${fmtE(totalPP)}</div></div>
+      <div class="metric"><div class="metric-label">Abattements & exo.</div><div class="metric-val accent">−${fmtE(Math.round(totalRedu))}</div></div>
+      <div class="metric"><div class="metric-label">Base taxable totale</div><div class="metric-val ${totalBase > 0 ? 'amber' : 'success'}">${fmtE(Math.round(totalBase))}</div></div>
+      <div class="metric"><div class="metric-label">Taux moyen effectif</div><div class="metric-val">${fmtP(tauxMoyen)}</div></div>
+    </div>
+    <div class="net-box animate">
+      <div class="net-box-title">Net transmis au${rows.length > 1 ? 'x' : ''} donataire${rows.length > 1 ? 's' : ''}</div>
+      <div class="net-box-val">${fmtE(Math.round(net))}</div>
+      <div class="net-box-note">${droitsCh
+        ? 'Les droits sont pris en charge par le donateur — le donataire reçoit l\'intégralité du montant donné.'
+        : 'Après paiement des droits par le donataire.'}</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:.5rem">${miniRows}</div>`;
+}
+
+/* ══════════════════════════════════════════════════════════
+   RENDU : DÉTAIL ACCORDÉON
+   ══════════════════════════════════════════════════════════ */
+const BAREME_NAMES = {
+  directe: 'Barème ligne directe (art. 777 I CGI)',
+  freres:  'Barème frères/sœurs (art. 777 II CGI)',
+  fixe55:  'Taux fixe 55 % (art. 777 III CGI — collatéraux jusqu\'au 4e degré)',
+  fixe60:  'Taux fixe 60 % (art. 777 IV CGI — non-parents)'
+};
+
+function buildHowItWorks(dem, nbDon, rows, bien) {
+  const nature     = dem.nature;
+  const usufType   = dem.usufType;
+  const hasAnterieur = rows.some(r => r.d.abattConso > 0 || r.d.donFamConso > 0);
+  const hasDonFam  = rows.some(r => r.d.donFamActif);
+  const hasHandi   = rows.some(r => r.d.handicap);
+  const multiDon   = nbDon === 2;
+  const multiBenef = rows.length > 1;
+  const items = [];
+
+  // ── 1. DÉMEMBREMENT ──────────────────────────────────────
+  if (nature === 'pp') {
+    // Calcul agrégé pour le texte
+    const totalPP    = rows.reduce((s, r) => s + r.montantPP, 0);
+    const totalBase  = rows.reduce((s, r) => s + r.baseTotal, 0);
+    const totalDroits= rows.reduce((s, r) => s + r.droitsTotal, 0);
+    const isZero     = totalDroits < 1;
+    if (isZero) {
+      items.push(`<strong>Pleine propriété</strong> — La totalité de la valeur donnée (${fmtE(totalPP)}) est transmise. Cette donation est entièrement couverte par les abattements légaux : aucun droit n'est dû.`);
+    } else {
+      items.push(`<strong>Pleine propriété</strong> — La valeur transmise (${fmtE(totalPP)}) constitue l'assiette de référence. Après application des abattements, la base taxable s'établit à ${fmtE(Math.round(totalBase))}, générant ${fmtE(Math.round(totalDroits))} de droits de donation.`);
+    }
+  } else if (nature === 'np') {
+    const npPct  = fmtN(dem.npCoeff * 100, 0);
+    const usPct  = fmtN(dem.usCoeff * 100, 0);
+    const totalPP = rows.reduce((s, r) => s + r.montantPP, 0);
+    const totalFisc = rows.reduce((s, r) => s + r.montantFisc, 0);
+    items.push(`<strong>Nue-propriété — art. 669 CGI</strong> — Le donateur (${dem.ageDon} ans) conserve l'usufruit viager de son vivant : il continue de percevoir les revenus ou d'occuper le bien. Seule la nue-propriété est transmise. À ${dem.ageDon} ans, l'usufruit représente ${usPct} % de la valeur en pleine propriété ; la nue-propriété transmise vaut donc ${npPct} % — soit ${fmtE(Math.round(totalFisc))} de valeur fiscale pour une pleine propriété de ${fmtE(totalPP)}. C'est sur cette assiette réduite que les droits sont calculés.`);
+    if (bien === 'argent') {
+      items.push(`<strong>Quasi-usufruit — art. 587 C. civ.</strong> — Une somme d'argent est un bien consomptible : le démembrement prend la forme d'un quasi-usufruit. Le donateur peut librement utiliser les fonds ; en contrepartie, une créance de restitution d'égal montant naît au profit du nu-propriétaire, exigible au décès du quasi-usufruitier. Ce mécanisme a des incidences successorales spécifiques — consultez impérativement un notaire avant de procéder.`);
+    }
+  } else if (nature === 'us') {
+    if (usufType === 'viager') {
+      const usPct = fmtN(dem.usCoeff * 100, 0);
+      const npPct = fmtN((1 - dem.usCoeff) * 100, 0);
+      const totalPP   = rows.reduce((s, r) => s + r.montantPP, 0);
+      const totalFisc = rows.reduce((s, r) => s + r.montantFisc, 0);
+      items.push(`<strong>Usufruit viager — art. 669 CGI</strong> — La donation porte uniquement sur le droit d'usage et de jouissance du bien : le donataire percevra les loyers ou pourra habiter le bien, mais ne pourra pas le vendre sans l'accord du nu-propriétaire. À ${dem.ageUsuf} ans, l'usufruitier reçoit une valeur fiscale de ${usPct} % de la pleine propriété — soit ${fmtE(Math.round(totalFisc))} sur une pleine propriété de ${fmtE(totalPP)}. La nue-propriété (${npPct} %) reste dans le patrimoine du donateur ou d'un tiers désigné et n'est pas taxée lors de cette opération.`);
+    } else {
+      const trUs  = Math.ceil(Math.max(1, dem.usufDuree) / 10);
+      const usPct = fmtN(dem.usCoeff * 100, 0);
+      const npPct = fmtN((1 - dem.usCoeff) * 100, 0);
+      const totalPP   = rows.reduce((s, r) => s + r.montantPP, 0);
+      const totalFisc = rows.reduce((s, r) => s + r.montantFisc, 0);
+      items.push(`<strong>Usufruit temporaire — art. 669 CGI</strong> — La donation porte sur un droit d'usage limité à ${dem.usufDuree} an${dem.usufDuree > 1 ? 's' : ''}. La règle fiscale prévoit 23 % de la valeur en pleine propriété par tranche de 10 ans commencée : ici ${trUs} tranche${trUs > 1 ? 's' : ''} × 23 % = ${usPct} %. L'usufruit transmis vaut donc ${fmtE(Math.round(totalFisc))} (sur une pleine propriété de ${fmtE(totalPP)}), et c'est cette seule valeur qui est soumise aux droits. La nue-propriété (${npPct} %) n'est pas concernée par la présente donation.`);
+    }
+  }
+
+  // ── 2. ABATTEMENTS PAR DONATAIRE ──────────────────────────
+  // Générer une explication personnalisée par donataire (ou synthèse si plusieurs)
+  if (rows.length === 1) {
+    const r   = rows[0];
+    const lien = r.d.lien;
+    const cp  = r.calcParts[0]; // premier (et seul) donateur
+    const abattBase = ABATT[lien] ?? 0;
+    const labelLien = LIEN_LABELS_LONG[lien] || lien;
+
+    // Libellé de l'abattement selon le lien
+    let abattDesc = '';
+    if (abattBase === 0) {
+      // Tiers, concubin, oncle/tante, cousin
+      if (lien === 'tiers' || lien === 'concubin') {
+        abattDesc = `en tant que <em>${labelLien}</em>, aucun abattement légal ne s'applique (art. 779 CGI). La totalité de la base taxable est imposée au taux fixe de 60 %, qui est le taux le plus élevé prévu par le barème`;
+      } else {
+        abattDesc = `en tant que <em>${labelLien}</em>, aucun abattement légal général n'est prévu (art. 779 CGI) — un taux fixe s'applique directement`;
+      }
+    } else {
+      abattDesc = `en tant que <em>${labelLien}</em>, l'abattement légal est de ${fmtE(abattBase)} par donateur, renouvelable tous les 15 ans (art. 779 CGI)`;
+    }
+
+    let abattText = `<strong>Abattement légal</strong> — ${abattBase > 0 ? `L'abattement de ${fmtE(abattBase)}` : 'L\'abattement'} s'apprécie par couple donateur/donataire et se renouvelle tous les 15 ans. Ici, ${abattDesc}.`;
+
+    // Abattement consommé
+    if (r.d.abattConso > 0) {
+      const restant = Math.max(0, abattBase - r.d.abattConso);
+      if (restant <= 0) {
+        abattText += ` Des donations antérieures ont déjà consommé la totalité de l'abattement (${fmtE(r.d.abattConso)} utilisés) : aucune réduction n'est applicable sur cette donation, qui est intégralement taxable.`;
+      } else {
+        abattText += ` Des donations antérieures ont partiellement consommé cet abattement (${fmtE(r.d.abattConso)} déjà utilisés). Il reste ${fmtE(restant)} disponible pour cette opération.`;
+      }
+    }
+
+    // Abattement handicap
+    if (r.d.handicap) {
+      abattText += ` L'abattement supplémentaire pour personne handicapée (${fmtE(159325)}, art. 779 II) est cumulé avec l'abattement du lien de parenté.`;
+    }
+
+    // Résultat de l'abattement
+    if (cp && cp.baseTaxable < 1) {
+      abattText += ` La donation (${fmtE(r.montantPP)}) est entièrement couverte par les abattements disponibles : aucun droit n'est dû.`;
+    } else if (cp) {
+      abattText += ` Après déduction, la base taxable s'établit à ${fmtE(Math.round(cp.baseTaxable))}.`;
+    }
+
+    items.push(abattText);
+  } else {
+    // Multi-donataires : synthèse + détail lien par lien
+    const liensUniques = [...new Set(rows.map(r => r.d.lien))];
+    let abattText = `<strong>Abattements légaux</strong> — Chaque abattement s'apprécie individuellement par couple donateur/donataire et se renouvelle tous les 15 ans. Les ${rows.length} donataires ne se partagent pas un même abattement : chacun bénéficie des siens propres.`;
+
+    // Détailler les abattements distincts présents
+    const abattDetails = liensUniques.map(lien => {
+      const ab = ABATT[lien] ?? 0;
+      const label = LIEN_LABELS_LONG[lien] || lien;
+      if (ab === 0) {
+        if (lien === 'tiers' || lien === 'concubin') return `${label} : aucun abattement — taux fixe 60 % (taux le plus élevé)`;
+        return `${label} : aucun abattement légal général`;
+      }
+      return `${label} : ${fmtE(ab)}`;
+    });
+    if (abattDetails.length > 0) {
+      abattText += ` Abattements de cette simulation — ${abattDetails.join(' ; ')}.`;
+    }
+
+    if (hasAnterieur) {
+      abattText += ` Certains donataires ont des donations antérieures qui réduisent leur abattement disponible (voir le détail ci-dessus).`;
+    }
+    if (hasHandi) {
+      abattText += ` L'abattement handicap (${fmtE(159325)}, art. 779 II) est cumulable avec l'abattement du lien de parenté pour les donataires concernés.`;
+    }
+    items.push(abattText);
+  }
+
+  // ── 3. BARÈME FISCAL (par lien) ───────────────────────────
+  // Mentionner les barèmes utilisés et les taux réels
+  const liensPresents = [...new Set(rows.map(r => r.d.lien))];
+  const baremeInfos = [];
+  liensPresents.forEach(lien => {
+    const tb = typeBareme(lien);
+    const label = LIEN_LABELS_LONG[lien] || lien;
+    const rowsLien = rows.filter(r => r.d.lien === lien);
+    const totalDroitsLien = rowsLien.reduce((s, r) => s + r.droitsTotal, 0);
+
+    if (tb === 'directe') {
+      if (lien === 'conjoint') {
+        baremeInfos.push(`<em>${label}</em> : barème progressif ligne directe et époux/PACS (art. 777 I CGI), tranches de 5 % à 45 %, avec abattement de ${fmtE(80724)}`);
+      } else if (lien === 'enfant') {
+        baremeInfos.push(`<em>${label}</em> : barème progressif ligne directe (art. 777 I CGI), tranches de 5 % à 45 %, abattement de ${fmtE(100000)} par donateur renouvelable tous les 15 ans`);
+      } else if (lien === 'petit-enfant') {
+        baremeInfos.push(`<em>${label}</em> : barème progressif ligne directe (art. 777 I CGI), tranches de 5 % à 45 %, abattement de ${fmtE(31865)}`);
+      } else if (lien === 'arriere-petit-enfant') {
+        baremeInfos.push(`<em>${label}</em> : barème progressif ligne directe (art. 777 I CGI), tranches de 5 % à 45 %, abattement de ${fmtE(5310)}`);
+      } else {
+        baremeInfos.push(`<em>${label}</em> : barème progressif ligne directe (art. 777 I CGI), tranches de 5 % à 45 %`);
+      }
+    } else if (tb === 'freres') {
+      baremeInfos.push(`<em>${label}</em> : barème frères/sœurs (art. 777 II CGI), 35 % jusqu'à ${fmtE(24430)} puis 45 % au-delà, abattement de ${fmtE(15932)}`);
+    } else if (tb === 'fixe55') {
+      baremeInfos.push(`<em>${label}</em> : taux fixe 55 % (art. 777 III CGI — collatéraux jusqu'au 4e degré), abattement de ${fmtE(ABATT[lien] ?? 0)}`);
+    } else {
+      baremeInfos.push(`<em>${label}</em> : taux fixe 60 % (art. 777 IV CGI — taux le plus élevé du barème, applicable aux personnes sans lien de parenté reconnu)`);
+    }
+  });
+  if (baremeInfos.length > 0) {
+    items.push(`<strong>Barème applicable</strong> — ${baremeInfos.join('. ')}.`);
+  }
+
+  // ── 4. DON FAMILIAL ──────────────────────────────────────
+  if (hasDonFam || (bien === 'argent' && rows.some(r => LIEN_DON_FAM.has(r.d.lien)))) {
+    const donFamRows = rows.filter(r => r.d.donFamActif);
+    let donFamText = `<strong>Don familial de sommes d'argent — art. 790G</strong> — Il s'agit d'une exonération distincte de l'abattement général, plafonnée à ${fmtE(EXO_DON_FAMILIAL)} par donateur et par donataire. Elle est réservée aux dons en numéraire, uniquement si le donateur a moins de 80 ans et le donataire est majeur. Renouvelable tous les 15 ans, elle se cumule avec l'abattement du lien de parenté.`;
+    if (donFamRows.length > 0) {
+      const totalExo = donFamRows.reduce((s, r) => s + r.exoTotal, 0);
+      if (totalExo > 0) {
+        donFamText += ` Dans cette simulation, l'exonération 790G représente ${fmtE(Math.round(totalExo))} supplémentaires déduits de la base taxable.`;
+      }
+    }
+    items.push(donFamText);
+  }
+
+  // ── 5. MULTI-DONATAIRES ───────────────────────────────────
+  if (multiBenef) {
+    const totalPP     = rows.reduce((s, r) => s + r.montantPP, 0);
+    const totalDroits = rows.reduce((s, r) => s + r.droitsTotal, 0);
+    items.push(`<strong>${rows.length} donataires</strong> — Le calcul est mené indépendamment pour chaque donataire : ${fmtE(totalPP)} transmis au total, ${fmtE(Math.round(totalDroits))} de droits cumulés. Chacun applique son propre abattement selon son lien de parenté — un abattement ne se partage jamais entre plusieurs donataires.`);
+  }
+
+  // ── 6. COUPLE DONATEUR ───────────────────────────────────
+  if (multiDon) {
+    items.push(`<strong>Couple donateur</strong> — Chaque donateur transmet la moitié et applique ses propres abattements indépendamment. Un enfant peut ainsi recevoir jusqu'à ${fmtE(200000)} totalement exonérés de ses deux parents (${fmtE(100000)} × 2). Les droits sont calculés séparément pour chaque donateur, puis additionnés — ce qui peut conduire à des économies significatives par rapport à un donateur unique.`);
+  }
+
+  // ── 7. NATURE DU BIEN ────────────────────────────────────
+  const BIEN_PEDAGO = {
+    'immo':         `<strong>Bien immobilier</strong> — La valeur fiscale retenue est la valeur vénale au jour de la donation (valeur de marché, confirmée par acte notarié). En cas de désaccord avec l'administration, un rescrit de valeur peut être demandé. Des décotes peuvent s'appliquer (bien occupé, loué, en indivision).`,
+    'immo-loc':     `<strong>Immobilier locatif</strong> — Valeur vénale au jour de la donation. Une décote pour bien loué est souvent admise en pratique. Si le bien fait l'objet d'un bail rural à long terme (≥ 18 ans), une exonération partielle de 75 % peut s'appliquer (art. 793 bis CGI) — consultez un notaire pour en vérifier les conditions.`,
+    'sci':          `<strong>Parts de SCI / SCPI</strong> — La valeur retenue est la valeur vénale des parts au jour de la donation. Des décotes peuvent s'appliquer (illiquidité, situation minoritaire, clauses d'agrément). Ce simulateur applique la valeur saisie sans décote.`,
+    'argent':       null,
+    'titres':       `<strong>Titres / actions / portefeuille</strong> — Valeur vénale au jour de la donation : cours de Bourse pour les titres cotés, valeur de rachat ou d'expertise pour les titres non cotés. Ce simulateur applique la valeur saisie.`,
+    'per':          `<strong>PER / Épargne retraite</strong> — Le PER assurantiel n'est pas directement transmissible par donation avant sa liquidation. Ce simulateur s'applique uniquement si les fonds ont été débloqués (retraite ou déblocage anticipé) et sont traités comme une somme d'argent. Vérifiez les conditions de déblocage de votre contrat.`,
+    'dutreil':      `<strong>Pacte Dutreil — art. 787B/C CGI</strong> — Sous conditions strictes (engagement collectif de conservation ≥ 2 ans, engagement individuel 4 ans, exercice d'une fonction de direction), le pacte Dutreil permet une exonération de <strong>75 %</strong> de la valeur des titres ou de l'entreprise. Ce simulateur applique le barème standard sans réduction Dutreil : les droits réels peuvent être considérablement inférieurs. Consultez un notaire ou un avocat fiscaliste spécialisé.`,
+    'holding':      `<strong>Holding patrimoniale</strong> — Une holding peut bénéficier du pacte Dutreil (art. 787B CGI) si elle anime effectivement une ou plusieurs sociétés opérationnelles. L'administration fiscale est particulièrement vigilante sur la qualification de "holding animatrice". Sans pacte, les parts sont taxées à leur valeur vénale au barème de droit commun.`,
+    'societe-nc':   `<strong>Parts de société non cotée</strong> — Valorisées à leur valeur vénale au jour de la donation. Si la société est opérationnelle, un pacte Dutreil (art. 787B) peut réduire la base taxable de 75 %. Des décotes d'illiquidité sont fréquentes en pratique. Une expertise indépendante est recommandée.`,
+    'av':           `<strong>Assurance-vie — hors champ de la donation classique</strong> — L'assurance-vie ne peut pas faire l'objet d'une donation au sens civil. Elle se transmet via la clause bénéficiaire du contrat, régie par les art. 990I (primes avant 70 ans) et 757B CGI (primes après 70 ans). Ce simulateur ne s'applique pas.`,
+    'capitalisation': `<strong>Contrat de capitalisation</strong> — Contrairement à l'assurance-vie, ce contrat est un actif transmissible par voie civile et peut être donné. La valeur fiscale retenue est la valeur de rachat au jour de la donation. Avantage clé : le donataire peut <em>conserver le contrat</em> sans le racheter, reportant la fiscalité sur les gains (PFU ou barème IR + prélèvements sociaux) au moment du rachat effectif. Ce différé d'imposition constitue un avantage patrimonial significatif en transmission intergénérationnelle.`,
+    'forestier':    `<strong>Groupement Forestier — art. 793 bis CGI</strong> — Les parts de groupements forestiers (GFF, GFI) peuvent bénéficier d'une <strong>exonération de 75 %</strong> de leur valeur fiscale lors de la donation si les conditions sont remplies : détention depuis au moins 2 ans, engagement de gestion forestière de 30 ans sous plan de gestion agréé par le CNPF ou certifié PEFC/FSC. Le quart restant (25 %) est taxé au barème de droit commun selon le lien de parenté avec le donataire. Ce simulateur applique le barème sur la totalité de la valeur saisie — si vous êtes éligible à l'art. 793 bis, la base taxable réelle est de seulement 25 % de cette valeur.`,
+    'viticole':     `<strong>Groupement Viticole (GFV)</strong> — Contrairement aux groupements forestiers, les groupements fonciers viticoles ne bénéficient pas d'exonération successorale de 75 % au titre de l'art. 793 bis. Les parts sont taxées au barème de donation de droit commun sur leur valeur vénale. Des décotes d'illiquidité et des contraintes agronomiques peuvent réduire la valeur retenue en pratique.`,
+    'fip-fcpi':     `<strong>FIP / FCPI</strong> — Les avantages fiscaux de ces fonds (réduction d'IR, exonération d'IFI) concernent exclusivement l'imposition du souscripteur et ne s'appliquent pas aux droits de donation. Les parts entrent dans l'assiette taxable à leur valeur de liquidation au jour de la donation. L'illiquidité des fonds peut compliquer la valorisation.`,
+    'pe':           `<strong>Private Equity / FCPR</strong> — Aucune exonération successorale spécifique. Les parts entrent dans l'assiette à leur valeur liquidative. Si les actifs sous-jacents constituent une société opérationnelle, un pacte Dutreil (art. 787B) pourrait théoriquement s'appliquer — à analyser au cas par cas avec un avocat fiscaliste.`,
+    'or':           `<strong>Or / métaux précieux</strong> — Aucune exonération spécifique à la donation. L'assiette est la valeur vénale au jour de la donation (cours de l'or à la date de l'acte, certification de l'expert-comptable ou de l'organisme de certification). Lors de la revente ultérieure par le donataire, la taxe sur les cessions de métaux précieux (TCA, art. 150 VI CGI — taux de 11,5 %) s'appliquera, sauf option pour le régime de la plus-value réelle.`,
+    'art':          `<strong>Œuvres d'art / objets de collection</strong> — Aucune exonération spécifique à la donation. La valeur vénale est déterminée par expertise (commissaire-priseur, expert agréé). Les droits de donation peuvent être acquittés par <em>dation en paiement</em> (art. 1131 CGI) : remise de l'œuvre à l'État en lieu et place du paiement des droits — cette procédure requiert un accord préalable du ministre chargé du Budget.`,
+    'autre':        null
+  };
+  const bienPedago = BIEN_PEDAGO[bien];
+  if (bienPedago) items.push(bienPedago);
+
+  const listHtml = items.map(it =>
+    `<p class="pedago-p">${it}</p>`
+  ).join('');
+
+  return `<div class="pedago-card animate">
+    <div class="pedago-card-header">
+      <div class="pedago-card-dot"></div>
+      <div class="pedago-card-title">Comment fonctionne ce calcul</div>
+    </div>
+    <div class="pedago-card-body">
+      ${listHtml}
+      <p class="pedago-dim"><strong>Simulation indicative.</strong> Les droits réels dépendent de la situation personnelle, du régime matrimonial, des actes antérieurs et de la date exacte de la donation. Consultez un notaire ou un conseiller fiscal avant toute opération.</p>
+    </div>
+  </div>`;
+}
+
+function renderDetail(rows, nbDon, droitsCh, dem, bien) {
+  const acc  = document.getElementById('detail-accordion');
+  const body = document.getElementById('detail-body');
+  acc.style.display = 'block';
+
+  let html = rows.map((r) => {
+    let parts = r.calcParts.map(c => {
+      const prefix = c.lbl
+        ? `<div class="detail-sub-title">${c.lbl} — transmis ${fmtE(Math.round(c.montantFisc))}</div>`
+        : '';
+      const tranchesHtml = c.baseTaxable > 0 && c.tranches.length
+        ? `<div class="detail-sub-title" style="margin-top:.75rem">${BAREME_NAMES[c.tb]}</div>
+           <div class="bracket-detail">
+             <div class="bracket-title">Décomposition par tranche</div>
+             ${c.tranches.filter(t => t.portion > 0).map(t => `
+               <div class="bracket-row ${t.impot < .5 ? 'zero' : ''}">
+                 <span class="rate-badge">${fmtN(t.taux*100,0)} %</span>
+                 <span class="tranche">${fmtE(t.de)} → ${t.a === Infinity ? '∞' : fmtE(t.a)} · base : ${fmtE(Math.round(t.portion))}</span>
+                 <span class="tax">+${fmtE(Math.round(t.impot))}</span>
+               </div>`).join('')}
+           </div>`
+        : '';
+
+      // Ligne(s) de démembrement — pédagogie fiscale
+      let demLine = '';
+      if (dem.nature === 'np') {
+        // NP : montrer PP + usufruit retenu + valeur fiscale NP
+        demLine = `<div class="dl dim"><span>Usufruit conservé par le donateur (${dem.ageDon} ans · ${fmtN(dem.usCoeff*100,0)} % · art. 669 CGI)</span><strong>${fmtE(Math.round(r.montantPP * dem.usCoeff))}</strong></div>
+        <div class="dl acc"><span>Valeur fiscale nue-propriété transmise (${fmtN(dem.npCoeff*100,0)} % × PP)</span><strong>${fmtE(Math.round(c.montantFisc))}</strong></div>`;
+      } else if (dem.nature === 'us') {
+        const trUs = Math.ceil(Math.max(1, dem.usufDuree) / 10);
+        const pctUs = fmtN(dem.usCoeff * 100, 0);
+        const pctNp = fmtN((1 - dem.usCoeff) * 100, 0);
+        const desc = dem.usufType === 'temp'
+          ? `temporaire ${dem.usufDuree} an${dem.usufDuree > 1 ? 's' : ''} — ${trUs} tranche${trUs > 1 ? 's' : ''} × 23 % = ${pctUs} % (nue-propriété : ${pctNp} %)`
+          : `viager — usufruitier ${dem.ageUsuf} ans — ${pctUs} % (nue-propriété : ${pctNp} %)`;
+        demLine = `<div class="dl dim"><span>Valeur fiscale usufruit — art. 669 CGI (${desc})</span><strong>${fmtE(Math.round(c.montantFisc))}</strong></div>`;
+      }
+
+      // Libellé de la valeur de référence (toujours la pleine propriété)
+      const valLabel = 'Valeur en pleine propriété';
+
+      return `${prefix}
+        <div class="dl dim"><span>${valLabel}</span><strong>${fmtE(r.montantPP)}</strong></div>
+        ${demLine}
+        <div class="dl"><span>Abattement légal — ${LIEN_LABELS_LONG[r.d.lien] || r.d.lien}</span><strong>${c.abattBase > 0 ? fmtE(c.abattBase) : 'Aucun'}</strong></div>
+        ${c.abattHandi > 0 ? `<div class="dl blu"><span>Abattement handicap (art. 779 II)</span><strong>+ ${fmtE(c.abattHandi)}</strong></div>` : ''}
+        ${c.abattConso > 0 ? `<div class="dl amb"><span>Abattement déjà consommé (< 15 ans)</span><strong>− ${fmtE(c.abattConso)}</strong></div>` : ''}
+        <div class="dl blu"><span>Abattement restant disponible</span><strong>${fmtE(Math.round(c.abattRestant))}</strong></div>
+        ${c.exoFam > 0 ? `<div class="dl suc"><span>Exonération don familial (art. 790G)</span><strong>− ${fmtE(Math.round(c.exoFam))}</strong></div>` : ''}
+        <div class="dl ${c.baseTaxable < 1 ? 'suc' : 'amb'}"><span>Base taxable</span><strong>${fmtE(Math.round(c.baseTaxable))}</strong></div>
+        ${tranchesHtml}
+        <div class="dl acc big" style="margin-top:.4rem"><span>Droits dus</span><strong>${fmtE(Math.round(c.droits))}</strong></div>`;
+    }).join('<hr style="border:none;border-top:1px dashed var(--border-subtle);margin:.9rem 0">');
+
+    return `<div class="detail-benef">
+      <div class="detail-benef-title">
+        ${r.name}
+        <span class="detail-tag">${LIEN_LABELS_LONG[r.d.lien] || r.d.lien}</span>
+        ${nbDon === 2 ? '<span class="detail-tag">2 donateurs</span>' : ''}
+        ${r.d.handicap ? '<span class="detail-tag" style="color:var(--blue);background:rgba(79,138,120,.08)">Handicap</span>' : ''}
+      </div>
+      ${parts}
+      ${r.droitsTotal < 1 ? '<div style="font-size:.75rem;color:var(--success);margin-top:.6rem;font-weight:500">✓ Aucun droit — montant entièrement couvert par les abattements et exonérations</div>' : ''}
+      ${droitsCh && r.droitsTotal >= 1 ? `<div style="font-size:.72rem;color:var(--text-muted);margin-top:.5rem">Droits pris en charge par le donateur — fiscalement neutre pour le donataire (art. 1712 CGI)</div>` : ''}
+    </div>`;
+  }).join('');
+
+  html += buildHowItWorks(dem, nbDon, rows, bien);
+
+  body.innerHTML = html;
+}
+
+/* ══════════════════════════════════════════════════════════
+   SLIDERS & INIT
+   ══════════════════════════════════════════════════════════ */
+function syncSlider(numId, sldId, dispId, fmt) {
+  const num = document.getElementById(numId);
+  const sld = document.getElementById(sldId);
+  const disp = dispId ? document.getElementById(dispId) : null;
+  function setPct() {
+    const mn = parseFloat(sld.min)||0, mx = parseFloat(sld.max)||100;
+    const v  = Math.min(Math.max(parseFloat(sld.value)||0, mn), mx);
+    sld.style.setProperty('--pct', ((v-mn)/(mx-mn)*100).toFixed(1)+'%');
+  }
+  num.addEventListener('input', () => {
+    sld.value = Math.min(Math.max(parseFloat(num.value)||0,parseFloat(sld.min)||0),parseFloat(sld.max)||100);
+    setPct(); if(disp) disp.textContent = fmt(parseFloat(num.value)||0); calculate();
+  });
+  sld.addEventListener('input', () => {
+    num.value = sld.value;
+    if(disp) disp.textContent = fmt(parseFloat(sld.value)||0); setPct(); calculate();
+  });
+  setPct(); if(disp) disp.textContent = fmt(parseFloat(num.value)||0);
+}
+
+syncSlider('don-age',     'don-age-s',     'don-age-disp',     v => Math.round(v) + ' ans');
+syncSlider('don-age-usuf','don-age-usuf-s','don-age-usuf-disp',v => Math.round(v) + ' ans');
+syncSlider('usuf-duree',  'usuf-duree-s',  'usuf-duree-disp',  v => Math.round(v) + ' ans');
+
+document.querySelectorAll('[name="don-nb"],[name="don-nature"],[name="usuf-type"]').forEach(el =>
+  el.addEventListener('change', () => { calculate(); syncAllDonFam(); }));
+document.getElementById('don-bien').addEventListener('change', () => { calculate(); syncAllDonFam(); });
+document.getElementById('don-droits-charge').addEventListener('change', calculate);
+
+// Ajout d'un donataire
+document.getElementById('add-benef-btn').addEventListener('click', () => {
+  const id  = ++ctr;
+  const num = getBenefIds().length + 1;
+  const card = createCard(id, num);
+  document.getElementById('benef-list').appendChild(card);
+  syncDonFam(id);
+  calculate();
+});
+
+// Lancer avec un donataire par défaut
+document.getElementById('add-benef-btn').click();
+
+// Dropdown nav
+/* Menu déroulant catégorisé — voir shared-nav.js */
+SP.nav.init();
+</script>
+</body>
+</html>
