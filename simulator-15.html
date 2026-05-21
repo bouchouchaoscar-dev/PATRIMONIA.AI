@@ -7,7 +7,7 @@
   <link rel="shortcut icon" href="favicon-32.png">
   <link rel="apple-touch-icon" sizes="180x180" href="favicon.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PEA — Plan d'Épargne en Actions — PATRIMONIA.AI</title>
+<title>PEA — Plan d'Épargne en Actions — Patrimonia.ai</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
@@ -16,7 +16,7 @@
 <script src="shared-nav.js?v=6"></script>
 <style>
 /* ═══════════════════════════════════════════════════
-   PEA — Plan d'Épargne en Actions · PATRIMONIA.AI
+   PEA — Plan d'Épargne en Actions · Patrimonia.ai
    Préfixe CSS : .pea-
 ═══════════════════════════════════════════════════ */
 :root {
@@ -408,7 +408,22 @@ canvas.pea-canvas { width:100%; display:block }
 </style>
 </head>
 <body>
-<div id="sp-nav-root"></div>
+
+<nav class="top-nav">
+  <a href="index.html" class="nav-logo"><img src="logo.png?v=3" alt="Patrimonia.ai" class="nav-logo-img"></a>
+  <div class="nav-right">
+    <a href="index.html" class="nav-back">
+      <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7.5 1.5L3 6l4.5 4.5"/></svg>
+      Accueil
+    </a>
+    <div class="nav-dropdown" id="mainDropdown">
+      <button class="nav-dropdown-btn" aria-expanded="false" aria-haspopup="true">
+        Simulateurs <svg class="nav-chevron" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.8" style="width:13px;height:8px;flex-shrink:0"><path d="M1 1l4 4 4-4"/></svg>
+      </button>
+      <div class="nav-dropdown-menu" id="navMenu" role="menu"></div>
+    </div>
+  </div>
+</nav>
 
 <div class="sim-page">
 
@@ -1129,7 +1144,7 @@ canvas.pea-canvas { width:100%; display:block }
 </div><!-- /sim-page -->
 
 <footer>
-  <span>PATRIMONIA.AI</span> — Simulateur PEA — Calculs indicatifs basés sur le barème fiscal 2026. Prélèvements sociaux : 17,2 %. PFU : 30 % (12,8 % IR + 17,2 % PS). Plafond PEA : 150 000 €.<br>
+  <span>Patrimonia.ai</span> — Simulateur PEA — Calculs indicatifs basés sur le barème fiscal 2026. Prélèvements sociaux : 17,2 %. PFU : 30 % (12,8 % IR + 17,2 % PS). Plafond PEA : 150 000 €.<br>
   Les projections de rendement ne constituent pas une garantie de performance future. Données à titre pédagogique uniquement — consultez un conseiller en gestion de patrimoine.
 </footer>
 
@@ -1821,11 +1836,11 @@ document.addEventListener('DOMContentLoaded', ()=>{
   $('pea-freq') && $('pea-freq').addEventListener('change',update);
   $('pea-tmr')  && $('pea-tmr').addEventListener('change',update);
 
+  SP.nav.init();
   update();
 });
 
 window.addEventListener('resize', ()=>{
-  // Redraw charts on resize
   clearTimeout(window._peaResizeT);
   window._peaResizeT = setTimeout(update, 120);
 });

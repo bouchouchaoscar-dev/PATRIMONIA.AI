@@ -7,7 +7,7 @@
   <link rel="shortcut icon" href="favicon-32.png">
   <link rel="apple-touch-icon" sizes="180x180" href="favicon.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CTO — Compte-Titres Ordinaire — PATRIMONIA.AI</title>
+<title>CTO — Compte-Titres Ordinaire — Patrimonia.ai</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
@@ -16,7 +16,7 @@
 <script src="shared-nav.js?v=6"></script>
 <style>
 /* ═══════════════════════════════════════════════════
-   CTO — Compte-Titres Ordinaire · PATRIMONIA.AI
+   CTO — Compte-Titres Ordinaire · Patrimonia.ai
    Préfixe CSS : .cto-
    Personnalité : marchés globaux · revenus · liberté
 ═══════════════════════════════════════════════════ */
@@ -411,10 +411,68 @@ canvas.cto-canvas { width:100%; display:block }
 .cto-peda-grid { display:grid; grid-template-columns:1fr 1fr; gap:.9rem }
 @media(max-width:700px){ .cto-peda-grid { grid-template-columns:1fr } }
 .cto-peda-full { grid-column:1/-1 }
+
+/* ── INCOME STRIP — passive income summary (Capitalisation tab) ── */
+.cto-income-strip {
+  display:grid; grid-template-columns:repeat(4,1fr); gap:.5rem;
+  background:linear-gradient(135deg,rgba(45,125,111,.06),rgba(61,90,128,.03));
+  border:1px solid rgba(45,125,111,.18); border-radius:var(--r-sm);
+  padding:.7rem 1rem; margin-bottom:1rem;
+}
+@media(max-width:640px){ .cto-income-strip { grid-template-columns:1fr 1fr } }
+.cto-income-item { text-align:center }
+.cto-income-val {
+  font-family:var(--sans); font-size:.93rem; font-weight:700;
+  color:var(--cto-teal); letter-spacing:-.03em; line-height:1.1;
+}
+.cto-income-val.muted { color:var(--danger); font-size:.85rem }
+.cto-income-lbl {
+  font-size:.57rem; font-weight:700; color:var(--text-dim);
+  letter-spacing:.07em; text-transform:uppercase; margin-top:.18rem;
+}
+
+/* ── RENTE PASSIVE CALLOUT — Dividendes tab ── */
+.cto-rente-box {
+  background:linear-gradient(135deg,rgba(45,125,111,.08),rgba(184,134,11,.04));
+  border:1.5px solid rgba(45,125,111,.22); border-radius:var(--r-sm);
+  padding:.9rem 1.1rem; display:flex; align-items:center;
+  justify-content:space-between; gap:1rem; margin-bottom:1rem;
+}
+.cto-rente-left { flex:1; min-width:0 }
+.cto-rente-eyebrow {
+  font-size:.56rem; font-weight:700; color:var(--cto-teal);
+  letter-spacing:.1em; text-transform:uppercase; margin-bottom:.18rem;
+}
+.cto-rente-title { font-size:.79rem; font-weight:600; color:var(--text); line-height:1.4 }
+.cto-rente-sub   { font-size:.63rem; color:var(--text-muted); margin-top:.15rem }
+.cto-rente-right { text-align:right; flex-shrink:0 }
+.cto-rente-val {
+  font-family:var(--sans); font-size:1.55rem; font-weight:700;
+  color:var(--cto-teal); letter-spacing:-.04em; line-height:1;
+}
+.cto-rente-unit {
+  font-size:.6rem; font-weight:700; color:var(--text-dim);
+  letter-spacing:.06em; text-transform:uppercase; margin-top:.22rem;
+}
 </style>
 </head>
 <body>
-<div id="sp-nav-root"></div>
+
+<nav class="top-nav">
+  <a href="index.html" class="nav-logo"><img src="logo.png?v=3" alt="Patrimonia.ai" class="nav-logo-img"></a>
+  <div class="nav-right">
+    <a href="index.html" class="nav-back">
+      <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7.5 1.5L3 6l4.5 4.5"/></svg>
+      Accueil
+    </a>
+    <div class="nav-dropdown" id="mainDropdown">
+      <button class="nav-dropdown-btn" aria-expanded="false" aria-haspopup="true">
+        Simulateurs <svg class="nav-chevron" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.8" style="width:13px;height:8px;flex-shrink:0"><path d="M1 1l4 4 4-4"/></svg>
+      </button>
+      <div class="nav-dropdown-menu" id="navMenu" role="menu"></div>
+    </div>
+  </div>
+</nav>
 
 <div class="sim-page">
 
@@ -675,6 +733,26 @@ canvas.cto-canvas { width:100%; display:block }
             </div>
           </div>
 
+          <!-- Flux de revenus passifs -->
+          <div class="cto-income-strip">
+            <div class="cto-income-item">
+              <div class="cto-income-val" id="ki-annual">—</div>
+              <div class="cto-income-lbl">Revenus / an</div>
+            </div>
+            <div class="cto-income-item">
+              <div class="cto-income-val" id="ki-monthly">—</div>
+              <div class="cto-income-lbl">Revenus / mois</div>
+            </div>
+            <div class="cto-income-item">
+              <div class="cto-income-val" id="ki-yield">—</div>
+              <div class="cto-income-lbl">Rendement courant</div>
+            </div>
+            <div class="cto-income-item">
+              <div class="cto-income-val muted" id="ki-drag">—</div>
+              <div class="cto-income-lbl">Fiscal drag / an</div>
+            </div>
+          </div>
+
           <div class="cto-chart-wrap">
             <div class="cto-chart-hdr">
               <div>
@@ -761,6 +839,20 @@ canvas.cto-canvas { width:100%; display:block }
 
         <!-- ── DIVIDENDES ── -->
         <div class="cto-panel" id="cto-p-div">
+
+          <!-- Rente passive callout -->
+          <div class="cto-rente-box">
+            <div class="cto-rente-left">
+              <div class="cto-rente-eyebrow">Revenu passif estimé</div>
+              <div class="cto-rente-title">Rente mensuelle nette à terme</div>
+              <div class="cto-rente-sub" id="rente-sub">Dividendes nets ÷ 12 — après PFU/barème, à l'issue de la simulation</div>
+            </div>
+            <div class="cto-rente-right">
+              <div class="cto-rente-val" id="rente-monthly">—</div>
+              <div class="cto-rente-unit">€ / mois net</div>
+            </div>
+          </div>
+
           <div class="cto-div-toggle">
             <div class="cto-div-opt active" id="div-reinvest-on" data-reinvest="1">Réinvestissement des dividendes</div>
             <div class="cto-div-opt" id="div-reinvest-off" data-reinvest="0">Revenus encaissés</div>
@@ -1047,7 +1139,7 @@ canvas.cto-canvas { width:100%; display:block }
 </div>
 
 <footer>
-  <span>PATRIMONIA.AI</span> — Simulateur CTO — Calculs indicatifs. PFU : 30 % (12,8 % IR + 17,2 % PS). Abattement dividendes barème : 40 %. Droits de succession : taux indicatifs (ligne directe). Les projections ne constituent pas une garantie de performance. Données à titre pédagogique — consultez un conseiller en gestion de patrimoine.
+  <span>Patrimonia.ai</span> — Simulateur CTO — Calculs indicatifs. PFU : 30 % (12,8 % IR + 17,2 % PS). Abattement dividendes barème : 40 %. Droits de succession : taux indicatifs (ligne directe). Les projections ne constituent pas une garantie de performance. Données à titre pédagogique — consultez un conseiller en gestion de patrimoine.
 </footer>
 
 <script>
@@ -1202,6 +1294,17 @@ function renderCapi(inp, res) {
   setTxt('kc-reel', fmt(realVal));
   setTxt('kc-badge', inp.duree+' an'+(inp.duree>1?'s':''));
 
+  // Income strip — flux de revenus passifs à terme
+  const rates0 = getEffectiveRates(inp.tmr, regime);
+  const finalDivGross = gross * (inp.div/100);
+  const finalDivNet   = finalDivGross * (1 - rates0.div);
+  const yieldCurrent  = gross > 0 ? (inp.div) : 0;
+  const annDragAvg    = inp.duree > 0 ? res.cumTaxNet / inp.duree : 0;
+  setTxt('ki-annual',  fmt(finalDivNet));
+  setTxt('ki-monthly', fmt(finalDivNet/12));
+  setTxt('ki-yield',   fmtPct(yieldCurrent));
+  setTxt('ki-drag',    '−'+fmt(annDragAvg));
+
   // Projection table
   const tbody = $('cto-proj-body'); if(!tbody) return;
   tbody.innerHTML='';
@@ -1306,6 +1409,11 @@ function renderDiv(inp, res) {
   setTxt('kd-cumul', fmt(cumDivNet));
   setTxt('kd-tax', '−'+fmt(cumDivTax));
   setTxt('kd-badge', inp.duree+' an'+(inp.duree>1?'s':''));
+
+  // Rente passive callout
+  setTxt('rente-monthly', fmt(lastDivNet/12));
+  const finalPort = reinvLine[reinvLine.length-1]||0;
+  setTxt('rente-sub', `À l'issue de ${inp.duree} an${inp.duree>1?'s':''} — portefeuille : ${fmt(finalPort)}`);
 
   drawDivBars($('cto-chart-div'), bars);
   drawDualLineSimple($('cto-chart-div2'), reinvLine, noneLine, inp.duree,'#4F8A78','#B8860B');
@@ -1700,6 +1808,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   });
 
   SP.initFmt&&SP.initFmt(document.body);
+  SP.nav.init();
   update();
 });
 
