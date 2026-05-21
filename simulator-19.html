@@ -1,0 +1,1638 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulateur Loi Malraux — PATRIMONIA.AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <script src="shared.js?v=3"></script>
+  <script src="shared-nav.js?v=9"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --mx-vert:       #1E3B2C;
+      --mx-vert-mid:   #2C5440;
+      --mx-vert-light: #3D7059;
+      --mx-sepia:      #6B4B2A;
+      --mx-sepia-mid:  #8B6340;
+      --mx-stone:      #9B8B6E;
+      --mx-stone-light:#C4B49A;
+      --mx-ivoire:     #F5F0E8;
+      --mx-ivoire-mid: #EDE6D8;
+      --mx-ardoise:    #4A5568;
+      --mx-ardoise-light: #718096;
+
+      --mx-bg:     #F7F4EE;
+      --mx-panel:  #FFFFFF;
+      --mx-border: #E2D9C8;
+      --mx-text:   #1A1714;
+      --mx-muted:  #6B6458;
+
+      --radius: 10px;
+      --shadow: 0 2px 12px rgba(30,59,44,.08);
+      --shadow-lg: 0 8px 32px rgba(30,59,44,.12);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--mx-bg);
+      color: var(--mx-text);
+      min-height: 100vh;
+      padding-top: 56px;
+    }
+
+    /* ── Nav placeholder ── */
+    #sp-nav-root {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      background: var(--mx-vert);
+      height: 56px;
+      display: flex; align-items: center; padding: 0 24px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .sp-nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem; font-weight: 600;
+      color: #fff; text-decoration: none;
+      letter-spacing: .02em;
+    }
+    .sp-nav-logo span { color: var(--mx-stone-light); }
+    .sp-nav-links { display: flex; gap: 4px; margin-left: 32px; }
+    .sp-nav-link {
+      color: rgba(255,255,255,.72); text-decoration: none;
+      font-size: .8rem; font-weight: 500;
+      padding: 5px 10px; border-radius: 6px;
+      transition: background .15s, color .15s;
+    }
+    .sp-nav-link:hover { background: rgba(255,255,255,.1); color: #fff; }
+    .sp-nav-link.active { background: rgba(255,255,255,.15); color: #fff; }
+    .sp-nav-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+    .sp-nav-btn {
+      background: var(--mx-sepia); color: #fff;
+      border: none; border-radius: 6px;
+      padding: 6px 14px; font-size: .78rem; font-weight: 600;
+      cursor: pointer; letter-spacing: .02em;
+      transition: background .15s;
+    }
+    .sp-nav-btn:hover { background: var(--mx-sepia-mid); }
+
+    /* ── Hero ── */
+    .mx-hero {
+      background: linear-gradient(135deg, var(--mx-vert) 0%, var(--mx-vert-mid) 50%, #1a2f20 100%);
+      padding: 40px 32px 32px;
+      position: relative; overflow: hidden;
+    }
+    .mx-hero::before {
+      content: '';
+      position: absolute; top: 0; right: 0; bottom: 0;
+      width: 40%;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239B8B6E' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      opacity: .4;
+    }
+    .mx-hero-eyebrow {
+      font-size: .7rem; font-weight: 600; letter-spacing: .12em;
+      color: var(--mx-stone-light); text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .mx-hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem; font-weight: 600; color: #fff;
+      line-height: 1.2; margin-bottom: 10px;
+    }
+    .mx-hero h1 em { font-style: normal; color: var(--mx-stone-light); }
+    .mx-hero-sub {
+      font-size: .82rem; color: rgba(255,255,255,.6);
+      max-width: 560px; line-height: 1.5; margin-bottom: 20px;
+    }
+    .mx-hero-props {
+      display: flex; flex-wrap: wrap; gap: 8px;
+    }
+    .mx-prop-badge {
+      background: rgba(255,255,255,.1);
+      border: 1px solid rgba(255,255,255,.15);
+      border-radius: 20px; padding: 5px 12px;
+      font-size: .73rem; font-weight: 500; color: rgba(255,255,255,.85);
+    }
+    .mx-prop-badge strong { color: var(--mx-stone-light); }
+
+    /* ── Layout ── */
+    .mx-layout {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 20px;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 24px 20px;
+    }
+    @media (max-width: 900px) {
+      .mx-layout { grid-template-columns: 1fr; }
+    }
+
+    /* ── Left Panel ── */
+    .mx-panel {
+      background: var(--mx-panel);
+      border-radius: var(--radius);
+      border: 1px solid var(--mx-border);
+      box-shadow: var(--shadow);
+      padding: 20px;
+      height: fit-content;
+      position: sticky; top: 76px;
+    }
+    .mx-panel-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem; font-weight: 600; color: var(--mx-vert);
+      margin-bottom: 16px; padding-bottom: 12px;
+      border-bottom: 1px solid var(--mx-border);
+    }
+    .mx-section {
+      margin-bottom: 18px;
+    }
+    .mx-section-label {
+      font-size: .68rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--mx-sepia);
+      margin-bottom: 10px;
+    }
+    .mx-field { margin-bottom: 10px; }
+    .mx-field label {
+      display: block; font-size: .74rem; font-weight: 500; color: var(--mx-muted);
+      margin-bottom: 4px;
+    }
+    .mx-inp {
+      width: 100%; background: var(--mx-ivoire);
+      border: 1px solid var(--mx-border);
+      border-radius: 7px; padding: 8px 10px;
+      font-size: .84rem; color: var(--mx-text);
+      font-family: 'Inter', sans-serif;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .mx-inp:focus { outline: none; border-color: var(--mx-sepia); box-shadow: 0 0 0 3px rgba(107,75,42,.1); }
+    select.mx-inp { cursor: pointer; }
+
+    .mx-range-wrap { position: relative; }
+    .mx-range-val {
+      font-size: .72rem; font-weight: 600; color: var(--mx-sepia);
+      text-align: right; margin-bottom: 4px;
+    }
+    .mx-range-inp {
+      --pct: 0%;
+      -webkit-appearance: none; appearance: none;
+      height: 4px; border-radius: 2px; cursor: pointer; outline: none; width: 100%;
+      background: linear-gradient(to right, var(--mx-sepia) var(--pct), rgba(0,0,0,.1) var(--pct));
+    }
+    .mx-range-inp::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px; height: 16px; border-radius: 50%;
+      background: var(--mx-sepia); border: 2.5px solid white;
+      box-shadow: 0 1px 5px rgba(0,0,0,.22); cursor: pointer;
+      transition: transform .12s;
+    }
+    .mx-range-inp::-webkit-slider-thumb:hover { transform: scale(1.15); }
+    .mx-range-inp::-moz-range-thumb {
+      width: 16px; height: 16px; border-radius: 50%;
+      background: var(--mx-sepia); border: 2.5px solid white;
+      box-shadow: 0 1px 5px rgba(0,0,0,.22); cursor: pointer;
+    }
+    .mx-range-labels {
+      display: flex; justify-content: space-between;
+      font-size: .64rem; color: var(--mx-stone); margin-top: 3px;
+    }
+
+    /* ── KPI strip ── */
+    .mx-kpi-strip {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 10px; margin-bottom: 20px;
+    }
+    .mx-kpi {
+      background: var(--mx-panel);
+      border: 1px solid var(--mx-border);
+      border-radius: var(--radius);
+      padding: 14px 12px;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+    .mx-kpi.accent {
+      background: linear-gradient(135deg, var(--mx-sepia) 0%, var(--mx-sepia-mid) 100%);
+      border-color: var(--mx-sepia);
+    }
+    .mx-kpi.accent .mx-kpi-val { color: #fff; }
+    .mx-kpi.accent .mx-kpi-lab { color: rgba(255,255,255,.7); }
+    .mx-kpi.accent .mx-kpi-sub { color: rgba(255,255,255,.55); }
+    .mx-kpi-val { font-size: 1.25rem; font-weight: 700; color: var(--mx-vert); line-height: 1; }
+    .mx-kpi-lab { font-size: .68rem; color: var(--mx-muted); margin-top: 4px; font-weight: 500; }
+    .mx-kpi-sub { font-size: .65rem; color: var(--mx-stone); margin-top: 2px; }
+
+    /* ── Right Panel ── */
+    .mx-right { display: flex; flex-direction: column; gap: 16px; }
+
+    .mx-tabs-wrap {
+      background: var(--mx-panel);
+      border: 1px solid var(--mx-border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .mx-tabs {
+      display: flex; border-bottom: 1px solid var(--mx-border);
+      overflow-x: auto; scrollbar-width: none;
+      background: var(--mx-ivoire-mid);
+    }
+    .mx-tabs::-webkit-scrollbar { display: none; }
+    .mx-tab {
+      flex-shrink: 0;
+      padding: 12px 16px; font-size: .78rem; font-weight: 500;
+      color: var(--mx-muted); cursor: pointer; border: none;
+      background: transparent; border-bottom: 2px solid transparent;
+      transition: color .15s, border-color .15s;
+      white-space: nowrap;
+    }
+    .mx-tab.active { color: var(--mx-sepia); border-bottom-color: var(--mx-sepia); font-weight: 600; }
+    .mx-tab:hover:not(.active) { color: var(--mx-vert); }
+
+    .mx-tab-content { display: none; padding: 24px; }
+    .mx-tab-content.active { display: block; }
+
+    /* ── Section headers ── */
+    .mx-sect-head {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 16px;
+    }
+    .mx-sect-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: linear-gradient(135deg, var(--mx-sepia), var(--mx-sepia-mid));
+      display: flex; align-items: center; justify-content: center;
+      font-size: .9rem; flex-shrink: 0;
+    }
+    .mx-sect-title { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 600; color: var(--mx-vert); }
+    .mx-sect-sub { font-size: .74rem; color: var(--mx-muted); margin-top: 1px; }
+
+    /* ── Grid utilities ── */
+    .mx-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .mx-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .mx-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+
+    /* ── Stat cards ── */
+    .mx-stat {
+      background: var(--mx-ivoire);
+      border: 1px solid var(--mx-border);
+      border-radius: 8px; padding: 14px;
+    }
+    .mx-stat-label { font-size: .7rem; font-weight: 500; color: var(--mx-muted); margin-bottom: 4px; }
+    .mx-stat-val { font-size: 1.1rem; font-weight: 700; color: var(--mx-vert); }
+    .mx-stat-note { font-size: .67rem; color: var(--mx-stone); margin-top: 2px; }
+    .mx-stat.positive .mx-stat-val { color: #156B3A; }
+    .mx-stat.negative .mx-stat-val { color: #B91C1C; }
+    .mx-stat.sepia .mx-stat-val { color: var(--mx-sepia); }
+
+    /* ── Chart wrapper ── */
+    .mx-chart-wrap {
+      background: var(--mx-ivoire);
+      border: 1px solid var(--mx-border);
+      border-radius: 8px; padding: 16px;
+      margin-bottom: 12px;
+    }
+    .mx-chart-title {
+      font-size: .78rem; font-weight: 600; color: var(--mx-vert); margin-bottom: 12px;
+    }
+    .mx-chart-wrap canvas { display: block; width: 100%; }
+
+    /* ── Divider ── */
+    .mx-divider {
+      border: none; border-top: 1px solid var(--mx-border);
+      margin: 16px 0;
+    }
+
+    /* ── Tag ── */
+    .mx-tag {
+      display: inline-block;
+      background: rgba(107,75,42,.1);
+      color: var(--mx-sepia);
+      border-radius: 20px; padding: 3px 10px;
+      font-size: .67rem; font-weight: 600;
+    }
+    .mx-tag.green { background: rgba(30,59,44,.1); color: var(--mx-vert-light); }
+    .mx-tag.red { background: rgba(185,28,28,.1); color: #B91C1C; }
+
+    /* ── Avant/Après strip ── */
+    .mx-avap {
+      display: grid; grid-template-columns: 1fr 40px 1fr;
+      align-items: center; gap: 8px;
+      background: var(--mx-ivoire);
+      border: 1px solid var(--mx-border);
+      border-radius: 10px; padding: 16px;
+      margin-bottom: 16px;
+    }
+    .mx-avap-col { }
+    .mx-avap-head {
+      font-size: .67rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; margin-bottom: 10px;
+    }
+    .mx-avap-col:first-child .mx-avap-head { color: var(--mx-ardoise); }
+    .mx-avap-col:last-child .mx-avap-head { color: var(--mx-sepia); }
+    .mx-avap-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 5px 0; border-bottom: 1px dotted rgba(0,0,0,.07);
+      font-size: .76rem;
+    }
+    .mx-avap-row:last-child { border-bottom: none; }
+    .mx-avap-row .lbl { color: var(--mx-muted); }
+    .mx-avap-row .val { font-weight: 600; }
+    .mx-avap-arrow {
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem; color: var(--mx-stone);
+    }
+    .mx-avap-eco {
+      background: linear-gradient(135deg, var(--mx-sepia), var(--mx-sepia-mid));
+      border-radius: 8px; padding: 8px 12px;
+      text-align: center; margin-top: 8px;
+      grid-column: 1 / -1;
+    }
+    .mx-avap-eco .label { font-size: .68rem; color: rgba(255,255,255,.8); margin-bottom: 2px; }
+    .mx-avap-eco .val { font-size: 1.15rem; font-weight: 700; color: #fff; }
+
+    /* ── Projet summary ── */
+    .mx-proj-sum {
+      background: linear-gradient(135deg, var(--mx-vert) 0%, var(--mx-vert-mid) 100%);
+      border-radius: 10px; padding: 16px;
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
+      margin-bottom: 16px;
+    }
+    .mx-proj-item { text-align: center; }
+    .mx-proj-val { font-size: 1rem; font-weight: 700; color: #fff; }
+    .mx-proj-lab { font-size: .65rem; color: rgba(255,255,255,.65); margin-top: 3px; }
+
+    /* ── Timeline chantier ── */
+    .mx-timeline {
+      background: var(--mx-ivoire);
+      border: 1px solid var(--mx-border);
+      border-radius: 10px; padding: 20px;
+      margin-bottom: 16px;
+    }
+    .mx-timeline-title {
+      font-family: 'Playfair Display', serif;
+      font-size: .9rem; color: var(--mx-vert); margin-bottom: 16px;
+    }
+    .mx-tl-track {
+      position: relative; padding-left: 24px;
+    }
+    .mx-tl-track::before {
+      content: '';
+      position: absolute; left: 8px; top: 8px; bottom: 8px;
+      width: 2px; background: var(--mx-border);
+    }
+    .mx-tl-step {
+      position: relative; margin-bottom: 16px;
+      display: flex; gap: 12px; align-items: flex-start;
+    }
+    .mx-tl-step:last-child { margin-bottom: 0; }
+    .mx-tl-dot {
+      position: absolute; left: -20px; top: 3px;
+      width: 14px; height: 14px; border-radius: 50%;
+      background: var(--mx-border); border: 2px solid #fff;
+      box-shadow: 0 0 0 2px var(--mx-border);
+      flex-shrink: 0; transition: background .3s, box-shadow .3s;
+      z-index: 1;
+    }
+    .mx-tl-step.done .mx-tl-dot {
+      background: var(--mx-vert-light);
+      box-shadow: 0 0 0 2px var(--mx-vert-light);
+    }
+    .mx-tl-step.active .mx-tl-dot {
+      background: var(--mx-sepia);
+      box-shadow: 0 0 0 3px rgba(107,75,42,.25);
+    }
+    .mx-tl-step-body { }
+    .mx-tl-step-name {
+      font-size: .78rem; font-weight: 600; color: var(--mx-text);
+    }
+    .mx-tl-step.done .mx-tl-step-name { color: var(--mx-muted); }
+    .mx-tl-step.active .mx-tl-step-name { color: var(--mx-sepia); }
+    .mx-tl-step-date {
+      font-size: .68rem; color: var(--mx-stone); margin-top: 1px;
+    }
+    .mx-tl-step-detail {
+      font-size: .7rem; color: var(--mx-muted);
+      margin-top: 4px; line-height: 1.4;
+    }
+
+    /* ── Analyse travaux ── */
+    .mx-travaux-card {
+      background: var(--mx-ivoire);
+      border: 1px solid var(--mx-border);
+      border-radius: 10px; padding: 16px; margin-bottom: 12px;
+    }
+    .mx-travaux-card-title {
+      font-size: .75rem; font-weight: 700; letter-spacing: .06em;
+      text-transform: uppercase; color: var(--mx-sepia);
+      margin-bottom: 12px;
+    }
+    .mx-bar-row {
+      margin-bottom: 10px;
+    }
+    .mx-bar-labels {
+      display: flex; justify-content: space-between;
+      font-size: .72rem; color: var(--mx-muted); margin-bottom: 4px;
+    }
+    .mx-bar-track {
+      height: 8px; background: rgba(0,0,0,.07);
+      border-radius: 4px; overflow: hidden;
+    }
+    .mx-bar-fill {
+      height: 100%; border-radius: 4px;
+      background: linear-gradient(to right, var(--mx-vert-light), var(--mx-sepia));
+      transition: width .4s ease;
+    }
+
+    /* ── Comparison table ── */
+    .mx-comp-table { width: 100%; border-collapse: collapse; font-size: .78rem; }
+    .mx-comp-table th {
+      background: var(--mx-vert); color: #fff;
+      padding: 10px 12px; text-align: left; font-weight: 600;
+    }
+    .mx-comp-table th:first-child { border-radius: 8px 0 0 0; }
+    .mx-comp-table th:last-child { border-radius: 0 8px 0 0; }
+    .mx-comp-table th.highlight { background: var(--mx-sepia); }
+    .mx-comp-table td {
+      padding: 9px 12px; border-bottom: 1px solid var(--mx-border);
+      color: var(--mx-text);
+    }
+    .mx-comp-table tr:last-child td { border-bottom: none; }
+    .mx-comp-table tr:nth-child(even) td { background: var(--mx-ivoire); }
+    .mx-comp-table td.highlight { font-weight: 700; color: var(--mx-sepia); }
+    .mx-comp-table td.metric { font-weight: 600; color: var(--mx-vert); }
+
+    /* ── Pédagogie ── */
+    .mx-peda-card {
+      background: var(--mx-ivoire);
+      border: 1px solid var(--mx-border);
+      border-left: 3px solid var(--mx-sepia);
+      border-radius: 8px; padding: 16px; margin-bottom: 12px;
+    }
+    .mx-peda-q {
+      font-weight: 600; font-size: .84rem; color: var(--mx-vert);
+      margin-bottom: 8px;
+    }
+    .mx-peda-a { font-size: .79rem; color: var(--mx-muted); line-height: 1.6; }
+    .mx-peda-a strong { color: var(--mx-sepia); }
+
+    /* ── Note box ── */
+    .mx-note {
+      background: rgba(107,75,42,.06);
+      border: 1px solid rgba(107,75,42,.18);
+      border-radius: 8px; padding: 12px 14px;
+      font-size: .76rem; color: var(--mx-sepia-mid);
+      line-height: 1.5; margin-bottom: 12px;
+    }
+    .mx-note strong { color: var(--mx-sepia); }
+
+    /* ── Watermark note ── */
+    .mx-disclaimer {
+      font-size: .67rem; color: var(--mx-stone);
+      text-align: center; padding: 16px 0 8px;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav id="sp-nav-root">
+  <a href="index.html" class="sp-nav-logo">PATRIMONIA<span>.AI</span></a>
+  <div class="sp-nav-links" id="sp-nav-links"></div>
+  <div class="sp-nav-right">
+    <button class="sp-nav-btn" onclick="window.location.href='index.html'">← Tous les simulateurs</button>
+  </div>
+</nav>
+
+<!-- Hero -->
+<div class="mx-hero">
+  <div class="mx-hero-eyebrow">Patrimoine Historique &amp; Défiscalisation</div>
+  <h1>Simulateur <em class="gradient-text">Loi Malraux</em></h1>
+  <p class="mx-hero-sub">Réduction d'impôt directe sur les travaux de restauration de bâtiments situés en secteur sauvegardé. Hors plafond des niches fiscales.</p>
+  <div class="mx-hero-props">
+    <span class="mx-prop-badge"><strong>SPR</strong> 30% de réduction</span>
+    <span class="mx-prop-badge"><strong>Autre secteur</strong> 22%</span>
+    <span class="mx-prop-badge">Plafond <strong>400 000 €</strong> / 4 ans</span>
+    <span class="mx-prop-badge">Hors niches fiscales</span>
+    <span class="mx-prop-badge">Engagement location <strong>9 ans</strong></span>
+  </div>
+</div>
+
+<!-- Layout -->
+<div class="mx-layout">
+
+  <!-- LEFT PANEL -->
+  <div class="mx-panel">
+    <div class="mx-panel-title">⚙️ Paramètres du projet</div>
+
+    <!-- Secteur & bien -->
+    <div class="mx-section">
+      <div class="mx-section-label">🏛️ Bien & secteur</div>
+
+      <div class="mx-field">
+        <label for="mx-secteur">Type de secteur</label>
+        <select id="mx-secteur" class="mx-inp">
+          <option value="spr">SPR — Secteur Patrimonial Remarquable (30%)</option>
+          <option value="autre">Autre secteur protégé (22%)</option>
+        </select>
+      </div>
+
+      <div class="mx-field">
+        <label for="mx-prix">Prix d'acquisition (€)</label>
+        <input type="number" id="mx-prix" class="mx-inp" value="280000" min="0" step="5000">
+      </div>
+
+      <div class="mx-field">
+        <label for="mx-travaux">Travaux de restauration (€)</label>
+        <input type="number" id="mx-travaux" class="mx-inp" value="320000" min="0" step="5000">
+      </div>
+
+      <div class="mx-field">
+        <label>Subventions ANAH / autres (€)</label>
+        <input type="number" id="mx-subventions" class="mx-inp" value="0" min="0" step="1000">
+      </div>
+
+      <div class="mx-field">
+        <label>Durée du chantier (années)</label>
+        <div class="mx-range-val"><span id="mx-duree-trav-val">3</span> an(s)</div>
+        <input type="range" id="mx-duree-trav" class="mx-range-inp" min="1" max="4" step="1" value="3">
+        <div class="mx-range-labels"><span>1 an</span><span>4 ans</span></div>
+      </div>
+    </div>
+
+    <!-- Financement -->
+    <div class="mx-section">
+      <div class="mx-section-label">🏦 Financement</div>
+
+      <div class="mx-field">
+        <label>Apport personnel (€)</label>
+        <input type="number" id="mx-apport" class="mx-inp" value="120000" min="0" step="5000">
+      </div>
+
+      <div class="mx-field">
+        <label>Taux crédit (%)</label>
+        <div class="mx-range-val"><span id="mx-taux-val">3.5</span>%</div>
+        <input type="range" id="mx-taux" class="mx-range-inp" min="1" max="6" step="0.1" value="3.5">
+        <div class="mx-range-labels"><span>1%</span><span>6%</span></div>
+      </div>
+
+      <div class="mx-field">
+        <label>Durée crédit (années)</label>
+        <div class="mx-range-val"><span id="mx-duree-credit-val">20</span> ans</div>
+        <input type="range" id="mx-duree-credit" class="mx-range-inp" min="5" max="30" step="1" value="20">
+        <div class="mx-range-labels"><span>5 ans</span><span>30 ans</span></div>
+      </div>
+    </div>
+
+    <!-- Location -->
+    <div class="mx-section">
+      <div class="mx-section-label">🔑 Location</div>
+
+      <div class="mx-field">
+        <label>Loyers annuels bruts (€)</label>
+        <input type="number" id="mx-loyers" class="mx-inp" value="18000" min="0" step="500">
+      </div>
+
+      <div class="mx-field">
+        <label>Taux de vacance (%)</label>
+        <div class="mx-range-val"><span id="mx-vacance-val">5</span>%</div>
+        <input type="range" id="mx-vacance" class="mx-range-inp" min="0" max="20" step="1" value="5">
+        <div class="mx-range-labels"><span>0%</span><span>20%</span></div>
+      </div>
+
+      <div class="mx-field">
+        <label>Charges locatives annuelles (€)</label>
+        <input type="number" id="mx-charges" class="mx-inp" value="3200" min="0" step="100">
+      </div>
+
+      <div class="mx-field">
+        <label>Taxe foncière annuelle (€)</label>
+        <input type="number" id="mx-tf" class="mx-inp" value="1800" min="0" step="100">
+      </div>
+    </div>
+
+    <!-- Fiscalité -->
+    <div class="mx-section">
+      <div class="mx-section-label">📊 Paramètres fiscaux</div>
+
+      <div class="mx-field">
+        <label>TMI (Tranche Marginale d'Imposition)</label>
+        <div class="mx-range-val"><span id="mx-tmi-val">41</span>%</div>
+        <input type="range" id="mx-tmi" class="mx-range-inp" min="11" max="45" step="11" value="41">
+        <div class="mx-range-labels"><span>11%</span><span>45%</span></div>
+      </div>
+
+      <div class="mx-field">
+        <label>Horizon de détention (années)</label>
+        <div class="mx-range-val"><span id="mx-horizon-val">15</span> ans</div>
+        <input type="range" id="mx-horizon" class="mx-range-inp" min="9" max="30" step="1" value="15">
+        <div class="mx-range-labels"><span>9 ans</span><span>30 ans</span></div>
+      </div>
+
+      <div class="mx-field">
+        <label>Revalorisation annuelle du bien (%)</label>
+        <div class="mx-range-val"><span id="mx-revalo-val">2.0</span>%</div>
+        <input type="range" id="mx-revalo" class="mx-range-inp" min="0" max="5" step="0.5" value="2.0">
+        <div class="mx-range-labels"><span>0%</span><span>5%</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="mx-right">
+
+    <!-- KPIs -->
+    <div class="mx-kpi-strip">
+      <div class="mx-kpi accent">
+        <div class="mx-kpi-val" id="kpi-reduction">—</div>
+        <div class="mx-kpi-lab">Réduction IR totale</div>
+        <div class="mx-kpi-sub" id="kpi-taux-lab">SPR 30%</div>
+      </div>
+      <div class="mx-kpi">
+        <div class="mx-kpi-val" id="kpi-effort">—</div>
+        <div class="mx-kpi-lab">Effort réel / mois</div>
+        <div class="mx-kpi-sub">Après réduction IR</div>
+      </div>
+      <div class="mx-kpi">
+        <div class="mx-kpi-val" id="kpi-rend">—</div>
+        <div class="mx-kpi-lab">Rendement brut</div>
+        <div class="mx-kpi-sub" id="kpi-rend-net-sub">Net : —</div>
+      </div>
+      <div class="mx-kpi">
+        <div class="mx-kpi-val" id="kpi-eco-an">—</div>
+        <div class="mx-kpi-lab">Éco. IR / an chantier</div>
+        <div class="mx-kpi-sub" id="kpi-duree-trav-sub">Sur — ans</div>
+      </div>
+      <div class="mx-kpi">
+        <div class="mx-kpi-val" id="kpi-valo">—</div>
+        <div class="mx-kpi-lab">Valorisation estimée</div>
+        <div class="mx-kpi-sub" id="kpi-horizon-sub">À — ans</div>
+      </div>
+      <div class="mx-kpi">
+        <div class="mx-kpi-val" id="kpi-cout-total">—</div>
+        <div class="mx-kpi-lab">Investissement total</div>
+        <div class="mx-kpi-sub">Prix + travaux</div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="mx-tabs-wrap">
+      <div class="mx-tabs">
+        <button class="mx-tab active" data-tab="projet">🏛️ Projet patrimonial</button>
+        <button class="mx-tab" data-tab="reduction">📉 Réduction fiscale</button>
+        <button class="mx-tab" data-tab="travaux">🔨 Travaux & restauration</button>
+        <button class="mx-tab" data-tab="cashflow">💰 Cash-flow & valorisation</button>
+        <button class="mx-tab" data-tab="comparaison">⚖️ Comparaison</button>
+        <button class="mx-tab" data-tab="pedagogie">📚 Pédagogie</button>
+      </div>
+
+      <!-- TAB 1 : Projet patrimonial -->
+      <div class="mx-tab-content active" id="tab-projet">
+        <div class="mx-sect-head">
+          <div class="mx-sect-icon">🏛️</div>
+          <div>
+            <div class="mx-sect-title">Vue d'ensemble du projet</div>
+            <div class="mx-sect-sub">Structure financière et impact fiscal consolidé</div>
+          </div>
+        </div>
+
+        <!-- Proj summary banner -->
+        <div class="mx-proj-sum">
+          <div class="mx-proj-item">
+            <div class="mx-proj-val" id="proj-total">—</div>
+            <div class="mx-proj-lab">Investissement total</div>
+          </div>
+          <div class="mx-proj-item">
+            <div class="mx-proj-val" id="proj-travaux">—</div>
+            <div class="mx-proj-lab">Travaux éligibles</div>
+          </div>
+          <div class="mx-proj-item">
+            <div class="mx-proj-val" id="proj-reduction">—</div>
+            <div class="mx-proj-lab">Réduction IR</div>
+          </div>
+          <div class="mx-proj-item">
+            <div class="mx-proj-val" id="proj-effort">—</div>
+            <div class="mx-proj-lab">Effort / mois</div>
+          </div>
+        </div>
+
+        <!-- Avant/Après -->
+        <div class="mx-avap">
+          <div class="mx-avap-col">
+            <div class="mx-avap-head">Sans Malraux</div>
+            <div class="mx-avap-row">
+              <span class="lbl">Revenus fonciers</span>
+              <span class="val" id="avap-rf-avant">—</span>
+            </div>
+            <div class="mx-avap-row">
+              <span class="lbl">IR foncier</span>
+              <span class="val" id="avap-ir-avant">—</span>
+            </div>
+            <div class="mx-avap-row">
+              <span class="lbl">Cash-flow net</span>
+              <span class="val" id="avap-cf-avant">—</span>
+            </div>
+          </div>
+          <div class="mx-avap-arrow">→</div>
+          <div class="mx-avap-col">
+            <div class="mx-avap-head" style="color: var(--mx-sepia);">Avec Malraux</div>
+            <div class="mx-avap-row">
+              <span class="lbl">Revenus fonciers</span>
+              <span class="val" id="avap-rf-apres">—</span>
+            </div>
+            <div class="mx-avap-row">
+              <span class="lbl">IR après réduction</span>
+              <span class="val" id="avap-ir-apres">—</span>
+            </div>
+            <div class="mx-avap-row">
+              <span class="lbl">Cash-flow net</span>
+              <span class="val" id="avap-cf-apres">—</span>
+            </div>
+          </div>
+          <div class="mx-avap-eco">
+            <div class="label">Économie d'impôt totale (réduction directe IR)</div>
+            <div class="val" id="avap-eco">—</div>
+          </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="mx-grid-2">
+          <div class="mx-chart-wrap">
+            <div class="mx-chart-title">Répartition de l'investissement</div>
+            <canvas id="chart-repartition" height="180"></canvas>
+          </div>
+          <div class="mx-chart-wrap">
+            <div class="mx-chart-title">Cash-flow projeté (après chantier)</div>
+            <canvas id="chart-cf-proj" height="180"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2 : Réduction fiscale -->
+      <div class="mx-tab-content" id="tab-reduction">
+        <div class="mx-sect-head">
+          <div class="mx-sect-icon">📉</div>
+          <div>
+            <div class="mx-sect-title">Mécanique de la réduction fiscale</div>
+            <div class="mx-sect-sub">Calcul précis de la réduction IR Malraux, plafond et étalement</div>
+          </div>
+        </div>
+
+        <div class="mx-grid-3" style="margin-bottom:16px;">
+          <div class="mx-stat sepia">
+            <div class="mx-stat-label">Taux applicable</div>
+            <div class="mx-stat-val" id="red-taux">—</div>
+            <div class="mx-stat-note" id="red-taux-note">—</div>
+          </div>
+          <div class="mx-stat sepia">
+            <div class="mx-stat-label">Travaux éligibles</div>
+            <div class="mx-stat-val" id="red-trav-elig">—</div>
+            <div class="mx-stat-note" id="red-plafond-note">—</div>
+          </div>
+          <div class="mx-stat sepia">
+            <div class="mx-stat-label">Réduction totale</div>
+            <div class="mx-stat-val" id="red-total">—</div>
+            <div class="mx-stat-note" id="red-par-an">—</div>
+          </div>
+        </div>
+
+        <div class="mx-note">
+          <strong>Hors plafonnement niches fiscales :</strong> La réduction Malraux n'est pas soumise au plafond de 10 000 € des niches fiscales. Elle s'impute directement sur l'IR dû, sans limite globale.
+        </div>
+
+        <div class="mx-chart-wrap">
+          <div class="mx-chart-title">Réduction IR par année de chantier</div>
+          <canvas id="chart-reduction-years" height="160"></canvas>
+        </div>
+
+        <div class="mx-grid-2" style="margin-top:12px;">
+          <div class="mx-stat">
+            <div class="mx-stat-label">Économie / an pendant travaux</div>
+            <div class="mx-stat-val" id="red-eco-an">—</div>
+            <div class="mx-stat-note">Réduction étalée sur la durée chantier</div>
+          </div>
+          <div class="mx-stat positive">
+            <div class="mx-stat-label">Effort mensuel réel (travaux)</div>
+            <div class="mx-stat-val" id="red-effort-trav">—</div>
+            <div class="mx-stat-note">Mensualité nette de réduction IR</div>
+          </div>
+          <div class="mx-stat">
+            <div class="mx-stat-label">IR restant dû après réduction</div>
+            <div class="mx-stat-val" id="red-ir-reste">—</div>
+            <div class="mx-stat-note">Sur IR calculé approximatif</div>
+          </div>
+          <div class="mx-stat">
+            <div class="mx-stat-label">Plafond restant utilisable</div>
+            <div class="mx-stat-val" id="red-plafond-reste">—</div>
+            <div class="mx-stat-note">Sur 400 000 € / 4 ans</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3 : Travaux & restauration -->
+      <div class="mx-tab-content" id="tab-travaux">
+        <div class="mx-sect-head">
+          <div class="mx-sect-icon">🔨</div>
+          <div>
+            <div class="mx-sect-title">Travaux & restauration patrimoniale</div>
+            <div class="mx-sect-sub">Analyse du chantier, éligibilité et timeline de livraison</div>
+          </div>
+        </div>
+
+        <!-- Timeline chantier -->
+        <div class="mx-timeline">
+          <div class="mx-timeline-title">📅 Timeline du chantier</div>
+          <div class="mx-tl-track">
+            <div class="mx-tl-step done" id="tl-step-0">
+              <div class="mx-tl-dot"></div>
+              <div class="mx-tl-step-body">
+                <div class="mx-tl-step-name">Acquisition du bien</div>
+                <div class="mx-tl-step-date" id="tl-date-0">Année N</div>
+                <div class="mx-tl-step-detail">Signature acte notarié, obtention financement.</div>
+              </div>
+            </div>
+            <div class="mx-tl-step done" id="tl-step-1">
+              <div class="mx-tl-dot"></div>
+              <div class="mx-tl-step-body">
+                <div class="mx-tl-step-name">Permis de restauration</div>
+                <div class="mx-tl-step-date" id="tl-date-1">N + 3 mois</div>
+                <div class="mx-tl-step-detail">Dossier ABF (Architecte des Bâtiments de France), PSMV.</div>
+              </div>
+            </div>
+            <div class="mx-tl-step active" id="tl-step-2">
+              <div class="mx-tl-dot"></div>
+              <div class="mx-tl-step-body">
+                <div class="mx-tl-step-name">Chantier de restauration</div>
+                <div class="mx-tl-step-date" id="tl-date-2">N+1 → N+3</div>
+                <div class="mx-tl-step-detail" id="tl-detail-2">Travaux étalés sur la durée chantier, réduction IR par tranche.</div>
+              </div>
+            </div>
+            <div class="mx-tl-step" id="tl-step-3">
+              <div class="mx-tl-dot"></div>
+              <div class="mx-tl-step-body">
+                <div class="mx-tl-step-name">Livraison du bien</div>
+                <div class="mx-tl-step-date" id="tl-date-3">—</div>
+                <div class="mx-tl-step-detail">Réception des travaux, obtention des attestations fiscales.</div>
+              </div>
+            </div>
+            <div class="mx-tl-step" id="tl-step-4">
+              <div class="mx-tl-dot"></div>
+              <div class="mx-tl-step-body">
+                <div class="mx-tl-step-name">Mise en location nue</div>
+                <div class="mx-tl-step-date" id="tl-date-4">—</div>
+                <div class="mx-tl-step-detail">Engagement de location 9 ans obligatoire, loyer plafonné selon zone.</div>
+              </div>
+            </div>
+            <div class="mx-tl-step" id="tl-step-5">
+              <div class="mx-tl-dot"></div>
+              <div class="mx-tl-step-body">
+                <div class="mx-tl-step-name">Fin d'engagement (9 ans)</div>
+                <div class="mx-tl-step-date" id="tl-date-5">—</div>
+                <div class="mx-tl-step-detail">Liberté de disposer du bien — revente, transmission ou poursuite.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Analyse travaux -->
+        <div class="mx-travaux-card">
+          <div class="mx-travaux-card-title">Analyse des travaux</div>
+          <div class="mx-bar-row">
+            <div class="mx-bar-labels">
+              <span>Travaux nets (hors subventions)</span>
+              <span id="bar-trav-nets">—</span>
+            </div>
+            <div class="mx-bar-track"><div class="mx-bar-fill" id="bar-trav-nets-fill" style="width:0%"></div></div>
+          </div>
+          <div class="mx-bar-row">
+            <div class="mx-bar-labels">
+              <span>Travaux éligibles (plafond 400k€)</span>
+              <span id="bar-trav-elig">—</span>
+            </div>
+            <div class="mx-bar-track"><div class="mx-bar-fill" id="bar-trav-elig-fill" style="width:0%;background:linear-gradient(to right,var(--mx-sepia),var(--mx-sepia-mid))"></div></div>
+          </div>
+          <div class="mx-bar-row">
+            <div class="mx-bar-labels">
+              <span>Part sur coût total</span>
+              <span id="bar-trav-pct">—</span>
+            </div>
+            <div class="mx-bar-track"><div class="mx-bar-fill" id="bar-trav-pct-fill" style="width:0%"></div></div>
+          </div>
+        </div>
+
+        <div class="mx-grid-3">
+          <div class="mx-stat">
+            <div class="mx-stat-label">Coût acquisition</div>
+            <div class="mx-stat-val" id="trav-prix">—</div>
+          </div>
+          <div class="mx-stat">
+            <div class="mx-stat-label">Travaux bruts</div>
+            <div class="mx-stat-val" id="trav-bruts">—</div>
+          </div>
+          <div class="mx-stat positive">
+            <div class="mx-stat-label">Subventions</div>
+            <div class="mx-stat-val" id="trav-subv">—</div>
+          </div>
+          <div class="mx-stat sepia">
+            <div class="mx-stat-label">Réduction / 100 k€ travaux</div>
+            <div class="mx-stat-val" id="trav-per100">—</div>
+          </div>
+          <div class="mx-stat">
+            <div class="mx-stat-label">Coût net après fiscalité</div>
+            <div class="mx-stat-val" id="trav-cout-net">—</div>
+            <div class="mx-stat-note">Prix + travaux − réduction IR</div>
+          </div>
+          <div class="mx-stat">
+            <div class="mx-stat-label">Ratio travaux / acquisition</div>
+            <div class="mx-stat-val" id="trav-ratio">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 4 : Cash-flow & valorisation -->
+      <div class="mx-tab-content" id="tab-cashflow">
+        <div class="mx-sect-head">
+          <div class="mx-sect-icon">💰</div>
+          <div>
+            <div class="mx-sect-title">Cash-flow &amp; valorisation patrimoniale</div>
+            <div class="mx-sect-sub">Rentabilité nette et projection de valeur à l'horizon choisi</div>
+          </div>
+        </div>
+
+        <div class="mx-grid-3" style="margin-bottom:16px;">
+          <div class="mx-stat">
+            <div class="mx-stat-label">Loyers nets annuels</div>
+            <div class="mx-stat-val" id="cf-loyers-nets">—</div>
+          </div>
+          <div class="mx-stat">
+            <div class="mx-stat-label">Mensualité crédit</div>
+            <div class="mx-stat-val" id="cf-mensualite">—</div>
+          </div>
+          <div class="mx-stat">
+            <div class="mx-stat-label">Effort mensuel brut</div>
+            <div class="mx-stat-val" id="cf-effort-brut">—</div>
+          </div>
+          <div class="mx-stat sepia">
+            <div class="mx-stat-label">Économie IR / mois (chantier)</div>
+            <div class="mx-stat-val" id="cf-eco-mensuel">—</div>
+          </div>
+          <div class="mx-stat positive">
+            <div class="mx-stat-label">Effort réel / mois</div>
+            <div class="mx-stat-val" id="cf-effort-reel">—</div>
+          </div>
+          <div class="mx-stat">
+            <div class="mx-stat-label">Rendement brut</div>
+            <div class="mx-stat-val" id="cf-rend-brut">—</div>
+          </div>
+        </div>
+
+        <div class="mx-chart-wrap">
+          <div class="mx-chart-title">Évolution de la valeur patrimoniale sur l'horizon</div>
+          <canvas id="chart-valorisation" height="160"></canvas>
+        </div>
+
+        <div class="mx-grid-2" style="margin-top:12px;">
+          <div class="mx-stat">
+            <div class="mx-stat-label">Valeur estimée à l'horizon</div>
+            <div class="mx-stat-val" id="cf-valo-fin">—</div>
+            <div class="mx-stat-note" id="cf-valo-horizon">À — ans</div>
+          </div>
+          <div class="mx-stat positive">
+            <div class="mx-stat-label">Plus-value latente brute</div>
+            <div class="mx-stat-val" id="cf-pv">—</div>
+            <div class="mx-stat-note">Avant abattements pour durée</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 5 : Comparaison -->
+      <div class="mx-tab-content" id="tab-comparaison">
+        <div class="mx-sect-head">
+          <div class="mx-sect-icon">⚖️</div>
+          <div>
+            <div class="mx-sect-title">Comparaison patrimoniale</div>
+            <div class="mx-sect-sub">Malraux vs Déficit Foncier vs LMNP vs Pinel vs SCI IS</div>
+          </div>
+        </div>
+
+        <div class="mx-note">
+          Comparaison sur la base de vos paramètres actuels. Les données LMNP, Pinel et SCI IS sont des estimations indicatives.
+        </div>
+
+        <div style="overflow-x:auto;">
+          <table class="mx-comp-table">
+            <thead>
+              <tr>
+                <th>Critère</th>
+                <th class="highlight">Malraux</th>
+                <th>Déficit Foncier</th>
+                <th>LMNP</th>
+                <th>Pinel</th>
+                <th>SCI IS</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="metric">Type d'avantage</td>
+                <td class="highlight">Réduction IR directe</td>
+                <td>Déduction revenu</td>
+                <td>Amortissement</td>
+                <td>Réduction IR</td>
+                <td>IS 15% / 25%</td>
+              </tr>
+              <tr>
+                <td class="metric">Plafond niches fiscales</td>
+                <td class="highlight">Non soumis</td>
+                <td>Soumis partiel</td>
+                <td>Non concerné</td>
+                <td>Soumis (10k€)</td>
+                <td>Non concerné</td>
+              </tr>
+              <tr>
+                <td class="metric">Avantage fiscal total</td>
+                <td class="highlight" id="comp-avantage-mx">—</td>
+                <td id="comp-avantage-df">—</td>
+                <td id="comp-avantage-lmnp">—</td>
+                <td id="comp-avantage-pinel">—</td>
+                <td id="comp-avantage-sci">—</td>
+              </tr>
+              <tr>
+                <td class="metric">Rendement brut</td>
+                <td class="highlight" id="comp-rend-mx">—</td>
+                <td id="comp-rend-df">—</td>
+                <td id="comp-rend-lmnp">—</td>
+                <td id="comp-rend-pinel">—</td>
+                <td id="comp-rend-sci">—</td>
+              </tr>
+              <tr>
+                <td class="metric">Engagement</td>
+                <td class="highlight">9 ans location nue</td>
+                <td>Aucun</td>
+                <td>Flexible</td>
+                <td>6/9/12 ans</td>
+                <td>Aucun</td>
+              </tr>
+              <tr>
+                <td class="metric">Valorisation patrimoniale</td>
+                <td class="highlight">Très forte (historique)</td>
+                <td>Forte (rénové)</td>
+                <td>Variable</td>
+                <td>Faible (neuf)</td>
+                <td>Variable</td>
+              </tr>
+              <tr>
+                <td class="metric">Effort mensuel estimé</td>
+                <td class="highlight" id="comp-effort-mx">—</td>
+                <td id="comp-effort-df">—</td>
+                <td id="comp-effort-lmnp">—</td>
+                <td id="comp-effort-pinel">—</td>
+                <td id="comp-effort-sci">—</td>
+              </tr>
+              <tr>
+                <td class="metric">Complexité</td>
+                <td class="highlight">Élevée (ABF, PSMV)</td>
+                <td>Modérée</td>
+                <td>Modérée</td>
+                <td>Faible</td>
+                <td>Élevée (compta)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="mx-chart-wrap" style="margin-top:16px;">
+          <div class="mx-chart-title">Avantage fiscal comparé (estimation indicative)</div>
+          <canvas id="chart-comparaison" height="180"></canvas>
+        </div>
+      </div>
+
+      <!-- TAB 6 : Pédagogie -->
+      <div class="mx-tab-content" id="tab-pedagogie">
+        <div class="mx-sect-head">
+          <div class="mx-sect-icon">📚</div>
+          <div>
+            <div class="mx-sect-title">Comprendre la Loi Malraux</div>
+            <div class="mx-sect-sub">Mécanismes, conditions et points de vigilance</div>
+          </div>
+        </div>
+
+        <div class="mx-peda-card">
+          <div class="mx-peda-q">Qu'est-ce que la Loi Malraux ?</div>
+          <div class="mx-peda-a">La Loi Malraux (1962) permet une <strong>réduction directe d'impôt sur le revenu</strong> pour les travaux de restauration complète de biens situés dans des secteurs patrimoniaux protégés. Contrairement au Déficit Foncier, l'avantage est une <strong>réduction</strong> (non une déduction), et n'est pas soumis au plafond des niches fiscales de 10 000 €.</div>
+        </div>
+
+        <div class="mx-peda-card">
+          <div class="mx-peda-q">SPR vs autre secteur protégé — quelle différence ?</div>
+          <div class="mx-peda-a">En <strong>Secteur Patrimonial Remarquable (SPR)</strong> avec PSMV (Plan de Sauvegarde et de Mise en Valeur), le taux est de <strong>30%</strong>. Pour les autres secteurs protégés (sans PSMV ou SPR avec PVAP seulement), le taux est de <strong>22%</strong>. La distinction se fait sur la nature du document d'urbanisme applicable.</div>
+        </div>
+
+        <div class="mx-peda-card">
+          <div class="mx-peda-q">Comment s'impute la réduction sur l'IR ?</div>
+          <div class="mx-peda-a">La réduction est étalée sur la durée du chantier (<strong>1 à 4 ans</strong>). Elle s'impute sur l'IR calculé l'année de déduction des travaux. Si la réduction dépasse l'IR dû, l'excédent est perdu (aucun report possible). Il est donc crucial que votre IR annuel soit suffisant pour absorber la réduction.</div>
+        </div>
+
+        <div class="mx-peda-card">
+          <div class="mx-peda-q">Quel est le plafond des travaux éligibles ?</div>
+          <div class="mx-peda-a">Le plafond est de <strong>400 000 € sur 4 années consécutives</strong>. Au-delà, les travaux ne génèrent plus de réduction. Ce plafond se cumule sur 4 ans, quel que soit le nombre d'opérations Malraux sur la période.</div>
+        </div>
+
+        <div class="mx-peda-card">
+          <div class="mx-peda-q">Quelles sont les obligations du propriétaire ?</div>
+          <div class="mx-peda-a"><strong>1. Restauration complète :</strong> les travaux doivent porter sur l'immeuble entier (pas une simple rénovation partielle). <strong>2. Autorisation spéciale ABF :</strong> accord de l'Architecte des Bâtiments de France obligatoire. <strong>3. Location nue pendant 9 ans</strong> : le bien doit être loué nu (non meublé) comme résidence principale du locataire. <strong>4. Loyers plafonnés</strong> selon la zone géographique.</div>
+        </div>
+
+        <div class="mx-peda-card">
+          <div class="mx-peda-q">Malraux vs Déficit Foncier : quand choisir lequel ?</div>
+          <div class="mx-peda-a">Choisissez <strong>Malraux</strong> si vos travaux dépassent 100 000 €, votre TMI est ≥ 41%, le bien est en secteur protégé identifié, et vous cherchez un avantage fiscal puissant hors niches. Choisissez <strong>Déficit Foncier</strong> si vos travaux sont inférieurs, le bien n'est pas en secteur Malraux, ou votre IR est insuffisant pour absorber une grande réduction.</div>
+        </div>
+
+        <div class="mx-note">
+          <strong>Avertissement :</strong> Ce simulateur est fourni à titre indicatif. La Loi Malraux comporte des conditions précises et une architecture juridique complexe. Consultez un conseiller en gestion de patrimoine et un avocat fiscaliste avant toute décision d'investissement.
+        </div>
+      </div>
+    </div>
+
+    <div class="mx-disclaimer">
+      Simulation indicative — PATRIMONIA.AI — Les calculs sont des estimations et ne constituent pas un conseil en investissement.
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ── Constants ── */
+  const PLAFOND_TRAVAUX = 400000;
+  const TAUX_SPR  = 0.30;
+  const TAUX_AUTRE = 0.22;
+  const PS_MX = 0.172;
+  const YEAR_NOW = 2026;
+
+  /* ── Helpers ── */
+  const $ = id => document.getElementById(id);
+  const setText = (id, v) => { const el = $(id); if (el) el.textContent = v; };
+  const eur  = v => SP.fmtEur(v);
+  const pct  = v => SP.fmtNum(v, 1) + ' %';
+  const num  = v => SP.fmtNum(v, 0);
+
+  function calcMensualite(capital, tauxPct, duree) {
+    if (capital <= 0 || duree <= 0) return 0;
+    if (tauxPct <= 0) return capital / (duree * 12);
+    const r = tauxPct / 100 / 12;
+    const n = duree * 12;
+    return capital * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1);
+  }
+
+  /* ── Read inputs ── */
+  function readInp() {
+    const g = id => SP.parseNum($$(id).value);
+    const $$ = id => $(id);
+    return {
+      secteur:      $$('mx-secteur').value,
+      prix:         SP.parseNum($$('mx-prix').value),
+      travaux:      SP.parseNum($$('mx-travaux').value),
+      subventions:  SP.parseNum($$('mx-subventions').value),
+      dureeTravaux: +$$('mx-duree-trav').value,
+      apport:       SP.parseNum($$('mx-apport').value),
+      tauxCredit:   +$$('mx-taux').value,
+      dureeCredit:  +$$('mx-duree-credit').value,
+      loyers:       SP.parseNum($$('mx-loyers').value),
+      vacance:      +$$('mx-vacance').value,
+      charges:      SP.parseNum($$('mx-charges').value),
+      tf:           SP.parseNum($$('mx-tf').value),
+      tmi:          +$$('mx-tmi').value,
+      horizon:      +$$('mx-horizon').value,
+      revalo:       +$$('mx-revalo').value,
+    };
+  }
+
+  /* ── Core calc ── */
+  function calcBase(p) {
+    const taux = p.secteur === 'spr' ? TAUX_SPR : TAUX_AUTRE;
+    const travauxNets     = Math.max(0, p.travaux - Math.min(p.subventions, p.travaux));
+    const travauxEligibles= Math.min(travauxNets, PLAFOND_TRAVAUX);
+    const reductionTotale = travauxEligibles * taux;
+    const ansTravaux      = Math.min(Math.max(p.dureeTravaux, 1), 4);
+    const reductionParAn  = reductionTotale / ansTravaux;
+
+    const emprunt   = Math.max(0, p.prix + p.travaux - p.apport);
+    const mensualite= calcMensualite(emprunt, p.tauxCredit, p.dureeCredit);
+    const coutTotal = p.prix + p.travaux;
+
+    const loyersNets  = p.loyers * (1 - p.vacance / 100);
+    const interetsAn1 = emprunt * p.tauxCredit / 100;
+    const rfNet       = loyersNets - p.charges - p.tf - interetsAn1;
+    const irFoncier   = Math.max(0, rfNet) * (p.tmi / 100 + PS_MX);
+
+    const cfSansRed    = loyersNets - p.charges - p.tf - interetsAn1 - irFoncier;
+    const effortBrut   = mensualite - (loyersNets - p.charges - p.tf - interetsAn1 + irFoncier) / 12;
+    const effortReel   = effortBrut - reductionParAn / 12;
+
+    const rendBrut   = coutTotal > 0 ? (loyersNets / coutTotal) * 100 : 0;
+    const rendNet    = coutTotal > 0 ? ((loyersNets - p.charges - p.tf) / coutTotal) * 100 : 0;
+    const rendNetNet = coutTotal > 0 ? ((loyersNets - p.charges - p.tf - irFoncier) / coutTotal) * 100 : 0;
+
+    // Valorisation
+    const valoFin = coutTotal * Math.pow(1 + p.revalo / 100, p.horizon);
+    const pvBrute = valoFin - coutTotal;
+
+    // IR estimé du foyer (approx simple)
+    const irEstime = (p.tmi / 100) * 80000; // heuristique
+    const irResteApres = Math.max(0, irEstime - reductionParAn);
+
+    return {
+      taux, travauxNets, travauxEligibles, reductionTotale, ansTravaux, reductionParAn,
+      emprunt, mensualite, coutTotal, interetsAn1, loyersNets, rfNet, irFoncier,
+      cfSansRed, effortBrut, effortReel, rendBrut, rendNet, rendNetNet,
+      valoFin, pvBrute, irResteApres, irEstime,
+    };
+  }
+
+  /* ── Sync sliders ── */
+  function syncSlider(el) {
+    const min = +el.min || 0, max = +el.max || 100, val = +el.value;
+    const p = max > min ? ((val - min) / (max - min)) * 100 : 0;
+    el.style.setProperty('--pct', p.toFixed(2) + '%');
+  }
+
+  /* ── Canvas helpers ── */
+  function setupCV(id) {
+    const c = $(id); if (!c) return null;
+    const w = c.offsetWidth; if (!w) return null;
+    const r = window.devicePixelRatio || 1;
+    const h = c.height || 180;
+    c.width  = w * r;
+    c.height = h * r;
+    c.style.height = h + 'px';
+    const ctx = c.getContext('2d');
+    ctx.scale(r, r);
+    ctx.clearRect(0, 0, w, h);
+    return { ctx, w, h };
+  }
+
+  function drawBarChart(id, labels, datasets, opts = {}) {
+    const cv = setupCV(id); if (!cv) return;
+    const { ctx, w, h } = cv;
+    const PAD = { top: 20, right: 16, bottom: 36, left: 56 };
+    const chartW = w - PAD.left - PAD.right;
+    const chartH = h - PAD.top - PAD.bottom;
+    const n = labels.length;
+    const allVals = datasets.flatMap(d => d.data);
+    const maxV  = Math.max(...allVals, 1);
+    const minV  = Math.min(...allVals, 0);
+    const range = maxV - minV || 1;
+
+    // Grid
+    ctx.strokeStyle = 'rgba(0,0,0,.07)'; ctx.lineWidth = 1;
+    for (let i = 0; i <= 4; i++) {
+      const y = PAD.top + chartH - (i / 4) * chartH;
+      ctx.beginPath(); ctx.moveTo(PAD.left, y); ctx.lineTo(PAD.left + chartW, y); ctx.stroke();
+      const v = minV + (i / 4) * range;
+      ctx.fillStyle = '#9B8B6E'; ctx.font = '10px Inter'; ctx.textAlign = 'right';
+      ctx.fillText(opts.fmtY ? opts.fmtY(v) : Math.round(v), PAD.left - 4, y + 4);
+    }
+
+    const bw = (chartW / n) * 0.6;
+    const gap = (chartW / n) * 0.4;
+    datasets.forEach((ds, di) => {
+      ds.data.forEach((val, i) => {
+        const barH = Math.abs(val - minV) / range * chartH;
+        const x = PAD.left + (i / n) * chartW + gap / 2 + di * (bw / datasets.length);
+        const y = PAD.top + chartH - (Math.max(val, minV) - minV) / range * chartH;
+        ctx.fillStyle = ds.color || '#6B4B2A';
+        ctx.beginPath();
+        ctx.roundRect ? ctx.roundRect(x, y, bw / datasets.length, barH, [3, 3, 0, 0])
+                      : ctx.rect(x, y, bw / datasets.length, barH);
+        ctx.fill();
+      });
+    });
+
+    // Labels
+    ctx.fillStyle = '#6B6458'; ctx.font = '10px Inter'; ctx.textAlign = 'center';
+    labels.forEach((lbl, i) => {
+      const x = PAD.left + (i + 0.5) / n * chartW;
+      ctx.fillText(lbl, x, h - PAD.bottom + 16);
+    });
+  }
+
+  function drawLineChart(id, labels, datasets, opts = {}) {
+    const cv = setupCV(id); if (!cv) return;
+    const { ctx, w, h } = cv;
+    const PAD = { top: 20, right: 16, bottom: 36, left: 66 };
+    const chartW = w - PAD.left - PAD.right;
+    const chartH = h - PAD.top - PAD.bottom;
+    const allVals = datasets.flatMap(d => d.data);
+    const maxV = Math.max(...allVals, 1);
+    const minV = Math.min(...allVals, 0);
+    const range = maxV - minV || 1;
+
+    ctx.strokeStyle = 'rgba(0,0,0,.07)'; ctx.lineWidth = 1;
+    for (let i = 0; i <= 4; i++) {
+      const y = PAD.top + chartH - (i / 4) * chartH;
+      ctx.beginPath(); ctx.moveTo(PAD.left, y); ctx.lineTo(PAD.left + chartW, y); ctx.stroke();
+      const v = minV + (i / 4) * range;
+      ctx.fillStyle = '#9B8B6E'; ctx.font = '10px Inter'; ctx.textAlign = 'right';
+      ctx.fillText(opts.fmtY ? opts.fmtY(v) : Math.round(v), PAD.left - 4, y + 4);
+    }
+
+    datasets.forEach(ds => {
+      ctx.beginPath(); ctx.strokeStyle = ds.color || '#1E3B2C';
+      ctx.lineWidth = 2.5; ctx.lineJoin = 'round';
+      ds.data.forEach((val, i) => {
+        const x = PAD.left + (i / (labels.length - 1)) * chartW;
+        const y = PAD.top + chartH - (val - minV) / range * chartH;
+        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+    });
+
+    ctx.fillStyle = '#6B6458'; ctx.font = '10px Inter'; ctx.textAlign = 'center';
+    const step = Math.max(1, Math.floor(labels.length / 6));
+    labels.forEach((lbl, i) => {
+      if (i % step !== 0 && i !== labels.length - 1) return;
+      const x = PAD.left + (i / (labels.length - 1)) * chartW;
+      ctx.fillText(lbl, x, h - PAD.bottom + 16);
+    });
+  }
+
+  function drawDonut(id, labels, values, colors) {
+    const cv = setupCV(id); if (!cv) return;
+    const { ctx, w, h } = cv;
+    const cx = w / 2, cy = h / 2 - 10;
+    const r = Math.min(w, h - 20) / 2 - 12;
+    const total = values.reduce((a, b) => a + b, 0) || 1;
+    let angle = -Math.PI / 2;
+    values.forEach((v, i) => {
+      const slice = (v / total) * Math.PI * 2;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.arc(cx, cy, r, angle, angle + slice);
+      ctx.closePath();
+      ctx.fillStyle = colors[i];
+      ctx.fill();
+      angle += slice;
+    });
+    ctx.beginPath();
+    ctx.arc(cx, cy, r * 0.55, 0, Math.PI * 2);
+    ctx.fillStyle = '#F7F4EE'; ctx.fill();
+    // Legend
+    const lgy = h - 16;
+    const lx = w / 2 - (labels.length * 90) / 2;
+    labels.forEach((lbl, i) => {
+      ctx.fillStyle = colors[i];
+      ctx.fillRect(lx + i * 90, lgy - 8, 10, 10);
+      ctx.fillStyle = '#6B6458'; ctx.font = '9px Inter'; ctx.textAlign = 'left';
+      ctx.fillText(lbl, lx + i * 90 + 14, lgy);
+    });
+  }
+
+  /* ── Render functions ── */
+  function renderKPIs(p, res) {
+    setText('kpi-reduction', eur(res.reductionTotale));
+    setText('kpi-taux-lab', (res.taux * 100).toFixed(0) + '% ' + (p.secteur === 'spr' ? 'SPR' : 'Autre'));
+    setText('kpi-effort', eur(Math.abs(res.effortReel)) + '/mois');
+    setText('kpi-rend', pct(res.rendBrut));
+    setText('kpi-rend-net-sub', 'Net–net : ' + pct(res.rendNetNet));
+    setText('kpi-eco-an', eur(res.reductionParAn));
+    setText('kpi-duree-trav-sub', 'Sur ' + res.ansTravaux + ' an' + (res.ansTravaux > 1 ? 's' : ''));
+    setText('kpi-valo', eur(res.valoFin));
+    setText('kpi-horizon-sub', 'À ' + p.horizon + ' ans (' + pct(p.revalo) + '/an)');
+    setText('kpi-cout-total', eur(res.coutTotal));
+  }
+
+  function renderProjet(p, res) {
+    // Proj summary
+    setText('proj-total', eur(res.coutTotal));
+    setText('proj-travaux', eur(res.travauxEligibles));
+    setText('proj-reduction', eur(res.reductionTotale));
+    const efTxt = res.effortReel >= 0 ? eur(res.effortReel) : '+' + eur(-res.effortReel);
+    setText('proj-effort', efTxt);
+
+    // Avant/Après
+    const irAvant = Math.max(0, res.rfNet) * (p.tmi / 100 + PS_MX);
+    const cfAvant = res.cfSansRed;
+    setText('avap-rf-avant', res.rfNet >= 0 ? eur(res.rfNet) : '−' + eur(-res.rfNet));
+    setText('avap-ir-avant', eur(irAvant));
+    const cfAvSgn = cfAvant >= 0 ? '+' : '−';
+    setText('avap-cf-avant', cfAvSgn + eur(Math.abs(cfAvant)) + '/an');
+
+    const irApres = Math.max(0, res.irFoncier - res.reductionParAn);
+    const cfApres = cfAvant + res.reductionParAn;
+    setText('avap-rf-apres', res.rfNet >= 0 ? eur(res.rfNet) : '−' + eur(-res.rfNet));
+    setText('avap-ir-apres', eur(Math.max(0, irApres)));
+    const cfApSgn = cfApres >= 0 ? '+' : '−';
+    setText('avap-cf-apres', cfApSgn + eur(Math.abs(cfApres)) + '/an');
+    setText('avap-eco', eur(res.reductionTotale));
+  }
+
+  function renderReduction(p, res) {
+    setText('red-taux', (res.taux * 100).toFixed(0) + '%');
+    setText('red-taux-note', p.secteur === 'spr' ? 'Secteur Patrimonial Remarquable' : 'Autre secteur protégé');
+    setText('red-trav-elig', eur(res.travauxEligibles));
+    const plafondNote = res.travauxNets > PLAFOND_TRAVAUX
+      ? 'Plafonné à 400 000 €'
+      : 'Intégralement éligibles';
+    setText('red-plafond-note', plafondNote);
+    setText('red-total', eur(res.reductionTotale));
+    setText('red-par-an', eur(res.reductionParAn) + ' / an × ' + res.ansTravaux + ' an' + (res.ansTravaux > 1 ? 's' : ''));
+    setText('red-eco-an', eur(res.reductionParAn));
+    setText('red-effort-trav', eur(Math.abs(res.effortReel)) + '/mois');
+    setText('red-ir-reste', eur(Math.max(0, res.irResteApres)));
+    const resteP = Math.max(0, PLAFOND_TRAVAUX - res.travauxEligibles);
+    setText('red-plafond-reste', eur(resteP));
+  }
+
+  function renderTravaux(p, res) {
+    // Timeline
+    const n = YEAR_NOW;
+    const fin_chantier = n + Math.ceil(p.dureeTravaux);
+    setText('tl-date-0', 'Année ' + n);
+    setText('tl-date-1', 'N + 3 mois');
+    setText('tl-date-2', n + ' → ' + fin_chantier);
+    setText('tl-detail-2', 'Travaux étalés sur ' + p.dureeTravaux + ' an' + (p.dureeTravaux > 1 ? 's' : '') + ', réduction IR ' + eur(res.reductionParAn) + '/an.');
+    setText('tl-date-3', fin_chantier);
+    setText('tl-date-4', fin_chantier + ' → ' + (fin_chantier + 9));
+    setText('tl-date-5', fin_chantier + 9);
+
+    // Bars
+    const maxTrav = Math.max(p.travaux, 1);
+    setText('bar-trav-nets', eur(res.travauxNets));
+    const fillNets = Math.min(100, (res.travauxNets / maxTrav) * 100);
+    $('bar-trav-nets-fill').style.width = fillNets + '%';
+
+    setText('bar-trav-elig', eur(res.travauxEligibles));
+    const fillElig = Math.min(100, (res.travauxEligibles / maxTrav) * 100);
+    $('bar-trav-elig-fill').style.width = fillElig + '%';
+
+    const pctTrav = res.coutTotal > 0 ? (res.travauxEligibles / res.coutTotal) * 100 : 0;
+    setText('bar-trav-pct', pct(pctTrav));
+    $('bar-trav-pct-fill').style.width = Math.min(100, pctTrav) + '%';
+
+    // Stats
+    setText('trav-prix', eur(p.prix));
+    setText('trav-bruts', eur(p.travaux));
+    setText('trav-subv', eur(p.subventions));
+    const per100 = res.travauxEligibles > 0 ? res.reductionTotale / (res.travauxEligibles / 100000) : 0;
+    setText('trav-per100', eur(per100));
+    setText('trav-cout-net', eur(res.coutTotal - res.reductionTotale));
+    const ratio = p.prix > 0 ? (p.travaux / p.prix * 100).toFixed(0) + '%' : '—';
+    setText('trav-ratio', ratio);
+  }
+
+  function renderCashflow(p, res) {
+    setText('cf-loyers-nets', eur(res.loyersNets) + '/an');
+    setText('cf-mensualite', eur(res.mensualite) + '/mois');
+    setText('cf-effort-brut', eur(res.effortBrut) + '/mois');
+    setText('cf-eco-mensuel', eur(res.reductionParAn / 12) + '/mois');
+    setText('cf-effort-reel', eur(Math.abs(res.effortReel)) + '/mois');
+    setText('cf-rend-brut', pct(res.rendBrut));
+    setText('cf-valo-fin', eur(res.valoFin));
+    setText('cf-valo-horizon', 'À ' + p.horizon + ' ans');
+    setText('cf-pv', eur(res.pvBrute));
+  }
+
+  function renderComparaison(p, res) {
+    const avantMx = res.reductionTotale;
+    const avantDf = p.travaux * (p.tmi / 100) * 0.6;
+    const avantLmnp = res.coutTotal * 0.04;
+    const avantPinel = res.coutTotal * 0.02;
+    const avantSci = res.coutTotal * 0.015;
+
+    setText('comp-avantage-mx', eur(avantMx));
+    setText('comp-avantage-df', eur(avantDf));
+    setText('comp-avantage-lmnp', eur(avantLmnp) + '/an');
+    setText('comp-avantage-pinel', eur(avantPinel) + '/an');
+    setText('comp-avantage-sci', eur(avantSci) + '/an');
+
+    setText('comp-rend-mx', pct(res.rendBrut));
+    setText('comp-rend-df', pct(res.rendBrut * 0.9));
+    setText('comp-rend-lmnp', pct(res.rendBrut * 1.1));
+    setText('comp-rend-pinel', pct(res.rendBrut * 0.75));
+    setText('comp-rend-sci', pct(res.rendBrut * 0.95));
+
+    setText('comp-effort-mx', eur(Math.abs(res.effortReel)) + '/m');
+    setText('comp-effort-df', eur(Math.abs(res.effortBrut) * 0.85) + '/m');
+    setText('comp-effort-lmnp', eur(Math.abs(res.effortBrut) * 0.9) + '/m');
+    setText('comp-effort-pinel', eur(Math.abs(res.effortBrut) * 0.95) + '/m');
+    setText('comp-effort-sci', eur(Math.abs(res.effortBrut) * 0.92) + '/m');
+  }
+
+  /* ── Charts ── */
+  function drawCharts(p, res) {
+    // Donut repartition
+    drawDonut('chart-repartition',
+      ['Acquisition', 'Travaux', 'Réduction IR'],
+      [p.prix, p.travaux, -res.reductionTotale < 0 ? 0 : res.reductionTotale],
+      ['#1E3B2C', '#6B4B2A', '#9B8B6E']
+    );
+
+    // CF projection (years after delivery)
+    const ys = [], cfs = [];
+    for (let y = 1; y <= Math.min(p.horizon, 20); y++) {
+      ys.push('Y' + y);
+      const cf = (res.loyersNets * Math.pow(1.015, y) - p.charges - p.tf - res.mensualite * 12 - res.irFoncier * 0.8);
+      cfs.push(cf / 12);
+    }
+    drawBarChart('chart-cf-proj', ys,
+      [{ data: cfs, color: '#2C5440' }],
+      { fmtY: v => (v >= 0 ? '+' : '') + Math.round(v / 100) * 100 }
+    );
+
+    // Reduction by year
+    const years = Array.from({ length: res.ansTravaux }, (_, i) => 'An ' + (i + 1));
+    drawBarChart('chart-reduction-years', years,
+      [{ data: Array(res.ansTravaux).fill(res.reductionParAn), color: '#6B4B2A' }],
+      { fmtY: v => (v / 1000).toFixed(0) + 'k' }
+    );
+
+    // Valorisation
+    const vYears = [], vVals = [];
+    for (let y = 0; y <= Math.min(p.horizon, 20); y++) {
+      vYears.push(y === 0 ? 'Achat' : 'Y' + y);
+      vVals.push(res.coutTotal * Math.pow(1 + p.revalo / 100, y));
+    }
+    drawLineChart('chart-valorisation', vYears,
+      [{ data: vVals, color: '#1E3B2C' }],
+      { fmtY: v => (v / 1000).toFixed(0) + 'k' }
+    );
+
+    // Comparison bar
+    const avantMx  = res.reductionTotale;
+    const avantDf   = p.travaux * (p.tmi / 100) * 0.6;
+    const avantLmnp = res.coutTotal * 0.04;
+    const avantPinel= res.coutTotal * 0.02;
+    drawBarChart('chart-comparaison',
+      ['Malraux', 'Déficit Foncier', 'LMNP', 'Pinel'],
+      [{ data: [avantMx, avantDf, avantLmnp, avantPinel],
+         color: '#6B4B2A' }],
+      { fmtY: v => (v / 1000).toFixed(0) + 'k' }
+    );
+  }
+
+  /* ── Master update ── */
+  function update() {
+    const p   = readInp();
+    const res = calcBase(p);
+    renderKPIs(p, res);
+    renderProjet(p, res);
+    renderReduction(p, res);
+    renderTravaux(p, res);
+    renderCashflow(p, res);
+    renderComparaison(p, res);
+    drawCharts(p, res);
+  }
+
+  /* ── Init ── */
+  document.addEventListener('DOMContentLoaded', function () {
+    SP.nav.init();
+    SP.initFmt();
+
+    // Tabs
+    document.querySelectorAll('.mx-tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.mx-tab').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.mx-tab-content').forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+        const tab = btn.dataset.tab;
+        $('tab-' + tab).classList.add('active');
+        // Redraw charts on tab switch
+        const p = readInp(), res = calcBase(p);
+        drawCharts(p, res);
+      });
+    });
+
+    // Slider display labels
+    const sliders = [
+      { el: 'mx-duree-trav',    out: 'mx-duree-trav-val',    fmt: v => v },
+      { el: 'mx-taux',          out: 'mx-taux-val',           fmt: v => (+v).toFixed(1) },
+      { el: 'mx-duree-credit',  out: 'mx-duree-credit-val',   fmt: v => v },
+      { el: 'mx-vacance',       out: 'mx-vacance-val',         fmt: v => v },
+      { el: 'mx-tmi',           out: 'mx-tmi-val',             fmt: v => v },
+      { el: 'mx-horizon',       out: 'mx-horizon-val',         fmt: v => v },
+      { el: 'mx-revalo',        out: 'mx-revalo-val',          fmt: v => (+v).toFixed(1) },
+    ];
+    sliders.forEach(({ el, out, fmt }) => {
+      const elem = $(el);
+      if (!elem) return;
+      syncSlider(elem);
+      elem.addEventListener('input', () => {
+        setText(out, fmt(elem.value));
+        syncSlider(elem);
+        update();
+      });
+    });
+
+    // Number inputs
+    document.querySelectorAll('.mx-inp:not([type=range])').forEach(inp => {
+      inp.addEventListener('input', update);
+      inp.addEventListener('change', update);
+    });
+
+    update();
+  });
+})();
+</script>
+</body>
+</html>

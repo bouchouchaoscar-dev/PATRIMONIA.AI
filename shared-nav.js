@@ -114,7 +114,11 @@
     { id: 'df',           num: 18, label: 'Déficit Foncier',                  href: 'simulator-18.html',
       cats: ['fiscalite', 'immobilier'],
       desc: 'Mécanique fiscale complète : travaux déductibles, imputation RG 10 700 €, report 10 ans, cash-flow réel et comparaison stratégies.',
-      keywords: ['deficit', 'foncier', 'travaux', 'deductible', 'imputation', 'report', 'tmi', 'revenus fonciers', 'renovation', 'immobilier', 'optimisation'],
+      keywords: ['deficit', 'foncier', 'travaux', 'deductible', 'imputation', 'report', 'tmi', 'revenus fonciers', 'renovation', 'immobilier', 'optimisation'] },
+    { id: 'mx',           num: 19, label: 'Loi Malraux',                      href: 'simulator-19.html',
+      cats: ['fiscalite', 'immobilier'],
+      desc: 'Réduction IR Malraux (SPR 30% / 22%), plafond 400 000 €, hors niches fiscales, restauration patrimoniale et valorisation long terme.',
+      keywords: ['malraux', 'reduction', 'ir', 'spr', 'restauration', 'patrimoine', 'historique', 'travaux', 'secteur', 'engagement', 'niches', 'fiscal'],
       isNew: true }
   ];
 
