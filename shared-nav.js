@@ -118,7 +118,11 @@
     { id: 'mx',           num: 19, label: 'Loi Malraux',                      href: 'simulator-19.html',
       cats: ['fiscalite', 'immobilier'],
       desc: 'Réduction IR Malraux (SPR 30% / 22%), plafond 400 000 €, hors niches fiscales, restauration patrimoniale et valorisation long terme.',
-      keywords: ['malraux', 'reduction', 'ir', 'spr', 'restauration', 'patrimoine', 'historique', 'travaux', 'secteur', 'engagement', 'niches', 'fiscal'],
+      keywords: ['malraux', 'reduction', 'ir', 'spr', 'restauration', 'patrimoine', 'historique', 'travaux', 'secteur', 'engagement', 'niches', 'fiscal'] },
+    { id: 'mh',           num: 20, label: 'Monument Historique',               href: 'simulator-20.html',
+      cats: ['fiscalite', 'immobilier', 'transmission'],
+      desc: 'Déficit imputable sans plafond sur le revenu global, conservation 15 ans, exonération succession — simulation complète du régime Monument Historique.',
+      keywords: ['monument', 'historique', 'mh', 'ismh', 'classe', 'inscrit', 'drac', 'deficit', 'deduction', 'revenu global', 'conservation', 'succession', 'exoneration', 'travaux', 'tmi', 'acmh'],
       isNew: true }
   ];
 

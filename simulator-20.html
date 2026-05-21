@@ -1,0 +1,1557 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="favicon-64.png">
+  <link rel="shortcut icon" href="favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="favicon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Monument Historique | Patrimonia.ai</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css?v=19">
+<script src="shared.js?v=2"></script>
+<script src="shared-nav.js?v=10"></script>
+<style>
+/* ═══════════════════════════════════════════════════
+   MONUMENT HISTORIQUE · PATRIMONIA.AI
+   Préfixe CSS : .mh-
+   Personnalité : patrimoine classé · déficit sans plafond · transmission d'exception
+   Accent principal : --amber (B8860B) — bronze patrimonial (token plateforme)
+   Accent secondaire : --slate — ardoise préstige (transmission)
+═══════════════════════════════════════════════════ */
+
+/* ── LAYOUT ── */
+.mh-layout { display:grid; grid-template-columns:360px 1fr; min-height:640px }
+@media(max-width:960px){ .mh-layout { grid-template-columns:1fr } }
+
+.mh-inp {
+  padding:1.6rem 1.4rem 2rem;
+  background:var(--surface-2);
+  border-right:1px solid var(--border-subtle);
+  overflow-y:auto; max-height:900px;
+}
+@media(max-width:960px){ .mh-inp { border-right:none; border-bottom:1px solid var(--border-subtle); max-height:none } }
+
+.mh-main { background:var(--surface); display:flex; flex-direction:column; min-width:0 }
+
+/* ── HERO PROPS ── */
+.mh-hero-props {
+  display:grid; grid-template-columns:repeat(4,1fr); gap:.8rem;
+  margin:1.2rem 0 1.6rem;
+}
+@media(max-width:900px){ .mh-hero-props { grid-template-columns:repeat(2,1fr) } }
+
+.mh-hero-prop {
+  display:flex; align-items:flex-start; gap:.6rem;
+  background:var(--surface-2); border:1px solid var(--border-subtle);
+  border-radius:var(--r-sm); padding:.8rem .9rem;
+}
+.mh-hero-icon {
+  width:30px; height:30px; border-radius:8px; flex-shrink:0;
+  background:var(--amber-dim); display:flex; align-items:center;
+  justify-content:center; color:var(--amber);
+}
+.mh-hero-icon svg { width:16px; height:16px }
+.mh-hero-prop-title { font-size:.71rem; font-weight:700; color:var(--text); letter-spacing:-.01em }
+.mh-hero-prop-desc  { font-size:.62rem; color:var(--text-dim); margin-top:.15rem; line-height:1.4 }
+
+/* ── TABS ── */
+.mh-tabs-nav {
+  display:flex; border-bottom:1px solid var(--border-subtle);
+  background:var(--surface-2); overflow-x:auto; flex-shrink:0;
+  scrollbar-width:none;
+}
+.mh-tabs-nav::-webkit-scrollbar { display:none }
+.mh-tab-btn {
+  flex-shrink:0; padding:.8rem 1.05rem;
+  font-family:var(--sans); font-size:.73rem; font-weight:500;
+  color:var(--text-muted); background:none;
+  border:none; border-bottom:2px solid transparent;
+  cursor:pointer; white-space:nowrap; letter-spacing:-.01em;
+  transition:color .18s, border-color .18s, background .18s;
+}
+.mh-tab-btn:hover { color:var(--text); background:var(--surface) }
+.mh-tab-btn.active { color:var(--amber); border-bottom-color:var(--amber); font-weight:600 }
+
+/* ── PANELS ── */
+.mh-panel { display:none; padding:1.4rem 1.5rem 2rem }
+.mh-panel.active { display:block }
+@media(max-width:960px){ .mh-panel { padding:1rem 1rem 1.5rem } }
+
+/* ── INPUT SECTION HEADERS ── */
+.mh-inp-sec {
+  font-size:.59rem; font-weight:700; color:var(--text-dim);
+  letter-spacing:.08em; text-transform:uppercase;
+  margin:1.3rem 0 .75rem; padding-bottom:.3rem;
+  border-bottom:1px solid var(--border-subtle);
+}
+.mh-inp-sec:first-child { margin-top:0 }
+
+.mh-range-row { display:flex; align-items:center; gap:.7rem; margin-bottom:.55rem }
+.mh-range-lbl { font-size:.7rem; color:var(--text-muted); flex:1; min-width:0 }
+.mh-range-disp {
+  font-family:var(--mono); font-size:.71rem; font-weight:600;
+  color:var(--amber); min-width:4rem; text-align:right; flex-shrink:0;
+}
+.mh-inp-select {
+  width:100%; font-size:.73rem; padding:.38rem .6rem;
+  border:1px solid var(--border-subtle); border-radius:7px;
+  background:var(--bg); color:var(--text);
+  font-family:var(--sans); cursor:pointer;
+}
+.mh-range-inp {
+  --pct: 0%;
+  -webkit-appearance:none; appearance:none;
+  height:4px; border-radius:2px; cursor:pointer; outline:none; width:100%;
+  background:linear-gradient(to right, var(--amber) var(--pct), rgba(0,0,0,.1) var(--pct));
+}
+.mh-range-inp::-webkit-slider-thumb {
+  -webkit-appearance:none;
+  width:16px; height:16px; border-radius:50%;
+  background:var(--amber); border:2.5px solid white;
+  box-shadow:0 1px 5px rgba(0,0,0,.22); cursor:pointer;
+  transition:transform .12s;
+}
+.mh-range-inp::-webkit-slider-thumb:hover { transform:scale(1.12) }
+.mh-range-inp::-moz-range-thumb {
+  width:14px; height:14px; border-radius:50%;
+  background:var(--amber); border:2.5px solid white;
+  box-shadow:0 1px 5px rgba(0,0,0,.22); cursor:pointer;
+}
+.mh-range-inp::-webkit-slider-runnable-track { background:transparent }
+.mh-range-inp::-moz-range-track { background:transparent; height:4px; border-radius:2px }
+
+/* ── KPI GRID ── */
+.mh-kpi-row { display:grid; gap:.7rem; margin-bottom:1rem }
+.mh-kpi-3 { grid-template-columns:repeat(3,1fr) }
+.mh-kpi-2 { grid-template-columns:repeat(2,1fr) }
+.mh-kpi-4 { grid-template-columns:repeat(4,1fr) }
+@media(max-width:700px){ .mh-kpi-3,.mh-kpi-4 { grid-template-columns:1fr 1fr } }
+@media(max-width:450px){ .mh-kpi-3 { grid-template-columns:1fr } }
+
+.mh-kpi {
+  background:var(--surface-2); border:1.5px solid var(--border-subtle);
+  border-radius:var(--r-sm); padding:.9rem 1rem .8rem;
+  transition:box-shadow .2s;
+}
+.mh-kpi:hover { box-shadow:0 4px 16px rgba(0,0,0,.06) }
+.mh-kpi.amber   { border-top:2.5px solid var(--amber) }
+.mh-kpi.accent  { border-top:2.5px solid var(--accent) }
+.mh-kpi.success { border-top:2.5px solid var(--success) }
+.mh-kpi.danger  { border-top:2.5px solid var(--danger) }
+.mh-kpi.slate   { border-top:2.5px solid var(--slate,#6E7F8B) }
+
+.mh-kpi-label {
+  font-size:.57rem; font-weight:700; color:var(--text-dim);
+  letter-spacing:.08em; text-transform:uppercase; margin-bottom:.35rem;
+}
+.mh-kpi-val {
+  font-family:var(--sans); font-size:1.05rem; font-weight:700;
+  color:var(--text); letter-spacing:-.03em; line-height:1.1;
+}
+.mh-kpi-val.lg     { font-size:1.22rem }
+.mh-kpi-val.amber  { color:var(--amber) }
+.mh-kpi-val.green  { color:var(--success) }
+.mh-kpi-val.red    { color:var(--danger) }
+.mh-kpi-val.accent { color:var(--accent) }
+.mh-kpi-val.slate  { color:var(--slate,#6E7F8B) }
+.mh-kpi-sub { font-size:.62rem; color:var(--text-dim); margin-top:.2rem }
+
+/* ── CHART WRAP ── */
+.mh-chart-wrap {
+  background:var(--surface-2); border:1px solid var(--border-subtle);
+  border-radius:var(--r); padding:.95rem .95rem .7rem; margin-bottom:1rem;
+}
+.mh-chart-hdr {
+  display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:.75rem;
+}
+.mh-chart-title {
+  font-size:.58rem; font-weight:700; color:var(--text-dim);
+  letter-spacing:.07em; text-transform:uppercase;
+}
+.mh-chart-sub { font-size:.62rem; color:var(--text-dim); margin-top:.1rem }
+.mh-chart-badge {
+  font-size:.57rem; font-weight:700; padding:.1rem .45rem;
+  border-radius:100px; background:var(--amber-dim); color:var(--amber); flex-shrink:0;
+}
+canvas.mh-canvas { width:100%; display:block }
+.mh-canvas-260 { height:260px }
+.mh-canvas-200 { height:200px }
+.mh-canvas-180 { height:180px }
+.mh-canvas-160 { height:160px }
+
+.mh-legend {
+  display:flex; flex-wrap:wrap; gap:.5rem .9rem; margin-top:.6rem;
+}
+.mh-legend-item { display:flex; align-items:center; gap:.3rem; font-size:.66rem; color:var(--text-muted) }
+.mh-legend-line { width:18px; height:2.5px; border-radius:2px; flex-shrink:0 }
+
+/* ── TIMELINE CONSERVATION — composant spécifique MH ── */
+.mh-tl-wrap {
+  background:var(--surface-2); border:1px solid var(--border-subtle);
+  border-radius:var(--r); padding:1rem 1.1rem 1.1rem; margin-bottom:1rem;
+}
+.mh-tl-title {
+  font-size:.58rem; font-weight:700; color:var(--text-dim);
+  letter-spacing:.07em; text-transform:uppercase; margin-bottom:1rem;
+}
+.mh-tl-track { position:relative; padding-left:20px }
+.mh-tl-track::before {
+  content:''; position:absolute; left:6px; top:8px; bottom:8px;
+  width:1.5px; background:var(--border-subtle);
+}
+.mh-tl-step { position:relative; margin-bottom:14px; display:flex; gap:10px; align-items:flex-start }
+.mh-tl-step:last-child { margin-bottom:0 }
+.mh-tl-dot {
+  position:absolute; left:-16px; top:4px;
+  width:12px; height:12px; border-radius:50%;
+  background:var(--border); border:2px solid var(--surface-2);
+  box-shadow:0 0 0 1.5px var(--border);
+  flex-shrink:0; z-index:1; transition:background .3s, box-shadow .3s;
+}
+.mh-tl-step.done .mh-tl-dot { background:var(--accent); box-shadow:0 0 0 1.5px var(--accent) }
+.mh-tl-step.active .mh-tl-dot { background:var(--amber); box-shadow:0 0 0 3px rgba(184,134,11,.2) }
+.mh-tl-name { font-size:.76rem; font-weight:600; color:var(--text); letter-spacing:-.01em }
+.mh-tl-step.done .mh-tl-name { color:var(--text-muted) }
+.mh-tl-step.active .mh-tl-name { color:var(--amber) }
+.mh-tl-date { font-size:.67rem; color:var(--text-dim); margin-top:1px }
+.mh-tl-detail { font-size:.68rem; color:var(--text-dim); margin-top:4px; line-height:1.45 }
+
+/* ── TRAVAUX BARRES ── */
+.mh-trav-card {
+  background:var(--surface-2); border:1.5px solid var(--border-subtle);
+  border-radius:var(--r-sm); padding:.9rem 1rem; margin-bottom:.7rem;
+}
+.mh-trav-hdr { display:flex; justify-content:space-between; align-items:center; margin-bottom:.5rem }
+.mh-trav-name { font-size:.78rem; font-weight:600; color:var(--text); letter-spacing:-.02em }
+.mh-trav-badge {
+  font-size:.56rem; font-weight:700; padding:.1rem .42rem;
+  border-radius:100px; text-transform:uppercase; letter-spacing:.04em;
+}
+.mh-trav-badge.ok  { background:var(--accent-dim); color:var(--accent) }
+.mh-trav-badge.lim { background:var(--amber-dim); color:var(--amber) }
+.mh-trav-card-desc { font-size:.63rem; color:var(--text-dim); line-height:1.5; margin-bottom:.65rem }
+.mh-trav-jauge { height:6px; background:var(--border-subtle); border-radius:3px; overflow:hidden; margin-top:.5rem }
+.mh-trav-jauge-fill { height:100%; border-radius:3px; transition:width .4s }
+.mh-trav-val { font-family:var(--mono); font-size:.76rem; font-weight:700; color:var(--text) }
+
+/* ── WATERFALL ── */
+.mh-wf-row {
+  display:grid; grid-template-columns:190px 1fr 100px;
+  align-items:center; gap:.7rem; padding:.38rem 0;
+  border-bottom:1px solid var(--border-subtle);
+}
+.mh-wf-row:last-child { border-bottom:none; border-top:2px solid var(--border); padding-top:.5rem; margin-top:.2rem }
+.mh-wf-lbl { font-size:.71rem; color:var(--text-muted) }
+.mh-wf-lbl.total { font-size:.73rem; font-weight:600; color:var(--text) }
+.mh-wf-bar-wrap { height:10px; background:var(--border-subtle); border-radius:3px; overflow:hidden }
+.mh-wf-bar { height:100%; border-radius:3px; width:0; transition:width .4s ease }
+.mh-wf-val { font-family:var(--mono); font-size:.71rem; font-weight:600; text-align:right; color:var(--text-muted) }
+.mh-wf-val.amber  { color:var(--amber) }
+.mh-wf-val.accent { color:var(--accent) }
+.mh-wf-val.neg    { color:var(--danger) }
+
+/* ── AVANT / APRÈS ── */
+.mh-avap-strip {
+  display:grid; grid-template-columns:1fr 22px 1fr; gap:.5rem;
+  background:var(--surface-2); border:1px solid var(--border-subtle);
+  border-radius:var(--r-sm); padding:.85rem; margin-bottom:1rem; align-items:center;
+}
+.mh-avap-badge {
+  font-size:.57rem; font-weight:700; letter-spacing:.07em; text-transform:uppercase;
+  padding:.1rem .4rem; border-radius:100px; display:inline-block; margin-bottom:.45rem;
+}
+.mh-avap-avant .mh-avap-badge { background:rgba(155,90,58,.08); color:var(--danger) }
+.mh-avap-apres .mh-avap-badge { background:var(--amber-dim); color:var(--amber) }
+.mh-avap-row {
+  display:flex; justify-content:space-between; align-items:baseline;
+  font-size:.69rem; color:var(--text-muted); padding:.2rem 0;
+  border-bottom:1px solid var(--border-subtle);
+}
+.mh-avap-row:last-child { border-bottom:none }
+.mh-avap-v { font-family:var(--mono); font-weight:600; font-size:.7rem; color:var(--text) }
+.mh-avap-v.eco { color:var(--amber); font-weight:700 }
+.mh-avap-v.neg { color:var(--danger) }
+.mh-avap-arrow { text-align:center; font-size:1rem; color:var(--amber); opacity:.45 }
+
+/* ── SYNTHÈSE PROJET (left panel) ── */
+.mh-proj-sum {
+  margin-top:1.2rem; background:var(--amber-dim);
+  border:1px solid rgba(184,134,11,.18); border-radius:var(--r-sm); padding:.75rem .9rem;
+}
+.mh-proj-sum-title {
+  font-size:.57rem; font-weight:700; color:var(--amber);
+  letter-spacing:.07em; text-transform:uppercase; margin-bottom:.5rem;
+}
+.mh-proj-row {
+  display:flex; justify-content:space-between; align-items:baseline;
+  font-size:.7rem; color:var(--text-muted); padding:.22rem 0;
+  border-bottom:1px solid rgba(184,134,11,.12);
+}
+.mh-proj-row:last-child { border-bottom:none }
+.mh-proj-v { font-family:var(--mono); font-weight:600; font-size:.7rem; color:var(--text) }
+.mh-proj-v.amber { color:var(--amber) }
+
+/* ── SUCCESSION CARD (tab Transmission) ── */
+.mh-succ-grid {
+  display:grid; grid-template-columns:1fr 1fr; gap:.85rem; margin-bottom:1rem;
+}
+@media(max-width:640px){ .mh-succ-grid { grid-template-columns:1fr } }
+.mh-succ-card {
+  background:var(--surface-2); border:1.5px solid var(--border-subtle);
+  border-radius:var(--r-sm); padding:1rem 1.05rem;
+}
+.mh-succ-card.prestige {
+  border-color:rgba(184,134,11,.3); background:var(--amber-dim);
+}
+.mh-succ-badge {
+  font-size:.56rem; font-weight:700; padding:.1rem .42rem;
+  border-radius:100px; text-transform:uppercase; letter-spacing:.04em;
+  display:inline-block; margin-bottom:.55rem;
+}
+.mh-succ-badge.sans  { background:rgba(155,90,58,.08); color:var(--danger) }
+.mh-succ-badge.avec  { background:var(--amber-dim); color:var(--amber) }
+.mh-succ-row {
+  display:flex; justify-content:space-between; align-items:baseline;
+  font-size:.7rem; color:var(--text-muted); padding:.22rem 0;
+  border-bottom:1px solid var(--border-subtle);
+}
+.mh-succ-row:last-child { border-bottom:none }
+.mh-succ-v { font-family:var(--mono); font-weight:600; font-size:.7rem; color:var(--text) }
+.mh-succ-v.eco { color:var(--amber); font-weight:700 }
+.mh-succ-v.neg { color:var(--danger) }
+
+/* ── PÉDAGOGIE CARDS ── */
+.mh-peda-grid {
+  display:grid; grid-template-columns:repeat(3,1fr); gap:.85rem; margin-bottom:1.2rem;
+}
+@media(max-width:760px){ .mh-peda-grid { grid-template-columns:1fr 1fr } }
+@media(max-width:460px){ .mh-peda-grid { grid-template-columns:1fr } }
+
+.mh-peda-card {
+  background:var(--surface-2); border:1.5px solid var(--border-subtle);
+  border-radius:var(--r-sm); padding:1.1rem;
+  transition:box-shadow .2s, transform .2s;
+}
+.mh-peda-card:hover { box-shadow:0 6px 22px rgba(0,0,0,.07); transform:translateY(-2px) }
+.mh-peda-icon {
+  width:34px; height:34px; border-radius:9px; margin-bottom:.7rem;
+  background:var(--amber-dim); display:flex; align-items:center;
+  justify-content:center; color:var(--amber);
+}
+.mh-peda-icon svg { width:17px; height:17px }
+.mh-peda-title { font-size:.82rem; font-weight:700; color:var(--text); letter-spacing:-.02em; margin-bottom:.45rem }
+.mh-peda-body  { font-size:.69rem; color:var(--text-muted); line-height:1.6 }
+.mh-peda-tag {
+  display:inline-block; margin-top:.55rem;
+  font-size:.56rem; font-weight:700; letter-spacing:.05em; text-transform:uppercase;
+  padding:.1rem .42rem; border-radius:100px;
+  background:var(--amber-dim); color:var(--amber);
+}
+
+/* ── MISC ── */
+.mh-section-lbl {
+  font-size:.59rem; font-weight:700; color:var(--text-dim);
+  letter-spacing:.08em; text-transform:uppercase; margin:0 0 .75rem;
+}
+.mh-divider { border:none; border-top:1px solid var(--border-subtle); margin:1rem 0 }
+.mh-info-box {
+  background:var(--amber-dim); border:1px solid rgba(184,134,11,.18);
+  border-radius:var(--r-sm); padding:.75rem 1rem; margin-bottom:1rem;
+  font-size:.69rem; color:var(--amber); line-height:1.55;
+}
+.mh-warn-box {
+  background:var(--danger-dim); border:1px solid var(--danger-mid);
+  border-radius:var(--r-sm); padding:.75rem 1rem; margin-bottom:1rem;
+  font-size:.69rem; color:var(--danger); line-height:1.55;
+}
+.mh-two-col { display:grid; grid-template-columns:1fr 1fr; gap:1rem }
+@media(max-width:640px){ .mh-two-col { grid-template-columns:1fr } }
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="index.html" class="nav-logo"><img src="logo.png?v=3" alt="Patrimonia.ai" class="nav-logo-img"></a>
+  <div class="nav-right">
+    <a href="index.html" class="nav-back">
+      <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7.5 1.5L3 6l4.5 4.5"/></svg>
+      Accueil
+    </a>
+    <div class="nav-dropdown" id="mainDropdown">
+      <button class="nav-dropdown-btn" aria-expanded="false" aria-haspopup="true">
+        Simulateurs <svg class="nav-chevron" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.8" style="width:13px;height:8px;flex-shrink:0"><path d="M1 1l4 4 4-4"/></svg>
+      </button>
+      <div class="nav-dropdown-menu" id="navMenu" role="menu"></div>
+    </div>
+  </div>
+</nav>
+
+<div class="sim-page">
+
+  <div class="sim-page-header">
+    <span class="sim-num-badge"></span>
+    <div>
+      <div class="sim-eyebrow">Patrimoine Classé &amp; Défiscalisation</div>
+      <h1>Monument <em class="gradient-text">Historique</em></h1>
+      <p>Déficit imputable sans plafond sur le revenu global, conservation 15 ans, transmission d'exception — simulation complète du mécanisme fiscal, des travaux et de la valorisation patrimoniale d'un bien classé ou inscrit.</p>
+    </div>
+  </div>
+
+  <!-- Hero props -->
+  <div class="mh-hero-props">
+    <div class="mh-hero-prop">
+      <div class="mh-hero-icon">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+          <path d="M8 2L2 6v8h4v-4h4v4h4V6L8 2z"/><path d="M1 6h14M5 2v4M11 2v4"/>
+        </svg>
+      </div>
+      <div>
+        <div class="mh-hero-prop-title">Classé / Inscrit MH</div>
+        <div class="mh-hero-prop-desc">Biens classés ou ISMH avec convention DRAC</div>
+      </div>
+    </div>
+    <div class="mh-hero-prop">
+      <div class="mh-hero-icon">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+          <path d="M3 12L6 9l2 2 5-7"/><path d="M2 14h12"/>
+        </svg>
+      </div>
+      <div>
+        <div class="mh-hero-prop-title">Déficit sans plafond</div>
+        <div class="mh-hero-prop-desc">Déduction totale sur revenu global, hors niches</div>
+      </div>
+    </div>
+    <div class="mh-hero-prop">
+      <div class="mh-hero-icon">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+          <circle cx="8" cy="8" r="5.5"/><path d="M8 4.5v4l2.5 1.5"/>
+        </svg>
+      </div>
+      <div>
+        <div class="mh-hero-prop-title">Conservation 15 ans</div>
+        <div class="mh-hero-prop-desc">Durée minimale pour consolider l'avantage fiscal</div>
+      </div>
+    </div>
+    <div class="mh-hero-prop">
+      <div class="mh-hero-icon">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+          <path d="M7 2v3M7 5L4 8M7 5l3 3M3 8h2v4H3zM6 8h2v4H6zM9 8h2v4H9z"/>
+        </svg>
+      </div>
+      <div>
+        <div class="mh-hero-prop-title">Transmission d'exception</div>
+        <div class="mh-hero-prop-desc">Exonération de droits sous conditions d'ouverture</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sim-card-wrap">
+    <div class="mh-layout">
+
+      <!-- ══════════════════ LEFT PANEL — INPUTS ══════════════════ -->
+      <div class="mh-inp">
+
+        <div class="mh-inp-sec">Le bien historique</div>
+
+        <div class="mh-range-row">
+          <label class="mh-range-lbl" for="mh-classement">Niveau de classement</label>
+        </div>
+        <select id="mh-classement" class="mh-inp-select">
+          <option value="classe">Classé Monument Historique</option>
+          <option value="inscrit" selected>Inscrit ISMH + convention DRAC</option>
+          <option value="convention">Propriété privée avec convention</option>
+        </select>
+
+        <div class="mh-range-row" style="margin-top:.75rem">
+          <label class="mh-range-lbl" for="mh-prix">Valeur vénale du bien</label>
+          <span class="mh-range-disp" id="mh-disp-prix">450 000 €</span>
+        </div>
+        <input type="range" id="mh-prix" class="mh-range-inp" min="100000" max="3000000" step="25000" value="450000">
+
+        <div class="mh-range-row" style="margin-top:.6rem">
+          <label class="mh-range-lbl" for="mh-travaux">Travaux de restauration</label>
+          <span class="mh-range-disp" id="mh-disp-travaux">380 000 €</span>
+        </div>
+        <input type="range" id="mh-travaux" class="mh-range-inp" min="50000" max="1500000" step="10000" value="380000">
+
+        <div class="mh-range-row" style="margin-top:.6rem">
+          <label class="mh-range-lbl" for="mh-subv">Subventions DRAC / État</label>
+          <span class="mh-range-disp" id="mh-disp-subv">0 €</span>
+        </div>
+        <input type="range" id="mh-subv" class="mh-range-inp" min="0" max="500000" step="5000" value="0">
+
+        <div class="mh-range-row" style="margin-top:.6rem">
+          <label class="mh-range-lbl" for="mh-duree-trav">Durée du chantier</label>
+          <span class="mh-range-disp" id="mh-disp-duree-trav">3 ans</span>
+        </div>
+        <input type="range" id="mh-duree-trav" class="mh-range-inp" min="1" max="5" step="1" value="3">
+
+        <div class="mh-inp-sec">Financement</div>
+
+        <div class="mh-range-row">
+          <label class="mh-range-lbl" for="mh-apport">Apport personnel</label>
+          <span class="mh-range-disp" id="mh-disp-apport">180 000 €</span>
+        </div>
+        <input type="range" id="mh-apport" class="mh-range-inp" min="0" max="1000000" step="10000" value="180000">
+
+        <div class="mh-range-row" style="margin-top:.6rem">
+          <label class="mh-range-lbl" for="mh-taux">Taux crédit</label>
+          <span class="mh-range-disp" id="mh-disp-taux">3,5 %</span>
+        </div>
+        <input type="range" id="mh-taux" class="mh-range-inp" min="1" max="6" step="0.1" value="3.5">
+
+        <div class="mh-range-row" style="margin-top:.6rem">
+          <label class="mh-range-lbl" for="mh-duree-cred">Durée crédit</label>
+          <span class="mh-range-disp" id="mh-disp-duree-cred">20 ans</span>
+        </div>
+        <input type="range" id="mh-duree-cred" class="mh-range-inp" min="5" max="25" step="1" value="20">
+
+        <div class="mh-inp-sec">Fiscalité &amp; projection</div>
+
+        <div class="mh-range-row">
+          <label class="mh-range-lbl" for="mh-tmi">Tranche marginale d'imposition</label>
+        </div>
+        <select id="mh-tmi" class="mh-inp-select">
+          <option value="30">30 % — TMI 30</option>
+          <option value="41" selected>41 % — TMI 41</option>
+          <option value="45">45 % — TMI 45</option>
+        </select>
+
+        <div class="mh-range-row" style="margin-top:.75rem">
+          <label class="mh-range-lbl" for="mh-rg">Revenu global imposable</label>
+          <span class="mh-range-disp" id="mh-disp-rg">180 000 €</span>
+        </div>
+        <input type="range" id="mh-rg" class="mh-range-inp" min="50000" max="500000" step="5000" value="180000">
+
+        <div class="mh-range-row" style="margin-top:.6rem">
+          <label class="mh-range-lbl" for="mh-horizon">Horizon de détention</label>
+          <span class="mh-range-disp" id="mh-disp-horizon">20 ans</span>
+        </div>
+        <input type="range" id="mh-horizon" class="mh-range-inp" min="15" max="35" step="1" value="20">
+
+        <div class="mh-range-row" style="margin-top:.5rem">
+          <label class="mh-range-lbl" for="mh-revalo">Revalorisation annuelle</label>
+          <span class="mh-range-disp" id="mh-disp-revalo">3,0 %</span>
+        </div>
+        <input type="range" id="mh-revalo" class="mh-range-inp" min="0" max="6" step="0.5" value="3">
+
+        <div class="mh-inp-sec">Location</div>
+
+        <div class="mh-range-row">
+          <label class="mh-range-lbl" for="mh-loyers">Loyers annuels bruts</label>
+          <span class="mh-range-disp" id="mh-disp-loyers">22 000 €</span>
+        </div>
+        <input type="range" id="mh-loyers" class="mh-range-inp" min="0" max="80000" step="1000" value="22000">
+
+        <div class="mh-range-row" style="margin-top:.5rem">
+          <label class="mh-range-lbl" for="mh-vacance">Vacance locative</label>
+          <span class="mh-range-disp" id="mh-disp-vacance">5,0 %</span>
+        </div>
+        <input type="range" id="mh-vacance" class="mh-range-inp" min="0" max="20" step="1" value="5">
+
+        <div class="mh-range-row" style="margin-top:.5rem">
+          <label class="mh-range-lbl" for="mh-charges">Charges annuelles</label>
+          <span class="mh-range-disp" id="mh-disp-charges">4 500 €</span>
+        </div>
+        <input type="range" id="mh-charges" class="mh-range-inp" min="0" max="20000" step="500" value="4500">
+
+        <div class="mh-range-row" style="margin-top:.5rem">
+          <label class="mh-range-lbl" for="mh-tf">Taxe foncière</label>
+          <span class="mh-range-disp" id="mh-disp-tf">2 200 €</span>
+        </div>
+        <input type="range" id="mh-tf" class="mh-range-inp" min="0" max="8000" step="100" value="2200">
+
+        <div class="mh-proj-sum">
+          <div class="mh-proj-sum-title">Synthèse MH</div>
+          <div class="mh-proj-row">
+            <span>Coût total</span>
+            <span class="mh-proj-v" id="mh-proj-total">—</span>
+          </div>
+          <div class="mh-proj-row">
+            <span>Travaux déductibles</span>
+            <span class="mh-proj-v amber" id="mh-proj-trav-ded">—</span>
+          </div>
+          <div class="mh-proj-row">
+            <span>Économie IR totale</span>
+            <span class="mh-proj-v amber" id="mh-proj-eco">—</span>
+          </div>
+          <div class="mh-proj-row">
+            <span>Effort mensuel réel</span>
+            <span class="mh-proj-v" id="mh-proj-effort">—</span>
+          </div>
+        </div>
+
+      </div><!-- /mh-inp -->
+
+      <!-- ══════════════════ RIGHT PANEL ══════════════════ -->
+      <div class="mh-main">
+
+        <nav class="mh-tabs-nav">
+          <button class="mh-tab-btn active" data-tab="global">Vue patrimoniale</button>
+          <button class="mh-tab-btn" data-tab="fiscalite">Fiscalité MH</button>
+          <button class="mh-tab-btn" data-tab="travaux">Travaux &amp; déficit</button>
+          <button class="mh-tab-btn" data-tab="cashflow">Cash-flow &amp; valo</button>
+          <button class="mh-tab-btn" data-tab="transmission">Transmission</button>
+          <button class="mh-tab-btn" data-tab="pedagogie">Pédagogie</button>
+        </nav>
+
+        <!-- ─────── TAB 1 : VUE PATRIMONIALE ─────── -->
+        <div class="mh-panel active" data-tab="global">
+
+          <div class="mh-kpi-row mh-kpi-3">
+            <div class="mh-kpi amber">
+              <div class="mh-kpi-label">Économie IR totale</div>
+              <div class="mh-kpi-val lg amber" id="g-eco-ir">—</div>
+              <div class="mh-kpi-sub" id="g-eco-sub">Déduction × TMI</div>
+            </div>
+            <div class="mh-kpi accent">
+              <div class="mh-kpi-label">Économie / an chantier</div>
+              <div class="mh-kpi-val accent" id="g-eco-an">—</div>
+              <div class="mh-kpi-sub" id="g-duree-sub">Étalée sur — ans</div>
+            </div>
+            <div class="mh-kpi success">
+              <div class="mh-kpi-label">Effort mensuel réel</div>
+              <div class="mh-kpi-val" id="g-effort">—</div>
+              <div class="mh-kpi-sub">Après économie IR mensuelle</div>
+            </div>
+          </div>
+
+          <div class="mh-kpi-row mh-kpi-3">
+            <div class="mh-kpi">
+              <div class="mh-kpi-label">Coût total investi</div>
+              <div class="mh-kpi-val" id="g-cout">—</div>
+              <div class="mh-kpi-sub">Prix + travaux</div>
+            </div>
+            <div class="mh-kpi accent">
+              <div class="mh-kpi-label">Rendement brut</div>
+              <div class="mh-kpi-val accent" id="g-rend-brut">—</div>
+              <div class="mh-kpi-sub" id="g-rend-net-sub">Net–net : —</div>
+            </div>
+            <div class="mh-kpi amber">
+              <div class="mh-kpi-label">Valorisation à l'horizon</div>
+              <div class="mh-kpi-val amber" id="g-valo">—</div>
+              <div class="mh-kpi-sub" id="g-horizon-sub">À — ans</div>
+            </div>
+          </div>
+
+          <div class="mh-chart-wrap">
+            <div class="mh-chart-hdr">
+              <div>
+                <div class="mh-chart-title">Projection patrimoniale</div>
+                <div class="mh-chart-sub">Valeur du bien et capital propre sur la durée de détention</div>
+              </div>
+              <span class="mh-chart-badge" id="g-badge-gain">—</span>
+            </div>
+            <canvas id="cv-projection" class="mh-canvas mh-canvas-260"></canvas>
+            <div class="mh-legend">
+              <div class="mh-legend-item"><div class="mh-legend-line" style="background:var(--accent)"></div>Valeur du bien</div>
+              <div class="mh-legend-item"><div class="mh-legend-line" style="background:var(--amber)"></div>Capital propre</div>
+            </div>
+          </div>
+
+          <div class="mh-avap-strip">
+            <div class="mh-avap-col mh-avap-avant">
+              <span class="mh-avap-badge">Sans MH</span>
+              <div class="mh-avap-row"><span>Revenu foncier net</span><span class="mh-avap-v" id="avap-rf-avant">—</span></div>
+              <div class="mh-avap-row"><span>IR + PS annuels</span><span class="mh-avap-v neg" id="avap-ir-avant">—</span></div>
+              <div class="mh-avap-row"><span>Effort annuel brut</span><span class="mh-avap-v neg" id="avap-ef-avant">—</span></div>
+            </div>
+            <div class="mh-avap-arrow">→</div>
+            <div class="mh-avap-col mh-avap-apres">
+              <span class="mh-avap-badge">Avec MH</span>
+              <div class="mh-avap-row"><span>Déduction RG</span><span class="mh-avap-v eco" id="avap-ded-apres">—</span></div>
+              <div class="mh-avap-row"><span>Économie IR/an</span><span class="mh-avap-v eco" id="avap-eco-an">—</span></div>
+              <div class="mh-avap-row"><span>Effort réel mensuel</span><span class="mh-avap-v eco" id="avap-ef-apres">—</span></div>
+            </div>
+          </div>
+
+          <div class="mh-info-box">
+            <strong>Mécanisme clé :</strong> contrairement à la réduction Malraux (imputation directe sur IR), les Monument Historiques offrent une <strong>déduction sur le revenu global</strong>. L'économie dépend directement de votre TMI — plus elle est élevée, plus l'avantage est puissant. Aucun plafond de travaux. Hors niches fiscales.
+          </div>
+
+        </div><!-- /global -->
+
+        <!-- ─────── TAB 2 : FISCALITÉ MH ─────── -->
+        <div class="mh-panel" data-tab="fiscalite">
+
+          <div class="mh-kpi-row mh-kpi-4">
+            <div class="mh-kpi amber">
+              <div class="mh-kpi-label">TMI applicable</div>
+              <div class="mh-kpi-val lg amber" id="f-tmi">—</div>
+              <div class="mh-kpi-sub" id="f-tmi-sub">—</div>
+            </div>
+            <div class="mh-kpi amber">
+              <div class="mh-kpi-label">Travaux déductibles</div>
+              <div class="mh-kpi-val amber" id="f-trav-ded">—</div>
+              <div class="mh-kpi-sub">Sans plafond de travaux</div>
+            </div>
+            <div class="mh-kpi amber">
+              <div class="mh-kpi-label">Économie IR totale</div>
+              <div class="mh-kpi-val lg amber" id="f-eco-total">—</div>
+              <div class="mh-kpi-sub">Travaux × TMI</div>
+            </div>
+            <div class="mh-kpi accent">
+              <div class="mh-kpi-label">Économie / an</div>
+              <div class="mh-kpi-val accent" id="f-eco-an">—</div>
+              <div class="mh-kpi-sub" id="f-ans-sub">Sur — ans</div>
+            </div>
+          </div>
+
+          <div class="mh-chart-wrap">
+            <div class="mh-chart-hdr">
+              <div>
+                <div class="mh-chart-title">Déduction fiscale par année de chantier</div>
+                <div class="mh-chart-sub">Étalement de l'économie d'impôt sur la durée des travaux</div>
+              </div>
+            </div>
+            <canvas id="cv-fiscalite-years" class="mh-canvas mh-canvas-160"></canvas>
+          </div>
+
+          <div class="mh-kpi-row mh-kpi-3" style="margin-top:0">
+            <div class="mh-kpi success">
+              <div class="mh-kpi-label">Effort mensuel chantier</div>
+              <div class="mh-kpi-val green" id="f-effort-trav">—</div>
+              <div class="mh-kpi-sub">Mensualité nette d'économie IR</div>
+            </div>
+            <div class="mh-kpi">
+              <div class="mh-kpi-label">IR résiduel estimé</div>
+              <div class="mh-kpi-val" id="f-ir-reste">—</div>
+              <div class="mh-kpi-sub">Après imputation annuelle</div>
+            </div>
+            <div class="mh-kpi accent">
+              <div class="mh-kpi-label">Revenu disponible</div>
+              <div class="mh-kpi-val accent" id="f-rg-apres">—</div>
+              <div class="mh-kpi-sub">RG après déduction travaux</div>
+            </div>
+          </div>
+
+          <!-- Avant/Après TMI -->
+          <div class="mh-chart-wrap">
+            <div class="mh-chart-hdr">
+              <div>
+                <div class="mh-chart-title">Impact TMI — Comparaison des profils</div>
+                <div class="mh-chart-sub">Économie IR totale selon la TMI, travaux identiques</div>
+              </div>
+            </div>
+            <canvas id="cv-tmi-comp" class="mh-canvas mh-canvas-180"></canvas>
+          </div>
+
+          <div class="mh-info-box">
+            <strong>Déduction vs Réduction :</strong> la déduction MH s'applique sur le revenu avant calcul de l'IR. L'économie réelle = travaux × TMI. Avec des travaux de 380 000 € à TMI 45%, l'économie atteint 171 000 € — sans aucun plafond ni limitation de niches fiscales.
+          </div>
+
+          <div class="mh-warn-box">
+            <strong>Attention :</strong> si les travaux dépassent le revenu global de l'année, le déficit excédentaire est reportable sur les <strong>6 années suivantes</strong> en revenus fonciers (pour les revenus locatifs). Pour les biens non loués classés MH, la déduction s'applique directement sur le revenu global sans restriction. Vérifiez la situation exacte avec un expert.
+          </div>
+
+        </div><!-- /fiscalite -->
+
+        <!-- ─────── TAB 3 : TRAVAUX & DÉFICIT ─────── -->
+        <div class="mh-panel" data-tab="travaux">
+
+          <div class="mh-kpi-row mh-kpi-3">
+            <div class="mh-kpi amber">
+              <div class="mh-kpi-label">Travaux nets (hors subventions)</div>
+              <div class="mh-kpi-val amber" id="t-nets">—</div>
+              <div class="mh-kpi-sub">Base déductible totale</div>
+            </div>
+            <div class="mh-kpi amber">
+              <div class="mh-kpi-label">Sans plafond applicable</div>
+              <div class="mh-kpi-val amber" id="t-sans-plafond">100 %</div>
+              <div class="mh-kpi-sub">Intégralité déductible</div>
+            </div>
+            <div class="mh-kpi success">
+              <div class="mh-kpi-label">Coût réel après économie IR</div>
+              <div class="mh-kpi-val green" id="t-cout-net">—</div>
+              <div class="mh-kpi-sub">Prix + travaux − économie IR</div>
+            </div>
+          </div>
+
+          <!-- Waterfall -->
+          <div class="mh-chart-wrap">
+            <div class="mh-chart-hdr">
+              <div>
+                <div class="mh-chart-title">Répartition de l'investissement total</div>
+                <div class="mh-chart-sub">Acquisition vs travaux vs économie fiscale</div>
+              </div>
+              <span class="mh-chart-badge" id="t-badge-pct">—</span>
+            </div>
+            <div class="mh-wf-row">
+              <div class="mh-wf-lbl">Acquisition</div>
+              <div class="mh-wf-bar-wrap"><div class="mh-wf-bar" id="wf-prix" style="background:var(--accent)"></div></div>
+              <div class="mh-wf-val" id="wf-v-prix">—</div>
+            </div>
+            <div class="mh-wf-row">
+              <div class="mh-wf-lbl">Travaux bruts</div>
+              <div class="mh-wf-bar-wrap"><div class="mh-wf-bar" id="wf-travaux" style="background:var(--amber)"></div></div>
+              <div class="mh-wf-val amber" id="wf-v-travaux">—</div>
+            </div>
+            <div class="mh-wf-row">
+              <div class="mh-wf-lbl">− Subventions DRAC</div>
+              <div class="mh-wf-bar-wrap"><div class="mh-wf-bar" id="wf-subv" style="background:var(--success)"></div></div>
+              <div class="mh-wf-val accent" id="wf-v-subv">—</div>
+            </div>
+            <div class="mh-wf-row">
+              <div class="mh-wf-lbl">− Économie IR</div>
+              <div class="mh-wf-bar-wrap"><div class="mh-wf-bar" id="wf-eco" style="background:var(--amber)"></div></div>
+              <div class="mh-wf-val amber" id="wf-v-eco">—</div>
+            </div>
+            <div class="mh-wf-row">
+              <div class="mh-wf-lbl total">= Coût net effectif</div>
+              <div class="mh-wf-bar-wrap"><div class="mh-wf-bar" id="wf-cout-net" style="background:var(--accent)"></div></div>
+              <div class="mh-wf-val accent" id="wf-v-cout-net">—</div>
+            </div>
+          </div>
+
+          <!-- Timeline conservation -->
+          <div class="mh-tl-wrap">
+            <div class="mh-tl-title">Calendrier de l'opération &amp; engagement de conservation</div>
+            <div class="mh-tl-track">
+              <div class="mh-tl-step done">
+                <div class="mh-tl-dot"></div>
+                <div>
+                  <div class="mh-tl-name">Acquisition du bien classé</div>
+                  <div class="mh-tl-date" id="tl-date-acq">Année N</div>
+                  <div class="mh-tl-detail">Acte notarié, vérification du statut de classement, accord de la DRAC.</div>
+                </div>
+              </div>
+              <div class="mh-tl-step done">
+                <div class="mh-tl-dot"></div>
+                <div>
+                  <div class="mh-tl-name">Autorisation des travaux (DRAC / ABF)</div>
+                  <div class="mh-tl-date">N + 2 à 6 mois</div>
+                  <div class="mh-tl-detail">Maîtrise d'oeuvre ACMH (Architecte en Chef des Monuments Historiques) obligatoire pour les biens classés.</div>
+                </div>
+              </div>
+              <div class="mh-tl-step active">
+                <div class="mh-tl-dot"></div>
+                <div>
+                  <div class="mh-tl-name">Chantier de restauration</div>
+                  <div class="mh-tl-date" id="tl-date-chantier">N+1 → N+3</div>
+                  <div class="mh-tl-detail" id="tl-detail-chantier">Travaux étalés — économie IR déductible par tranche annuelle.</div>
+                </div>
+              </div>
+              <div class="mh-tl-step">
+                <div class="mh-tl-dot"></div>
+                <div>
+                  <div class="mh-tl-name">Livraison &amp; réception</div>
+                  <div class="mh-tl-date" id="tl-date-livraison">—</div>
+                  <div class="mh-tl-detail">Réception chantier, attestations fiscales, ouverture éventuelle au public.</div>
+                </div>
+              </div>
+              <div class="mh-tl-step">
+                <div class="mh-tl-dot"></div>
+                <div>
+                  <div class="mh-tl-name">Période de conservation obligatoire</div>
+                  <div class="mh-tl-date" id="tl-date-conserv">N → N+15</div>
+                  <div class="mh-tl-detail">15 ans minimum pour consolider l'avantage fiscal. Cession anticipée = remise en cause partielle.</div>
+                </div>
+              </div>
+              <div class="mh-tl-step">
+                <div class="mh-tl-dot"></div>
+                <div>
+                  <div class="mh-tl-name">Liberté totale de transmission</div>
+                  <div class="mh-tl-date" id="tl-date-fin">—</div>
+                  <div class="mh-tl-detail">Revente, donation, succession — avec exonération potentielle si convention active.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mh-trav-card">
+            <div class="mh-trav-hdr">
+              <div class="mh-trav-name">Travaux de restauration patrimoniale</div>
+              <span class="mh-trav-badge ok">Déductibles sans plafond</span>
+            </div>
+            <div class="mh-trav-card-desc">Travaux de restauration, entretien, réparation des parties classées — sous contrôle ACMH. Entièrement déductibles du revenu global, sans limitation de montant.</div>
+            <div class="mh-trav-val" id="t-val-restau">—</div>
+            <div class="mh-trav-jauge"><div class="mh-trav-jauge-fill" id="t-jauge-restau" style="width:0%;background:var(--amber)"></div></div>
+          </div>
+
+          <div class="mh-trav-card">
+            <div class="mh-trav-hdr">
+              <div class="mh-trav-name">Subventions DRAC &amp; aides publiques</div>
+              <span class="mh-trav-badge lim">À déduire de la base</span>
+            </div>
+            <div class="mh-trav-card-desc">Les subventions DRAC, fondations, ANAH ou État viennent réduire la base des travaux déductibles — elles ne se cumulent pas avec la déduction fiscale.</div>
+            <div class="mh-trav-val" id="t-val-subv" style="color:var(--success)">—</div>
+            <div class="mh-trav-jauge"><div class="mh-trav-jauge-fill" id="t-jauge-subv" style="width:0%;background:var(--success)"></div></div>
+          </div>
+
+        </div><!-- /travaux -->
+
+        <!-- ─────── TAB 4 : CASH-FLOW & VALORISATION ─────── -->
+        <div class="mh-panel" data-tab="cashflow">
+
+          <div class="mh-kpi-row mh-kpi-3">
+            <div class="mh-kpi slate">
+              <div class="mh-kpi-label">Loyers nets annuels</div>
+              <div class="mh-kpi-val" id="cf-loyers-nets">—</div>
+              <div class="mh-kpi-sub">Après vacance locative</div>
+            </div>
+            <div class="mh-kpi">
+              <div class="mh-kpi-label">Mensualité crédit</div>
+              <div class="mh-kpi-val" id="cf-mensualite">—</div>
+              <div class="mh-kpi-sub">Capital + intérêts</div>
+            </div>
+            <div class="mh-kpi success">
+              <div class="mh-kpi-label">Effort mensuel réel</div>
+              <div class="mh-kpi-val lg" id="cf-effort-reel">—</div>
+              <div class="mh-kpi-sub">Phase chantier (économie MH déduite)</div>
+            </div>
+          </div>
+
+          <div class="mh-kpi-row mh-kpi-4">
+            <div class="mh-kpi">
+              <div class="mh-kpi-label">Rendement brut</div>
+              <div class="mh-kpi-val" id="cf-rend-brut">—</div>
+              <div class="mh-kpi-sub">Loyers / coût total</div>
+            </div>
+            <div class="mh-kpi">
+              <div class="mh-kpi-label">Rendement net</div>
+              <div class="mh-kpi-val" id="cf-rend-net">—</div>
+              <div class="mh-kpi-sub">Après charges</div>
+            </div>
+            <div class="mh-kpi amber">
+              <div class="mh-kpi-label">Économie IR / mois</div>
+              <div class="mh-kpi-val amber" id="cf-eco-mensuel">—</div>
+              <div class="mh-kpi-sub">Pendant phase chantier</div>
+            </div>
+            <div class="mh-kpi accent">
+              <div class="mh-kpi-label">Plus-value brute</div>
+              <div class="mh-kpi-val accent" id="cf-pv">—</div>
+              <div class="mh-kpi-sub" id="cf-pv-sub">À — ans</div>
+            </div>
+          </div>
+
+          <div class="mh-chart-wrap">
+            <div class="mh-chart-hdr">
+              <div>
+                <div class="mh-chart-title">Valorisation &amp; cash-flow cumulé</div>
+                <div class="mh-chart-sub">Projection sur la durée de détention</div>
+              </div>
+              <span class="mh-chart-badge" id="cf-badge-valo">—</span>
+            </div>
+            <canvas id="cv-cashflow" class="mh-canvas mh-canvas-260"></canvas>
+            <div class="mh-legend">
+              <div class="mh-legend-item"><div class="mh-legend-line" style="background:var(--accent)"></div>Valeur du bien</div>
+              <div class="mh-legend-item"><div class="mh-legend-line" style="background:var(--amber)"></div>Cash-flow cumulé</div>
+            </div>
+          </div>
+
+          <div class="mh-info-box">
+            <strong>Valorisation des MH :</strong> les biens classés ou inscrits tendent à bénéficier d'une valorisation supérieure à la moyenne (caractère unique, rareté, prestige). Une revalorisation de 3 à 4 %/an est fréquemment observée sur les marchés patrimoniaux. Les biens rénovés avec label DRAC bénéficient d'un attrait particulier des acheteurs fortunés et institutionnels.
+          </div>
+
+        </div><!-- /cashflow -->
+
+        <!-- ─────── TAB 5 : TRANSMISSION & SUCCESSION ─────── -->
+        <div class="mh-panel" data-tab="transmission">
+
+          <div class="mh-kpi-row mh-kpi-3">
+            <div class="mh-kpi amber">
+              <div class="mh-kpi-label">Valeur estimée à l'horizon</div>
+              <div class="mh-kpi-val lg amber" id="tr-valo">—</div>
+              <div class="mh-kpi-sub" id="tr-valo-sub">À — ans</div>
+            </div>
+            <div class="mh-kpi danger">
+              <div class="mh-kpi-label">Droits de succession sans MH</div>
+              <div class="mh-kpi-val red" id="tr-droits-sans">—</div>
+              <div class="mh-kpi-sub">Barème 45% par tranche</div>
+            </div>
+            <div class="mh-kpi success">
+              <div class="mh-kpi-label">Économie droits avec exonération</div>
+              <div class="mh-kpi-val lg green" id="tr-eco-droits">—</div>
+              <div class="mh-kpi-sub">Convention ouverture au public</div>
+            </div>
+          </div>
+
+          <div class="mh-succ-grid">
+            <div class="mh-succ-card">
+              <span class="mh-succ-badge sans">Sans convention MH</span>
+              <div class="mh-succ-row"><span>Valeur taxable</span><span class="mh-succ-v" id="tr-val-taxable-sans">—</span></div>
+              <div class="mh-succ-row"><span>Abattement enfant</span><span class="mh-succ-v" id="tr-abatt-sans">100 000 €</span></div>
+              <div class="mh-succ-row"><span>Base imposable</span><span class="mh-succ-v" id="tr-base-sans">—</span></div>
+              <div class="mh-succ-row"><span>Droits estimés</span><span class="mh-succ-v neg" id="tr-droits-sans-det">—</span></div>
+            </div>
+            <div class="mh-succ-card prestige">
+              <span class="mh-succ-badge avec">Avec convention MH</span>
+              <div class="mh-succ-row"><span>Valeur taxable</span><span class="mh-succ-v" id="tr-val-taxable-avec">—</span></div>
+              <div class="mh-succ-row"><span>Exonération MH</span><span class="mh-succ-v eco" id="tr-exo">Partielle ou totale</span></div>
+              <div class="mh-succ-row"><span>Base imposable</span><span class="mh-succ-v" id="tr-base-avec">—</span></div>
+              <div class="mh-succ-row"><span>Droits estimés</span><span class="mh-succ-v eco" id="tr-droits-avec-det">—</span></div>
+            </div>
+          </div>
+
+          <!-- Timeline conservation -->
+          <div class="mh-tl-wrap">
+            <div class="mh-tl-title">Stratégie de conservation &amp; transmission — 15 ans</div>
+            <div class="mh-tl-track">
+              <div class="mh-tl-step done">
+                <div class="mh-tl-dot"></div>
+                <div>
+                  <div class="mh-tl-name">Acquisition &amp; travaux</div>
+                  <div class="mh-tl-date" id="tl2-acq">Année N</div>
+                  <div class="mh-tl-detail">Déduction travaux sur revenu global — économie IR immédiate.</div>
+                </div>
+              </div>
+              <div class="mh-tl-step active">
+                <div class="mh-tl-dot"></div>
+                <div>
+                  <div class="mh-tl-name">Gestion &amp; convention d'ouverture</div>
+                  <div class="mh-tl-date">N → N+15</div>
+                  <div class="mh-tl-detail">Ouverture au public min. 40 jours/an — condition pour l'exonération de droits de succession.</div>
+                </div>
+              </div>
+              <div class="mh-tl-step">
+                <div class="mh-tl-dot"></div>
+                <div>
+                  <div class="mh-tl-name">Donation en nue-propriété</div>
+                  <div class="mh-tl-date" id="tl2-donation">Possible à partir de N+5</div>
+                  <div class="mh-tl-detail">Transmettez la nue-propriété aux héritiers en bénéficiant d'une décote de valeur. L'usufruit reste chez vous.</div>
+                </div>
+              </div>
+              <div class="mh-tl-step">
+                <div class="mh-tl-dot"></div>
+                <div>
+                  <div class="mh-tl-name">Fin de la période de conservation</div>
+                  <div class="mh-tl-date" id="tl2-fin">N+15</div>
+                  <div class="mh-tl-detail">L'avantage fiscal est définitivement acquis. Revente libre ou transmission sans condition fiscale.</div>
+                </div>
+              </div>
+              <div class="mh-tl-step">
+                <div class="mh-tl-dot"></div>
+                <div>
+                  <div class="mh-tl-name">Transmission successorale optimisée</div>
+                  <div class="mh-tl-date" id="tl2-succ">À l'horizon</div>
+                  <div class="mh-tl-detail">Avec convention MH : exonération partielle ou totale des droits de succession sur le bien classé.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mh-info-box">
+            <strong>Exonération succession MH :</strong> pour les immeubles classés, lorsqu'une convention est signée avec le ministère de la Culture (ouverture au public, entretien), les héritiers peuvent bénéficier d'une <strong>exonération totale des droits de succession</strong> sur le bien classé (article 795 A du CGI). Conditions cumulatives : classement MH + convention active + maintien du classement par les héritiers.
+          </div>
+
+          <div class="mh-warn-box">
+            <strong>Contrainte :</strong> si le bien est vendu avant 15 ans, la déduction est remise en cause proportionnellement. En cas de donation sans convention active, les droits de transmission restent dus au barème classique, potentiellement sans abattement supplémentaire.
+          </div>
+
+        </div><!-- /transmission -->
+
+        <!-- ─────── TAB 6 : PÉDAGOGIE ─────── -->
+        <div class="mh-panel" data-tab="pedagogie">
+
+          <div class="mh-peda-grid">
+
+            <div class="mh-peda-card">
+              <div class="mh-peda-icon">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M8 2L2 6v8h4v-4h4v4h4V6L8 2z"/>
+                </svg>
+              </div>
+              <div class="mh-peda-title">Déduction vs Réduction</div>
+              <div class="mh-peda-body">Contrairement à Malraux (réduction directe d'IR), le Monument Historique fonctionne par <strong>déduction sur le revenu global</strong>. L'économie = travaux × TMI. Plus la TMI est haute, plus l'avantage est puissant — et sans aucun plafond.</div>
+              <span class="mh-peda-tag">CGI art. 156 II</span>
+            </div>
+
+            <div class="mh-peda-card">
+              <div class="mh-peda-icon">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M3 12L6 9l2 2 5-7"/><path d="M2 14h12"/>
+                </svg>
+              </div>
+              <div class="mh-peda-title">Aucun plafond de travaux</div>
+              <div class="mh-peda-body">Contrairement au Déficit Foncier (10 700 €/an sur RG) ou à Malraux (400 000 € sur 4 ans), le régime MH ne comporte <strong>aucun plafond sur le montant des travaux déductibles</strong>. Un chantier de 1,5 M€ est intégralement déductible.</div>
+              <span class="mh-peda-tag">Déduction illimitée</span>
+            </div>
+
+            <div class="mh-peda-card">
+              <div class="mh-peda-icon">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <circle cx="8" cy="8" r="5.5"/><path d="M8 4.5v4l2.5 1.5"/>
+                </svg>
+              </div>
+              <div class="mh-peda-title">Conservation 15 ans</div>
+              <div class="mh-peda-body">Le bien doit être conservé <strong>15 ans minimum</strong> à compter de l'acquisition. En cas de cession avant ce délai, la déduction fiscale est remise en cause proportionnellement. La conservation peut s'effectuer par transmission successorale.</div>
+              <span class="mh-peda-tag">15 ans minimum</span>
+            </div>
+
+            <div class="mh-peda-card">
+              <div class="mh-peda-icon">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M7 2v3M7 5L4 8M7 5l3 3M3 8h2v4H3zM6 8h2v4H6zM9 8h2v4H9z"/>
+                </svg>
+              </div>
+              <div class="mh-peda-title">Exonération succession</div>
+              <div class="mh-peda-body">Pour les immeubles classés MH avec convention d'ouverture au public (min. 40 jours/an), les héritiers peuvent bénéficier d'une <strong>exonération totale des droits de succession</strong> sur le bien — art. 795 A du CGI. Avantage dynastique unique.</div>
+              <span class="mh-peda-tag">Art. 795 A CGI</span>
+            </div>
+
+            <div class="mh-peda-card">
+              <div class="mh-peda-icon">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M2 12V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v8"/><path d="M1 12h14M5 12V8h6v4"/>
+                </svg>
+              </div>
+              <div class="mh-peda-title">Profils investisseurs</div>
+              <div class="mh-peda-body">Le Monument Historique est optimal pour les <strong>TMI 41 % et 45 %</strong> disposant d'un revenu global élevé. Idéal pour une stratégie long terme : valorisation patrimoniale d'exception + transmission dynastique + déduction immédiate.</div>
+              <span class="mh-peda-tag">TMI 41-45% idéal</span>
+            </div>
+
+            <div class="mh-peda-card">
+              <div class="mh-peda-icon">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M8 2a6 6 0 1 0 0 12A6 6 0 0 0 8 2z"/><path d="M8 6v4M8 5v.5"/>
+                </svg>
+              </div>
+              <div class="mh-peda-title">MH vs Malraux</div>
+              <div class="mh-peda-body"><strong>Malraux :</strong> réduction IR (30%/22%), plafond 400 k€, engagement locatif 9 ans. <strong>MH :</strong> déduction RG (TMI%), aucun plafond, conservation 15 ans, exonération succession possible. MH est plus puissant pour TMI 45% et transmission.</div>
+              <span class="mh-peda-tag">MH vs Malraux</span>
+            </div>
+
+          </div>
+
+          <div class="mh-warn-box">
+            <strong>ACMH obligatoire pour les biens classés :</strong> les travaux sur un immeuble classé doivent être dirigés par un Architecte en Chef des Monuments Historiques (ACMH). Pour les biens inscrits (ISMH), un Architecte du Patrimoine agréé suffit. Ces honoraires sont inclus dans les travaux déductibles.
+          </div>
+
+        </div><!-- /pedagogie -->
+
+      </div><!-- /mh-main -->
+    </div><!-- /mh-layout -->
+  </div><!-- /sim-card-wrap -->
+
+  <p style="font-size:.67rem;color:var(--text-dim);text-align:center;padding:1.5rem 0 .5rem;line-height:1.5">
+    Simulation indicative — PATRIMONIA.AI — Les calculs sont des estimations et ne constituent pas un conseil en investissement.
+  </p>
+
+</div><!-- /sim-page -->
+
+<script>
+(function () {
+  'use strict';
+
+  const TAUX_PS   = 0.172;
+  const YEAR_NOW  = 2026;
+  const CONSERV   = 15;
+
+  const $   = id => document.getElementById(id);
+  const ST  = (id, v) => { const el = $(id); if (el) el.textContent = v; };
+  const eur = v => SP.fmtEur(v);
+  const pct = v => SP.fmtNum(v, 1) + ' %';
+
+  function calcMens(capital, tauxPct, duree) {
+    if (capital <= 0 || duree <= 0) return 0;
+    if (tauxPct <= 0) return capital / (duree * 12);
+    const r = tauxPct / 100 / 12, n = duree * 12;
+    return capital * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1);
+  }
+
+  /* Barème droits de succession enfant (barème 2026) */
+  function calcDroitsSuccEnfant(base) {
+    if (base <= 0) return 0;
+    const tranches = [
+      [8072,   0.05],
+      [12109,  0.10],
+      [15932,  0.15],
+      [552324, 0.20],
+      [902838, 0.30],
+      [1805677,0.40],
+      [Infinity,0.45]
+    ];
+    let impot = 0, cumul = 0;
+    for (const [limite, taux] of tranches) {
+      const tranche = Math.min(base - cumul, limite);
+      if (tranche <= 0) break;
+      impot += tranche * taux;
+      cumul += tranche;
+      if (cumul >= base) break;
+    }
+    return impot;
+  }
+
+  function readInp() {
+    return {
+      classement:  $('mh-classement').value,
+      prix:        +$('mh-prix').value,
+      travaux:     +$('mh-travaux').value,
+      subv:        +$('mh-subv').value,
+      dureeTrav:   +$('mh-duree-trav').value,
+      apport:      +$('mh-apport').value,
+      tauxCred:    +$('mh-taux').value,
+      dureeCred:   +$('mh-duree-cred').value,
+      tmi:         +$('mh-tmi').value,
+      rg:          +$('mh-rg').value,
+      horizon:     +$('mh-horizon').value,
+      revalo:      +$('mh-revalo').value,
+      loyers:      +$('mh-loyers').value,
+      vacance:     +$('mh-vacance').value,
+      charges:     +$('mh-charges').value,
+      tf:          +$('mh-tf').value,
+    };
+  }
+
+  function calcBase(p) {
+    const travauxNets  = Math.max(0, p.travaux - Math.min(p.subv, p.travaux));
+    const ecoIRTotal   = travauxNets * (p.tmi / 100);
+    const ecoParAn     = ecoIRTotal / Math.max(1, p.dureeTrav);
+    const rgApres      = Math.max(0, p.rg - travauxNets / p.dureeTrav);
+
+    const emprunt   = Math.max(0, p.prix + p.travaux - p.apport);
+    const mensual   = calcMens(emprunt, p.tauxCred, p.dureeCred);
+    const coutTotal = p.prix + p.travaux;
+
+    const loyersNets = p.loyers * (1 - p.vacance / 100);
+    const interetsAn = emprunt * p.tauxCred / 100;
+    const rfNet      = loyersNets - p.charges - p.tf - interetsAn;
+    const irFoncier  = Math.max(0, rfNet) * (p.tmi / 100 + TAUX_PS);
+
+    const effortBrut = mensual - loyersNets / 12;
+    const effortReel = effortBrut - ecoParAn / 12;
+
+    const rendBrut    = coutTotal > 0 ? loyersNets / coutTotal * 100 : 0;
+    const rendNet     = coutTotal > 0 ? (loyersNets - p.charges - p.tf) / coutTotal * 100 : 0;
+    const rendNetNet  = coutTotal > 0 ? (loyersNets - p.charges - p.tf - irFoncier) / coutTotal * 100 : 0;
+
+    const valoFin     = p.prix * Math.pow(1 + p.revalo / 100, p.horizon);
+    const valoAvecTrav= (p.prix + travauxNets) * Math.pow(1 + p.revalo / 100, p.horizon);
+    const pvBrute     = valoFin - p.prix;
+
+    /* Succession */
+    const abattEnfant  = 100000;
+    const baseSuccSans  = Math.max(0, valoAvecTrav - abattEnfant);
+    const droitsSans    = calcDroitsSuccEnfant(baseSuccSans);
+    /* Avec convention classé: exonération totale possible */
+    const exoMH        = p.classement === 'classe' ? 1.0 : p.classement === 'inscrit' ? 0.75 : 0.5;
+    const valExo       = valoAvecTrav * exoMH;
+    const baseSuccAvec  = Math.max(0, valoAvecTrav - valExo - abattEnfant);
+    const droitsAvec    = calcDroitsSuccEnfant(baseSuccAvec);
+    const economieDroits= droitsSans - droitsAvec;
+
+    const irEstime     = p.rg * (p.tmi / 100) * 0.8;
+    const irResteApres = Math.max(0, irEstime - ecoParAn);
+
+    const cfAnnuel     = loyersNets - p.charges - p.tf - interetsAn - irFoncier;
+
+    return {
+      travauxNets, ecoIRTotal, ecoParAn, rgApres,
+      emprunt, mensual, coutTotal, interetsAn,
+      loyersNets, rfNet, irFoncier, effortBrut, effortReel,
+      rendBrut, rendNet, rendNetNet,
+      valoFin, valoAvecTrav, pvBrute,
+      droitsSans, droitsAvec, economieDroits, exoMH, valExo,
+      baseSuccSans, baseSuccAvec, abattEnfant,
+      irEstime, irResteApres, cfAnnuel,
+    };
+  }
+
+  /* ── Slider sync ── */
+  function syncSlider(el) {
+    const min = +el.min || 0, max = +el.max || 100, val = +el.value;
+    const p = max > min ? ((val - min) / (max - min)) * 100 : 0;
+    el.style.setProperty('--pct', p.toFixed(2) + '%');
+  }
+
+  /* ── Canvas helpers ── */
+  function setupCV(id, h) {
+    const c = $(id); if (!c) return null;
+    const w = c.offsetWidth; if (!w) return null;
+    const r = window.devicePixelRatio || 1;
+    c.width  = w * r; c.height = h * r;
+    c.style.height = h + 'px';
+    const ctx = c.getContext('2d');
+    ctx.scale(r, r);
+    ctx.clearRect(0, 0, w, h);
+    return { ctx, w, h };
+  }
+
+  function drawBars(id, labels, datasets, opts) {
+    const cv = setupCV(id, opts.h || 180); if (!cv) return;
+    const { ctx, w, h } = cv;
+    const PAD = { t:18, r:14, b:32, l:56 };
+    const cW = w - PAD.l - PAD.r, cH = h - PAD.t - PAD.b;
+    const n = labels.length;
+    const allV = datasets.flatMap(d => d.data);
+    const maxV = Math.max(...allV, 1), minV = Math.min(0, ...allV);
+    const range = maxV - minV || 1;
+
+    ctx.strokeStyle = 'rgba(0,0,0,.06)'; ctx.lineWidth = 1;
+    for (let i = 0; i <= 4; i++) {
+      const y = PAD.t + cH - i / 4 * cH;
+      ctx.beginPath(); ctx.moveTo(PAD.l, y); ctx.lineTo(PAD.l + cW, y); ctx.stroke();
+      const v = minV + i / 4 * range;
+      ctx.fillStyle = '#98989D'; ctx.font = '9px system-ui'; ctx.textAlign = 'right';
+      ctx.fillText(opts.fmtY ? opts.fmtY(v) : Math.round(v), PAD.l - 4, y + 3);
+    }
+    const bw = (cW / n) * 0.55, gp = (cW / n) * 0.45;
+    datasets.forEach(ds => {
+      ds.data.forEach((val, i) => {
+        const bh = Math.abs(val - minV) / range * cH;
+        const x  = PAD.l + i / n * cW + gp / 2;
+        const y  = PAD.t + cH - (Math.max(val, minV) - minV) / range * cH;
+        ctx.fillStyle = ds.color || '#B8860B';
+        ctx.beginPath();
+        ctx.roundRect ? ctx.roundRect(x, y, bw, bh, [3,3,0,0]) : ctx.rect(x, y, bw, bh);
+        ctx.fill();
+      });
+    });
+    ctx.fillStyle = '#6E6E73'; ctx.font = '9px system-ui'; ctx.textAlign = 'center';
+    labels.forEach((lbl, i) => ctx.fillText(lbl, PAD.l + (i + 0.5) / n * cW, h - PAD.b + 14));
+  }
+
+  function drawLines(id, labels, datasets, opts) {
+    const cv = setupCV(id, opts.h || 260); if (!cv) return;
+    const { ctx, w, h } = cv;
+    const PAD = { t:18, r:14, b:32, l:66 };
+    const cW = w - PAD.l - PAD.r, cH = h - PAD.t - PAD.b;
+    const allV = datasets.flatMap(d => d.data);
+    const maxV = Math.max(...allV, 1), minV = Math.min(0, ...allV);
+    const range = maxV - minV || 1;
+
+    ctx.strokeStyle = 'rgba(0,0,0,.06)'; ctx.lineWidth = 1;
+    for (let i = 0; i <= 4; i++) {
+      const y = PAD.t + cH - i / 4 * cH;
+      ctx.beginPath(); ctx.moveTo(PAD.l, y); ctx.lineTo(PAD.l + cW, y); ctx.stroke();
+      const v = minV + i / 4 * range;
+      ctx.fillStyle = '#98989D'; ctx.font = '9px system-ui'; ctx.textAlign = 'right';
+      ctx.fillText(opts.fmtY ? opts.fmtY(v) : Math.round(v), PAD.l - 4, y + 3);
+    }
+    datasets.forEach(ds => {
+      ctx.beginPath(); ctx.strokeStyle = ds.color; ctx.lineWidth = 2.5;
+      if (ds.dash) ctx.setLineDash(ds.dash); else ctx.setLineDash([]);
+      ctx.lineJoin = 'round';
+      ds.data.forEach((val, i) => {
+        const x = PAD.l + i / (labels.length - 1) * cW;
+        const y = PAD.t + cH - (val - minV) / range * cH;
+        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      });
+      ctx.stroke(); ctx.setLineDash([]);
+    });
+    ctx.fillStyle = '#6E6E73'; ctx.font = '9px system-ui'; ctx.textAlign = 'center';
+    const step = Math.max(1, Math.floor(labels.length / 6));
+    labels.forEach((lbl, i) => {
+      if (i % step !== 0 && i !== labels.length - 1) return;
+      const x = PAD.l + i / (labels.length - 1) * cW;
+      ctx.fillText(lbl, x, h - PAD.b + 14);
+    });
+  }
+
+  /* ── Render helpers ── */
+  function renderGlobal(p, res) {
+    ST('g-eco-ir', eur(res.ecoIRTotal));
+    ST('g-eco-sub', p.tmi + ' % TMI — déduction RG');
+    ST('g-eco-an', eur(res.ecoParAn) + '/an');
+    ST('g-duree-sub', 'Étalée sur ' + p.dureeTrav + ' an' + (p.dureeTrav > 1 ? 's' : ''));
+    ST('g-effort', eur(Math.abs(res.effortReel)) + '/mois');
+    ST('g-cout', eur(res.coutTotal));
+    ST('g-rend-brut', pct(res.rendBrut));
+    ST('g-rend-net-sub', 'Net–net : ' + pct(res.rendNetNet));
+    ST('g-valo', eur(res.valoFin));
+    ST('g-horizon-sub', 'À ' + p.horizon + ' ans (+' + p.revalo.toFixed(1) + '%/an)');
+    ST('g-badge-gain', '+' + eur(res.valoFin - p.prix));
+
+    ST('avap-rf-avant', res.rfNet >= 0 ? eur(res.rfNet) : '−' + eur(-res.rfNet));
+    ST('avap-ir-avant', eur(res.irFoncier));
+    ST('avap-ef-avant', '−' + eur(Math.abs(res.effortBrut * 12)) + '/an');
+    ST('avap-ded-apres', eur(res.travauxNets) + ' déduits');
+    ST('avap-eco-an', eur(res.ecoParAn) + '/an');
+    ST('avap-ef-apres', eur(Math.abs(res.effortReel)) + '/mois');
+
+    ST('mh-proj-total', eur(res.coutTotal));
+    ST('mh-proj-trav-ded', eur(res.travauxNets));
+    ST('mh-proj-eco', eur(res.ecoIRTotal));
+    ST('mh-proj-effort', eur(Math.abs(res.effortReel)) + '/mois');
+  }
+
+  function renderFiscalite(p, res) {
+    ST('f-tmi', p.tmi + ' %');
+    ST('f-tmi-sub', p.tmi >= 45 ? 'Tranche supérieure — optimum MH' : 'Tranche marginale ' + p.tmi + '%');
+    ST('f-trav-ded', eur(res.travauxNets));
+    ST('f-eco-total', eur(res.ecoIRTotal));
+    ST('f-eco-an', eur(res.ecoParAn));
+    ST('f-ans-sub', 'Sur ' + p.dureeTrav + ' an' + (p.dureeTrav > 1 ? 's' : ''));
+    ST('f-effort-trav', eur(Math.abs(res.effortReel)) + '/mois');
+    ST('f-ir-reste', eur(res.irResteApres));
+    ST('f-rg-apres', eur(res.rgApres) + '/an');
+  }
+
+  function renderTravaux(p, res) {
+    const fin = YEAR_NOW + Math.ceil(p.dureeTrav);
+    ST('tl-date-acq', 'Année ' + YEAR_NOW);
+    ST('tl-date-chantier', YEAR_NOW + ' → ' + fin);
+    ST('tl-detail-chantier', 'Travaux étalés sur ' + p.dureeTrav + ' an' + (p.dureeTrav > 1 ? 's' : '') + ' — économie IR ' + eur(res.ecoParAn) + '/an.');
+    ST('tl-date-livraison', fin);
+    ST('tl-date-conserv', YEAR_NOW + ' → ' + (YEAR_NOW + CONSERV));
+    ST('tl-date-fin', YEAR_NOW + CONSERV);
+
+    ST('t-nets', eur(res.travauxNets));
+    ST('t-cout-net', eur(res.coutTotal - res.ecoIRTotal));
+
+    const maxRef = Math.max(res.coutTotal, 1);
+    const setBar = (id, val) => {
+      const el = $(id); if (el) el.style.width = Math.min(100, val / maxRef * 100).toFixed(1) + '%';
+    };
+    ST('wf-v-prix', eur(p.prix));     setBar('wf-prix', p.prix);
+    ST('wf-v-travaux', eur(p.travaux)); setBar('wf-travaux', p.travaux);
+    ST('wf-v-subv', p.subv > 0 ? '−' + eur(p.subv) : '0 €'); setBar('wf-subv', p.subv);
+    ST('wf-v-eco', '−' + eur(res.ecoIRTotal)); setBar('wf-eco', res.ecoIRTotal);
+    ST('wf-v-cout-net', eur(res.coutTotal - res.ecoIRTotal)); setBar('wf-cout-net', res.coutTotal - res.ecoIRTotal);
+
+    const pctTrav = res.coutTotal > 0 ? (p.travaux / res.coutTotal * 100).toFixed(0) : 0;
+    ST('t-badge-pct', pctTrav + '% travaux');
+
+    ST('t-val-restau', eur(res.travauxNets));
+    const jRes = $('t-jauge-restau');
+    if (jRes) jRes.style.width = Math.min(100, res.travauxNets / Math.max(res.coutTotal, 1) * 100).toFixed(1) + '%';
+    ST('t-val-subv', eur(p.subv));
+    const jSubv = $('t-jauge-subv');
+    if (jSubv) jSubv.style.width = p.travaux > 0 ? Math.min(100, p.subv / p.travaux * 100).toFixed(1) + '%' : '0%';
+  }
+
+  function renderCashflow(p, res) {
+    ST('cf-loyers-nets', eur(res.loyersNets) + '/an');
+    ST('cf-mensualite', eur(res.mensual) + '/mois');
+    ST('cf-effort-reel', eur(Math.abs(res.effortReel)) + '/mois');
+    ST('cf-rend-brut', pct(res.rendBrut));
+    ST('cf-rend-net', pct(res.rendNet));
+    ST('cf-eco-mensuel', eur(res.ecoParAn / 12) + '/mois');
+    ST('cf-pv', eur(res.pvBrute));
+    ST('cf-pv-sub', 'À ' + p.horizon + ' ans');
+    ST('cf-badge-valo', eur(res.valoFin));
+  }
+
+  function renderTransmission(p, res) {
+    const fin = YEAR_NOW + p.horizon;
+    ST('tr-valo', eur(res.valoAvecTrav));
+    ST('tr-valo-sub', 'À ' + p.horizon + ' ans (+' + p.revalo.toFixed(1) + '%/an)');
+    ST('tr-droits-sans', eur(res.droitsSans));
+    ST('tr-eco-droits', eur(res.economieDroits));
+    ST('tr-val-taxable-sans', eur(res.valoAvecTrav));
+    ST('tr-abatt-sans', eur(res.abattEnfant));
+    ST('tr-base-sans', eur(res.baseSuccSans));
+    ST('tr-droits-sans-det', eur(res.droitsSans));
+    const exoPct = (res.exoMH * 100).toFixed(0);
+    ST('tr-val-taxable-avec', eur(res.valoAvecTrav));
+    ST('tr-exo', exoPct + '% exonéré (' + eur(res.valExo) + ')');
+    ST('tr-base-avec', eur(res.baseSuccAvec));
+    ST('tr-droits-avec-det', res.droitsAvec > 0 ? eur(res.droitsAvec) : '0 €');
+
+    ST('tl2-acq', 'Année ' + YEAR_NOW);
+    ST('tl2-donation', 'Possible à partir de ' + (YEAR_NOW + 5));
+    ST('tl2-fin', YEAR_NOW + CONSERV);
+    ST('tl2-succ', fin);
+  }
+
+  function drawCharts(p, res) {
+    // Projection patrimoniale
+    const yrs = [], vVals = [], kVals = [];
+    for (let y = 0; y <= Math.min(p.horizon, 25); y++) {
+      yrs.push(y === 0 ? 'N' : 'N+' + y);
+      vVals.push(p.prix * Math.pow(1 + p.revalo / 100, y));
+      kVals.push(p.prix * Math.pow(1 + p.revalo / 100, y) - res.emprunt * Math.max(0, 1 - y / p.dureeCred));
+    }
+    drawLines('cv-projection', yrs,
+      [{ data: vVals, color: '#4F8A78' },
+       { data: kVals, color: '#B8860B', dash: [5,3] }],
+      { h: 260, fmtY: v => (v / 1000).toFixed(0) + 'k' });
+
+    // Économie fiscale par an
+    const rYrs = Array.from({ length: p.dureeTrav }, (_, i) => 'An ' + (i + 1));
+    drawBars('cv-fiscalite-years', rYrs,
+      [{ data: Array(p.dureeTrav).fill(res.ecoParAn), color: '#B8860B' }],
+      { h: 160, fmtY: v => (v / 1000).toFixed(0) + 'k' });
+
+    // Comparaison TMI
+    const tmis = [30, 41, 45];
+    drawBars('cv-tmi-comp', tmis.map(t => t + '%'),
+      [{ data: tmis.map(t => res.travauxNets * (t / 100)), color: '#B8860B' }],
+      { h: 180, fmtY: v => (v / 1000).toFixed(0) + 'k' });
+
+    // Cash-flow + valo
+    const cfYrs = [], cfVals = [], valo2 = [];
+    let cfCum = 0;
+    for (let y = 0; y <= Math.min(p.horizon, 20); y++) {
+      cfYrs.push(y === 0 ? 'N' : 'N+' + y);
+      cfCum += res.cfAnnuel * Math.pow(1.015, y);
+      cfVals.push(cfCum);
+      valo2.push(p.prix * Math.pow(1 + p.revalo / 100, y));
+    }
+    drawLines('cv-cashflow', cfYrs,
+      [{ data: valo2, color: '#4F8A78' },
+       { data: cfVals, color: '#B8860B', dash: [5, 3] }],
+      { h: 260, fmtY: v => (v / 1000).toFixed(0) + 'k' });
+  }
+
+  function update() {
+    const p   = readInp();
+    const res = calcBase(p);
+    renderGlobal(p, res);
+    renderFiscalite(p, res);
+    renderTravaux(p, res);
+    renderCashflow(p, res);
+    renderTransmission(p, res);
+    drawCharts(p, res);
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    SP.nav.init();
+    SP.initFmt();
+
+    // Tabs
+    document.querySelectorAll('.mh-tab-btn').forEach(btn => {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('.mh-tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.mh-panel').forEach(c => c.classList.remove('active'));
+        this.classList.add('active');
+        const panel = document.querySelector('.mh-panel[data-tab="' + this.dataset.tab + '"]');
+        if (panel) panel.classList.add('active');
+        const p = readInp(), res = calcBase(p);
+        drawCharts(p, res);
+      });
+    });
+
+    // Sliders
+    const sliders = [
+      { id: 'mh-prix',        disp: 'mh-disp-prix',        fmt: v => SP.fmtEur(+v) },
+      { id: 'mh-travaux',     disp: 'mh-disp-travaux',     fmt: v => SP.fmtEur(+v) },
+      { id: 'mh-subv',        disp: 'mh-disp-subv',        fmt: v => SP.fmtEur(+v) },
+      { id: 'mh-duree-trav',  disp: 'mh-disp-duree-trav',  fmt: v => v + ' an' + (+v > 1 ? 's' : '') },
+      { id: 'mh-apport',      disp: 'mh-disp-apport',      fmt: v => SP.fmtEur(+v) },
+      { id: 'mh-taux',        disp: 'mh-disp-taux',        fmt: v => SP.fmtNum(+v, 1) + ' %' },
+      { id: 'mh-duree-cred',  disp: 'mh-disp-duree-cred',  fmt: v => v + ' ans' },
+      { id: 'mh-rg',          disp: 'mh-disp-rg',          fmt: v => SP.fmtEur(+v) },
+      { id: 'mh-horizon',     disp: 'mh-disp-horizon',     fmt: v => v + ' ans' },
+      { id: 'mh-revalo',      disp: 'mh-disp-revalo',      fmt: v => SP.fmtNum(+v, 1) + ' %' },
+      { id: 'mh-loyers',      disp: 'mh-disp-loyers',      fmt: v => SP.fmtEur(+v) },
+      { id: 'mh-vacance',     disp: 'mh-disp-vacance',     fmt: v => SP.fmtNum(+v, 1) + ' %' },
+      { id: 'mh-charges',     disp: 'mh-disp-charges',     fmt: v => SP.fmtEur(+v) },
+      { id: 'mh-tf',          disp: 'mh-disp-tf',          fmt: v => SP.fmtEur(+v) },
+    ];
+    sliders.forEach(s => {
+      const el = $(s.id); if (!el) return;
+      const disp = $(s.disp);
+      function upd() {
+        if (disp) disp.textContent = s.fmt(el.value);
+        syncSlider(el);
+        update();
+      }
+      el.addEventListener('input', upd);
+      upd();
+    });
+
+    $('mh-classement').addEventListener('change', update);
+    $('mh-tmi').addEventListener('change', update);
+
+    update();
+  });
+
+})();
+</script>
+</body>
+</html>
