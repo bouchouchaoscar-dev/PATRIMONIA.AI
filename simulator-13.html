@@ -464,7 +464,8 @@ input.no-spinner { -moz-appearance:textfield }
 .av-bene-total.over  { background:var(--av-rose-dim);    color:var(--av-rose)    }
 .av-bene-total.under { background:var(--av-gold-dim);    color:var(--av-gold)    }
 
-/* Bouton ajouter */
+/* Actions bénéficiaires (ajouter + répartir) */
+.av-bene-actions { display:grid; grid-template-columns:1fr 1fr; gap:.4rem }
 .av-add-bene-btn {
   width:100%; padding:.42rem .6rem;
   background:transparent; border:1.5px dashed var(--border);
@@ -690,7 +691,10 @@ input.no-spinner { -moz-appearance:textfield }
             <div class="inp-sec" style="margin-top:.75rem;margin-bottom:.5rem">Bénéficiaires</div>
             <div id="av-bene-container"></div>
             <div class="av-bene-total under" id="av-bene-total">Répartition : 0 %</div>
-            <button type="button" id="av-add-bene" class="av-add-bene-btn">+ Ajouter un bénéficiaire</button>
+            <div class="av-bene-actions">
+              <button type="button" id="av-add-bene" class="av-add-bene-btn">+ Ajouter un bénéficiaire</button>
+              <button type="button" id="av-split-eq" class="av-add-bene-btn" title="Quota identique pour chaque bénéficiaire">Répartir également</button>
+            </div>
             <!-- Démembrement -->
             <div class="field">
               <div class="field-label"><label for="av-demem">Clause bénéficiaire démembrée</label></div>
@@ -919,8 +923,33 @@ function updateBeneProp(id, field, value) {
 function updateBeneQuota(id, raw) {
   const b = beneState.find(b => b.id === id);
   if (!b) return;
-  b.quota = Math.max(0, Math.min(100, +raw || 0));
+  /* Clamp au reste disponible : empêche le total de dépasser 100 %.
+     Si l'utilisateur saisit 80 alors qu'il reste 30, on cape à 30. */
+  const used = beneState.reduce((s, x) => s + (x.id === id ? 0 : x.quota), 0);
+  const maxAllowed = Math.max(0, 100 - used);
+  const wanted = Math.max(0, +raw || 0);
+  const capped = Math.min(wanted, maxAllowed);
+  b.quota = capped;
+  /* Si on a cape : on remet la valeur réelle dans l'input pour feedback visuel */
+  if (capped !== wanted) {
+    const card = document.querySelector(`[data-bene-id="${id}"]`);
+    if (card) {
+      const input = card.querySelector('input[type="number"]');
+      if (input) input.value = capped;
+    }
+  }
   updateBeneTotals();
+  renderAll();
+}
+
+/* Répartition égalitaire : 100 / N, avec arrondi entier et delta sur le dernier */
+function repartirEgalement() {
+  const n = beneState.length;
+  if (!n) return;
+  const base = Math.floor(100 / n);
+  const rem  = 100 - base * n;
+  beneState.forEach((b, i) => { b.quota = base + (i === n - 1 ? rem : 0); });
+  renderBeneInputs();
   renderAll();
 }
 
@@ -1730,6 +1759,9 @@ function linkRange(id, dispId, suffix, decimals) {
   function upd() {
     const v = parseFloat(el.value);
     disp.textContent = v.toFixed(decimals).replace('.',',') + ' ' + suffix;
+    const min = +el.min || 0, max = +el.max || 100;
+    const p = max > min ? (v - min) / (max - min) * 100 : 0;
+    el.style.setProperty('--pct', p.toFixed(2) + '%');
     renderAll();
   }
   el.addEventListener('input', upd);
@@ -1779,6 +1811,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Bouton ajouter un bénéficiaire
   document.getElementById('av-add-bene').addEventListener('click', addBene);
+  document.getElementById('av-split-eq').addEventListener('click', repartirEgalement);
 
   linkSlider('av-vi', 'av-vi-sld', 'av-vi-disp');
   linkRange('av-rdt',  'av-rdt-disp',  '%', 1);

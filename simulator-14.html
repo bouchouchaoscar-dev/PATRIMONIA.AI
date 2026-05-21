@@ -1183,14 +1183,17 @@ function sync(inputId, sliderId, dispId, fmt) {
   const inp = document.getElementById(inputId);
   const sl = sliderId ? document.getElementById(sliderId) : null;
   const disp = dispId ? document.getElementById(dispId) : null;
+  /* Range élément cible pour --pct (slider séparé OU input range lui-même) */
+  const rangeEl = sl || (inp && inp.type === 'range' ? inp : null);
   function update(src) {
     const v = +(src.value || 0);
     if (inp && src !== inp) inp.value = v;
     if (sl && src !== sl) sl.value = v;
     if (disp) disp.textContent = fmt ? fmt(v) : v;
-    if (sl) {
-      const min = +sl.min || 0, max = +sl.max || 100;
-      sl.style.setProperty('--pct', ((v - min) / (max - min) * 100) + '%');
+    if (rangeEl) {
+      const min = +rangeEl.min || 0, max = +rangeEl.max || 100;
+      const pct = max > min ? (v - min) / (max - min) * 100 : 0;
+      rangeEl.style.setProperty('--pct', pct.toFixed(2) + '%');
     }
     renderAll();
   }

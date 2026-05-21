@@ -333,6 +333,25 @@ body {
 
 /* ─── RESPONSIVE ─── */
 @media (max-width: 480px) {
+  /* Top-nav compacte pour éviter overflow horizontal sur mobile (≤390px) */
+  .top-nav { padding: 0 1rem; gap: .5rem; height: 64px }
+  .nav-logo-img { height: 48px }
+  .nav-right { gap: .35rem }
+  .nav-back {
+    padding: .35rem .55rem;
+    /* Texte "Accueil" masqué — l'icône flèche suffit */
+    font-size: 0;
+    gap: 0;
+  }
+  .nav-back svg { width: 14px; height: 14px }
+  .nav-dropdown-btn {
+    font-size: .72rem;
+    padding: .32rem .7rem .32rem .8rem;
+    gap: .35rem;
+  }
+  .nav-chevron { width: 10px; height: 6px }
+
+  /* Dropdown menu plein écran */
   .nav-dropdown-menu {
     position: fixed;
     top: 58px; right: 8px; left: 8px;

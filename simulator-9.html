@@ -740,6 +740,21 @@ document.querySelectorAll('input[name="trav-mode"]').forEach(r => {
   });
 });
 
+/* Valeurs par défaut : dates initialisées pour produire un résultat dès le chargement
+   (10 ans de détention → exemple représentatif de plus-value immobilière) */
+(function initDates() {
+  const acq = document.getElementById('pv-date-acq');
+  const vente = document.getElementById('pv-date-vente');
+  if (acq && !acq.value) {
+    const d = new Date();
+    d.setFullYear(d.getFullYear() - 10);
+    acq.value = d.toISOString().slice(0, 10);
+  }
+  if (vente && !vente.value) {
+    vente.value = new Date().toISOString().slice(0, 10);
+  }
+})();
+
 /* Listeners */
 ['pv-nature','pv-date-acq','pv-date-vente']
   .forEach(id => document.getElementById(id).addEventListener('change', calculate));
