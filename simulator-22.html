@@ -1,0 +1,1760 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="favicon-64.png">
+  <link rel="shortcut icon" href="favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="favicon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Démembrement Avancé | Patrimonia.ai</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css?v=19">
+<script src="shared.js?v=2"></script>
+<script src="shared-nav.js?v=12"></script>
+<style>
+/* ═══════════════════════════════════════════════════
+   DÉMEMBREMENT AVANCÉ · PATRIMONIA.AI
+   Préfixe CSS : .dm-
+   Personnalité : ingénierie patrimoniale · transmission · succession
+   Accent principal : --accent (#4F8A78) — NP / patrimoine
+   Accent secondaire : --amber — usufruit / revenus / fiscal
+═══════════════════════════════════════════════════ */
+
+.dm-layout { display:grid; grid-template-columns:360px 1fr; min-height:640px }
+@media(max-width:960px){ .dm-layout { grid-template-columns:1fr } }
+
+.dm-inp {
+  padding:1.6rem 1.4rem 2rem;
+  background:var(--surface-2);
+  border-right:1px solid var(--border-subtle);
+  overflow-y:auto; max-height:900px;
+}
+@media(max-width:960px){ .dm-inp { border-right:none; border-bottom:1px solid var(--border-subtle); max-height:none } }
+
+.dm-main { background:var(--surface); display:flex; flex-direction:column; min-width:0 }
+
+.dm-hero-props {
+  display:grid; grid-template-columns:repeat(4,1fr); gap:.8rem;
+  margin:1.2rem 0 1.6rem;
+}
+@media(max-width:900px){ .dm-hero-props { grid-template-columns:repeat(2,1fr) } }
+
+.dm-hero-prop {
+  display:flex; align-items:flex-start; gap:.6rem;
+  background:var(--surface-2); border:1px solid var(--border-subtle);
+  border-radius:var(--r-sm); padding:.8rem .9rem;
+}
+.dm-hero-icon {
+  width:30px; height:30px; border-radius:8px; flex-shrink:0;
+  background:var(--amber-dim); display:flex; align-items:center;
+  justify-content:center; color:var(--amber);
+}
+.dm-hero-icon.np { background:var(--accent-dim); color:var(--accent) }
+.dm-hero-icon svg { width:16px; height:16px }
+.dm-hero-prop-title { font-size:.71rem; font-weight:700; color:var(--text); letter-spacing:-.01em }
+.dm-hero-prop-desc  { font-size:.62rem; color:var(--text-dim); margin-top:.15rem; line-height:1.4 }
+
+.dm-tabs-nav {
+  display:flex; border-bottom:1px solid var(--border-subtle);
+  background:var(--surface-2); overflow-x:auto; flex-shrink:0;
+  scrollbar-width:none;
+}
+.dm-tabs-nav::-webkit-scrollbar { display:none }
+.dm-tab-btn {
+  flex-shrink:0; padding:.8rem 1.05rem;
+  font-family:var(--sans); font-size:.73rem; font-weight:500;
+  color:var(--text-muted); background:none;
+  border:none; border-bottom:2px solid transparent;
+  cursor:pointer; white-space:nowrap; letter-spacing:-.01em;
+  transition:color .18s, border-color .18s, background .18s;
+}
+.dm-tab-btn:hover { color:var(--text); background:var(--surface) }
+.dm-tab-btn.active { color:var(--accent); border-bottom-color:var(--accent); font-weight:600 }
+
+.dm-panel { display:none; padding:1.4rem 1.5rem 2rem }
+.dm-panel.active { display:block }
+@media(max-width:960px){ .dm-panel { padding:1rem 1rem 1.5rem } }
+
+.dm-inp-sec {
+  font-size:.59rem; font-weight:700; color:var(--text-dim);
+  letter-spacing:.08em; text-transform:uppercase;
+  margin:1.3rem 0 .75rem; padding-bottom:.3rem;
+  border-bottom:1px solid var(--border-subtle);
+}
+.dm-inp-sec:first-child { margin-top:0 }
+
+.dm-range-row { display:flex; align-items:center; gap:.7rem; margin-bottom:.55rem }
+.dm-range-lbl { font-size:.7rem; color:var(--text-muted); flex:1; min-width:0 }
+.dm-range-disp {
+  font-family:var(--mono); font-size:.71rem; font-weight:600;
+  color:var(--accent); min-width:4rem; text-align:right; flex-shrink:0;
+}
+.dm-range-disp.amber { color:var(--amber) }
+
+.dm-inp-select {
+  width:100%; font-size:.73rem; padding:.38rem .6rem;
+  border:1px solid var(--border-subtle); border-radius:7px;
+  background:var(--bg); color:var(--text);
+  font-family:var(--sans); cursor:pointer;
+}
+
+.dm-range-inp {
+  --pct: 0%;
+  -webkit-appearance:none; appearance:none;
+  height:4px; border-radius:2px; cursor:pointer; outline:none; width:100%;
+  background:linear-gradient(to right, var(--accent) var(--pct), rgba(0,0,0,.1) var(--pct));
+}
+.dm-range-inp.amber {
+  background:linear-gradient(to right, var(--amber) var(--pct), rgba(0,0,0,.1) var(--pct));
+}
+.dm-range-inp::-webkit-slider-thumb {
+  -webkit-appearance:none; width:16px; height:16px; border-radius:50%;
+  background:var(--accent); border:2.5px solid white;
+  box-shadow:0 1px 5px rgba(0,0,0,.22); cursor:pointer; transition:transform .12s;
+}
+.dm-range-inp.amber::-webkit-slider-thumb { background:var(--amber) }
+.dm-range-inp::-webkit-slider-thumb:hover { transform:scale(1.12) }
+.dm-range-inp::-moz-range-thumb {
+  width:14px; height:14px; border-radius:50%;
+  background:var(--accent); border:2.5px solid white;
+  box-shadow:0 1px 5px rgba(0,0,0,.22); cursor:pointer;
+}
+.dm-range-inp::-webkit-slider-runnable-track { background:transparent }
+.dm-range-inp::-moz-range-track { background:transparent; height:4px; border-radius:2px }
+
+.dm-kpi-row { display:grid; gap:.7rem; margin-bottom:1rem }
+.dm-kpi-3 { grid-template-columns:repeat(3,1fr) }
+.dm-kpi-2 { grid-template-columns:repeat(2,1fr) }
+.dm-kpi-4 { grid-template-columns:repeat(4,1fr) }
+@media(max-width:700px){ .dm-kpi-3,.dm-kpi-4 { grid-template-columns:1fr 1fr } }
+@media(max-width:450px){ .dm-kpi-3 { grid-template-columns:1fr } }
+
+.dm-kpi {
+  background:var(--surface-2); border:1.5px solid var(--border-subtle);
+  border-radius:var(--r-sm); padding:.9rem 1rem .8rem; transition:box-shadow .2s;
+}
+.dm-kpi:hover { box-shadow:0 4px 16px rgba(0,0,0,.06) }
+.dm-kpi.accent  { border-top:2.5px solid var(--accent) }
+.dm-kpi.amber   { border-top:2.5px solid var(--amber) }
+.dm-kpi.success { border-top:2.5px solid var(--success) }
+.dm-kpi.danger  { border-top:2.5px solid var(--danger) }
+.dm-kpi.slate   { border-top:2.5px solid #6E7F8B }
+
+.dm-kpi-label {
+  font-size:.57rem; font-weight:700; color:var(--text-dim);
+  letter-spacing:.08em; text-transform:uppercase; margin-bottom:.35rem;
+}
+.dm-kpi-val {
+  font-family:var(--sans); font-size:1.05rem; font-weight:700;
+  color:var(--text); letter-spacing:-.03em; line-height:1.1;
+}
+.dm-kpi-val.lg     { font-size:1.22rem }
+.dm-kpi-val.accent { color:var(--accent) }
+.dm-kpi-val.amber  { color:var(--amber) }
+.dm-kpi-val.green  { color:var(--success) }
+.dm-kpi-val.red    { color:var(--danger) }
+.dm-kpi-sub { font-size:.62rem; color:var(--text-dim); margin-top:.2rem }
+
+/* ── SPLIT BLOCK — cœur visuel ── */
+.dm-split-block {
+  background:linear-gradient(135deg, rgba(184,134,11,.07) 0%, rgba(79,138,120,.08) 60%, var(--surface-2) 100%);
+  border:1.5px solid rgba(79,138,120,.2);
+  border-radius:var(--r); padding:1.35rem 1.45rem 1.2rem;
+  margin-bottom:1rem; position:relative; overflow:hidden;
+}
+.dm-split-block::after {
+  content:''; position:absolute; top:-40px; right:-40px;
+  width:160px; height:160px;
+  background:radial-gradient(circle, rgba(79,138,120,.1) 0%, transparent 70%);
+  border-radius:50%; pointer-events:none;
+}
+.dm-split-eyebrow {
+  font-size:.58rem; font-weight:700; color:var(--text-dim);
+  letter-spacing:.08em; text-transform:uppercase; margin-bottom:.7rem;
+}
+.dm-split-bar {
+  display:flex; height:12px; border-radius:6px; overflow:hidden; margin:.7rem 0 1rem; gap:2px;
+}
+.dm-split-bar-us {
+  background:var(--amber); border-radius:6px 0 0 6px;
+  transition:width .45s ease; min-width:4px;
+}
+.dm-split-bar-np {
+  background:var(--accent); border-radius:0 6px 6px 0;
+  flex:1; transition:width .45s ease;
+}
+.dm-split-cols {
+  display:grid; grid-template-columns:1fr 28px 1fr; align-items:center; gap:.5rem;
+}
+.dm-split-side-lbl {
+  font-size:.58rem; font-weight:700; letter-spacing:.07em;
+  text-transform:uppercase; margin-bottom:.25rem;
+}
+.dm-split-side-lbl.us { color:var(--amber) }
+.dm-split-side-lbl.np { color:var(--accent) }
+.dm-split-val {
+  font-family:var(--sans); font-size:1.7rem; font-weight:700;
+  letter-spacing:-.04em; line-height:1;
+}
+.dm-split-val.us { color:var(--amber) }
+.dm-split-val.np { color:var(--accent) }
+.dm-split-pct { font-size:.72rem; color:var(--text-muted); margin-top:.18rem; font-family:var(--mono) }
+.dm-split-sep { text-align:center; font-size:1.2rem; color:var(--border); font-weight:300 }
+.dm-split-pp {
+  margin-top:.8rem; padding-top:.65rem;
+  border-top:1px solid rgba(79,138,120,.15);
+  display:flex; justify-content:space-between; align-items:baseline;
+}
+.dm-split-pp-lbl { font-size:.68rem; color:var(--text-dim) }
+.dm-split-pp-val { font-family:var(--mono); font-size:.8rem; font-weight:700; color:var(--text) }
+
+/* ── CHARTS ── */
+.dm-chart-wrap {
+  background:var(--surface-2); border:1px solid var(--border-subtle);
+  border-radius:var(--r); padding:.95rem .95rem .7rem; margin-bottom:1rem;
+}
+.dm-chart-hdr { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:.75rem }
+.dm-chart-title { font-size:.58rem; font-weight:700; color:var(--text-dim); letter-spacing:.07em; text-transform:uppercase }
+.dm-chart-sub { font-size:.62rem; color:var(--text-dim); margin-top:.1rem }
+.dm-chart-badge {
+  font-size:.57rem; font-weight:700; padding:.1rem .45rem;
+  border-radius:100px; background:var(--accent-dim); color:var(--accent); flex-shrink:0;
+}
+.dm-chart-badge.amber { background:var(--amber-dim); color:var(--amber) }
+canvas.dm-canvas { width:100%; display:block }
+.dm-canvas-260 { height:260px }
+.dm-canvas-200 { height:200px }
+.dm-canvas-180 { height:180px }
+.dm-canvas-160 { height:160px }
+
+.dm-legend { display:flex; flex-wrap:wrap; gap:.5rem .9rem; margin-top:.6rem }
+.dm-legend-item { display:flex; align-items:center; gap:.3rem; font-size:.66rem; color:var(--text-muted) }
+.dm-legend-line { width:18px; height:2.5px; border-radius:2px; flex-shrink:0 }
+
+/* ── AVANT/APRÈS ── */
+.dm-avap-strip {
+  display:grid; grid-template-columns:1fr 22px 1fr; gap:.5rem;
+  background:var(--surface-2); border:1px solid var(--border-subtle);
+  border-radius:var(--r-sm); padding:.85rem; margin-bottom:1rem; align-items:center;
+}
+.dm-avap-badge {
+  font-size:.57rem; font-weight:700; letter-spacing:.07em; text-transform:uppercase;
+  padding:.1rem .4rem; border-radius:100px; display:inline-block; margin-bottom:.45rem;
+}
+.dm-avap-left .dm-avap-badge  { background:var(--amber-dim); color:var(--amber) }
+.dm-avap-right .dm-avap-badge { background:var(--accent-dim); color:var(--accent) }
+.dm-avap-row {
+  display:flex; justify-content:space-between; align-items:baseline;
+  font-size:.69rem; color:var(--text-muted); padding:.2rem 0;
+  border-bottom:1px solid var(--border-subtle);
+}
+.dm-avap-row:last-child { border-bottom:none }
+.dm-avap-v { font-family:var(--mono); font-weight:600; font-size:.7rem; color:var(--text) }
+.dm-avap-v.eco   { color:var(--accent); font-weight:700 }
+.dm-avap-v.neg   { color:var(--danger); font-weight:700 }
+.dm-avap-v.amber { color:var(--amber); font-weight:700 }
+.dm-avap-arrow { text-align:center; font-size:1rem; color:var(--accent); opacity:.45 }
+
+/* ── WATERFALL ── */
+.dm-wf-row {
+  display:grid; grid-template-columns:180px 1fr 110px;
+  align-items:center; gap:.7rem; padding:.38rem 0;
+  border-bottom:1px solid var(--border-subtle);
+}
+.dm-wf-row:last-child { border-bottom:none; border-top:2px solid var(--border); padding-top:.5rem; margin-top:.2rem }
+.dm-wf-lbl { font-size:.71rem; color:var(--text-muted) }
+.dm-wf-lbl.total { font-size:.73rem; font-weight:600; color:var(--text) }
+.dm-wf-bar-wrap { height:10px; background:var(--border-subtle); border-radius:3px; overflow:hidden }
+.dm-wf-bar { height:100%; border-radius:3px; width:0; transition:width .4s ease }
+.dm-wf-val { font-family:var(--mono); font-size:.71rem; font-weight:600; text-align:right; color:var(--text-muted) }
+.dm-wf-val.accent { color:var(--accent) }
+.dm-wf-val.amber  { color:var(--amber) }
+.dm-wf-val.neg    { color:var(--danger) }
+
+/* ── TIMELINE ── */
+.dm-tl-wrap {
+  background:var(--surface-2); border:1px solid var(--border-subtle);
+  border-radius:var(--r); padding:1rem 1.1rem 1.1rem; margin-bottom:1rem;
+}
+.dm-tl-title {
+  font-size:.58rem; font-weight:700; color:var(--text-dim);
+  letter-spacing:.07em; text-transform:uppercase; margin-bottom:1rem;
+}
+.dm-tl-track { position:relative; padding-left:20px }
+.dm-tl-track::before {
+  content:''; position:absolute; left:6px; top:8px; bottom:8px;
+  width:1.5px; background:var(--border-subtle);
+}
+.dm-tl-step { position:relative; margin-bottom:14px; display:flex; gap:10px; align-items:flex-start }
+.dm-tl-step:last-child { margin-bottom:0 }
+.dm-tl-dot {
+  position:absolute; left:-16px; top:4px; width:12px; height:12px;
+  border-radius:50%; background:var(--border); border:2px solid var(--surface-2);
+  box-shadow:0 0 0 1.5px var(--border); flex-shrink:0; z-index:1;
+}
+.dm-tl-step.done   .dm-tl-dot { background:var(--accent); box-shadow:0 0 0 1.5px var(--accent) }
+.dm-tl-step.active .dm-tl-dot { background:var(--amber); box-shadow:0 0 0 3px rgba(184,134,11,.2) }
+.dm-tl-step.future .dm-tl-dot { background:var(--text-dim); box-shadow:0 0 0 1.5px var(--text-dim) }
+.dm-tl-name { font-size:.76rem; font-weight:600; color:var(--text); letter-spacing:-.01em }
+.dm-tl-step.done   .dm-tl-name { color:var(--text-muted) }
+.dm-tl-step.active .dm-tl-name { color:var(--amber) }
+.dm-tl-step.future .dm-tl-name { color:var(--text-muted) }
+.dm-tl-date   { font-size:.67rem; color:var(--text-dim); margin-top:1px }
+.dm-tl-detail { font-size:.68rem; color:var(--text-dim); margin-top:4px; line-height:1.45 }
+
+/* ── PÉDAGOGIE ── */
+.dm-peda-grid {
+  display:grid; grid-template-columns:repeat(3,1fr); gap:.85rem; margin-bottom:1.2rem;
+}
+@media(max-width:760px){ .dm-peda-grid { grid-template-columns:1fr 1fr } }
+@media(max-width:460px){ .dm-peda-grid { grid-template-columns:1fr } }
+.dm-peda-card {
+  background:var(--surface-2); border:1.5px solid var(--border-subtle);
+  border-radius:var(--r-sm); padding:1.1rem; transition:box-shadow .2s, transform .2s;
+}
+.dm-peda-card:hover { box-shadow:0 6px 22px rgba(0,0,0,.07); transform:translateY(-2px) }
+.dm-peda-icon {
+  width:34px; height:34px; border-radius:9px; margin-bottom:.7rem;
+  background:var(--accent-dim); display:flex; align-items:center;
+  justify-content:center; color:var(--accent);
+}
+.dm-peda-icon.amber { background:var(--amber-dim); color:var(--amber) }
+.dm-peda-icon svg { width:17px; height:17px }
+.dm-peda-title { font-size:.82rem; font-weight:700; color:var(--text); letter-spacing:-.02em; margin-bottom:.45rem }
+.dm-peda-body  { font-size:.69rem; color:var(--text-muted); line-height:1.6 }
+.dm-peda-tag {
+  display:inline-block; margin-top:.55rem;
+  font-size:.56rem; font-weight:700; letter-spacing:.05em; text-transform:uppercase;
+  padding:.1rem .42rem; border-radius:100px;
+  background:var(--accent-dim); color:var(--accent);
+}
+.dm-peda-tag.amber { background:var(--amber-dim); color:var(--amber) }
+
+/* ── MISC ── */
+.dm-info-box {
+  background:var(--accent-dim); border:1px solid rgba(79,138,120,.18);
+  border-radius:var(--r-sm); padding:.75rem 1rem; margin-bottom:1rem;
+  font-size:.69rem; color:var(--accent); line-height:1.55;
+}
+.dm-amber-box {
+  background:var(--amber-dim); border:1px solid rgba(184,134,11,.18);
+  border-radius:var(--r-sm); padding:.75rem 1rem; margin-bottom:1rem;
+  font-size:.69rem; color:var(--amber); line-height:1.55;
+}
+.dm-warn-box {
+  background:rgba(209,52,56,.06); border:1px solid rgba(209,52,56,.18);
+  border-radius:var(--r-sm); padding:.75rem 1rem; margin-bottom:1rem;
+  font-size:.69rem; color:var(--danger); line-height:1.55;
+}
+.dm-two-col { display:grid; grid-template-columns:1fr 1fr; gap:1rem }
+@media(max-width:640px){ .dm-two-col { grid-template-columns:1fr } }
+
+/* ── SYNTHÈSE PANNEAU GAUCHE ── */
+.dm-syn-block {
+  margin-top:1.2rem;
+  background:linear-gradient(135deg, var(--amber-dim) 0%, var(--accent-dim) 100%);
+  border:1px solid rgba(79,138,120,.18); border-radius:var(--r-sm); padding:.75rem .9rem;
+}
+.dm-syn-title {
+  font-size:.57rem; font-weight:700; color:var(--accent);
+  letter-spacing:.07em; text-transform:uppercase; margin-bottom:.5rem;
+}
+.dm-syn-row {
+  display:flex; justify-content:space-between; align-items:baseline;
+  font-size:.7rem; color:var(--text-muted); padding:.22rem 0;
+  border-bottom:1px solid rgba(79,138,120,.12);
+}
+.dm-syn-row:last-child { border-bottom:none }
+.dm-syn-v { font-family:var(--mono); font-weight:600; font-size:.7rem; color:var(--text) }
+.dm-syn-v.accent { color:var(--accent) }
+.dm-syn-v.amber  { color:var(--amber) }
+
+/* ── BLOC TRANSMISSION (Tab 5) ── */
+.dm-transm-block {
+  background:linear-gradient(135deg, var(--accent-dim) 0%, var(--surface-2) 100%);
+  border:1.5px solid rgba(79,138,120,.22);
+  border-radius:var(--r); padding:1.35rem 1.45rem 1.2rem;
+  margin-bottom:1rem; position:relative; overflow:hidden;
+}
+.dm-transm-block::after {
+  content:''; position:absolute; top:-30px; right:-30px; width:130px; height:130px;
+  background:radial-gradient(circle, rgba(79,138,120,.12) 0%, transparent 70%);
+  border-radius:50%; pointer-events:none;
+}
+.dm-transm-eyebrow {
+  font-size:.58rem; font-weight:700; color:var(--accent);
+  letter-spacing:.08em; text-transform:uppercase; margin-bottom:.65rem;
+}
+.dm-transm-amount {
+  font-family:var(--sans); font-size:2.3rem; font-weight:700;
+  color:var(--accent); letter-spacing:-.04em; line-height:1;
+}
+.dm-transm-sub { font-size:.78rem; color:var(--text-muted); margin-top:.3rem; margin-bottom:.8rem }
+.dm-transm-row {
+  display:grid; grid-template-columns:repeat(3,1fr); gap:.5rem;
+  border-top:1px solid rgba(79,138,120,.15); padding-top:.75rem;
+}
+.dm-transm-cell { text-align:center; padding:.4rem .5rem; background:rgba(255,255,255,.5); border-radius:6px }
+.dm-transm-cell-val { display:block; font-family:var(--mono); font-size:.78rem; font-weight:700; color:var(--accent) }
+.dm-transm-cell-lbl { display:block; font-size:.6rem; color:var(--text-dim); margin-top:.12rem }
+
+/* ── TABLEAU COMPARAISON ── */
+.dm-comp-wrap { overflow-x:auto; margin-bottom:1rem }
+.dm-comp-grid {
+  min-width:480px; display:grid; grid-template-columns:160px repeat(3,1fr);
+  border:1px solid var(--border-subtle); border-radius:var(--r-sm); overflow:hidden;
+}
+.dm-comp-hdr {
+  padding:.6rem .65rem; background:var(--surface-2); border-bottom:2px solid var(--border);
+  font-size:.58rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+  color:var(--text-dim); text-align:center;
+}
+.dm-comp-hdr.lbl { text-align:left }
+.dm-comp-hdr.win { background:var(--accent-dim); color:var(--accent); border-bottom-color:rgba(79,138,120,.3) }
+.dm-comp-cell {
+  padding:.45rem .65rem; border-bottom:1px solid var(--border-subtle);
+  border-left:1px solid var(--border-subtle); text-align:center;
+  font-size:.71rem; font-family:var(--mono); color:var(--text-muted);
+}
+.dm-comp-cell.lbl { text-align:left; font-family:var(--sans); font-size:.71rem; font-weight:500; color:var(--text); border-left:none; background:var(--surface-2) }
+.dm-comp-cell.best    { background:var(--accent-dim); color:var(--accent); font-weight:700 }
+.dm-comp-cell.good    { color:var(--success) }
+.dm-comp-cell.bad     { color:var(--danger) }
+.dm-comp-cell.neutral { color:var(--text-dim); font-size:.66rem; font-family:var(--sans) }
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="index.html" class="nav-logo"><img src="logo.png?v=3" alt="Patrimonia.ai" class="nav-logo-img"></a>
+  <div class="nav-right">
+    <a href="index.html" class="nav-back">
+      <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7.5 1.5L3 6l4.5 4.5"/></svg>
+      Accueil
+    </a>
+    <div class="nav-dropdown" id="mainDropdown">
+      <button class="nav-dropdown-btn" aria-expanded="false" aria-haspopup="true">
+        Simulateurs <svg class="nav-chevron" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.8" style="width:13px;height:8px;flex-shrink:0"><path d="M1 1l4 4 4-4"/></svg>
+      </button>
+      <div class="nav-dropdown-menu" id="navMenu" role="menu"></div>
+    </div>
+  </div>
+</nav>
+
+<div class="sim-page">
+
+  <div class="sim-page-header">
+    <span class="sim-num-badge"></span>
+    <div>
+      <div class="sim-eyebrow">Ingénierie Patrimoniale &amp; Succession</div>
+      <h1>Démembrement — <em class="gradient-text">Transmission Intelligente</em></h1>
+      <p>Structurez et transmettez votre patrimoine familial : barème CGI 669, donation démembrée, SCPI nue-propriété, optimisation IFI et architecture successorale générationnelle. L'outil du family office.</p>
+    </div>
+  </div>
+
+  <div class="dm-hero-props">
+    <div class="dm-hero-prop">
+      <div class="dm-hero-icon">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+          <path d="M8 2v3M8 5L5 8M8 5l3 3M4 8h2v4H4zM7 8h2v4H7zM10 8h2v4H10z"/>
+        </svg>
+      </div>
+      <div>
+        <div class="dm-hero-prop-title">Barème CGI 669</div>
+        <div class="dm-hero-prop-desc">Répartition officielle US / NP par âge</div>
+      </div>
+    </div>
+    <div class="dm-hero-prop">
+      <div class="dm-hero-icon np">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+          <path d="M3 12V6l5-3.5L13 6v6M6.5 12V8.5h3V12"/>
+        </svg>
+      </div>
+      <div>
+        <div class="dm-hero-prop-title">Nue-propriété</div>
+        <div class="dm-hero-prop-desc">Acquisition décotée, pleine propriété future</div>
+      </div>
+    </div>
+    <div class="dm-hero-prop">
+      <div class="dm-hero-icon">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+          <path d="M2 11.5h10M3 9l2.5-3 2 2L11 4M9.5 4H11v1.5"/>
+        </svg>
+      </div>
+      <div>
+        <div class="dm-hero-prop-title">Donation démembrée</div>
+        <div class="dm-hero-prop-desc">Droits calculés sur NP seule, pas PP</div>
+      </div>
+    </div>
+    <div class="dm-hero-prop">
+      <div class="dm-hero-icon np">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+          <path d="M8 1.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13zM8 4v4.5l2.5 2"/>
+        </svg>
+      </div>
+      <div>
+        <div class="dm-hero-prop-title">Vision long terme</div>
+        <div class="dm-hero-prop-desc">Remembrement, génération future, IFI</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sim-card-wrap">
+    <div class="dm-layout">
+
+      <!-- ══ LEFT PANEL — INPUTS ══ -->
+      <div class="dm-inp">
+
+        <div class="dm-inp-sec">A. Actif patrimonial</div>
+
+        <div class="dm-range-row">
+          <label class="dm-range-lbl" for="dm-valeur">Valeur de l'actif</label>
+          <span class="dm-range-disp amber" id="dm-disp-valeur">500 000 €</span>
+        </div>
+        <input type="range" id="dm-valeur" class="dm-range-inp amber" min="50000" max="3000000" step="10000" value="500000">
+
+        <div class="dm-range-row" style="margin-top:.75rem">
+          <label class="dm-range-lbl" for="dm-type-actif">Type d'actif</label>
+        </div>
+        <select id="dm-type-actif" class="dm-inp-select">
+          <option value="immo" selected>Immobilier résidentiel</option>
+          <option value="scpi">SCPI (parts)</option>
+          <option value="portefeuille">Portefeuille / titres</option>
+          <option value="sci">Parts de SCI</option>
+        </select>
+
+        <div class="dm-range-row" style="margin-top:.75rem">
+          <label class="dm-range-lbl" for="dm-revalo">Revalorisation annuelle</label>
+          <span class="dm-range-disp" id="dm-disp-revalo">2,0 %</span>
+        </div>
+        <input type="range" id="dm-revalo" class="dm-range-inp" min="0" max="5" step="0.5" value="2">
+
+        <div class="dm-range-row" style="margin-top:.6rem">
+          <label class="dm-range-lbl" for="dm-revenus">Revenus générés (rendement)</label>
+          <span class="dm-range-disp amber" id="dm-disp-revenus">4,0 %</span>
+        </div>
+        <input type="range" id="dm-revenus" class="dm-range-inp amber" min="0" max="8" step="0.5" value="4">
+
+        <div class="dm-range-row" style="margin-top:.6rem">
+          <label class="dm-range-lbl" for="dm-horizon">Horizon patrimonial</label>
+          <span class="dm-range-disp" id="dm-disp-horizon">20 ans</span>
+        </div>
+        <input type="range" id="dm-horizon" class="dm-range-inp" min="5" max="35" step="1" value="20">
+
+        <div class="dm-inp-sec">B. Usufruit</div>
+
+        <div class="dm-range-row">
+          <label class="dm-range-lbl" for="dm-type-us">Type d'usufruit</label>
+        </div>
+        <select id="dm-type-us" class="dm-inp-select">
+          <option value="viager" selected>Viager (barème CGI 669)</option>
+          <option value="temporaire">Temporaire (durée fixe)</option>
+        </select>
+
+        <div class="dm-range-row" style="margin-top:.75rem">
+          <label class="dm-range-lbl" for="dm-age">Âge de l'usufruitier</label>
+          <span class="dm-range-disp amber" id="dm-disp-age">60 ans</span>
+        </div>
+        <input type="range" id="dm-age" class="dm-range-inp amber" min="30" max="90" step="1" value="60">
+
+        <div id="dm-temp-fields">
+          <div class="dm-range-row" style="margin-top:.6rem">
+            <label class="dm-range-lbl" for="dm-duree-temp">Durée usufruit temporaire</label>
+            <span class="dm-range-disp" id="dm-disp-duree-temp">10 ans</span>
+          </div>
+          <input type="range" id="dm-duree-temp" class="dm-range-inp" min="5" max="20" step="5" value="10">
+        </div>
+
+        <div class="dm-range-row" style="margin-top:.75rem">
+          <label class="dm-range-lbl" for="dm-nb-us">Nombre d'usufruitiers</label>
+        </div>
+        <select id="dm-nb-us" class="dm-inp-select">
+          <option value="1" selected>1 usufruitier</option>
+          <option value="2">2 usufruitiers (couple)</option>
+        </select>
+
+        <div class="dm-inp-sec">C. Transmission</div>
+
+        <div class="dm-range-row">
+          <label class="dm-range-lbl" for="dm-nb-heritiers">Nombre d'héritiers / donataires</label>
+          <span class="dm-range-disp" id="dm-disp-nb-heritiers">2</span>
+        </div>
+        <input type="range" id="dm-nb-heritiers" class="dm-range-inp" min="1" max="5" step="1" value="2">
+
+        <div class="dm-range-row" style="margin-top:.75rem">
+          <label class="dm-range-lbl" for="dm-lien">Lien de parenté</label>
+        </div>
+        <select id="dm-lien" class="dm-inp-select">
+          <option value="enfants" selected>Enfants (abatt. 100 000 €)</option>
+          <option value="petits">Petits-enfants (31 865 €)</option>
+          <option value="neveux">Neveux / nièces (7 967 €)</option>
+          <option value="autres">Autres (1 594 €)</option>
+        </select>
+
+        <div class="dm-range-row" style="margin-top:.75rem">
+          <label class="dm-range-lbl" for="dm-donation">Donation démembrée maintenant ?</label>
+        </div>
+        <select id="dm-donation" class="dm-inp-select">
+          <option value="oui" selected>Oui — donation NP maintenant</option>
+          <option value="non">Non — projection succession future</option>
+        </select>
+
+        <div class="dm-inp-sec">D. Fiscalité</div>
+
+        <div class="dm-range-row">
+          <label class="dm-range-lbl" for="dm-tmi">TMI de l'usufruitier</label>
+        </div>
+        <select id="dm-tmi" class="dm-inp-select">
+          <option value="11">11 % — TMI 11</option>
+          <option value="30" selected>30 % — TMI 30</option>
+          <option value="41">41 % — TMI 41</option>
+          <option value="45">45 % — TMI 45</option>
+        </select>
+
+        <div class="dm-range-row" style="margin-top:.75rem">
+          <label class="dm-range-lbl" for="dm-ifi">Assujetti à l'IFI ?</label>
+        </div>
+        <select id="dm-ifi" class="dm-inp-select">
+          <option value="non" selected>Non</option>
+          <option value="oui">Oui</option>
+        </select>
+
+        <div id="dm-ifi-fields" style="display:none">
+          <div class="dm-range-row" style="margin-top:.75rem">
+            <label class="dm-range-lbl" for="dm-patrimoine-ifi">Patrimoine imposable IFI</label>
+            <span class="dm-range-disp" id="dm-disp-patrimoine-ifi">2 000 000 €</span>
+          </div>
+          <input type="range" id="dm-patrimoine-ifi" class="dm-range-inp" min="800000" max="10000000" step="50000" value="2000000">
+        </div>
+
+        <!-- Synthèse panneau gauche -->
+        <div class="dm-syn-block">
+          <div class="dm-syn-title">Ingénierie démembrement</div>
+          <div class="dm-syn-row">
+            <span>Valeur nue-propriété</span>
+            <span class="dm-syn-v accent" id="syn-np">—</span>
+          </div>
+          <div class="dm-syn-row">
+            <span>Valeur usufruit</span>
+            <span class="dm-syn-v amber" id="syn-us">—</span>
+          </div>
+          <div class="dm-syn-row">
+            <span>Droits sur NP</span>
+            <span class="dm-syn-v" id="syn-droits">—</span>
+          </div>
+          <div class="dm-syn-row">
+            <span>Économie vs PP</span>
+            <span class="dm-syn-v accent" id="syn-eco">—</span>
+          </div>
+          <div class="dm-syn-row">
+            <span>Valeur future (remembrement)</span>
+            <span class="dm-syn-v" id="syn-futur">—</span>
+          </div>
+        </div>
+
+      </div><!-- /dm-inp -->
+
+      <!-- ══ RIGHT PANEL ══ -->
+      <div class="dm-main">
+
+        <nav class="dm-tabs-nav">
+          <button class="dm-tab-btn active" data-tab="classique">Démembrement classique</button>
+          <button class="dm-tab-btn" data-tab="donation">Donation démembrée</button>
+          <button class="dm-tab-btn" data-tab="scpi">SCPI &amp; NP</button>
+          <button class="dm-tab-btn" data-tab="ifi">Immobilier &amp; IFI</button>
+          <button class="dm-tab-btn" data-tab="succession">Transmission</button>
+          <button class="dm-tab-btn" data-tab="pedagogie">Pédagogie</button>
+        </nav>
+
+        <!-- ─── TAB 1 : DÉMEMBREMENT CLASSIQUE ─── -->
+        <div class="dm-panel active" data-tab="classique">
+
+          <div class="dm-split-block">
+            <div class="dm-split-eyebrow">Répartition démembrement — Barème CGI art. 669</div>
+            <div class="dm-split-bar">
+              <div class="dm-split-bar-us" id="dm-bar-us" style="width:40%"></div>
+              <div class="dm-split-bar-np" id="dm-bar-np" style="width:60%"></div>
+            </div>
+            <div class="dm-split-cols">
+              <div>
+                <div class="dm-split-side-lbl us">Usufruit</div>
+                <div class="dm-split-val us" id="split-val-us">—</div>
+                <div class="dm-split-pct" id="split-pct-us">— %</div>
+              </div>
+              <div class="dm-split-sep">|</div>
+              <div>
+                <div class="dm-split-side-lbl np">Nue-propriété</div>
+                <div class="dm-split-val np" id="split-val-np">—</div>
+                <div class="dm-split-pct" id="split-pct-np">— %</div>
+              </div>
+            </div>
+            <div class="dm-split-pp">
+              <span class="dm-split-pp-lbl">Pleine propriété aujourd'hui</span>
+              <span class="dm-split-pp-val" id="split-val-pp">—</span>
+            </div>
+          </div>
+
+          <div class="dm-kpi-row dm-kpi-3">
+            <div class="dm-kpi amber">
+              <div class="dm-kpi-label">Taux usufruit (CGI)</div>
+              <div class="dm-kpi-val lg amber" id="k1-taux-us">—</div>
+              <div class="dm-kpi-sub" id="k1-taux-us-sub">Âge — ans</div>
+            </div>
+            <div class="dm-kpi accent">
+              <div class="dm-kpi-label">Décote nue-propriété</div>
+              <div class="dm-kpi-val lg accent" id="k1-decote">—</div>
+              <div class="dm-kpi-sub">Économie à l'acquisition</div>
+            </div>
+            <div class="dm-kpi success">
+              <div class="dm-kpi-label">Valeur au remembrement</div>
+              <div class="dm-kpi-val green" id="k1-futur">—</div>
+              <div class="dm-kpi-sub" id="k1-futur-sub">À N+—</div>
+            </div>
+          </div>
+
+          <div class="dm-kpi-row dm-kpi-3">
+            <div class="dm-kpi">
+              <div class="dm-kpi-label">Revenus usufruitier / an</div>
+              <div class="dm-kpi-val amber" id="k1-revenus">—</div>
+              <div class="dm-kpi-sub">Rendement × valeur PP</div>
+            </div>
+            <div class="dm-kpi">
+              <div class="dm-kpi-label">Durée effective</div>
+              <div class="dm-kpi-val" id="k1-duree">—</div>
+              <div class="dm-kpi-sub" id="k1-duree-sub">Espérance viager / durée temp</div>
+            </div>
+            <div class="dm-kpi accent">
+              <div class="dm-kpi-label">Gain NP (remembrement)</div>
+              <div class="dm-kpi-val accent" id="k1-gain">—</div>
+              <div class="dm-kpi-sub">Valeur future − prix NP payé</div>
+            </div>
+          </div>
+
+          <div class="dm-chart-wrap">
+            <div class="dm-chart-hdr">
+              <div>
+                <div class="dm-chart-title">Évolution valeur PP · NP · US dans le temps</div>
+                <div class="dm-chart-sub">Convergence NP → PP au remembrement</div>
+              </div>
+              <span class="dm-chart-badge" id="k1-badge">—</span>
+            </div>
+            <canvas id="cv-evolution" class="dm-canvas dm-canvas-200"></canvas>
+            <div class="dm-legend">
+              <div class="dm-legend-item"><div class="dm-legend-line" style="background:var(--accent)"></div>Valeur NP (acheteur)</div>
+              <div class="dm-legend-item"><div class="dm-legend-line" style="background:rgba(79,138,120,.3);border-top:2px dashed rgba(79,138,120,.5)"></div>Valeur PP projetée</div>
+              <div class="dm-legend-item"><div class="dm-legend-line" style="background:var(--amber)"></div>Valeur usufruit</div>
+            </div>
+          </div>
+
+          <div class="dm-tl-wrap">
+            <div class="dm-tl-title">Timeline démembrement</div>
+            <div class="dm-tl-track">
+              <div class="dm-tl-step done">
+                <div class="dm-tl-dot"></div>
+                <div>
+                  <div class="dm-tl-name">Mise en place du démembrement</div>
+                  <div class="dm-tl-date" id="tl1-date">Année 2026</div>
+                  <div class="dm-tl-detail" id="tl1-detail">Répartition US / NP selon barème CGI 669. US conserve l'usage et les revenus.</div>
+                </div>
+              </div>
+              <div class="dm-tl-step active">
+                <div class="dm-tl-dot"></div>
+                <div>
+                  <div class="dm-tl-name">Période de démembrement</div>
+                  <div class="dm-tl-date" id="tl2-date">2026 → —</div>
+                  <div class="dm-tl-detail" id="tl2-detail">L'usufruitier perçoit les revenus. Le nu-propriétaire ne perçoit rien mais sa valeur croît.</div>
+                </div>
+              </div>
+              <div class="dm-tl-step future">
+                <div class="dm-tl-dot"></div>
+                <div>
+                  <div class="dm-tl-name">Remembrement — pleine propriété</div>
+                  <div class="dm-tl-date" id="tl3-date">Année —</div>
+                  <div class="dm-tl-detail" id="tl3-detail">Extinction de l'usufruit. NP récupère la pleine propriété sans droits supplémentaires.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /tab classique -->
+
+        <!-- ─── TAB 2 : DONATION DÉMEMBRÉE ─── -->
+        <div class="dm-panel" data-tab="donation">
+
+          <div class="dm-info-box">
+            <strong>Principe de la donation démembrée :</strong> le donateur conserve l'usufruit (revenus et jouissance), et donne la nue-propriété. Les droits de donation sont calculés sur la seule valeur de la NP (décotée par barème CGI 669), pas sur la pleine propriété.
+          </div>
+
+          <div class="dm-avap-strip">
+            <div class="dm-avap-left">
+              <div class="dm-avap-badge">Donation pleine propriété</div>
+              <div class="dm-avap-row"><span>Base taxable</span><span class="dm-avap-v" id="don-pp-base">—</span></div>
+              <div class="dm-avap-row"><span>Abattement (par héritier)</span><span class="dm-avap-v" id="don-pp-abatt">—</span></div>
+              <div class="dm-avap-row"><span>Droits totaux</span><span class="dm-avap-v neg" id="don-pp-droits">—</span></div>
+            </div>
+            <div class="dm-avap-arrow">→</div>
+            <div class="dm-avap-right">
+              <div class="dm-avap-badge">Donation nue-propriété</div>
+              <div class="dm-avap-row"><span>Base taxable (NP)</span><span class="dm-avap-v accent" id="don-np-base">—</span></div>
+              <div class="dm-avap-row"><span>Abattement (par héritier)</span><span class="dm-avap-v" id="don-np-abatt">—</span></div>
+              <div class="dm-avap-row"><span>Droits totaux</span><span class="dm-avap-v eco" id="don-np-droits">—</span></div>
+            </div>
+          </div>
+
+          <div class="dm-kpi-row dm-kpi-4">
+            <div class="dm-kpi amber">
+              <div class="dm-kpi-label">Économie de droits</div>
+              <div class="dm-kpi-val lg amber" id="don-eco">—</div>
+              <div class="dm-kpi-sub">NP vs PP en donation</div>
+            </div>
+            <div class="dm-kpi accent">
+              <div class="dm-kpi-label">Valeur NP transmise</div>
+              <div class="dm-kpi-val accent" id="don-np-val">—</div>
+              <div class="dm-kpi-sub">Part transmise aujourd'hui</div>
+            </div>
+            <div class="dm-kpi success">
+              <div class="dm-kpi-label">PP future héritiers</div>
+              <div class="dm-kpi-val green" id="don-pp-futur">—</div>
+              <div class="dm-kpi-sub">Sans droits au remembrement</div>
+            </div>
+            <div class="dm-kpi">
+              <div class="dm-kpi-label">Gain net transmis</div>
+              <div class="dm-kpi-val" id="don-gain-net">—</div>
+              <div class="dm-kpi-sub">PP future − droits payés</div>
+            </div>
+          </div>
+
+          <div class="dm-chart-wrap">
+            <div class="dm-chart-hdr">
+              <div>
+                <div class="dm-chart-title">Waterfall — de la PP aux droits réels</div>
+                <div class="dm-chart-sub">Visualisation de l'économie successorale par démembrement</div>
+              </div>
+            </div>
+            <div id="wf-don-wrap">
+              <div class="dm-wf-row">
+                <span class="dm-wf-lbl">Valeur pleine propriété</span>
+                <div class="dm-wf-bar-wrap"><div class="dm-wf-bar" id="wf-bar-pp" style="background:var(--border)"></div></div>
+                <span class="dm-wf-val" id="wf-v-pp">—</span>
+              </div>
+              <div class="dm-wf-row">
+                <span class="dm-wf-lbl">Valeur nue-propriété</span>
+                <div class="dm-wf-bar-wrap"><div class="dm-wf-bar" id="wf-bar-np" style="background:var(--accent)"></div></div>
+                <span class="dm-wf-val accent" id="wf-v-np">—</span>
+              </div>
+              <div class="dm-wf-row">
+                <span class="dm-wf-lbl">Abattements legaux</span>
+                <div class="dm-wf-bar-wrap"><div class="dm-wf-bar" id="wf-bar-abatt" style="background:var(--success)"></div></div>
+                <span class="dm-wf-val" id="wf-v-abatt">—</span>
+              </div>
+              <div class="dm-wf-row">
+                <span class="dm-wf-lbl">Droits de donation NP</span>
+                <div class="dm-wf-bar-wrap"><div class="dm-wf-bar" id="wf-bar-droits" style="background:var(--danger)"></div></div>
+                <span class="dm-wf-val neg" id="wf-v-droits">—</span>
+              </div>
+              <div class="dm-wf-row">
+                <span class="dm-wf-lbl">Valeur future héritiers (PP)</span>
+                <div class="dm-wf-bar-wrap"><div class="dm-wf-bar" id="wf-bar-futur" style="background:var(--accent)"></div></div>
+                <span class="dm-wf-val accent" id="wf-v-futur">—</span>
+              </div>
+              <div class="dm-wf-row">
+                <span class="dm-wf-lbl total">Gain net intergénérationnel</span>
+                <div class="dm-wf-bar-wrap"><div class="dm-wf-bar" id="wf-bar-gain" style="background:var(--accent)"></div></div>
+                <span class="dm-wf-val accent" id="wf-v-gain">—</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="dm-chart-wrap">
+            <div class="dm-chart-hdr">
+              <div>
+                <div class="dm-chart-title">Projection intergénérationnelle</div>
+                <div class="dm-chart-sub">Valeur PP héritée avec et sans donation démembrée</div>
+              </div>
+            </div>
+            <canvas id="cv-donation-proj" class="dm-canvas dm-canvas-200"></canvas>
+            <div class="dm-legend">
+              <div class="dm-legend-item"><div class="dm-legend-line" style="background:var(--accent)"></div>Avec donation NP (transmission optimisée)</div>
+              <div class="dm-legend-item"><div class="dm-legend-line" style="background:rgba(184,134,11,.6);border-top:2px dashed rgba(184,134,11,.6)"></div>Sans donation (succession PP)</div>
+            </div>
+          </div>
+
+        </div><!-- /tab donation -->
+
+        <!-- ─── TAB 3 : SCPI & DÉMEMBREMENT ─── -->
+        <div class="dm-panel" data-tab="scpi">
+
+          <div class="dm-info-box">
+            <strong>SCPI en nue-propriété :</strong> l'investisseur achète la NP à prix décoté. L'usufruitier (souvent une compagnie) perçoit les revenus pendant la durée définie. À l'extinction de l'usufruit, le nu-propriétaire récupère la pleine propriété sans droits et sans fiscalité sur les revenus pendant la période.
+          </div>
+
+          <div class="dm-kpi-row dm-kpi-3">
+            <div class="dm-kpi amber">
+              <div class="dm-kpi-label">Taux usufruit temporaire</div>
+              <div class="dm-kpi-val lg amber" id="scpi-tus">—</div>
+              <div class="dm-kpi-sub" id="scpi-tus-sub">Pour — ans (23% / 10 ans)</div>
+            </div>
+            <div class="dm-kpi accent">
+              <div class="dm-kpi-label">Prix NP (décote)</div>
+              <div class="dm-kpi-val lg accent" id="scpi-np">—</div>
+              <div class="dm-kpi-sub" id="scpi-np-sub">Au lieu de — € en PP</div>
+            </div>
+            <div class="dm-kpi success">
+              <div class="dm-kpi-label">Valeur récupérée</div>
+              <div class="dm-kpi-val green" id="scpi-futur">—</div>
+              <div class="dm-kpi-sub" id="scpi-futur-sub">À N+—</div>
+            </div>
+          </div>
+
+          <div class="dm-kpi-row dm-kpi-3">
+            <div class="dm-kpi accent">
+              <div class="dm-kpi-label">Rendement implicite NP</div>
+              <div class="dm-kpi-val accent" id="scpi-rend-impl">—</div>
+              <div class="dm-kpi-sub">TRI annualisé sans revenus</div>
+            </div>
+            <div class="dm-kpi">
+              <div class="dm-kpi-label">Gain NP (nets)</div>
+              <div class="dm-kpi-val" id="scpi-gain">—</div>
+              <div class="dm-kpi-sub">PP future − prix NP payé</div>
+            </div>
+            <div class="dm-kpi amber">
+              <div class="dm-kpi-label">Revenus US cumulés</div>
+              <div class="dm-kpi-val amber" id="scpi-rev-us">—</div>
+              <div class="dm-kpi-sub">Perçus par l'usufruitier</div>
+            </div>
+          </div>
+
+          <div class="dm-amber-box">
+            <strong>Avantage fiscal NP :</strong> le nu-propriétaire ne perçoit aucun revenu → aucune fiscalité IR/PS pendant la période. Les plus-values à la revente sont calculées sur le prix PP d'origine (art. 150 U CGI), pas sur le prix NP payé.
+          </div>
+
+          <div class="dm-tl-wrap">
+            <div class="dm-tl-title">Timeline usufruit temporaire SCPI</div>
+            <div class="dm-tl-track">
+              <div class="dm-tl-step done">
+                <div class="dm-tl-dot"></div>
+                <div>
+                  <div class="dm-tl-name">Achat nue-propriété</div>
+                  <div class="dm-tl-date">2026</div>
+                  <div class="dm-tl-detail" id="scpi-tl1">Acquisition NP à prix décoté. Zéro revenu, zéro fiscalité.</div>
+                </div>
+              </div>
+              <div class="dm-tl-step active">
+                <div class="dm-tl-dot"></div>
+                <div>
+                  <div class="dm-tl-name">Période d'usufruit temporaire</div>
+                  <div class="dm-tl-date" id="scpi-tl2-date">2026 → —</div>
+                  <div class="dm-tl-detail" id="scpi-tl2">Usufruitier perçoit les loyers SCPI. NP : zéro charge, zéro IR, zéro PS.</div>
+                </div>
+              </div>
+              <div class="dm-tl-step future">
+                <div class="dm-tl-dot"></div>
+                <div>
+                  <div class="dm-tl-name">Remembrement SCPI</div>
+                  <div class="dm-tl-date" id="scpi-tl3-date">Année —</div>
+                  <div class="dm-tl-detail" id="scpi-tl3">Réunion PP sans frais ni droits. Valeur récupérée estimée : —</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="dm-chart-wrap">
+            <div class="dm-chart-hdr">
+              <div>
+                <div class="dm-chart-title">Comparaison NP vs Pleine propriété SCPI</div>
+                <div class="dm-chart-sub">Valeur nette patrimoine à l'horizon</div>
+              </div>
+            </div>
+            <canvas id="cv-scpi" class="dm-canvas dm-canvas-200"></canvas>
+            <div class="dm-legend">
+              <div class="dm-legend-item"><div class="dm-legend-line" style="background:var(--accent)"></div>NP → PP (remembrement)</div>
+              <div class="dm-legend-item"><div class="dm-legend-line" style="background:rgba(79,138,120,.35);border-top:2px dashed rgba(79,138,120,.45)"></div>PP directe (référence)</div>
+            </div>
+          </div>
+
+        </div><!-- /tab scpi -->
+
+        <!-- ─── TAB 4 : IMMOBILIER & IFI ─── -->
+        <div class="dm-panel" data-tab="ifi">
+
+          <div class="dm-info-box">
+            <strong>IFI &amp; démembrement :</strong> l'usufruitier est imposé à l'IFI sur la valeur en <em>pleine propriété</em> (art. 968 CGI). En revanche, si la nue-propriété est donnée ou cédée à un tiers, la base IFI de l'usufruitier reste en PP. La réforme 2013 a supprimé l'imposition au prorata — l'usufruitier seul porte l'IFI sur la PP.
+          </div>
+
+          <div class="dm-avap-strip">
+            <div class="dm-avap-left">
+              <div class="dm-avap-badge">Avant démembrement</div>
+              <div class="dm-avap-row"><span>Patrimoine IFI</span><span class="dm-avap-v" id="ifi-avant-base">—</span></div>
+              <div class="dm-avap-row"><span>IFI annuel</span><span class="dm-avap-v neg" id="ifi-avant-montant">—</span></div>
+              <div class="dm-avap-row"><span>IFI cumulé 10 ans</span><span class="dm-avap-v neg" id="ifi-avant-cum">—</span></div>
+            </div>
+            <div class="dm-avap-arrow">→</div>
+            <div class="dm-avap-right">
+              <div class="dm-avap-badge">Après démembrement</div>
+              <div class="dm-avap-row"><span>Patrimoine IFI usufruitier</span><span class="dm-avap-v" id="ifi-apres-base">—</span></div>
+              <div class="dm-avap-row"><span>IFI annuel</span><span class="dm-avap-v eco" id="ifi-apres-montant">—</span></div>
+              <div class="dm-avap-row"><span>IFI cumulé 10 ans</span><span class="dm-avap-v eco" id="ifi-apres-cum">—</span></div>
+            </div>
+          </div>
+
+          <div class="dm-kpi-row dm-kpi-3">
+            <div class="dm-kpi amber">
+              <div class="dm-kpi-label">Économie IFI annuelle</div>
+              <div class="dm-kpi-val lg amber" id="k4-eco-annuel">—</div>
+              <div class="dm-kpi-sub">Réduction IFI après NP transmise</div>
+            </div>
+            <div class="dm-kpi accent">
+              <div class="dm-kpi-label">Économie IFI cumulée</div>
+              <div class="dm-kpi-val accent" id="k4-eco-cum">—</div>
+              <div class="dm-kpi-sub" id="k4-eco-cum-sub">Sur — ans</div>
+            </div>
+            <div class="dm-kpi">
+              <div class="dm-kpi-label">Valeur NP transmise</div>
+              <div class="dm-kpi-val" id="k4-np">—</div>
+              <div class="dm-kpi-sub">Sortie base IFI nu-propriétaire</div>
+            </div>
+          </div>
+
+          <div class="dm-warn-box">
+            <strong>Attention — règle IFI :</strong> l'usufruitier reste imposé sur la <strong>valeur pleine propriété</strong> même après donation NP (art. 968 al.1 CGI). L'économie IFI n'est réalisée que si l'usufruitier <em>cède également</em> l'usufruit (démembrement complet à un tiers), ou si le nu-propriétaire bénéficie d'exceptions (quote-part PP < 1,3 M€). Simulations à vérifier avec un CGP.
+          </div>
+
+          <div class="dm-chart-wrap">
+            <div class="dm-chart-hdr">
+              <div>
+                <div class="dm-chart-title">IFI annuel — avant vs après démembrement</div>
+                <div class="dm-chart-sub">Impact patrimonial net de la transmission NP</div>
+              </div>
+            </div>
+            <canvas id="cv-ifi" class="dm-canvas dm-canvas-180"></canvas>
+            <div class="dm-legend">
+              <div class="dm-legend-item"><div class="dm-legend-line" style="background:rgba(184,134,11,.7)"></div>IFI avant</div>
+              <div class="dm-legend-item"><div class="dm-legend-line" style="background:var(--accent)"></div>IFI après démembrement</div>
+            </div>
+          </div>
+
+        </div><!-- /tab ifi -->
+
+        <!-- ─── TAB 5 : TRANSMISSION & SUCCESSION ─── -->
+        <div class="dm-panel" data-tab="succession">
+
+          <div class="dm-transm-block">
+            <div class="dm-transm-eyebrow">Capital transmis net — héritiers</div>
+            <div class="dm-transm-amount" id="tr-capital-net">—</div>
+            <div class="dm-transm-sub" id="tr-capital-sub">Valeur PP future − droits payés aujourd'hui</div>
+            <div class="dm-transm-row">
+              <div class="dm-transm-cell">
+                <strong class="dm-transm-cell-val" id="tr-pp-futur">—</strong>
+                <span class="dm-transm-cell-lbl">PP future estimée</span>
+              </div>
+              <div class="dm-transm-cell">
+                <strong class="dm-transm-cell-val" id="tr-droits-payes">—</strong>
+                <span class="dm-transm-cell-lbl">Droits donation payés</span>
+              </div>
+              <div class="dm-transm-cell">
+                <strong class="dm-transm-cell-val" id="tr-eco-succ">—</strong>
+                <span class="dm-transm-cell-lbl">Économie vs succession PP</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="dm-kpi-row dm-kpi-3">
+            <div class="dm-kpi accent">
+              <div class="dm-kpi-label">Économie successorale</div>
+              <div class="dm-kpi-val lg accent" id="tr-k-eco">—</div>
+              <div class="dm-kpi-sub">Droits évités vs succession PP</div>
+            </div>
+            <div class="dm-kpi success">
+              <div class="dm-kpi-label">Taux transmission</div>
+              <div class="dm-kpi-val green" id="tr-k-taux">—</div>
+              <div class="dm-kpi-sub">Capital transmis / PP future</div>
+            </div>
+            <div class="dm-kpi">
+              <div class="dm-kpi-label">Droits succession si PP</div>
+              <div class="dm-kpi-val red" id="tr-k-droits-succ">—</div>
+              <div class="dm-kpi-sub">Sans optimisation</div>
+            </div>
+          </div>
+
+          <div class="dm-comp-wrap">
+            <div class="dm-comp-grid">
+              <div class="dm-comp-hdr lbl">Critère</div>
+              <div class="dm-comp-hdr win">Donation NP</div>
+              <div class="dm-comp-hdr">Succession PP</div>
+              <div class="dm-comp-hdr">Donation PP</div>
+              <div class="dm-comp-cell lbl">Droits payés</div>
+              <div class="dm-comp-cell best" id="c-droits-np">—</div>
+              <div class="dm-comp-cell bad" id="c-droits-succ">—</div>
+              <div class="dm-comp-cell bad" id="c-droits-pp">—</div>
+              <div class="dm-comp-cell lbl">Valeur transmise</div>
+              <div class="dm-comp-cell best" id="c-val-np">—</div>
+              <div class="dm-comp-cell" id="c-val-succ">—</div>
+              <div class="dm-comp-cell" id="c-val-pp">—</div>
+              <div class="dm-comp-cell lbl">Moment</div>
+              <div class="dm-comp-cell best neutral">Maintenant</div>
+              <div class="dm-comp-cell neutral">Au décès</div>
+              <div class="dm-comp-cell neutral">Maintenant</div>
+              <div class="dm-comp-cell lbl">Revenus donateur</div>
+              <div class="dm-comp-cell best neutral">Conservés (US)</div>
+              <div class="dm-comp-cell neutral">N/A</div>
+              <div class="dm-comp-cell neutral">Perdus</div>
+              <div class="dm-comp-cell lbl">Économie vs succession</div>
+              <div class="dm-comp-cell best" id="c-eco-np">—</div>
+              <div class="dm-comp-cell neutral">Référence</div>
+              <div class="dm-comp-cell" id="c-eco-pp">—</div>
+            </div>
+          </div>
+
+          <div class="dm-chart-wrap">
+            <div class="dm-chart-hdr">
+              <div>
+                <div class="dm-chart-title">Timeline générationnelle — architecture familiale</div>
+                <div class="dm-chart-sub">Valeur patrimoine transmis selon la stratégie</div>
+              </div>
+              <span class="dm-chart-badge" id="tr-badge">—</span>
+            </div>
+            <canvas id="cv-succession" class="dm-canvas dm-canvas-260"></canvas>
+            <div class="dm-legend">
+              <div class="dm-legend-item"><div class="dm-legend-line" style="background:var(--accent)"></div>Donation NP (optimisé)</div>
+              <div class="dm-legend-item"><div class="dm-legend-line" style="background:rgba(184,134,11,.7);border-top:2px dashed rgba(184,134,11,.7)"></div>Succession PP (sans optimisation)</div>
+            </div>
+          </div>
+
+        </div><!-- /tab succession -->
+
+        <!-- ─── TAB 6 : PÉDAGOGIE ─── -->
+        <div class="dm-panel" data-tab="pedagogie">
+
+          <div class="dm-peda-grid">
+
+            <div class="dm-peda-card">
+              <div class="dm-peda-icon">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+                  <path d="M8 2v3M8 5L5 8M8 5l3 3M4 8h2v4H4zM7 8h2v4H7zM10 8h2v4H10z"/>
+                </svg>
+              </div>
+              <div class="dm-peda-title">Qu'est-ce que le démembrement ?</div>
+              <div class="dm-peda-body">Le démembrement de propriété consiste à séparer la pleine propriété (PP) en deux droits distincts : l'usufruit (droit d'usage et de percevoir les revenus) et la nue-propriété (droit de disposer du bien à terme). Les deux se réunissent au décès de l'usufruitier ou à l'échéance fixée.</div>
+              <span class="dm-peda-tag">Fondamentaux CGI</span>
+            </div>
+
+            <div class="dm-peda-card">
+              <div class="dm-peda-icon amber">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+                  <circle cx="8" cy="8" r="6"/><path d="M8 5v3l2.5 2"/>
+                </svg>
+              </div>
+              <div class="dm-peda-title">Usufruit vs Nue-propriété</div>
+              <div class="dm-peda-body"><strong>Usufruitier</strong> : perçoit les loyers, habite le bien, paie les charges courantes et la taxe foncière. Imposé à l'IFI sur la valeur PP. <strong>Nu-propriétaire</strong> : n'a aucun revenu, aucune fiscalité courante, supporte les grosses réparations (art. 605 Code civil). Récupère la PP sans frais à l'extinction.</div>
+              <span class="dm-peda-tag amber">Droits &amp; obligations</span>
+            </div>
+
+            <div class="dm-peda-card">
+              <div class="dm-peda-icon">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+                  <path d="M2 12.5h12M5 9.5V7M8 9.5V4.5M11 9.5V6.5"/>
+                </svg>
+              </div>
+              <div class="dm-peda-title">Barème CGI 669 — usufruit viager</div>
+              <div class="dm-peda-body">La valeur de l'usufruit viager est fixée par le barème de l'article 669 du CGI selon l'âge : 90% avant 21 ans, 80% de 21 à 30 ans, 70% de 31 à 40 ans, 60% de 41 à 50 ans, 50% de 51 à 60 ans, 40% de 61 à 70 ans, 30% de 71 à 80 ans, 20% de 81 à 90 ans, 10% après 90 ans. La NP = 100% − taux US.</div>
+              <span class="dm-peda-tag">Art. 669 CGI</span>
+            </div>
+
+            <div class="dm-peda-card">
+              <div class="dm-peda-icon">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+                  <path d="M2 11.5h10M3 9l2.5-3 2 2L11 4M9.5 4H11v1.5"/>
+                </svg>
+              </div>
+              <div class="dm-peda-title">Donation démembrée</div>
+              <div class="dm-peda-body">Le donateur conserve l'usufruit (revenus, jouissance) et donne la nue-propriété. Les droits de donation sont calculés sur la seule valeur NP (décotée par barème CGI). À son décès, l'usufruit s'éteint : les enfants récupèrent la pleine propriété <strong>sans aucun droit supplémentaire</strong>. Toute revalorisation entre la donation et le décès est transmise gratuitement.</div>
+              <span class="dm-peda-tag">Art. 669 + 792 CGI</span>
+            </div>
+
+            <div class="dm-peda-card">
+              <div class="dm-peda-icon np">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+                  <path d="M3 12V6l5-3.5L13 6v6M6.5 12V8.5h3V12"/>
+                </svg>
+              </div>
+              <div class="dm-peda-title">SCPI en nue-propriété</div>
+              <div class="dm-peda-body">Acquisition des parts SCPI en nue-propriété à prix décoté. L'usufruit temporaire est cédé à un acquéreur institutionnel pour une durée fixe (10-20 ans). Pendant cette période : zéro revenu → zéro IR → zéro PS pour le NP. À l'extinction : recouvrement de la PP estimée à la valeur de marché. Rendement implicite annualisé : généralement entre 3,5% et 5,5%.</div>
+              <span class="dm-peda-tag">SCPI &amp; fiscalité</span>
+            </div>
+
+            <div class="dm-peda-card">
+              <div class="dm-peda-icon amber">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+                  <path d="M3 13.5V7l5-5 5 5v6.5M1.5 13.5h13"/>
+                  <path d="M6 13.5V9.5h4v4"/>
+                </svg>
+              </div>
+              <div class="dm-peda-title">Risques &amp; vigilances</div>
+              <div class="dm-peda-body"><strong>Abus de droit :</strong> donation sans intention libérale réelle (art. L64 LPF) peut être requalifiée. <strong>IFI :</strong> l'usufruitier reste imposé sur PP (art. 968 CGI). <strong>PV cession NP :</strong> la plus-value est calculée sur prix PP d'origine (not NP). <strong>Réversion :</strong> en cas de prédécès du NP, la PP revient à l'usufruitier sauf clause contraire. Toujours consulter un notaire.</div>
+              <span class="dm-peda-tag amber">Risques CGP</span>
+            </div>
+
+          </div>
+
+          <div class="dm-amber-box">
+            <strong>Abattements légaux (2026) :</strong> Enfants : 100 000 € par parent, renouvelable tous les 15 ans. Petits-enfants : 31 865 €. Neveux/nièces : 7 967 €. Conjoint/PACS : 80 724 €. Ces abattements s'appliquent sur la valeur NP, rendant la donation démembrée encore plus avantageuse.
+          </div>
+
+        </div><!-- /tab pedagogie -->
+
+      </div><!-- /dm-main -->
+    </div><!-- /dm-layout -->
+  </div><!-- /sim-card-wrap -->
+</div><!-- /sim-page -->
+
+<script>
+(function(){
+  'use strict';
+
+  const YEAR = 2026;
+
+  function $(id){ return document.getElementById(id) }
+  function ST(id, val){ const el=$(id); if(el) el.textContent = val }
+  function eur(v){ return SP.fmtEur(Math.round(v)) }
+  function pct(v, d){ return SP.fmtNum(v, d != null ? d : 1) + ' %' }
+  function fmtK(v){ return (v/1000).toFixed(0) + 'k' }
+
+  /* ── Barème CGI 669 ── */
+  function tauxUSViager(age){
+    if(age < 21) return 0.90;
+    if(age < 31) return 0.80;
+    if(age < 41) return 0.70;
+    if(age < 51) return 0.60;
+    if(age < 61) return 0.50;
+    if(age < 71) return 0.40;
+    if(age < 81) return 0.30;
+    if(age < 91) return 0.20;
+    return 0.10;
+  }
+
+  function tauxUSTemp(duree){
+    return Math.min(0.90, Math.ceil(duree / 10) * 0.23);
+  }
+
+  function getUSRate(p){
+    if(p.typeUS === 'temporaire'){
+      const tT = tauxUSTemp(p.dureeTemp);
+      const tV = tauxUSViager(p.age);
+      return Math.min(tT, tV);
+    }
+    return tauxUSViager(p.age);
+  }
+
+  /* ── Barème droits de donation ── */
+  function abattement(lien){
+    const ab = { enfants:100000, petits:31865, neveux:7967, autres:1594 };
+    return ab[lien] || 1594;
+  }
+
+  function calcBareme(base){
+    if(base <= 0) return 0;
+    const slices = [
+      [8072, 0.05], [12109, 0.10], [15932, 0.15],
+      [552324, 0.20], [902838, 0.30], [1805677, 0.40], [Infinity, 0.45]
+    ];
+    let tax = 0, cumul = 0;
+    for(const [top, rate] of slices){
+      const slice = Math.min(base - cumul, top - cumul);
+      if(slice <= 0) break;
+      tax += slice * rate;
+      cumul = top;
+      if(cumul >= base) break;
+    }
+    return tax;
+  }
+
+  function calcDroits(valParH, lien){
+    const ab = abattement(lien);
+    const taxable = Math.max(0, valParH - ab);
+    return calcBareme(taxable);
+  }
+
+  /* ── IFI ── */
+  function calcIFI(patrimoine){
+    if(patrimoine <= 800000) return 0;
+    const slices = [
+      [1300000, 0.005], [2570000, 0.007],
+      [5000000, 0.01], [10000000, 0.0125], [Infinity, 0.015]
+    ];
+    let tax = 0, prev = 800000;
+    for(const [top, rate] of slices){
+      const slice = Math.min(patrimoine, top) - prev;
+      if(slice <= 0) break;
+      tax += slice * rate;
+      prev = top;
+      if(patrimoine <= top) break;
+    }
+    return tax;
+  }
+
+  /* ── Lire les inputs ── */
+  function readInp(){
+    const v = id => parseFloat($(id)?.value || 0);
+    const s = id => $(id)?.value || '';
+    return {
+      valeur:      v('dm-valeur'),
+      typeActif:   s('dm-type-actif'),
+      revalo:      v('dm-revalo'),
+      revenus:     v('dm-revenus'),
+      horizon:     Math.round(v('dm-horizon')),
+      typeUS:      s('dm-type-us'),
+      age:         Math.round(v('dm-age')),
+      dureeTemp:   Math.round(v('dm-duree-temp')),
+      nbUS:        parseInt(s('dm-nb-us')) || 1,
+      nbH:         Math.round(v('dm-nb-heritiers')),
+      lien:        s('dm-lien'),
+      donation:    s('dm-donation') === 'oui',
+      tmi:         parseInt(s('dm-tmi')) || 30,
+      ifi:         s('dm-ifi') === 'oui',
+      patriIFI:    v('dm-patrimoine-ifi'),
+    };
+  }
+
+  /* ── Calcul central ── */
+  function calcBase(p){
+    const tUS  = getUSRate(p);
+    const tNP  = 1 - tUS;
+    const valUS = p.valeur * tUS;
+    const valNP = p.valeur * tNP;
+
+    const esperance = Math.max(5, 88 - p.age);
+    const dureeDemo = p.typeUS === 'temporaire' ? p.dureeTemp : esperance;
+
+    const valoFin = p.valeur * Math.pow(1 + p.revalo / 100, dureeDemo);
+    const revenusAnnuels = p.valeur * (p.revenus / 100);
+    const revCum = revenusAnnuels * dureeDemo;
+
+    /* Droits donation */
+    const nb      = Math.max(1, p.nbH);
+    const ppParH  = p.valeur / nb;
+    const npParH  = valNP / nb;
+    const droitsPP = calcDroits(ppParH, p.lien) * nb;
+    const droitsNP = calcDroits(npParH,  p.lien) * nb;
+    const eco      = Math.max(0, droitsPP - droitsNP);
+
+    /* Droits sur PP future (succession sans optimisation) */
+    const ppFutParH = valoFin / nb;
+    const droitsSuccPP = calcDroits(ppFutParH, p.lien) * nb;
+
+    /* Capital transmis net */
+    const capitalTransmis = valoFin - (p.donation ? droitsNP : droitsSuccPP);
+    const economieSucc = Math.max(0, droitsSuccPP - droitsNP);
+
+    /* IFI */
+    const baseIFIRef  = p.ifi ? p.patriIFI : p.valeur;
+    const ifiAvant    = p.ifi ? calcIFI(baseIFIRef) : 0;
+    const ifiApres    = p.ifi ? calcIFI(Math.max(0, baseIFIRef - valNP)) : 0;
+    const ecoIFI      = Math.max(0, ifiAvant - ifiApres);
+
+    /* SCPI NP temporaire (toujours afficher en tab 3) */
+    const dureeScpi = p.typeUS === 'temporaire' ? p.dureeTemp : 10;
+    const tUSScpi   = tauxUSTemp(dureeScpi);
+    const npScpi    = p.valeur * (1 - tUSScpi);
+    const ppFutScpi = p.valeur * Math.pow(1 + p.revalo / 100, dureeScpi);
+    const rendImpl  = npScpi > 0 ? (Math.pow(ppFutScpi / npScpi, 1 / dureeScpi) - 1) * 100 : 0;
+    const revCumUS  = revenusAnnuels * dureeScpi;
+
+    return {
+      tUS, tNP, valUS, valNP,
+      dureeDemo, valoFin, revenusAnnuels, revCum,
+      droitsPP, droitsNP, eco,
+      droitsSuccPP, capitalTransmis, economieSucc,
+      ifiAvant, ifiApres, ecoIFI,
+      dureeScpi, tUSScpi, npScpi, ppFutScpi, rendImpl, revCumUS,
+    };
+  }
+
+  /* ── Render Tab 1 : classique ── */
+  function renderClassique(p, r){
+    const tUSPct = (r.tUS * 100).toFixed(0);
+    const tNPPct = (r.tNP * 100).toFixed(0);
+
+    /* Split block */
+    const barUS = $('dm-bar-us'), barNP = $('dm-bar-np');
+    if(barUS){ barUS.style.width = tUSPct + '%' }
+    if(barNP){ barNP.style.width = tNPPct + '%' }
+
+    ST('split-val-us', eur(r.valUS));
+    ST('split-val-np', eur(r.valNP));
+    ST('split-pct-us', tUSPct + ' % US');
+    ST('split-pct-np', tNPPct + ' % NP');
+    ST('split-val-pp',  eur(p.valeur));
+
+    /* KPIs */
+    ST('k1-taux-us', tUSPct + ' %');
+    ST('k1-taux-us-sub', 'Âge ' + p.age + ' ans — ' + (p.typeUS === 'viager' ? 'viager' : 'temporaire'));
+    ST('k1-decote', eur(r.valUS));
+    ST('k1-futur',  eur(r.valoFin));
+    ST('k1-futur-sub', 'N+' + r.dureeDemo + ' (revalo ' + p.revalo + '%/an)');
+    ST('k1-revenus', eur(r.revenusAnnuels) + '/an');
+    ST('k1-duree', r.dureeDemo + ' ans');
+    ST('k1-duree-sub', p.typeUS === 'viager' ? 'Espérance de vie estimée' : 'Durée temporaire');
+    ST('k1-gain', eur(r.valoFin - r.valNP));
+    ST('k1-badge', 'Remembrement N+' + r.dureeDemo);
+
+    /* Timeline */
+    const finAn = YEAR + r.dureeDemo;
+    ST('tl1-detail', 'Répartition US ' + tUSPct + '% (' + eur(r.valUS) + ') / NP ' + tNPPct + '% (' + eur(r.valNP) + ') — barème CGI 669.');
+    ST('tl2-date', YEAR + ' → ' + finAn);
+    ST('tl2-detail', 'Usufruitier perçoit ' + eur(r.revenusAnnuels) + '/an (' + p.revenus + '% × valeur PP). NP croît passivement.');
+    ST('tl3-date', 'Année ' + finAn);
+    ST('tl3-detail', 'Extinction usufruit. Remembrement PP : ' + eur(r.valoFin) + ' estimé. Gain NP : +' + eur(r.valoFin - r.valNP) + '.');
+
+    /* Panneau gauche */
+    ST('syn-np', eur(r.valNP));
+    ST('syn-us', eur(r.valUS));
+    ST('syn-droits', eur(r.droitsNP));
+    ST('syn-eco', '+' + eur(r.eco));
+    ST('syn-futur', eur(r.valoFin));
+  }
+
+  /* ── Render Tab 2 : donation ── */
+  function renderDonation(p, r){
+    const ab = abattement(p.lien);
+    const nb = Math.max(1, p.nbH);
+
+    ST('don-pp-base', eur(p.valeur));
+    ST('don-pp-abatt', eur(ab) + ' × ' + nb);
+    ST('don-pp-droits', '−' + eur(r.droitsPP));
+    ST('don-np-base', eur(r.valNP));
+    ST('don-np-abatt', eur(ab) + ' × ' + nb);
+    ST('don-np-droits', '−' + eur(r.droitsNP));
+    ST('don-eco', '+' + eur(r.eco));
+    ST('don-np-val', eur(r.valNP));
+    ST('don-pp-futur', eur(r.valoFin));
+    ST('don-gain-net', eur(r.valoFin - r.droitsNP));
+
+    /* Waterfall */
+    const maxRef = Math.max(r.valoFin, p.valeur, 1);
+    const pct100 = v => Math.min(100, Math.abs(v) / maxRef * 100).toFixed(1) + '%';
+    const setBar = (id, val) => { const el=$(id); if(el) el.style.width = pct100(val) };
+    setBar('wf-bar-pp', p.valeur);    ST('wf-v-pp',  eur(p.valeur));
+    setBar('wf-bar-np', r.valNP);    ST('wf-v-np',  eur(r.valNP));
+    setBar('wf-bar-abatt', ab * nb); ST('wf-v-abatt', eur(ab * nb));
+    setBar('wf-bar-droits', r.droitsNP); ST('wf-v-droits', '−' + eur(r.droitsNP));
+    setBar('wf-bar-futur', r.valoFin); ST('wf-v-futur', eur(r.valoFin));
+    setBar('wf-bar-gain', r.valoFin - r.droitsNP); ST('wf-v-gain', '+' + eur(r.valoFin - r.droitsNP));
+  }
+
+  /* ── Render Tab 3 : SCPI NP ── */
+  function renderSCPI(p, r){
+    ST('scpi-tus', (r.tUSScpi * 100).toFixed(0) + ' %');
+    ST('scpi-tus-sub', 'Pour ' + r.dureeScpi + ' ans (23% / 10 ans)');
+    ST('scpi-np', eur(r.npScpi));
+    ST('scpi-np-sub', 'Au lieu de ' + eur(p.valeur) + ' en PP');
+    ST('scpi-futur', eur(r.ppFutScpi));
+    ST('scpi-futur-sub', 'N+' + r.dureeScpi + ' (revalo ' + p.revalo + '%/an)');
+    ST('scpi-rend-impl', pct(r.rendImpl));
+    ST('scpi-gain', eur(r.ppFutScpi - r.npScpi));
+    ST('scpi-rev-us', eur(r.revCumUS));
+
+    /* Timeline */
+    const fin = YEAR + r.dureeScpi;
+    ST('scpi-tl1', 'Achat NP : ' + eur(r.npScpi) + ' (décote ' + (r.tUSScpi * 100).toFixed(0) + '%). Zéro revenu, zéro IR, zéro PS.');
+    ST('scpi-tl2-date', YEAR + ' → ' + fin);
+    ST('scpi-tl2', 'Usufruitier perçoit ' + eur(r.revenusAnnuels) + '/an (total ' + eur(r.revCumUS) + '). NP : aucune charge fiscale.');
+    ST('scpi-tl3-date', 'Année ' + fin);
+    ST('scpi-tl3', 'Remembrement PP. Valeur estimée : ' + eur(r.ppFutScpi) + '. Rendement implicite NP : ' + pct(r.rendImpl) + '/an.');
+  }
+
+  /* ── Render Tab 4 : IFI ── */
+  function renderIFI(p, r){
+    if(!p.ifi){
+      ['ifi-avant-base','ifi-avant-montant','ifi-avant-cum',
+       'ifi-apres-base','ifi-apres-montant','ifi-apres-cum',
+       'k4-eco-annuel','k4-eco-cum','k4-np'].forEach(id => ST(id, 'N/A — IFI non activé'));
+      return;
+    }
+    ST('ifi-avant-base', eur(p.patriIFI));
+    ST('ifi-avant-montant', '−' + eur(r.ifiAvant));
+    ST('ifi-avant-cum', '−' + eur(r.ifiAvant * 10));
+    const baseApres = Math.max(0, p.patriIFI - r.valNP);
+    ST('ifi-apres-base', eur(baseApres) + ' (−NP donnée)');
+    ST('ifi-apres-montant', '−' + eur(r.ifiApres));
+    ST('ifi-apres-cum', '−' + eur(r.ifiApres * 10));
+    ST('k4-eco-annuel', '+' + eur(r.ecoIFI));
+    ST('k4-eco-cum', '+' + eur(r.ecoIFI * p.horizon));
+    ST('k4-eco-cum-sub', 'Sur ' + p.horizon + ' ans');
+    ST('k4-np', eur(r.valNP));
+  }
+
+  /* ── Render Tab 5 : succession ── */
+  function renderSuccession(p, r){
+    ST('tr-capital-net', eur(r.capitalTransmis));
+    ST('tr-capital-sub', 'PP future (' + eur(r.valoFin) + ') − droits payés (' + eur(p.donation ? r.droitsNP : r.droitsSuccPP) + ')');
+    ST('tr-pp-futur', eur(r.valoFin));
+    ST('tr-droits-payes', eur(p.donation ? r.droitsNP : r.droitsSuccPP));
+    ST('tr-eco-succ', '+' + eur(r.economieSucc));
+    ST('tr-k-eco', '+' + eur(r.economieSucc));
+    const tauxTrans = r.valoFin > 0 ? r.capitalTransmis / r.valoFin * 100 : 0;
+    ST('tr-k-taux', pct(tauxTrans));
+    ST('tr-k-droits-succ', '−' + eur(r.droitsSuccPP));
+    ST('tr-badge', 'Capital net transmis : ' + eur(r.capitalTransmis));
+
+    /* Tableau comparatif */
+    ST('c-droits-np',   eur(r.droitsNP));
+    ST('c-droits-succ', eur(r.droitsSuccPP));
+    ST('c-droits-pp',   eur(r.droitsPP));
+    ST('c-val-np',   eur(r.valoFin));
+    ST('c-val-succ', eur(r.valoFin - r.droitsSuccPP));
+    ST('c-val-pp',   eur(r.valoFin));
+    ST('c-eco-np', '+' + eur(r.economieSucc));
+    ST('c-eco-pp', p.donation ? eur(r.droitsPP - r.droitsNP) + ' (droits)' : '—');
+  }
+
+  /* ── Charts ── */
+  function syncSlider(el){
+    const mn = +el.min || 0, mx = +el.max || 100, vl = +el.value;
+    const p = mx > mn ? ((vl - mn) / (mx - mn)) * 100 : 0;
+    el.style.setProperty('--pct', p.toFixed(2) + '%');
+  }
+
+  function setupCV(id, h){
+    const c = $(id); if(!c) return null;
+    const w = c.offsetWidth; if(!w) return null;
+    const r = window.devicePixelRatio || 1;
+    c.width  = w * r; c.height = h * r;
+    c.style.height = h + 'px';
+    const ctx = c.getContext('2d');
+    ctx.scale(r, r);
+    ctx.clearRect(0, 0, w, h);
+    return { ctx, w, h };
+  }
+
+  function drawLines(id, labels, datasets, opts){
+    const cv = setupCV(id, opts.h || 200); if(!cv) return;
+    const { ctx, w, h } = cv;
+    const PAD = { t:18, r:14, b:32, l:60 };
+    const cW = w - PAD.l - PAD.r, cH = h - PAD.t - PAD.b;
+    const allV = datasets.flatMap(d => d.data);
+    const maxV = Math.max(...allV, 1), minV = Math.min(0, ...allV);
+    const range = maxV - minV || 1;
+    ctx.strokeStyle = 'rgba(0,0,0,.06)'; ctx.lineWidth = 1;
+    for(let i = 0; i <= 4; i++){
+      const y = PAD.t + cH - i / 4 * cH;
+      ctx.beginPath(); ctx.moveTo(PAD.l, y); ctx.lineTo(PAD.l + cW, y); ctx.stroke();
+      ctx.fillStyle = '#98989D'; ctx.font = '9px system-ui'; ctx.textAlign = 'right';
+      ctx.fillText(opts.fmtY ? opts.fmtY(minV + i/4*range) : Math.round(minV + i/4*range), PAD.l-4, y+3);
+    }
+    datasets.forEach(ds => {
+      ctx.beginPath(); ctx.strokeStyle = ds.color; ctx.lineWidth = 2.5;
+      if(ds.dash) ctx.setLineDash(ds.dash); else ctx.setLineDash([]);
+      if(ds.fill){
+        ctx.globalAlpha = 0.10;
+        ctx.fillStyle = ds.color;
+        const pts = ds.data.map((v,i) => ({
+          x: PAD.l + i/(labels.length-1)*cW,
+          y: PAD.t + cH - (v - minV)/range*cH
+        }));
+        ctx.beginPath();
+        pts.forEach((pt,i) => i===0 ? ctx.moveTo(pt.x,pt.y) : ctx.lineTo(pt.x,pt.y));
+        ctx.lineTo(pts[pts.length-1].x, PAD.t+cH);
+        ctx.lineTo(pts[0].x, PAD.t+cH);
+        ctx.closePath(); ctx.fill(); ctx.globalAlpha = 1;
+      }
+      ctx.beginPath(); ctx.lineJoin = 'round';
+      ds.data.forEach((val,i) => {
+        const x = PAD.l + i/(labels.length-1)*cW;
+        const y = PAD.t + cH - (val-minV)/range*cH;
+        i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+      });
+      ctx.stroke(); ctx.setLineDash([]);
+    });
+    ctx.fillStyle = '#6E6E73'; ctx.font = '9px system-ui'; ctx.textAlign = 'center';
+    const step = Math.max(1, Math.floor(labels.length/6));
+    labels.forEach((lbl,i) => {
+      if(i % step !== 0 && i !== labels.length-1) return;
+      ctx.fillText(lbl, PAD.l + i/(labels.length-1)*cW, h - PAD.b + 14);
+    });
+  }
+
+  function drawBars(id, labels, datasets, opts){
+    const cv = setupCV(id, opts.h || 180); if(!cv) return;
+    const { ctx, w, h } = cv;
+    const PAD = { t:18, r:14, b:32, l:60 };
+    const cW = w - PAD.l - PAD.r, cH = h - PAD.t - PAD.b;
+    const n = labels.length;
+    const allV = datasets.flatMap(d => d.data);
+    const maxV = Math.max(...allV, 1), minV = Math.min(0, ...allV);
+    const range = maxV - minV || 1;
+    ctx.strokeStyle = 'rgba(0,0,0,.06)'; ctx.lineWidth = 1;
+    for(let i = 0; i <= 4; i++){
+      const y = PAD.t + cH - i/4*cH;
+      ctx.beginPath(); ctx.moveTo(PAD.l, y); ctx.lineTo(PAD.l+cW, y); ctx.stroke();
+      ctx.fillStyle = '#98989D'; ctx.font = '9px system-ui'; ctx.textAlign = 'right';
+      ctx.fillText(opts.fmtY ? opts.fmtY(minV + i/4*range) : Math.round(minV+i/4*range), PAD.l-4, y+3);
+    }
+    const bwTotal = (cW/n)*0.7, bw = bwTotal/datasets.length, gp = (cW/n)*0.3;
+    datasets.forEach((ds,di) => {
+      ds.data.forEach((val,i) => {
+        const bh = Math.abs(val-minV)/range*cH;
+        const x = PAD.l + i/n*cW + gp/2 + di*bw;
+        const y = PAD.t + cH - (Math.max(val,minV)-minV)/range*cH;
+        ctx.fillStyle = ds.color || '#4F8A78';
+        ctx.beginPath();
+        ctx.roundRect ? ctx.roundRect(x, y, bw-1, bh, [3,3,0,0]) : ctx.rect(x, y, bw-1, bh);
+        ctx.fill();
+      });
+    });
+    ctx.fillStyle = '#6E6E73'; ctx.font = '9px system-ui'; ctx.textAlign = 'center';
+    labels.forEach((lbl,i) => ctx.fillText(lbl, PAD.l+(i+0.5)/n*cW, h-PAD.b+14));
+  }
+
+  function drawCharts(p, r){
+    /* Tab 1 — évolution NP / PP / US */
+    const horizon = Math.min(r.dureeDemo + 2, 30);
+    const yrs = [], npVals = [], ppVals = [], usVals = [];
+    for(let y = 0; y <= horizon; y++){
+      yrs.push(y === 0 ? 'N' : 'N+' + y);
+      const pp = p.valeur * Math.pow(1 + p.revalo / 100, y);
+      const remaining = Math.max(0, (r.dureeDemo - y) / r.dureeDemo);
+      ppVals.push(pp);
+      npVals.push(y >= r.dureeDemo ? pp : r.valNP * Math.pow(1 + p.revalo / 100, y));
+      usVals.push(r.valUS * remaining);
+    }
+    drawLines('cv-evolution', yrs, [
+      { data: npVals, color: '#4F8A78', fill: true },
+      { data: ppVals, color: 'rgba(79,138,120,.35)', dash: [4,3] },
+      { data: usVals, color: '#B8860B' }
+    ], { h: 200, fmtY: v => fmtK(v) });
+
+    /* Tab 2 — projection intergénérationnelle */
+    const projYrs = [], vOpti = [], vSans = [];
+    for(let y = 0; y <= Math.min(p.horizon, 30); y++){
+      projYrs.push(y === 0 ? 'N' : 'N+' + y);
+      const pp = p.valeur * Math.pow(1 + p.revalo / 100, y);
+      vOpti.push(y < r.dureeDemo ? r.valNP * Math.pow(1+p.revalo/100,y) : pp - r.droitsNP);
+      vSans.push(y >= p.horizon ? pp - r.droitsSuccPP : pp);
+    }
+    drawLines('cv-donation-proj', projYrs, [
+      { data: vOpti, color: '#4F8A78', fill: true },
+      { data: vSans, color: 'rgba(184,134,11,.6)', dash: [5,3] }
+    ], { h: 200, fmtY: v => fmtK(v) });
+
+    /* Tab 3 — SCPI NP vs PP */
+    const scpiYrs = [], scpiNP = [], scpiPP = [];
+    for(let y = 0; y <= r.dureeScpi; y++){
+      scpiYrs.push(y === 0 ? 'N' : 'N+' + y);
+      const pp = p.valeur * Math.pow(1 + p.revalo / 100, y);
+      scpiNP.push(y >= r.dureeScpi ? pp : r.npScpi * Math.pow(1 + p.revalo / 100, y));
+      scpiPP.push(pp);
+    }
+    drawLines('cv-scpi', scpiYrs, [
+      { data: scpiNP, color: '#4F8A78', fill: true },
+      { data: scpiPP, color: 'rgba(79,138,120,.35)', dash: [4,3] }
+    ], { h: 200, fmtY: v => fmtK(v) });
+
+    /* Tab 4 — IFI avant/après */
+    if(p.ifi){
+      drawBars('cv-ifi', ['IFI avant', 'IFI après NP'],
+        [{ data: [r.ifiAvant, r.ifiApres], color: '#4F8A78' },
+         { data: [r.ifiAvant, r.ifiAvant], color: 'rgba(184,134,11,.5)' }],
+        { h: 180, fmtY: v => fmtK(v) });
+    } else {
+      drawBars('cv-ifi', ['IFI avant', 'IFI après NP'],
+        [{ data: [0, 0], color: '#4F8A78' }],
+        { h: 180, fmtY: v => fmtK(v) });
+    }
+
+    /* Tab 5 — succession générationnelle */
+    const succYrs = [], vAvecOpti = [], vSansOpti = [];
+    for(let y = 0; y <= Math.min(p.horizon, 30); y++){
+      succYrs.push(y === 0 ? 'N' : 'N+' + y);
+      const pp = p.valeur * Math.pow(1 + p.revalo / 100, y);
+      vAvecOpti.push(y < r.dureeDemo ? r.valNP * Math.pow(1+p.revalo/100,y) : pp - r.droitsNP);
+      vSansOpti.push(pp - (y >= p.horizon ? r.droitsSuccPP : 0));
+    }
+    drawLines('cv-succession', succYrs, [
+      { data: vAvecOpti, color: '#4F8A78', fill: true },
+      { data: vSansOpti, color: 'rgba(184,134,11,.7)', dash: [5,3] }
+    ], { h: 260, fmtY: v => fmtK(v) });
+  }
+
+  function update(){
+    const p   = readInp();
+    const r   = calcBase(p);
+    renderClassique(p, r);
+    renderDonation(p, r);
+    renderSCPI(p, r);
+    renderIFI(p, r);
+    renderSuccession(p, r);
+    drawCharts(p, r);
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    SP.nav.init();
+    SP.initFmt();
+
+    /* Tabs */
+    document.querySelectorAll('.dm-tab-btn').forEach(btn => {
+      btn.addEventListener('click', function(){
+        document.querySelectorAll('.dm-tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.dm-panel').forEach(c => c.classList.remove('active'));
+        this.classList.add('active');
+        const panel = document.querySelector('.dm-panel[data-tab="' + this.dataset.tab + '"]');
+        if(panel) panel.classList.add('active');
+        const p = readInp(), r = calcBase(p);
+        drawCharts(p, r);
+      });
+    });
+
+    /* Gestion champ usufruit temporaire */
+    $('dm-type-us')?.addEventListener('change', function(){
+      const tf = $('dm-temp-fields');
+      if(tf) tf.style.display = this.value === 'temporaire' ? 'block' : 'none';
+      update();
+    });
+    if($('dm-type-us')?.value !== 'temporaire'){
+      const tf = $('dm-temp-fields');
+      if(tf) tf.style.display = 'none';
+    }
+
+    /* IFI fields */
+    $('dm-ifi')?.addEventListener('change', function(){
+      const f = $('dm-ifi-fields');
+      if(f) f.style.display = this.value === 'oui' ? 'block' : 'none';
+      update();
+    });
+
+    /* Sliders */
+    const sliders = [
+      { id:'dm-valeur',          disp:'dm-disp-valeur',          fmt: v => SP.fmtEur(+v) },
+      { id:'dm-revalo',          disp:'dm-disp-revalo',          fmt: v => SP.fmtNum(+v,1) + ' %' },
+      { id:'dm-revenus',         disp:'dm-disp-revenus',         fmt: v => SP.fmtNum(+v,1) + ' %' },
+      { id:'dm-horizon',         disp:'dm-disp-horizon',         fmt: v => v + ' ans' },
+      { id:'dm-age',             disp:'dm-disp-age',             fmt: v => v + ' ans' },
+      { id:'dm-duree-temp',      disp:'dm-disp-duree-temp',      fmt: v => v + ' ans' },
+      { id:'dm-nb-heritiers',    disp:'dm-disp-nb-heritiers',    fmt: v => v },
+      { id:'dm-patrimoine-ifi',  disp:'dm-disp-patrimoine-ifi',  fmt: v => SP.fmtEur(+v) },
+    ];
+
+    sliders.forEach(s => {
+      const el = $(s.id); if(!el) return;
+      const disp = $(s.disp);
+      function upd(){
+        if(disp) disp.textContent = s.fmt(el.value);
+        syncSlider(el);
+        update();
+      }
+      el.addEventListener('input', upd);
+      upd();
+    });
+
+    ['dm-type-actif','dm-nb-us','dm-lien','dm-donation','dm-tmi'].forEach(id => {
+      const el = $(id); if(el) el.addEventListener('change', update);
+    });
+
+    update();
+  });
+})();
+</script>
+</body>
+</html>

@@ -126,7 +126,11 @@
     { id: 'scpi',         num: 21, label: 'SCPI — Revenus Passifs',             href: 'simulator-21.html',
       cats: ['immobilier', 'finance'],
       desc: 'Rente passive, crédit vs comptant, fiscalité FR/EU/AV/IS, démembrement NP/US et comparaison patrimoniale SCPI vs locatif vs ETF.',
-      keywords: ['scpi', 'rente', 'revenus passifs', 'immobilier indirect', 'parts', 'rendement', 'demembrement', 'nue propriete', 'usufruit', 'credit', 'comptant', 'tmi', 'prelevement social', 'europeenne', 'assurance vie', 'sci is', 'locatif', 'etf', 'fonds euros', 'livret a', 'patrimoine'],
+      keywords: ['scpi', 'rente', 'revenus passifs', 'immobilier indirect', 'parts', 'rendement', 'demembrement', 'nue propriete', 'usufruit', 'credit', 'comptant', 'tmi', 'prelevement social', 'europeenne', 'assurance vie', 'sci is', 'locatif', 'etf', 'fonds euros', 'livret a', 'patrimoine'] },
+    { id: 'demembrement', num: 22, label: 'Démembrement Avancé',                href: 'simulator-22.html',
+      cats: ['fiscalite', 'transmission', 'immobilier'],
+      desc: 'Ingénierie patrimoniale complète : barème CGI 669, donation démembrée, SCPI nue-propriété, IFI et architecture successorale générationnelle.',
+      keywords: ['demembrement', 'nue propriete', 'usufruit', 'cgi 669', 'donation demembree', 'transmission', 'succession', 'ifi', 'scpi np', 'remembrement', 'viager', 'temporaire', 'heritage', 'family office', 'ingenierie patrimoniale', 'abattement', 'droits donation', 'tmi'],
       isNew: true }
   ];
 
