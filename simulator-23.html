@@ -304,39 +304,36 @@ input[type=range].pn-slider.amber-slider::-webkit-slider-thumb { background:var(
 <body>
 
 <!-- ─── NAV ─── -->
-<header class="top-nav">
-  <a href="index.html" class="nav-brand">
-    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M3 17V9l7-5 7 5v8M8 17v-5h4v5"/>
-    </svg>
-    Patrimonia<span>.ai</span>
-  </a>
-  <div class="nav-dropdown" id="mainDropdown">
-    <button class="nav-dropdown-btn" aria-expanded="false" aria-haspopup="true">
-      Simulateurs
-      <svg class="nav-chevron" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 5l4 4 4-4"/></svg>
-    </button>
-    <div class="nav-dropdown-menu" id="navMenu" role="menu"></div>
+<nav class="top-nav">
+  <a href="index.html" class="nav-logo"><img src="logo.png?v=3" alt="Patrimonia.ai" class="nav-logo-img"></a>
+  <div class="nav-right">
+    <a href="index.html" class="nav-back">
+      <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7.5 1.5L3 6l4.5 4.5"/></svg>
+      Accueil
+    </a>
+    <div class="nav-dropdown" id="mainDropdown">
+      <button class="nav-dropdown-btn" aria-expanded="false" aria-haspopup="true">
+        Simulateurs <svg class="nav-chevron" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.8" style="width:13px;height:8px;flex-shrink:0"><path d="M1 1l4 4 4-4"/></svg>
+      </button>
+      <div class="nav-dropdown-menu" id="navMenu" role="menu"></div>
+    </div>
   </div>
-</header>
+</nav>
 
-<!-- ─── PAGE HEADER ─── -->
+<!-- ─── PAGE ─── -->
+<div class="sim-page">
+
 <div class="sim-page-header">
-  <div class="sim-header-content">
-    <div class="sim-header-icon">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M3 21V9l9-6 9 6v12M9 21v-7h6v7M5 12l7-4.5L19 12"/>
-      </svg>
-    </div>
-    <div>
-      <h1 class="sim-header-title">Pinel / Denormandie</h1>
-      <p class="sim-header-sub">Investissement immobilier locatif défiscalisant · Effort d'épargne optimisé · Constitution de patrimoine</p>
-    </div>
+  <span class="sim-num-badge"></span>
+  <div>
+    <div class="sim-eyebrow">Immobilier &amp; Défiscalisation</div>
+    <h1>Pinel / Denormandie — <em class="gradient-text">Investissement Locatif Optimisé</em></h1>
+    <p>Réduction IR directe, effort mensuel réel après fiscalité, cash-flow, Pinel vs Denormandie et comparaison LMNP / SCPI / Déficit foncier.</p>
   </div>
 </div>
 
 <!-- ─── LAYOUT ─── -->
-<div class="pn-layout sim-layout-wrap">
+<div class="pn-layout">
 
 <!-- ══════════════ COLONNE INPUTS ══════════════ -->
 <aside class="pn-inp">
@@ -931,7 +928,8 @@ input[type=range].pn-slider.amber-slider::-webkit-slider-thumb { background:var(
   </div>
 
 </main>
-</div><!-- .pn-layout -->
+</div><!-- /pn-layout -->
+</div><!-- /sim-page -->
 
 <script>
 (function(){
@@ -1540,5 +1538,6 @@ window.addEventListener('resize', function(){ setTimeout(calcAndRender,60); });
 
 })();
 </script>
+
 </body>
 </html>
