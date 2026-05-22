@@ -130,7 +130,11 @@
     { id: 'demembrement', num: 22, label: 'Démembrement Avancé',                href: 'simulator-22.html',
       cats: ['fiscalite', 'transmission', 'immobilier'],
       desc: 'Ingénierie patrimoniale complète : barème CGI 669, donation démembrée, SCPI nue-propriété, IFI et architecture successorale générationnelle.',
-      keywords: ['demembrement', 'nue propriete', 'usufruit', 'cgi 669', 'donation demembree', 'transmission', 'succession', 'ifi', 'scpi np', 'remembrement', 'viager', 'temporaire', 'heritage', 'family office', 'ingenierie patrimoniale', 'abattement', 'droits donation', 'tmi'],
+      keywords: ['demembrement', 'nue propriete', 'usufruit', 'cgi 669', 'donation demembree', 'transmission', 'succession', 'ifi', 'scpi np', 'remembrement', 'viager', 'temporaire', 'heritage', 'family office', 'ingenierie patrimoniale', 'abattement', 'droits donation', 'tmi'] },
+    { id: 'pinel',        num: 23, label: 'Pinel / Denormandie',               href: 'simulator-23.html',
+      cats: ['fiscalite', 'immobilier'],
+      desc: 'Investissement locatif défiscalisant : réduction IR, cash-flow réel, effort mensuel net, Pinel vs Denormandie et comparaison patrimoniale.',
+      keywords: ['pinel', 'denormandie', 'reduction', 'ir', 'immobilier', 'locatif', 'loyer', 'zone', 'abis', 'zone a', 'zone b1', 'engagement', 'defiscalisation', 'neuf', 'ancien', 'travaux', 'rendement', 'cashflow', 'effort', 'tmi', 'patrimoine', 'constituion', 'investissement'],
       isNew: true }
   ];
 

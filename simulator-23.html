@@ -1,0 +1,1544 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="64x64" href="favicon-64.png">
+<link rel="shortcut icon" href="favicon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="favicon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pinel / Denormandie | Patrimonia.ai</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css?v=19">
+<script src="shared.js?v=2"></script>
+<script src="shared-nav.js?v=13"></script>
+<style>
+/* ═══════════════════════════════════════════════════
+   PINEL / DENORMANDIE · PATRIMONIA.AI
+   Préfixe CSS : .pn-
+   Personnalité : immobilier locatif défiscalisant · investissement accessible
+   Accent principal : --accent (#4F8A78) — patrimoine / bien
+   Accent secondaire : --amber — réduction IR / avantage fiscal
+═══════════════════════════════════════════════════ */
+
+.pn-layout { display:grid; grid-template-columns:360px 1fr; min-height:640px }
+@media(max-width:960px){ .pn-layout { grid-template-columns:1fr } }
+
+.pn-inp {
+  padding:1.6rem 1.4rem 2rem;
+  background:var(--surface-2);
+  border-right:1px solid var(--border-subtle);
+  overflow-y:auto; max-height:900px;
+}
+@media(max-width:960px){ .pn-inp { border-right:none; border-bottom:1px solid var(--border-subtle); max-height:none } }
+
+.pn-main { background:var(--surface); display:flex; flex-direction:column; min-width:0 }
+
+.pn-inp-sec {
+  font-size:.59rem; font-weight:700; color:var(--text-dim);
+  letter-spacing:.08em; text-transform:uppercase;
+  margin:1.3rem 0 .75rem; padding-bottom:.3rem;
+  border-bottom:1px solid var(--border-subtle);
+}
+.pn-inp-sec:first-child { margin-top:0 }
+
+.pn-range-row { display:flex; align-items:center; gap:.7rem; margin-bottom:.55rem }
+.pn-range-lbl { font-size:.7rem; color:var(--text-muted); flex:1; min-width:0 }
+.pn-range-disp {
+  font-family:var(--mono); font-size:.71rem; font-weight:600;
+  color:var(--accent); min-width:4.5rem; text-align:right; flex-shrink:0;
+}
+.pn-range-disp.amber { color:var(--amber) }
+
+.pn-inp-select {
+  width:100%; font-size:.73rem; padding:.38rem .6rem;
+  border:1px solid var(--border-subtle); border-radius:7px;
+  background:var(--bg); color:var(--text);
+  cursor:pointer; outline:none; margin-bottom:.55rem;
+}
+.pn-inp-select:focus { border-color:var(--accent) }
+
+.pn-radios { display:flex; gap:.4rem; margin-bottom:.55rem; flex-wrap:wrap }
+.pn-radio-btn {
+  flex:1; min-width:0; padding:.35rem .3rem; text-align:center;
+  font-size:.68rem; font-weight:500; border-radius:7px;
+  border:1px solid var(--border-subtle); background:var(--bg);
+  color:var(--text-muted); cursor:pointer; transition:all .18s; white-space:nowrap;
+}
+.pn-radio-btn.active {
+  background:var(--accent-dim); color:var(--accent);
+  border-color:var(--accent); font-weight:700;
+}
+.pn-radio-btn.amber-active {
+  background:var(--amber-dim); color:var(--amber);
+  border-color:var(--amber); font-weight:700;
+}
+
+/* Tabs */
+.pn-tabs-nav {
+  display:flex; border-bottom:1px solid var(--border-subtle);
+  background:var(--surface-2); overflow-x:auto; flex-shrink:0;
+  scrollbar-width:none;
+}
+.pn-tabs-nav::-webkit-scrollbar { display:none }
+.pn-tab-btn {
+  flex-shrink:0; padding:.8rem 1.05rem;
+  font-family:var(--sans); font-size:.73rem; font-weight:500;
+  color:var(--text-muted); background:none;
+  border:none; border-bottom:2px solid transparent;
+  cursor:pointer; white-space:nowrap; letter-spacing:-.01em;
+  transition:color .18s, border-color .18s, background .18s;
+}
+.pn-tab-btn:hover { color:var(--text); background:var(--surface) }
+.pn-tab-btn.active { color:var(--accent); border-bottom-color:var(--accent); font-weight:600 }
+
+.pn-panel { display:none; padding:1.4rem 1.5rem 2rem }
+.pn-panel.active { display:block }
+@media(max-width:960px){ .pn-panel { padding:1rem 1rem 1.5rem } }
+
+/* ── Bloc effort mensuel (cœur émotionnel Tab 1) ── */
+.pn-effort-block {
+  background:linear-gradient(135deg, rgba(79,138,120,.08) 0%, rgba(184,134,11,.05) 70%, var(--surface-2) 100%);
+  border:1.5px solid rgba(79,138,120,.22);
+  border-radius:var(--r); padding:1.35rem 1.45rem 1.2rem;
+  margin-bottom:1rem; position:relative; overflow:hidden;
+}
+.pn-effort-block::before {
+  content:''; position:absolute; top:0; right:0;
+  width:140px; height:140px; border-radius:50%;
+  background:radial-gradient(circle, rgba(79,138,120,.06) 0%, transparent 70%);
+  transform:translate(40px,-40px);
+}
+.pn-effort-title {
+  font-size:.62rem; font-weight:700; color:var(--text-dim);
+  letter-spacing:.07em; text-transform:uppercase; margin-bottom:.9rem;
+}
+.pn-effort-main { display:flex; align-items:baseline; gap:.5rem; margin-bottom:.2rem }
+.pn-effort-val {
+  font-family:var(--mono); font-size:2rem; font-weight:700;
+  color:var(--accent); line-height:1;
+}
+.pn-effort-unit { font-size:.75rem; color:var(--text-muted); font-weight:500 }
+.pn-effort-sub { font-size:.68rem; color:var(--text-dim); margin-bottom:1rem }
+.pn-effort-grid { display:grid; grid-template-columns:1fr 1fr; gap:.6rem }
+.pn-effort-kpi {
+  background:rgba(255,255,255,.05); border:1px solid var(--border-subtle);
+  border-radius:var(--r-sm); padding:.65rem .75rem;
+}
+.pn-effort-kpi-lbl { font-size:.6rem; color:var(--text-dim); font-weight:600; letter-spacing:.04em; margin-bottom:.2rem }
+.pn-effort-kpi-val { font-family:var(--mono); font-size:.85rem; font-weight:700; color:var(--text) }
+.pn-effort-kpi-val.green { color:var(--accent) }
+.pn-effort-kpi-val.amber { color:var(--amber) }
+
+/* ── Bloc réduction fiscale (Tab 2) ── */
+.pn-fiscal-block {
+  background:linear-gradient(135deg, rgba(184,134,11,.09) 0%, rgba(79,138,120,.06) 70%, var(--surface-2) 100%);
+  border:1.5px solid rgba(184,134,11,.22);
+  border-radius:var(--r); padding:1.35rem 1.45rem 1.2rem;
+  margin-bottom:1rem;
+}
+.pn-fiscal-main { display:flex; align-items:baseline; gap:.5rem; margin-bottom:.2rem }
+.pn-fiscal-val {
+  font-family:var(--mono); font-size:2.1rem; font-weight:700;
+  color:var(--amber); line-height:1;
+}
+.pn-fiscal-unit { font-size:.75rem; color:var(--text-muted); font-weight:500 }
+.pn-fiscal-sub { font-size:.68rem; color:var(--text-dim); margin-bottom:1rem }
+
+/* Badges durée */
+.pn-dur-badges { display:flex; gap:.5rem; margin-bottom:1.1rem; flex-wrap:wrap }
+.pn-dur-badge {
+  display:flex; flex-direction:column; align-items:center;
+  padding:.55rem .9rem; border-radius:var(--r-sm);
+  border:1.5px solid var(--border-subtle); background:var(--surface-2);
+  cursor:pointer; transition:all .2s; min-width:80px;
+}
+.pn-dur-badge.active {
+  border-color:var(--amber); background:var(--amber-dim);
+}
+.pn-dur-badge-years { font-size:.65rem; font-weight:700; color:var(--text-muted); letter-spacing:.04em }
+.pn-dur-badge.active .pn-dur-badge-years { color:var(--amber) }
+.pn-dur-badge-taux { font-family:var(--mono); font-size:1.05rem; font-weight:700; color:var(--text) }
+.pn-dur-badge.active .pn-dur-badge-taux { color:var(--amber) }
+.pn-dur-badge-montant { font-size:.6rem; color:var(--text-dim); margin-top:.1rem }
+
+/* ── KPI grilles universelles ── */
+.pn-kpi-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:.75rem; margin-bottom:1.1rem }
+@media(max-width:600px){ .pn-kpi-grid { grid-template-columns:repeat(2,1fr) } }
+.pn-kpi-grid-2 { display:grid; grid-template-columns:repeat(2,1fr); gap:.75rem; margin-bottom:1.1rem }
+
+.pn-kpi {
+  background:var(--surface-2); border:1px solid var(--border-subtle);
+  border-radius:var(--r-sm); padding:.85rem .9rem;
+}
+.pn-kpi-lbl { font-size:.6rem; font-weight:700; color:var(--text-dim); letter-spacing:.05em; text-transform:uppercase; margin-bottom:.3rem }
+.pn-kpi-val { font-family:var(--mono); font-size:1.05rem; font-weight:700; color:var(--text) }
+.pn-kpi-val.green { color:var(--accent) }
+.pn-kpi-val.amber { color:var(--amber) }
+.pn-kpi-val.danger { color:var(--danger) }
+.pn-kpi-val.muted { color:var(--text-muted) }
+.pn-kpi-sub { font-size:.59rem; color:var(--text-dim); margin-top:.2rem }
+
+/* ── Waterfall fiscal ── */
+.pn-waterfall { display:flex; flex-direction:column; gap:.45rem; margin-bottom:1.1rem }
+.pn-wf-row { display:flex; align-items:center; gap:.8rem }
+.pn-wf-lbl { font-size:.68rem; color:var(--text-muted); min-width:140px; flex-shrink:0 }
+.pn-wf-bar-wrap { flex:1; height:10px; background:var(--surface-2); border-radius:5px; overflow:hidden }
+.pn-wf-bar { height:100%; border-radius:5px; transition:width .45s ease }
+.pn-wf-val { font-family:var(--mono); font-size:.68rem; font-weight:600; min-width:70px; text-align:right; flex-shrink:0 }
+
+/* ── Comparatif Pinel vs Denormandie ── */
+.pn-vs-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1.1rem }
+@media(max-width:600px){ .pn-vs-grid { grid-template-columns:1fr } }
+.pn-vs-card {
+  background:var(--surface-2); border:1.5px solid var(--border-subtle);
+  border-radius:var(--r); padding:1rem 1.1rem;
+}
+.pn-vs-card.winner { border-color:var(--accent); background:var(--accent-dim) }
+.pn-vs-card-title {
+  font-size:.72rem; font-weight:700; color:var(--text);
+  margin-bottom:.8rem; display:flex; align-items:center; gap:.4rem;
+}
+.pn-vs-badge {
+  font-size:.55rem; padding:.15rem .4rem; border-radius:4px;
+  background:var(--accent); color:#fff; font-weight:700; letter-spacing:.04em;
+}
+.pn-vs-badge.amber { background:var(--amber) }
+.pn-vs-row { display:flex; justify-content:space-between; align-items:center; padding:.3rem 0; border-bottom:1px solid var(--border-subtle) }
+.pn-vs-row:last-child { border-bottom:none }
+.pn-vs-row-lbl { font-size:.67rem; color:var(--text-muted) }
+.pn-vs-row-val { font-family:var(--mono); font-size:.72rem; font-weight:600; color:var(--text) }
+.pn-vs-row-val.green { color:var(--accent) }
+.pn-vs-row-val.amber { color:var(--amber) }
+
+/* ── Tableau comparaison patrimoniale ── */
+.pn-cmp-table { width:100%; border-collapse:collapse; font-size:.68rem; margin-bottom:1.1rem }
+.pn-cmp-table th {
+  text-align:left; padding:.5rem .7rem; background:var(--surface-2);
+  color:var(--text-dim); font-weight:700; letter-spacing:.05em; font-size:.6rem;
+  border-bottom:1px solid var(--border-subtle); text-transform:uppercase;
+}
+.pn-cmp-table td { padding:.55rem .7rem; border-bottom:1px solid var(--border-subtle); color:var(--text-muted) }
+.pn-cmp-table tr:hover td { background:var(--surface-2) }
+.pn-cmp-table .pn-cmp-name { font-weight:600; color:var(--text) }
+.pn-dot { display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:.35rem }
+.pn-dot-green { background:var(--accent) }
+.pn-dot-amber { background:var(--amber) }
+.pn-dot-blue { background:#5B8FBF }
+.pn-dot-muted { background:var(--text-dim) }
+.pn-dot-purple { background:#8B73C4 }
+
+/* ── Pédagogie cards ── */
+.pn-ped-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:.9rem; margin-bottom:1rem }
+@media(max-width:700px){ .pn-ped-grid { grid-template-columns:1fr } }
+.pn-ped-card {
+  background:var(--surface-2); border:1px solid var(--border-subtle);
+  border-radius:var(--r); padding:1.1rem 1.15rem;
+}
+.pn-ped-icon {
+  width:32px; height:32px; border-radius:9px;
+  background:var(--accent-dim); display:flex; align-items:center;
+  justify-content:center; margin-bottom:.7rem;
+}
+.pn-ped-icon svg { width:17px; height:17px; stroke:var(--accent); fill:none; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round }
+.pn-ped-icon.amber { background:var(--amber-dim) }
+.pn-ped-icon.amber svg { stroke:var(--amber) }
+.pn-ped-title { font-size:.78rem; font-weight:700; color:var(--text); margin-bottom:.5rem }
+.pn-ped-body { font-size:.69rem; color:var(--text-muted); line-height:1.6 }
+.pn-ped-body strong { color:var(--text); font-weight:600 }
+.pn-ped-body ul { margin:.35rem 0 0 .9rem; padding:0 }
+.pn-ped-body li { margin-bottom:.2rem }
+
+/* ── Canvas charts ── */
+.pn-chart-wrap { position:relative; margin-bottom:1.1rem }
+.pn-chart-title {
+  font-size:.66rem; font-weight:700; color:var(--text-dim);
+  letter-spacing:.05em; text-transform:uppercase; margin-bottom:.6rem;
+}
+.pn-chart-wrap canvas { border-radius:var(--r-sm) }
+
+/* ── Section title ── */
+.pn-section-title {
+  font-size:.8rem; font-weight:700; color:var(--text);
+  margin:0 0 .9rem; letter-spacing:-.01em;
+}
+
+/* ── Avantages strip (avant/après fiscal) ── */
+.pn-av-ap-strip {
+  display:grid; grid-template-columns:1fr auto 1fr; gap:.6rem;
+  align-items:center; margin-bottom:1rem;
+}
+.pn-av-box, .pn-ap-box {
+  background:var(--surface-2); border:1px solid var(--border-subtle);
+  border-radius:var(--r-sm); padding:.75rem .85rem;
+}
+.pn-av-ap-arrow {
+  color:var(--accent); font-size:1.2rem; font-weight:700; text-align:center;
+}
+.pn-av-lbl, .pn-ap-lbl {
+  font-size:.58rem; color:var(--text-dim); font-weight:700;
+  letter-spacing:.05em; text-transform:uppercase; margin-bottom:.25rem;
+}
+.pn-av-val { font-family:var(--mono); font-size:1rem; font-weight:700; color:var(--danger) }
+.pn-ap-val { font-family:var(--mono); font-size:1rem; font-weight:700; color:var(--accent) }
+.pn-av-sub, .pn-ap-sub { font-size:.6rem; color:var(--text-dim); margin-top:.15rem }
+
+/* ── Slider range ── */
+input[type=range].pn-slider {
+  -webkit-appearance:none; width:100%; height:5px;
+  border-radius:3px; outline:none; cursor:pointer;
+  background:linear-gradient(to right, var(--accent) 0%, var(--accent) calc(var(--pct,50)*1%), var(--border) calc(var(--pct,50)*1%), var(--border) 100%);
+}
+input[type=range].pn-slider::-webkit-slider-thumb {
+  -webkit-appearance:none; width:16px; height:16px; border-radius:50%;
+  background:var(--accent); border:2px solid var(--bg); box-shadow:0 1px 4px rgba(0,0,0,.25);
+}
+input[type=range].pn-slider.amber-slider {
+  background:linear-gradient(to right, var(--amber) 0%, var(--amber) calc(var(--pct,50)*1%), var(--border) calc(var(--pct,50)*1%), var(--border) 100%);
+}
+input[type=range].pn-slider.amber-slider::-webkit-slider-thumb { background:var(--amber) }
+</style>
+</head>
+<body>
+
+<!-- ─── NAV ─── -->
+<header class="top-nav">
+  <a href="index.html" class="nav-brand">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 17V9l7-5 7 5v8M8 17v-5h4v5"/>
+    </svg>
+    Patrimonia<span>.ai</span>
+  </a>
+  <div class="nav-dropdown" id="mainDropdown">
+    <button class="nav-dropdown-btn" aria-expanded="false" aria-haspopup="true">
+      Simulateurs
+      <svg class="nav-chevron" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 5l4 4 4-4"/></svg>
+    </button>
+    <div class="nav-dropdown-menu" id="navMenu" role="menu"></div>
+  </div>
+</header>
+
+<!-- ─── PAGE HEADER ─── -->
+<div class="sim-page-header">
+  <div class="sim-header-content">
+    <div class="sim-header-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 21V9l9-6 9 6v12M9 21v-7h6v7M5 12l7-4.5L19 12"/>
+      </svg>
+    </div>
+    <div>
+      <h1 class="sim-header-title">Pinel / Denormandie</h1>
+      <p class="sim-header-sub">Investissement immobilier locatif défiscalisant · Effort d'épargne optimisé · Constitution de patrimoine</p>
+    </div>
+  </div>
+</div>
+
+<!-- ─── LAYOUT ─── -->
+<div class="pn-layout sim-layout-wrap">
+
+<!-- ══════════════ COLONNE INPUTS ══════════════ -->
+<aside class="pn-inp">
+
+  <!-- A. BIEN IMMOBILIER -->
+  <div class="pn-inp-sec">A. Bien immobilier</div>
+
+  <div class="pn-range-row">
+    <span class="pn-range-lbl">Prix d'acquisition</span>
+    <span class="pn-range-disp amber" id="d-prix">200 000 €</span>
+  </div>
+  <input type="range" class="pn-slider amber-slider" id="r-prix" min="80000" max="500000" step="5000" value="200000" style="--pct:30">
+  <div style="display:flex;justify-content:space-between;font-size:.58rem;color:var(--text-dim);margin-bottom:.7rem"><span>80k€</span><span>500k€</span></div>
+
+  <div class="pn-range-row">
+    <span class="pn-range-lbl">Surface (m²)</span>
+    <span class="pn-range-disp" id="d-surface">45 m²</span>
+  </div>
+  <input type="range" class="pn-slider" id="r-surface" min="20" max="150" step="1" value="45" style="--pct:22">
+  <div style="display:flex;justify-content:space-between;font-size:.58rem;color:var(--text-dim);margin-bottom:.7rem"><span>20m²</span><span>150m²</span></div>
+
+  <label style="font-size:.7rem;color:var(--text-muted);display:block;margin-bottom:.3rem">Type de dispositif</label>
+  <select class="pn-inp-select" id="s-type">
+    <option value="pinel_plus">Pinel+ (DPE A/B)</option>
+    <option value="pinel">Pinel classique (taux réduits)</option>
+    <option value="denormandie">Denormandie (ancien rénové)</option>
+  </select>
+
+  <label style="font-size:.7rem;color:var(--text-muted);display:block;margin-bottom:.3rem">Zone</label>
+  <select class="pn-inp-select" id="s-zone">
+    <option value="abis">Zone A bis (Paris + petite couronne)</option>
+    <option value="a">Zone A (IDF, Côte d'Azur…)</option>
+    <option value="b1" selected>Zone B1 (Métropoles 250k+)</option>
+    <option value="b2">Zone B2 (Denormandie uniquement)</option>
+  </select>
+
+  <div style="display:flex;align-items:center;gap:.7rem;margin-bottom:.7rem">
+    <label style="font-size:.7rem;color:var(--text-muted);flex:1">Parking inclus</label>
+    <div class="pn-radios" style="margin-bottom:0;flex:0 0 auto">
+      <button class="pn-radio-btn" data-group="parking" data-val="oui">Oui</button>
+      <button class="pn-radio-btn active" data-group="parking" data-val="non">Non</button>
+    </div>
+  </div>
+
+  <!-- B. LOCATION -->
+  <div class="pn-inp-sec">B. Location</div>
+
+  <div class="pn-range-row">
+    <span class="pn-range-lbl">Loyer mensuel</span>
+    <span class="pn-range-disp" id="d-loyer">650 €</span>
+  </div>
+  <input type="range" class="pn-slider" id="r-loyer" min="300" max="3000" step="25" value="650" style="--pct:17">
+  <div style="display:flex;justify-content:space-between;font-size:.58rem;color:var(--text-dim);margin-bottom:.7rem"><span>300€</span><span>3 000€</span></div>
+
+  <label style="font-size:.7rem;color:var(--text-muted);display:block;margin-bottom:.4rem">Durée d'engagement</label>
+  <div class="pn-radios" id="rg-duree">
+    <button class="pn-radio-btn" data-group="duree" data-val="6">6 ans</button>
+    <button class="pn-radio-btn active" data-group="duree" data-val="9">9 ans</button>
+    <button class="pn-radio-btn" data-group="duree" data-val="12">12 ans</button>
+  </div>
+
+  <div class="pn-range-row">
+    <span class="pn-range-lbl">Vacance locative</span>
+    <span class="pn-range-disp amber" id="d-vacance">5%</span>
+  </div>
+  <input type="range" class="pn-slider amber-slider" id="r-vacance" min="0" max="20" step="1" value="5" style="--pct:25">
+  <div style="display:flex;justify-content:space-between;font-size:.58rem;color:var(--text-dim);margin-bottom:.7rem"><span>0%</span><span>20%</span></div>
+
+  <div class="pn-range-row">
+    <span class="pn-range-lbl">Charges mensuelles</span>
+    <span class="pn-range-disp" id="d-charges">120 €</span>
+  </div>
+  <input type="range" class="pn-slider" id="r-charges" min="0" max="600" step="10" value="120" style="--pct:20">
+  <div style="display:flex;justify-content:space-between;font-size:.58rem;color:var(--text-dim);margin-bottom:.7rem"><span>0€</span><span>600€</span></div>
+
+  <div class="pn-range-row">
+    <span class="pn-range-lbl">Taxe foncière/an</span>
+    <span class="pn-range-disp" id="d-tf">900 €</span>
+  </div>
+  <input type="range" class="pn-slider" id="r-tf" min="0" max="5000" step="50" value="900" style="--pct:18">
+  <div style="display:flex;justify-content:space-between;font-size:.58rem;color:var(--text-dim);margin-bottom:.7rem"><span>0€</span><span>5 000€</span></div>
+
+  <!-- C. FINANCEMENT -->
+  <div class="pn-inp-sec">C. Financement</div>
+
+  <div class="pn-range-row">
+    <span class="pn-range-lbl">Apport personnel</span>
+    <span class="pn-range-disp" id="d-apport">20 000 €</span>
+  </div>
+  <input type="range" class="pn-slider" id="r-apport" min="0" max="200000" step="2500" value="20000" style="--pct:10">
+  <div style="display:flex;justify-content:space-between;font-size:.58rem;color:var(--text-dim);margin-bottom:.7rem"><span>0€</span><span>200k€</span></div>
+
+  <div class="pn-range-row">
+    <span class="pn-range-lbl">Taux crédit (%)</span>
+    <span class="pn-range-disp amber" id="d-taux">3.5%</span>
+  </div>
+  <input type="range" class="pn-slider amber-slider" id="r-taux" min="1" max="7" step="0.05" value="3.5" style="--pct:42">
+  <div style="display:flex;justify-content:space-between;font-size:.58rem;color:var(--text-dim);margin-bottom:.7rem"><span>1%</span><span>7%</span></div>
+
+  <div class="pn-range-row">
+    <span class="pn-range-lbl">Durée crédit</span>
+    <span class="pn-range-disp" id="d-duree-credit">20 ans</span>
+  </div>
+  <input type="range" class="pn-slider" id="r-duree-credit" min="7" max="30" step="1" value="20" style="--pct:59">
+  <div style="display:flex;justify-content:space-between;font-size:.58rem;color:var(--text-dim);margin-bottom:.7rem"><span>7 ans</span><span>30 ans</span></div>
+
+  <div class="pn-range-row">
+    <span class="pn-range-lbl">Assurance crédit (%/an)</span>
+    <span class="pn-range-disp" id="d-assurance">0.35%</span>
+  </div>
+  <input type="range" class="pn-slider" id="r-assurance" min="0.10" max="1.0" step="0.05" value="0.35" style="--pct:28">
+  <div style="display:flex;justify-content:space-between;font-size:.58rem;color:var(--text-dim);margin-bottom:.7rem"><span>0.10%</span><span>1.00%</span></div>
+
+  <!-- D. FISCALITÉ -->
+  <div class="pn-inp-sec">D. Fiscalité & projection</div>
+
+  <label style="font-size:.7rem;color:var(--text-muted);display:block;margin-bottom:.3rem">TMI (Tranche marginale)</label>
+  <select class="pn-inp-select" id="s-tmi">
+    <option value="11">11%</option>
+    <option value="30" selected>30%</option>
+    <option value="41">41%</option>
+    <option value="45">45%</option>
+  </select>
+
+  <div class="pn-range-row">
+    <span class="pn-range-lbl">Revalorisation bien/an</span>
+    <span class="pn-range-disp" id="d-revalo">1.5%</span>
+  </div>
+  <input type="range" class="pn-slider" id="r-revalo" min="0" max="5" step="0.1" value="1.5" style="--pct:30">
+  <div style="display:flex;justify-content:space-between;font-size:.58rem;color:var(--text-dim);margin-bottom:.7rem"><span>0%</span><span>5%</span></div>
+
+  <div class="pn-range-row">
+    <span class="pn-range-lbl">Horizon détention</span>
+    <span class="pn-range-disp" id="d-horizon">20 ans</span>
+  </div>
+  <input type="range" class="pn-slider" id="r-horizon" min="6" max="30" step="1" value="20" style="--pct:61">
+  <div style="display:flex;justify-content:space-between;font-size:.58rem;color:var(--text-dim);margin-bottom:.7rem"><span>6 ans</span><span>30 ans</span></div>
+
+</aside>
+
+<!-- ══════════════ ZONE PRINCIPALE ══════════════ -->
+<main class="pn-main">
+
+  <!-- TABS NAV -->
+  <nav class="pn-tabs-nav" role="tablist">
+    <button class="pn-tab-btn active" data-tab="0">Projet immobilier</button>
+    <button class="pn-tab-btn" data-tab="1">Réduction fiscale</button>
+    <button class="pn-tab-btn" data-tab="2">Cash-flow & rentabilité</button>
+    <button class="pn-tab-btn" data-tab="3">Pinel vs Denormandie</button>
+    <button class="pn-tab-btn" data-tab="4">Comparaison patrimoniale</button>
+    <button class="pn-tab-btn" data-tab="5">Pédagogie</button>
+  </nav>
+
+  <!-- ═══ TAB 0 — PROJET IMMOBILIER ═══ -->
+  <div class="pn-panel active" data-panel="0">
+
+    <!-- Bloc effort mensuel -->
+    <div class="pn-effort-block">
+      <div class="pn-effort-title">Effort d'épargne réel (mensuel)</div>
+      <div class="pn-effort-main">
+        <span class="pn-effort-val" id="t0-effort-val">−</span>
+        <span class="pn-effort-unit">€ / mois</span>
+      </div>
+      <div class="pn-effort-sub" id="t0-effort-sub">après loyers perçus · avant avantage fiscal</div>
+      <div class="pn-effort-grid">
+        <div class="pn-effort-kpi">
+          <div class="pn-effort-kpi-lbl">Effort net après fiscalité</div>
+          <div class="pn-effort-kpi-val green" id="t0-effort-net">−</div>
+        </div>
+        <div class="pn-effort-kpi">
+          <div class="pn-effort-kpi-lbl">Réduction IR mensuelle</div>
+          <div class="pn-effort-kpi-val amber" id="t0-red-mensuelle">−</div>
+        </div>
+        <div class="pn-effort-kpi">
+          <div class="pn-effort-kpi-lbl">Mensualité crédit</div>
+          <div class="pn-effort-kpi-val" id="t0-mensualite">−</div>
+        </div>
+        <div class="pn-effort-kpi">
+          <div class="pn-effort-kpi-lbl">Patrimoine constitué</div>
+          <div class="pn-effort-kpi-val green" id="t0-patrimoine">−</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pn-kpi-grid">
+      <div class="pn-kpi">
+        <div class="pn-kpi-lbl">Investissement total</div>
+        <div class="pn-kpi-val amber" id="t0-invest">−</div>
+        <div class="pn-kpi-sub" id="t0-invest-sub">−</div>
+      </div>
+      <div class="pn-kpi">
+        <div class="pn-kpi-lbl">Réduction IR totale</div>
+        <div class="pn-kpi-val green" id="t0-red-totale">−</div>
+        <div class="pn-kpi-sub" id="t0-red-sub">−</div>
+      </div>
+      <div class="pn-kpi">
+        <div class="pn-kpi-lbl">Valeur future (revente)</div>
+        <div class="pn-kpi-val" id="t0-valeur-future">−</div>
+        <div class="pn-kpi-sub" id="t0-vf-sub">−</div>
+      </div>
+      <div class="pn-kpi">
+        <div class="pn-kpi-lbl">Rendement brut</div>
+        <div class="pn-kpi-val green" id="t0-rend-brut">−</div>
+        <div class="pn-kpi-sub">loyers / prix d'acquisition</div>
+      </div>
+      <div class="pn-kpi">
+        <div class="pn-kpi-lbl">Rendement net</div>
+        <div class="pn-kpi-val" id="t0-rend-net">−</div>
+        <div class="pn-kpi-sub">après charges & fiscalité</div>
+      </div>
+      <div class="pn-kpi">
+        <div class="pn-kpi-lbl">Capital remboursé</div>
+        <div class="pn-kpi-val" id="t0-cap-rembourse">−</div>
+        <div class="pn-kpi-sub" id="t0-cr-sub">à l'horizon de détention</div>
+      </div>
+    </div>
+
+    <div class="pn-chart-wrap">
+      <div class="pn-chart-title">Projection valeur bien & patrimoine net</div>
+      <canvas id="cv-projet" height="180"></canvas>
+    </div>
+
+  </div>
+
+  <!-- ═══ TAB 1 — RÉDUCTION FISCALE ═══ -->
+  <div class="pn-panel" data-panel="1">
+
+    <div class="pn-fiscal-block">
+      <div class="pn-effort-title">Réduction d'impôt (IR) cumulée</div>
+      <div class="pn-fiscal-main">
+        <span class="pn-fiscal-val" id="t1-red-totale">−</span>
+        <span class="pn-fiscal-unit">€ sur <span id="t1-duree-label">9 ans</span></span>
+      </div>
+      <div class="pn-fiscal-sub" id="t1-fiscal-sub">−</div>
+    </div>
+
+    <div class="pn-dur-badges" id="dur-badges">
+      <div class="pn-dur-badge" data-dur="6">
+        <span class="pn-dur-badge-years">6 ANS</span>
+        <span class="pn-dur-badge-taux" id="db-taux-6">−</span>
+        <span class="pn-dur-badge-montant" id="db-mont-6">−</span>
+      </div>
+      <div class="pn-dur-badge active" data-dur="9">
+        <span class="pn-dur-badge-years">9 ANS</span>
+        <span class="pn-dur-badge-taux" id="db-taux-9">−</span>
+        <span class="pn-dur-badge-montant" id="db-mont-9">−</span>
+      </div>
+      <div class="pn-dur-badge" data-dur="12">
+        <span class="pn-dur-badge-years">12 ANS</span>
+        <span class="pn-dur-badge-taux" id="db-taux-12">−</span>
+        <span class="pn-dur-badge-montant" id="db-mont-12">−</span>
+      </div>
+    </div>
+
+    <!-- Avant / Après IR -->
+    <div class="pn-av-ap-strip">
+      <div class="pn-av-box">
+        <div class="pn-av-lbl">IR sans Pinel</div>
+        <div class="pn-av-val" id="t1-ir-avant">−</div>
+        <div class="pn-av-sub">impôt annuel estimé</div>
+      </div>
+      <div class="pn-av-ap-arrow">→</div>
+      <div class="pn-ap-box">
+        <div class="pn-ap-lbl">IR avec Pinel</div>
+        <div class="pn-ap-val" id="t1-ir-apres">−</div>
+        <div class="pn-ap-sub" id="t1-ir-eco">économie − €/an</div>
+      </div>
+    </div>
+
+    <div class="pn-kpi-grid">
+      <div class="pn-kpi">
+        <div class="pn-kpi-lbl">Réduction annuelle</div>
+        <div class="pn-kpi-val amber" id="t1-red-an">−</div>
+        <div class="pn-kpi-sub">lissée sur la durée</div>
+      </div>
+      <div class="pn-kpi">
+        <div class="pn-kpi-lbl">Base éligible</div>
+        <div class="pn-kpi-val" id="t1-base">−</div>
+        <div class="pn-kpi-sub">plafonnée 300k€ · 5 500€/m²</div>
+      </div>
+      <div class="pn-kpi">
+        <div class="pn-kpi-lbl">Taux de réduction</div>
+        <div class="pn-kpi-val green" id="t1-taux-red">−</div>
+        <div class="pn-kpi-sub" id="t1-type-label">−</div>
+      </div>
+      <div class="pn-kpi">
+        <div class="pn-kpi-lbl">Coût réel après fiscalité</div>
+        <div class="pn-kpi-val" id="t1-cout-reel">−</div>
+        <div class="pn-kpi-sub">prix − réduction totale</div>
+      </div>
+      <div class="pn-kpi">
+        <div class="pn-kpi-lbl">Gain fiscal / m²</div>
+        <div class="pn-kpi-val amber" id="t1-gain-m2">−</div>
+        <div class="pn-kpi-sub">réduction / surface</div>
+      </div>
+      <div class="pn-kpi">
+        <div class="pn-kpi-lbl">Effort net / m²</div>
+        <div class="pn-kpi-val" id="t1-effort-m2">−</div>
+        <div class="pn-kpi-sub">coût réel / surface</div>
+      </div>
+    </div>
+
+    <!-- Waterfall fiscal -->
+    <div class="pn-chart-title">Décomposition fiscale</div>
+    <div class="pn-waterfall" id="wf-fiscal"></div>
+
+    <div class="pn-chart-wrap">
+      <div class="pn-chart-title">Gain fiscal cumulé dans le temps</div>
+      <canvas id="cv-fiscal" height="170"></canvas>
+    </div>
+
+  </div>
+
+  <!-- ═══ TAB 2 — CASH-FLOW & RENTABILITÉ ═══ -->
+  <div class="pn-panel" data-panel="2">
+
+    <p class="pn-section-title">Combien cela me coûte réellement chaque mois ?</p>
+
+    <div class="pn-kpi-grid">
+      <div class="pn-kpi">
+        <div class="pn-kpi-lbl">Cash-flow mensuel brut</div>
+        <div class="pn-kpi-val" id="t2-cf-brut">−</div>
+        <div class="pn-kpi-sub">loyers − mensualité crédit − charges</div>
+      </div>
+      <div class="pn-kpi">
+        <div class="pn-kpi-lbl">Cash-flow mensuel net</div>
+        <div class="pn-kpi-val green" id="t2-cf-net">−</div>
+        <div class="pn-kpi-sub">après avantage fiscal mensuel</div>
+      </div>
+      <div class="pn-kpi">
+        <div class="pn-kpi-lbl">Effort réel mensuel</div>
+        <div class="pn-kpi-val amber" id="t2-effort">−</div>
+        <div class="pn-kpi-sub">montant mensuel à sortir de poche</div>
+      </div>
+      <div class="pn-kpi">
+        <div class="pn-kpi-lbl">Rendement brut</div>
+        <div class="pn-kpi-val" id="t2-rend-brut">−</div>
+        <div class="pn-kpi-sub">loyers annuels / prix</div>
+      </div>
+      <div class="pn-kpi">
+        <div class="pn-kpi-lbl">Rendement net charges</div>
+        <div class="pn-kpi-val" id="t2-rend-net">−</div>
+        <div class="pn-kpi-sub">après charges & vacance</div>
+      </div>
+      <div class="pn-kpi">
+        <div class="pn-kpi-lbl">Patrimoine final</div>
+        <div class="pn-kpi-val green" id="t2-patrimoine">−</div>
+        <div class="pn-kpi-sub" id="t2-patri-sub">à l'horizon</div>
+      </div>
+    </div>
+
+    <!-- Avant/après cash-flow -->
+    <div class="pn-av-ap-strip">
+      <div class="pn-av-box">
+        <div class="pn-av-lbl">Charge mensuelle brute</div>
+        <div class="pn-av-val" id="t2-charge-brute">−</div>
+        <div class="pn-av-sub">sans avantage fiscal</div>
+      </div>
+      <div class="pn-av-ap-arrow">→</div>
+      <div class="pn-ap-box">
+        <div class="pn-ap-lbl">Coût mensuel net réel</div>
+        <div class="pn-ap-val" id="t2-cout-net">−</div>
+        <div class="pn-ap-sub" id="t2-eco-mensuelle">économie −€/mois</div>
+      </div>
+    </div>
+
+    <div class="pn-chart-wrap">
+      <div class="pn-chart-title">Cash-flow cumulé & évolution dette / patrimoine</div>
+      <canvas id="cv-cashflow" height="190"></canvas>
+    </div>
+
+  </div>
+
+  <!-- ═══ TAB 3 — PINEL VS DENORMANDIE ═══ -->
+  <div class="pn-panel" data-panel="3">
+
+    <p class="pn-section-title">Pinel (neuf) vs Denormandie (ancien rénové)</p>
+
+    <div class="pn-vs-grid" id="vs-grid">
+      <div class="pn-vs-card" id="vs-pinel">
+        <div class="pn-vs-card-title">
+          <span id="vs-pinel-label">Pinel+</span>
+          <span class="pn-vs-badge" id="vs-pinel-badge">Neuf</span>
+        </div>
+        <div class="pn-vs-row"><span class="pn-vs-row-lbl">Taux réduction</span><span class="pn-vs-row-val amber" id="vs-p-taux">−</span></div>
+        <div class="pn-vs-row"><span class="pn-vs-row-lbl">Réduction totale</span><span class="pn-vs-row-val amber" id="vs-p-red">−</span></div>
+        <div class="pn-vs-row"><span class="pn-vs-row-lbl">Réduction annuelle</span><span class="pn-vs-row-val" id="vs-p-redan">−</span></div>
+        <div class="pn-vs-row"><span class="pn-vs-row-lbl">Cash-flow mensuel net</span><span class="pn-vs-row-val green" id="vs-p-cf">−</span></div>
+        <div class="pn-vs-row"><span class="pn-vs-row-lbl">Rendement brut</span><span class="pn-vs-row-val" id="vs-p-rend">−</span></div>
+        <div class="pn-vs-row"><span class="pn-vs-row-lbl">Travaux requis</span><span class="pn-vs-row-val" id="vs-p-travaux">−</span></div>
+        <div class="pn-vs-row"><span class="pn-vs-row-lbl">Charges copro (estimé)</span><span class="pn-vs-row-val" id="vs-p-charges">−</span></div>
+        <div class="pn-vs-row"><span class="pn-vs-row-lbl">Patrimoine final</span><span class="pn-vs-row-val green" id="vs-p-patri">−</span></div>
+      </div>
+      <div class="pn-vs-card" id="vs-deno">
+        <div class="pn-vs-card-title">
+          <span>Denormandie</span>
+          <span class="pn-vs-badge amber">Ancien rénové</span>
+        </div>
+        <div class="pn-vs-row"><span class="pn-vs-row-lbl">Taux réduction</span><span class="pn-vs-row-val amber" id="vs-d-taux">−</span></div>
+        <div class="pn-vs-row"><span class="pn-vs-row-lbl">Réduction totale</span><span class="pn-vs-row-val amber" id="vs-d-red">−</span></div>
+        <div class="pn-vs-row"><span class="pn-vs-row-lbl">Réduction annuelle</span><span class="pn-vs-row-val" id="vs-d-redan">−</span></div>
+        <div class="pn-vs-row"><span class="pn-vs-row-lbl">Cash-flow mensuel net</span><span class="pn-vs-row-val green" id="vs-d-cf">−</span></div>
+        <div class="pn-vs-row"><span class="pn-vs-row-lbl">Rendement brut</span><span class="pn-vs-row-val" id="vs-d-rend">−</span></div>
+        <div class="pn-vs-row"><span class="pn-vs-row-lbl">Travaux requis</span><span class="pn-vs-row-val amber" id="vs-d-travaux">−</span></div>
+        <div class="pn-vs-row"><span class="pn-vs-row-lbl">Prix acquisition (estimé)</span><span class="pn-vs-row-val" id="vs-d-charges">−</span></div>
+        <div class="pn-vs-row"><span class="pn-vs-row-lbl">Patrimoine final</span><span class="pn-vs-row-val green" id="vs-d-patri">−</span></div>
+      </div>
+    </div>
+
+    <div class="pn-chart-wrap">
+      <div class="pn-chart-title">Comparatif projection patrimoniale Pinel vs Denormandie</div>
+      <canvas id="cv-vs" height="180"></canvas>
+    </div>
+
+    <div class="pn-kpi-grid">
+      <div class="pn-kpi">
+        <div class="pn-kpi-lbl">Avantage fiscal net</div>
+        <div class="pn-kpi-val amber" id="t3-av-fiscal">−</div>
+        <div class="pn-kpi-sub" id="t3-av-fiscal-sub">réduction totale sur la durée</div>
+      </div>
+      <div class="pn-kpi">
+        <div class="pn-kpi-lbl">Meilleur cash-flow</div>
+        <div class="pn-kpi-val green" id="t3-av-cf">−</div>
+        <div class="pn-kpi-sub" id="t3-av-cf-sub">−</div>
+      </div>
+      <div class="pn-kpi">
+        <div class="pn-kpi-lbl">Potentiel valorisation</div>
+        <div class="pn-kpi-val" id="t3-av-valo">−</div>
+        <div class="pn-kpi-sub" id="t3-av-valo-sub">−</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══ TAB 4 — COMPARAISON PATRIMONIALE ═══ -->
+  <div class="pn-panel" data-panel="4">
+
+    <p class="pn-section-title">Pinel / Denormandie vs alternatives patrimoniales</p>
+
+    <table class="pn-cmp-table">
+      <thead>
+        <tr>
+          <th>Dispositif</th>
+          <th>Rend. brut</th>
+          <th>Avantage fiscal</th>
+          <th>Cash-flow</th>
+          <th>Gestion</th>
+          <th>Horizon idéal</th>
+        </tr>
+      </thead>
+      <tbody id="cmp-tbody"></tbody>
+    </table>
+
+    <div class="pn-chart-wrap">
+      <div class="pn-chart-title">Patrimoine final comparé (à l'horizon de détention)</div>
+      <canvas id="cv-cmp" height="200"></canvas>
+    </div>
+
+    <div class="pn-kpi-grid">
+      <div class="pn-kpi">
+        <div class="pn-kpi-lbl">Votre Pinel/Deno</div>
+        <div class="pn-kpi-val green" id="t4-pn-patri">−</div>
+        <div class="pn-kpi-sub">patrimoine final simulé</div>
+      </div>
+      <div class="pn-kpi">
+        <div class="pn-kpi-lbl">vs LMNP estimé</div>
+        <div class="pn-kpi-val" id="t4-lmnp-patri">−</div>
+        <div class="pn-kpi-sub">fiscalité BIC micro/réel</div>
+      </div>
+      <div class="pn-kpi">
+        <div class="pn-kpi-lbl">vs SCPI estimé</div>
+        <div class="pn-kpi-val" id="t4-scpi-patri">−</div>
+        <div class="pn-kpi-sub">même capital investi</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══ TAB 5 — PÉDAGOGIE ═══ -->
+  <div class="pn-panel" data-panel="5">
+
+    <div class="pn-ped-grid">
+
+      <div class="pn-ped-card">
+        <div class="pn-ped-icon">
+          <svg viewBox="0 0 24 24"><path d="M3 21V9l9-6 9 6v12M9 21v-7h6v7"/></svg>
+        </div>
+        <div class="pn-ped-title">Qu'est-ce que le Pinel ?</div>
+        <div class="pn-ped-body">
+          Le dispositif Pinel permettait d'acquérir un logement neuf en zone tendue pour le mettre en location, en échange d'une <strong>réduction d'IR</strong> calculée sur le prix d'acquisition (plafonnée à 300 000 € et 5 500 €/m²).<br><br>
+          Le Pinel classique s'est <strong>terminé le 31 décembre 2024</strong> pour les nouvelles acquisitions. Seul le Pinel+ (performances énergétiques renforcées) était maintenu à taux plein.
+          <ul>
+            <li>Zones éligibles : A bis, A, B1</li>
+            <li>Plafonds de loyer par zone</li>
+            <li>Plafonds de ressources locataires</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="pn-ped-card">
+        <div class="pn-ped-icon amber">
+          <svg viewBox="0 0 24 24"><path d="M12 2l3 6 7 1-5 5 1 7-6-3-6 3 1-7L2 9l7-1z"/></svg>
+        </div>
+        <div class="pn-ped-title">Pinel vs Pinel+</div>
+        <div class="pn-ped-body">
+          Le <strong>Pinel+</strong> maintient les taux initiaux (12% / 18% / 21%) en contrepartie d'exigences renforcées :<br><br>
+          <ul>
+            <li>DPE classe A ou B</li>
+            <li>Surface minimale : T2 ≥ 45m², T3 ≥ 62m², T4 ≥ 79m²</li>
+            <li>Double orientation à partir du T3</li>
+            <li>Espace extérieur privatif (balcon, terrasse)</li>
+          </ul>
+          Le Pinel classique 2024 ne proposait plus que 9% / 12% / 14% — <strong>30 à 35% de moins</strong> d'avantage fiscal.
+        </div>
+      </div>
+
+      <div class="pn-ped-card">
+        <div class="pn-ped-icon">
+          <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V7l7-5 7 5v12a2 2 0 01-2 2z"/><path d="M9 21V12h6v9"/></svg>
+        </div>
+        <div class="pn-ped-title">Denormandie</div>
+        <div class="pn-ped-body">
+          Le <strong>Denormandie</strong> est l'équivalent Pinel pour l'immobilier <strong>ancien à rénover</strong>, dans des communes spécifiques (programme "Action cœur de ville").<br><br>
+          <ul>
+            <li>Taux identiques au Pinel original : <strong>12% / 18% / 21%</strong></li>
+            <li>Travaux obligatoires : ≥ 25% du coût total d'opération</li>
+            <li>Eligible zones A, A bis, B1, B2 (certaines communes)</li>
+            <li>Prorogé jusqu'au <strong>31 décembre 2026</strong></li>
+          </ul>
+          Les travaux sont intégrés dans la base de calcul de la réduction IR.
+        </div>
+      </div>
+
+      <div class="pn-ped-card">
+        <div class="pn-ped-icon amber">
+          <svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+        </div>
+        <div class="pn-ped-title">La réduction fiscale en détail</div>
+        <div class="pn-ped-body">
+          La réduction est calculée sur une <strong>base plafonnée</strong> :<br><br>
+          <ul>
+            <li>Maximum : <strong>300 000 €</strong> par an</li>
+            <li>Maximum : <strong>5 500 €/m²</strong></li>
+            <li>Plafond global niches fiscales : <strong>10 000 €/an</strong></li>
+            <li>La réduction est <strong>lissée linéairement</strong> sur la durée d'engagement</li>
+            <li>Non reportable en cas d'IR insuffisant</li>
+          </ul>
+          Elle s'impute directement sur l'IR dû, <strong>pas sur le revenu imposable</strong>.
+        </div>
+      </div>
+
+      <div class="pn-ped-card">
+        <div class="pn-ped-icon">
+          <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0zM12 9v4M12 17h.01"/></svg>
+        </div>
+        <div class="pn-ped-title">Risques & vigilance</div>
+        <div class="pn-ped-body">
+          <ul>
+            <li><strong>Vacance locative</strong> : zones B1/B2 peuvent connaître des difficultés de location</li>
+            <li><strong>Plafonds loyers</strong> : souvent inférieurs au marché libre, impactant la rentabilité</li>
+            <li><strong>Prix d'achat</strong> : le neuf se vend souvent à prime vs l'ancien</li>
+            <li><strong>Sortie anticipée</strong> : remise en cause de toute la réduction IR</li>
+            <li><strong>Revente</strong> : marché secondaire Pinel parfois moins liquide</li>
+            <li><strong>Niches fiscales</strong> : plafond 10 000€/an partagé avec d'autres dispositifs</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="pn-ped-card">
+        <div class="pn-ped-icon amber">
+          <svg viewBox="0 0 24 24"><path d="M3 3h18v18H3z"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg>
+        </div>
+        <div class="pn-ped-title">Stratégies patrimoniales</div>
+        <div class="pn-ped-body">
+          <strong>Pinel / Denormandie convient si :</strong>
+          <ul>
+            <li>TMI ≥ 30% avec IR suffisant pour absorber la réduction</li>
+            <li>Objectif de constitution de patrimoine immobilier</li>
+            <li>Capacité d'épargne mensuelle disponible</li>
+            <li>Horizon ≥ 9 à 12 ans pour maximiser l'avantage</li>
+          </ul>
+          <strong>Alternatives à considérer :</strong>
+          <ul>
+            <li>LMNP : fiscalité BIC, amortissement, cash-flow positif</li>
+            <li>Déficit Foncier : TMI élevé, travaux importants</li>
+            <li>SCPI : diversification sans gestion, ticket réduit</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</main>
+</div><!-- .pn-layout -->
+
+<script>
+(function(){
+'use strict';
+
+/* ─── TYPES & BARÈMES ─── */
+const TYPES_INFO = {
+  pinel:       { label:'Pinel classique', taux:{ 6:0.09, 9:0.12, 12:0.14 } },
+  pinel_plus:  { label:'Pinel+',          taux:{ 6:0.12, 9:0.18, 12:0.21 } },
+  denormandie: { label:'Denormandie',     taux:{ 6:0.12, 9:0.18, 12:0.21 } }
+};
+
+const LOYERS_PLAFOND = { abis:18.25, a:13.57, b1:10.93, b2:9.50 };
+
+/* ─── ÉTAT ─── */
+const S = {
+  prix:200000, surface:45, type:'pinel_plus', zone:'b1', parking:'non',
+  loyer:650, duree:9, vacance:5, charges:120, tf:900,
+  apport:20000, tauxCredit:3.5, dureeCredit:20, assurance:0.35,
+  tmi:30, revalo:1.5, horizon:20
+};
+
+/* ─── FORMATAGE ─── */
+function fmtEur(v, dec){ dec = dec||0; return (Math.round(v*Math.pow(10,dec))/Math.pow(10,dec)).toLocaleString('fr-FR')+'€'; }
+function fmtPct(v, dec){ dec = dec===undefined?1:dec; return (Math.round(v*Math.pow(10,dec))/Math.pow(10,dec)).toLocaleString('fr-FR')+'%'; }
+function el(id){ return document.getElementById(id); }
+function set(id, v){ var e=el(id); if(e) e.textContent=v; }
+
+/* ─── SLIDER SYNC ─── */
+function syncSlider(slider, disp, fmt){
+  function upd(){
+    var v=parseFloat(slider.value), min=parseFloat(slider.min), max=parseFloat(slider.max);
+    var pct = max>min ? Math.round((v-min)/(max-min)*100) : 0;
+    slider.style.setProperty('--pct', pct);
+    if(disp && fmt) disp.textContent = fmt(v);
+  }
+  slider.addEventListener('input', upd);
+  upd();
+}
+
+/* ─── INIT SLIDERS ─── */
+syncSlider(el('r-prix'),        el('d-prix'),        v=>Math.round(v/1000)+'k€' === v+'€'? fmtEur(v) : fmtEur(v));
+syncSlider(el('r-prix'),        el('d-prix'),        v=>fmtEur(v));
+syncSlider(el('r-surface'),     el('d-surface'),     v=>Math.round(v)+' m²');
+syncSlider(el('r-loyer'),       el('d-loyer'),       v=>fmtEur(v));
+syncSlider(el('r-vacance'),     el('d-vacance'),     v=>Math.round(v)+'%');
+syncSlider(el('r-charges'),     el('d-charges'),     v=>fmtEur(v));
+syncSlider(el('r-tf'),          el('d-tf'),          v=>fmtEur(v));
+syncSlider(el('r-apport'),      el('d-apport'),      v=>fmtEur(v));
+syncSlider(el('r-taux'),        el('d-taux'),        v=>v.toFixed(2)+'%');
+syncSlider(el('r-duree-credit'),el('d-duree-credit'),v=>Math.round(v)+' ans');
+syncSlider(el('r-assurance'),   el('d-assurance'),   v=>v.toFixed(2)+'%');
+syncSlider(el('r-revalo'),      el('d-revalo'),      v=>v.toFixed(1)+'%');
+syncSlider(el('r-horizon'),     el('d-horizon'),     v=>Math.round(v)+' ans');
+
+/* ─── RADIO BUTTONS ─── */
+function setupRadios(groupName, onChange){
+  document.querySelectorAll('[data-group="'+groupName+'"]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('[data-group="'+groupName+'"]').forEach(function(b){ b.classList.remove('active') });
+      btn.classList.add('active');
+      if(onChange) onChange(btn.dataset.val);
+    });
+  });
+}
+setupRadios('parking', function(v){ S.parking=v; calcAndRender(); });
+setupRadios('duree', function(v){ S.duree=parseInt(v); calcAndRender(); });
+
+/* ─── SLIDERS → STATE ─── */
+function bindRange(id, key, parse){
+  el(id).addEventListener('input', function(){ S[key]=parse(this.value); calcAndRender(); });
+}
+bindRange('r-prix',         'prix',         parseFloat);
+bindRange('r-surface',      'surface',      parseFloat);
+bindRange('r-loyer',        'loyer',        parseFloat);
+bindRange('r-vacance',      'vacance',      parseFloat);
+bindRange('r-charges',      'charges',      parseFloat);
+bindRange('r-tf',           'tf',           parseFloat);
+bindRange('r-apport',       'apport',       parseFloat);
+bindRange('r-taux',         'tauxCredit',   parseFloat);
+bindRange('r-duree-credit', 'dureeCredit',  parseFloat);
+bindRange('r-assurance',    'assurance',    parseFloat);
+bindRange('r-revalo',       'revalo',       parseFloat);
+bindRange('r-horizon',      'horizon',      parseFloat);
+
+el('s-type').addEventListener('change', function(){ S.type=this.value; calcAndRender(); });
+el('s-zone').addEventListener('change', function(){ S.zone=this.value; calcAndRender(); });
+el('s-tmi').addEventListener('change',  function(){ S.tmi=parseFloat(this.value); calcAndRender(); });
+
+/* ─── MOTEUR DE CALCUL ─── */
+function calcCore(p){
+  var ti = TYPES_INFO[p.type];
+  var tauxRed = ti.taux[p.duree];
+
+  // Base éligible
+  var baseMax = Math.min(p.prix, 300000, p.surface * 5500);
+  var redTotale = baseMax * tauxRed;
+  var redAnnuelle = redTotale / p.duree;
+
+  // Crédit
+  var montantCredit = Math.max(0, p.prix - p.apport);
+  var tauxM = p.tauxCredit / 100 / 12;
+  var nbM = p.dureeCredit * 12;
+  var mensalit = 0;
+  if(tauxM > 0 && nbM > 0){
+    mensalit = montantCredit * tauxM / (1 - Math.pow(1+tauxM, -nbM));
+  } else if(nbM > 0) {
+    mensalit = montantCredit / nbM;
+  }
+  var assurM = p.prix * p.assurance / 100 / 12;
+  var mensalitTotale = mensalit + assurM;
+
+  // Loyers
+  var loyerBrut = p.loyer;
+  var loyerAnnuelBrut = loyerBrut * 12 * (1 - p.vacance / 100);
+  var chargesAn = p.charges * 12 + p.tf;
+  var revenuFoncierBrut = loyerAnnuelBrut - chargesAn;
+
+  // Fiscalité revenus fonciers (régime réel, approx)
+  var interetsAn = montantCredit * (p.tauxCredit / 100);
+  var revImposable = Math.max(0, revenuFoncierBrut - interetsAn - assurM * 12);
+  var tauxFoncier = (p.tmi / 100) + 0.172;
+  var impotFoncier = revImposable * tauxFoncier;
+
+  // Cash-flow
+  var encaissM = loyerBrut * (1 - p.vacance / 100);
+  var decaissM = mensalitTotale + p.charges + p.tf / 12;
+  var cfBrut = encaissM - decaissM;
+  var cfNet = cfBrut + redAnnuelle / 12 - impotFoncier / 12;
+  var effortBrut = decaissM - encaissM;
+  var effortNet = Math.max(0, effortBrut - redAnnuelle / 12 + impotFoncier / 12);
+
+  // Rendement
+  var rendBrut = loyerAnnuelBrut / p.prix * 100;
+  var rendNet = (loyerAnnuelBrut - chargesAn - impotFoncier) / p.prix * 100;
+
+  // Projection
+  var valFuture = p.prix * Math.pow(1 + p.revalo / 100, p.horizon);
+  var horizonCredit = Math.min(p.horizon, p.dureeCredit);
+  // Capital remboursé (approximation)
+  var capRembourse = 0;
+  if(montantCredit > 0 && p.dureeCredit > 0){
+    capRembourse = montantCredit * (horizonCredit / p.dureeCredit);
+  }
+  var detteRestante = Math.max(0, montantCredit - capRembourse);
+  var patrimoineNet = valFuture - detteRestante;
+
+  // IR estimé avant/après
+  var irEstimAvant = (p.tmi / 100) * 50000; // proxy revenus existants
+  var irEstimApres = Math.max(0, irEstimAvant - redAnnuelle);
+
+  // Coût réel
+  var coutReel = p.prix - redTotale;
+
+  return {
+    tauxRed, baseMax, redTotale, redAnnuelle,
+    montantCredit, mensalitTotale, mensalit, assurM,
+    loyerBrut, loyerAnnuelBrut, chargesAn, revenuFoncierBrut,
+    revImposable, impotFoncier, tauxFoncier,
+    encaissM, decaissM, cfBrut, cfNet,
+    effortBrut, effortNet,
+    rendBrut, rendNet, valFuture, capRembourse,
+    detteRestante, patrimoineNet, coutReel,
+    irEstimAvant, irEstimApres
+  };
+}
+
+function calcForType(overrideType, p){
+  var pp = Object.assign({}, p, { type: overrideType });
+  return calcCore(pp);
+}
+
+/* ─── CANVAS UTILS ─── */
+function setupCV(id){
+  var c = el(id);
+  if(!c) return null;
+  var dpr = window.devicePixelRatio || 1;
+  var w = c.parentElement.clientWidth || 400;
+  var h = parseInt(c.getAttribute('height')) || 180;
+  c.width = w * dpr; c.height = h * dpr;
+  c.style.width = w+'px'; c.style.height = h+'px';
+  var ctx = c.getContext('2d');
+  ctx.scale(dpr, dpr);
+  return { ctx:ctx, w:w, h:h };
+}
+
+function getColors(el_){
+  var s = getComputedStyle(el_||document.body);
+  return {
+    accent: s.getPropertyValue('--accent').trim() || '#4F8A78',
+    amber:  s.getPropertyValue('--amber').trim()  || '#B8860B',
+    text:   s.getPropertyValue('--text').trim()   || '#e8e8e8',
+    dim:    s.getPropertyValue('--text-dim').trim()|| '#666',
+    border: s.getPropertyValue('--border').trim() || '#333',
+    surface2: s.getPropertyValue('--surface-2').trim() || '#1e1e1e',
+    blue:   '#5B8FBF',
+    purple: '#8B73C4',
+    danger: s.getPropertyValue('--danger').trim()  || '#d06060'
+  };
+}
+
+function drawGrid(cv, maxV, steps, col, pad, labels){
+  var ctx=cv.ctx, w=cv.w, h=cv.h;
+  ctx.strokeStyle=col; ctx.lineWidth=.5; ctx.setLineDash([4,4]);
+  for(var i=0;i<=steps;i++){
+    var y=pad+(h-2*pad)*(1-i/steps);
+    ctx.beginPath(); ctx.moveTo(pad,y); ctx.lineTo(w-pad/2,y); ctx.stroke();
+    if(labels){
+      ctx.fillStyle=col; ctx.font='9px system-ui';
+      ctx.textAlign='right';
+      ctx.fillText(fmtK(maxV*i/steps), pad-4, y+3);
+    }
+  }
+  ctx.setLineDash([]);
+}
+
+function fmtK(v){
+  if(Math.abs(v)>=1e6) return (v/1e6).toFixed(1)+'M';
+  if(Math.abs(v)>=1000) return Math.round(v/1000)+'k';
+  return Math.round(v)+'';
+}
+
+function drawLine(cv, pts, col, pad, maxV, dash, fill, fillCol){
+  var ctx=cv.ctx, w=cv.w, h=cv.h;
+  if(!pts.length) return;
+  var W=w-pad-pad/2, H=h-2*pad;
+  ctx.beginPath();
+  pts.forEach(function(v,i){
+    var x=pad+i/(pts.length-1)*W;
+    var y=pad+H*(1-Math.max(0,v)/maxV);
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  });
+  if(fill){
+    ctx.lineTo(pad+(pts.length-1)/(pts.length-1)*W, pad+H);
+    ctx.lineTo(pad, pad+H);
+    ctx.closePath();
+    ctx.fillStyle=fillCol||col+'22';
+    ctx.fill();
+    ctx.beginPath();
+    pts.forEach(function(v,i){
+      var x=pad+i/(pts.length-1)*W;
+      var y=pad+H*(1-Math.max(0,v)/maxV);
+      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    });
+  }
+  if(dash) ctx.setLineDash(dash); else ctx.setLineDash([]);
+  ctx.strokeStyle=col; ctx.lineWidth=2; ctx.stroke();
+  ctx.setLineDash([]);
+}
+
+function drawBarsH(cv, items, pad, colFn){
+  var ctx=cv.ctx, w=cv.w, h=cv.h;
+  var max=0; items.forEach(function(it){ if(it.v>max) max=it.v; });
+  var barH=Math.floor((h-2*pad)/items.length*0.6);
+  var gap=Math.floor((h-2*pad)/items.length);
+  items.forEach(function(it,i){
+    var y=pad+i*gap;
+    var bw=(it.v/max)*(w-pad*3.5);
+    ctx.fillStyle=colFn?colFn(it,i):(it.col||'#4F8A78');
+    ctx.beginPath();
+    roundRect(ctx, pad*2, y, Math.max(bw,4), barH, 4);
+    ctx.fill();
+    ctx.fillStyle=ctx.fillStyle; ctx.font='bold 9px system-ui';
+    ctx.textAlign='left'; ctx.fillStyle='rgba(200,200,200,.7)';
+    ctx.fillText(it.lbl, pad*2, y-3);
+    ctx.fillStyle=ctx.fillStyle; ctx.font='bold 9px system-ui';
+    ctx.textAlign='left'; ctx.fillStyle='rgba(220,220,220,.9)';
+    ctx.fillText(fmtK(it.v), pad*2+bw+5, y+barH/2+3);
+  });
+}
+
+function roundRect(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y);
+  ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx.lineTo(x+r,y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+  ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y);
+  ctx.closePath();
+}
+
+/* ─── RENDER FONCTIONS ─── */
+function renderTab0(r){
+  set('t0-effort-val', Math.abs(Math.round(r.effortBrut)));
+  set('t0-effort-sub', 'Mensualité '+fmtEur(Math.round(r.mensalitTotale))+' − loyer perçu '+fmtEur(Math.round(r.encaissM)));
+  set('t0-effort-net', fmtEur(Math.round(r.effortNet))+'/mois');
+  set('t0-red-mensuelle', '+'+fmtEur(Math.round(r.redAnnuelle/12))+'/mois');
+  set('t0-mensualite', fmtEur(Math.round(r.mensalitTotale))+'/mois');
+  set('t0-patrimoine', fmtEur(Math.round(r.patrimoineNet)));
+  set('t0-invest', fmtEur(S.prix));
+  set('t0-invest-sub', 'apport '+fmtEur(S.apport)+' · crédit '+fmtEur(Math.round(r.montantCredit)));
+  set('t0-red-totale', fmtEur(Math.round(r.redTotale)));
+  set('t0-red-sub', fmtPct(r.tauxRed*100)+' sur '+S.duree+' ans');
+  set('t0-valeur-future', fmtEur(Math.round(r.valFuture)));
+  set('t0-vf-sub', 'dans '+S.horizon+' ans à +'+S.revalo+'%/an');
+  set('t0-rend-brut', fmtPct(r.rendBrut));
+  set('t0-rend-net', fmtPct(r.rendNet));
+  set('t0-cap-rembourse', fmtEur(Math.round(r.capRembourse)));
+  set('t0-cr-sub', 'à '+S.horizon+' ans (sur '+S.dureeCredit+' ans de crédit)');
+
+  // Canvas projet
+  var cv = setupCV('cv-projet');
+  if(!cv) return;
+  var col = getColors();
+  var pts = S.horizon, ptArr = [];
+  var ptDebt = [], ptNetPat = [];
+  for(var i=0;i<=pts;i++){
+    var vf = S.prix * Math.pow(1+S.revalo/100, i);
+    var capRmb = r.montantCredit * Math.min(i/S.dureeCredit, 1);
+    var dette = Math.max(0, r.montantCredit - capRmb);
+    ptArr.push(vf);
+    ptDebt.push(dette);
+    ptNetPat.push(vf - dette);
+  }
+  var maxV = Math.max(...ptArr, ...ptNetPat) * 1.1;
+  cv.ctx.clearRect(0,0,cv.w,cv.h);
+  var pad = 42;
+  drawGrid(cv, maxV, 4, col.border, pad, true);
+  drawLine(cv, ptArr, col.accent, pad, maxV, null, true, col.accent+'18');
+  drawLine(cv, ptNetPat, col.amber, pad, maxV, null, false);
+  drawLine(cv, ptDebt, col.dim, pad, maxV, [4,4]);
+  // Légende
+  cv.ctx.font = '9px system-ui';
+  [[col.accent,'Valeur bien'],[col.amber,'Patrimoine net'],[col.dim,'Crédit restant']].forEach(function(it,i){
+    cv.ctx.fillStyle=it[0]; cv.ctx.fillRect(pad+i*100, cv.h-12, 10, 8);
+    cv.ctx.fillStyle='rgba(180,180,180,.7)'; cv.ctx.fillText(it[1], pad+i*100+13, cv.h-5);
+  });
+}
+
+function renderTab1(r){
+  var ti = TYPES_INFO[S.type];
+  set('t1-red-totale', fmtEur(Math.round(r.redTotale)));
+  set('t1-duree-label', S.duree+' ans');
+  set('t1-fiscal-sub', 'Base éligible '+fmtEur(Math.round(r.baseMax))+' × '+fmtPct(r.tauxRed*100)+' = '+fmtEur(Math.round(r.redTotale)));
+  set('t1-ir-avant', fmtEur(Math.round(r.irEstimAvant)));
+  set('t1-ir-apres', fmtEur(Math.round(r.irEstimApres)));
+  set('t1-ir-eco', 'économie '+fmtEur(Math.round(r.redAnnuelle))+'/an');
+  set('t1-red-an', fmtEur(Math.round(r.redAnnuelle))+'/an');
+  set('t1-base', fmtEur(Math.round(r.baseMax)));
+  set('t1-taux-red', fmtPct(r.tauxRed*100));
+  set('t1-type-label', ti.label+' / '+S.duree+' ans');
+  set('t1-cout-reel', fmtEur(Math.round(r.coutReel)));
+  set('t1-gain-m2', fmtEur(Math.round(r.redTotale/S.surface))+'/m²');
+  set('t1-effort-m2', fmtEur(Math.round(r.coutReel/S.surface))+'/m²');
+
+  // Badges durées
+  [6,9,12].forEach(function(d){
+    var t = ti.taux[d];
+    var base = Math.min(S.prix, 300000, S.surface*5500);
+    var red = base * t;
+    set('db-taux-'+d, fmtPct(t*100));
+    set('db-mont-'+d, fmtEur(Math.round(red)));
+    var badge = el('dur-badges').querySelector('[data-dur="'+d+'"]');
+    if(badge) badge.classList.toggle('active', d===S.duree);
+  });
+
+  // Waterfall
+  var wf = el('wf-fiscal');
+  if(wf){
+    var items = [
+      { lbl:'Prix d\'acquisition', v:S.prix, col:getColors().dim },
+      { lbl:'Réduction IR totale', v:r.redTotale, col:getColors().amber },
+      { lbl:'Coût réel après fiscalité', v:r.coutReel, col:getColors().accent }
+    ];
+    var maxWf = S.prix;
+    wf.innerHTML = items.map(function(it){
+      var pct = Math.round(it.v/maxWf*100);
+      var valCls = it.lbl.indexOf('duction')>=0?'amber':'';
+      return '<div class="pn-wf-row">'
+        +'<span class="pn-wf-lbl">'+it.lbl+'</span>'
+        +'<div class="pn-wf-bar-wrap"><div class="pn-wf-bar" style="width:'+pct+'%;background:'+it.col+'"></div></div>'
+        +'<span class="pn-wf-val" style="color:'+it.col+'">'+fmtEur(Math.round(it.v))+'</span>'
+        +'</div>';
+    }).join('');
+  }
+
+  // Canvas fiscal cumulé
+  var cv = setupCV('cv-fiscal');
+  if(!cv) return;
+  var col = getColors();
+  var pts=[];
+  for(var i=0;i<=S.duree;i++) pts.push(r.redAnnuelle*i);
+  var maxV = r.redTotale * 1.15;
+  cv.ctx.clearRect(0,0,cv.w,cv.h);
+  var pad=42;
+  drawGrid(cv, maxV, 4, col.border, pad, true);
+  drawLine(cv, pts, col.amber, pad, maxV, null, true, col.amber+'22');
+  cv.ctx.font='9px system-ui'; cv.ctx.fillStyle='rgba(180,180,180,.7)'; cv.ctx.textAlign='left';
+  cv.ctx.fillText('Réduction IR cumulée', pad, cv.h-5);
+}
+
+function renderTab2(r){
+  var cfBrutStr = (r.cfBrut>=0?'+':'')+fmtEur(Math.round(r.cfBrut));
+  var cfNetStr  = (r.cfNet >=0?'+':'')+fmtEur(Math.round(r.cfNet));
+  set('t2-cf-brut', cfBrutStr);
+  set('t2-cf-net', cfNetStr);
+  set('t2-effort', fmtEur(Math.round(r.effortNet))+'/mois');
+  set('t2-rend-brut', fmtPct(r.rendBrut));
+  set('t2-rend-net', fmtPct(r.rendNet));
+  set('t2-patrimoine', fmtEur(Math.round(r.patrimoineNet)));
+  set('t2-patri-sub', 'net après crédit à '+S.horizon+' ans');
+  set('t2-charge-brute', fmtEur(Math.round(r.effortBrut))+'/mois');
+  set('t2-cout-net', fmtEur(Math.round(r.effortNet))+'/mois');
+  set('t2-eco-mensuelle', 'avantage fiscal '+fmtEur(Math.round(r.redAnnuelle/12))+'/mois');
+
+  // Coloriser selon signe
+  var el2=el('t2-cf-net');
+  if(el2){ el2.className='pn-kpi-val'+(r.cfNet>=0?' green':' danger'); }
+
+  // Canvas cash-flow & patrimoine
+  var cv = setupCV('cv-cashflow');
+  if(!cv) return;
+  var col = getColors();
+  var ptsCF=[], ptsDebt=[], ptsPat=[];
+  var cfCumul=0;
+  for(var i=0;i<=S.horizon;i++){
+    cfCumul += r.cfNet*12;
+    var capR = r.montantCredit * Math.min(i/S.dureeCredit,1);
+    var dette = Math.max(0, r.montantCredit - capR);
+    var vf = S.prix * Math.pow(1+S.revalo/100,i);
+    ptsCF.push(cfCumul);
+    ptsDebt.push(dette);
+    ptsPat.push(vf - dette);
+  }
+  var allV = ptsCF.concat(ptsPat);
+  var minV = Math.min(...allV, 0);
+  var maxV = Math.max(...allV) * 1.1;
+  var range = maxV - minV;
+  // Normalize pour affichage (décaler tout de minV si négatif)
+  var pad=42;
+  cv.ctx.clearRect(0,0,cv.w,cv.h);
+  drawGrid(cv, maxV, 4, col.border, pad, true);
+  drawLine(cv, ptsPat, col.accent, pad, maxV, null, true, col.accent+'15');
+  drawLine(cv, ptsCF, col.amber, pad, maxV, [5,3]);
+  drawLine(cv, ptsDebt, col.dim, pad, maxV, [3,3]);
+  cv.ctx.font='9px system-ui';
+  [[col.accent,'Patrimoine net'],[col.amber,'CF cumulé','dash'],[col.dim,'Crédit restant','dash']].forEach(function(it,i){
+    cv.ctx.fillStyle=it[0]; cv.ctx.fillRect(pad+i*105, cv.h-12, 10, 8);
+    cv.ctx.fillStyle='rgba(180,180,180,.7)'; cv.ctx.fillText(it[1], pad+i*105+13, cv.h-5);
+  });
+}
+
+function renderTab3(r){
+  var rDeno = calcForType('denormandie', S);
+  var rPinP = calcForType('pinel_plus', S);
+  var rPinC = calcForType('pinel', S);
+  var rPinel = (S.type === 'denormandie') ? rPinP : r;
+  var rDenorm = rDeno;
+
+  set('vs-pinel-label', S.type==='pinel' ? 'Pinel classique' : 'Pinel+');
+  set('vs-p-taux', fmtPct(rPinel.tauxRed*100));
+  set('vs-p-red', fmtEur(Math.round(rPinel.redTotale)));
+  set('vs-p-redan', fmtEur(Math.round(rPinel.redAnnuelle))+'/an');
+  set('vs-p-cf', (rPinel.cfNet>=0?'+':'')+fmtEur(Math.round(rPinel.cfNet))+'/mois');
+  set('vs-p-rend', fmtPct(rPinel.rendBrut));
+  set('vs-p-travaux', 'Aucun (neuf)');
+  set('vs-p-charges', fmtEur(Math.round(S.charges))+'/mois (estimé copro neuf)');
+  set('vs-p-patri', fmtEur(Math.round(rPinel.patrimoineNet)));
+
+  var travaux = S.prix * 0.25;
+  set('vs-d-taux', fmtPct(rDenorm.tauxRed*100));
+  set('vs-d-red', fmtEur(Math.round(rDenorm.redTotale)));
+  set('vs-d-redan', fmtEur(Math.round(rDenorm.redAnnuelle))+'/an');
+  set('vs-d-cf', (rDenorm.cfNet>=0?'+':'')+fmtEur(Math.round(rDenorm.cfNet))+'/mois');
+  set('vs-d-rend', fmtPct(rDenorm.rendBrut));
+  set('vs-d-travaux', '≥ 25% ('+fmtEur(Math.round(travaux))+')');
+  set('vs-d-charges', 'Prix foncier ≈ '+fmtEur(Math.round(S.prix*0.75))+' + travaux');
+  set('vs-d-patri', fmtEur(Math.round(rDenorm.patrimoineNet)));
+
+  // Comparaison globale
+  var avPinel = rPinel.redTotale > rDenorm.redTotale ? rPinel.redTotale : rDenorm.redTotale;
+  set('t3-av-fiscal', fmtEur(Math.round(avPinel)));
+  set('t3-av-fiscal-sub', rPinel.redTotale>=rDenorm.redTotale?'Pinel avantage':'Denormandie avantage');
+  var cfWin = rPinel.cfNet >= rDenorm.cfNet ? rPinel.cfNet : rDenorm.cfNet;
+  set('t3-av-cf', (cfWin>=0?'+':'')+fmtEur(Math.round(cfWin))+'/mois');
+  set('t3-av-cf-sub', rPinel.cfNet>=rDenorm.cfNet?'Pinel+ meilleur CF':'Denormandie meilleur CF');
+  set('t3-av-valo', '+'+fmtPct(S.revalo)+'/an → '+fmtEur(Math.round(rPinel.valFuture)));
+  set('t3-av-valo-sub', 'identique (même prix de base)');
+
+  // Canvas vs
+  var cv = setupCV('cv-vs');
+  if(!cv) return;
+  var col = getColors();
+  var pts1=[], pts2=[];
+  for(var i=0;i<=S.horizon;i++){
+    var vf = S.prix*Math.pow(1+S.revalo/100,i);
+    var cap = rPinel.montantCredit*Math.min(i/S.dureeCredit,1);
+    pts1.push(vf - Math.max(0,rPinel.montantCredit-cap) + rPinel.redTotale);
+    pts2.push(vf - Math.max(0,rDenorm.montantCredit-cap) + rDenorm.redTotale);
+  }
+  var maxV = Math.max(...pts1,...pts2)*1.1;
+  cv.ctx.clearRect(0,0,cv.w,cv.h);
+  var pad=42;
+  drawGrid(cv, maxV, 4, col.border, pad, true);
+  drawLine(cv, pts1, col.accent, pad, maxV, null, true, col.accent+'15');
+  drawLine(cv, pts2, col.amber, pad, maxV, [5,3]);
+  cv.ctx.font='9px system-ui';
+  [[col.accent,'Pinel / Pinel+'],[col.amber,'Denormandie']].forEach(function(it,i){
+    cv.ctx.fillStyle=it[0]; cv.ctx.fillRect(pad+i*120, cv.h-12, 10, 8);
+    cv.ctx.fillStyle='rgba(180,180,180,.7)'; cv.ctx.fillText(it[1], pad+i*120+13, cv.h-5);
+  });
+}
+
+function renderTab4(r){
+  var col = getColors();
+  var capital = S.apport;
+  // Estimations comparatives (même capital investi)
+  var scpiRendement = 4.5; // % brut
+  var scpiGain = capital * Math.pow(1+scpiRendement/100, S.horizon) - capital;
+  var lmnpRend = r.rendBrut * 1.2; // LMNP amortissement ~ +20% rendement net
+  var lmnpPatri = S.prix * Math.pow(1+S.revalo/100, S.horizon) - r.detteRestante;
+
+  set('t4-pn-patri', fmtEur(Math.round(r.patrimoineNet)));
+  set('t4-lmnp-patri', fmtEur(Math.round(lmnpPatri)));
+  set('t4-scpi-patri', fmtEur(Math.round(capital + scpiGain)));
+
+  // Tableau
+  var tbody = el('cmp-tbody');
+  if(tbody){
+    var rows = [
+      { dot:'green', nom:'Pinel / Denormandie', rend:fmtPct(r.rendBrut), fiscal:'Réduction IR directe', cf:r.cfNet>=0?'Positif':'Légèrement négatif', gestion:'Active', horizon:'6–12 ans min' },
+      { dot:'blue',  nom:'LMNP',                rend:fmtPct(lmnpRend),   fiscal:'Amortissement (BIC)', cf:'Souvent positif', gestion:'Active', horizon:'8–15 ans' },
+      { dot:'amber', nom:'SCPI',                 rend:fmtPct(scpiRendement), fiscal:'PFU ou barème', cf:'Distribué mensuel', gestion:'Aucune', horizon:'8+ ans' },
+      { dot:'purple',nom:'Déficit Foncier',       rend:fmtPct(r.rendBrut*1.1), fiscal:'Déduction RG 10 700€', cf:'Variable', gestion:'Active', horizon:'10+ ans' },
+      { dot:'muted', nom:'Assurance-vie (ETF)',   rend:'5–7%',            fiscal:'Fiscalité sortie', cf:'Non', gestion:'Pilotée', horizon:'8+ ans' }
+    ];
+    tbody.innerHTML = rows.map(function(row){
+      return '<tr>'
+        +'<td class="pn-cmp-name"><span class="pn-dot pn-dot-'+row.dot+'"></span>'+row.nom+'</td>'
+        +'<td>'+row.rend+'</td>'
+        +'<td>'+row.fiscal+'</td>'
+        +'<td>'+row.cf+'</td>'
+        +'<td>'+row.gestion+'</td>'
+        +'<td>'+row.horizon+'</td>'
+        +'</tr>';
+    }).join('');
+  }
+
+  // Canvas comparaison barres
+  var cv = setupCV('cv-cmp');
+  if(!cv) return;
+  var items=[
+    { lbl:'Pinel/Denormandie', v:r.patrimoineNet, col:col.accent },
+    { lbl:'LMNP (estimé)',     v:lmnpPatri,        col:col.blue },
+    { lbl:'SCPI',              v:capital+scpiGain, col:col.amber },
+    { lbl:'Livret A (2%)',     v:capital*Math.pow(1.02,S.horizon), col:col.dim }
+  ];
+  cv.ctx.clearRect(0,0,cv.w,cv.h);
+  drawBarsH(cv, items, 24, null);
+}
+
+function calcAndRender(){
+  S.prix        = parseFloat(el('r-prix').value);
+  S.surface     = parseFloat(el('r-surface').value);
+  S.type        = el('s-type').value;
+  S.zone        = el('s-zone').value;
+  S.loyer       = parseFloat(el('r-loyer').value);
+  S.vacance     = parseFloat(el('r-vacance').value);
+  S.charges     = parseFloat(el('r-charges').value);
+  S.tf          = parseFloat(el('r-tf').value);
+  S.apport      = parseFloat(el('r-apport').value);
+  S.tauxCredit  = parseFloat(el('r-taux').value);
+  S.dureeCredit = parseFloat(el('r-duree-credit').value);
+  S.assurance   = parseFloat(el('r-assurance').value);
+  S.tmi         = parseFloat(el('s-tmi').value);
+  S.revalo      = parseFloat(el('r-revalo').value);
+  S.horizon     = parseFloat(el('r-horizon').value);
+
+  var r = calcCore(S);
+  renderTab0(r);
+  renderTab1(r);
+  renderTab2(r);
+  renderTab3(r);
+  renderTab4(r);
+}
+
+/* ─── TABS ─── */
+document.querySelectorAll('.pn-tab-btn').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    document.querySelectorAll('.pn-tab-btn').forEach(function(b){ b.classList.remove('active'); });
+    document.querySelectorAll('.pn-panel').forEach(function(p){ p.classList.remove('active'); });
+    btn.classList.add('active');
+    var idx = btn.dataset.tab;
+    var panel = document.querySelector('[data-panel="'+idx+'"]');
+    if(panel) panel.classList.add('active');
+    setTimeout(calcAndRender, 30);
+  });
+});
+
+/* ─── BADGES DURÉE (Tab 1) ─── */
+document.querySelectorAll('.pn-dur-badge[data-dur]').forEach(function(b){
+  b.addEventListener('click', function(){
+    S.duree = parseInt(b.dataset.dur);
+    document.querySelectorAll('[data-group="duree"]').forEach(function(rb){
+      rb.classList.toggle('active', rb.dataset.val === b.dataset.dur);
+    });
+    calcAndRender();
+  });
+});
+
+/* ─── INIT ─── */
+SP.nav.init();
+if(typeof SP.initFmt === 'function') SP.initFmt();
+calcAndRender();
+window.addEventListener('resize', function(){ setTimeout(calcAndRender,60); });
+
+})();
+</script>
+</body>
+</html>
