@@ -1,0 +1,1705 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="favicon-64.png">
+  <link rel="shortcut icon" href="favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="favicon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCPI — Revenus Passifs | Patrimonia.ai</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css?v=19">
+<script src="shared.js?v=2"></script>
+<script src="shared-nav.js?v=11"></script>
+<style>
+/* ═══════════════════════════════════════════════════
+   SCPI · PATRIMONIA.AI
+   Préfixe CSS : .sc-
+   Personnalité : revenus passifs · rente patrimoniale · immobilier indirect
+   Accent principal : --accent (#4F8A78) — vert patrimonial (token plateforme)
+   Accent secondaire : --amber — fiscal & crédit
+═══════════════════════════════════════════════════ */
+
+/* ── LAYOUT ── */
+.sc-layout { display:grid; grid-template-columns:360px 1fr; min-height:640px }
+@media(max-width:960px){ .sc-layout { grid-template-columns:1fr } }
+
+.sc-inp {
+  padding:1.6rem 1.4rem 2rem;
+  background:var(--surface-2);
+  border-right:1px solid var(--border-subtle);
+  overflow-y:auto; max-height:900px;
+}
+@media(max-width:960px){ .sc-inp { border-right:none; border-bottom:1px solid var(--border-subtle); max-height:none } }
+
+.sc-main { background:var(--surface); display:flex; flex-direction:column; min-width:0 }
+
+/* ── HERO PROPS ── */
+.sc-hero-props {
+  display:grid; grid-template-columns:repeat(4,1fr); gap:.8rem;
+  margin:1.2rem 0 1.6rem;
+}
+@media(max-width:900px){ .sc-hero-props { grid-template-columns:repeat(2,1fr) } }
+
+.sc-hero-prop {
+  display:flex; align-items:flex-start; gap:.6rem;
+  background:var(--surface-2); border:1px solid var(--border-subtle);
+  border-radius:var(--r-sm); padding:.8rem .9rem;
+}
+.sc-hero-icon {
+  width:30px; height:30px; border-radius:8px; flex-shrink:0;
+  background:var(--accent-dim); display:flex; align-items:center;
+  justify-content:center; color:var(--accent);
+}
+.sc-hero-icon svg { width:16px; height:16px }
+.sc-hero-prop-title { font-size:.71rem; font-weight:700; color:var(--text); letter-spacing:-.01em }
+.sc-hero-prop-desc  { font-size:.62rem; color:var(--text-dim); margin-top:.15rem; line-height:1.4 }
+
+/* ── TABS ── */
+.sc-tabs-nav {
+  display:flex; border-bottom:1px solid var(--border-subtle);
+  background:var(--surface-2); overflow-x:auto; flex-shrink:0;
+  scrollbar-width:none;
+}
+.sc-tabs-nav::-webkit-scrollbar { display:none }
+.sc-tab-btn {
+  flex-shrink:0; padding:.8rem 1.05rem;
+  font-family:var(--sans); font-size:.73rem; font-weight:500;
+  color:var(--text-muted); background:none;
+  border:none; border-bottom:2px solid transparent;
+  cursor:pointer; white-space:nowrap; letter-spacing:-.01em;
+  transition:color .18s, border-color .18s, background .18s;
+}
+.sc-tab-btn:hover { color:var(--text); background:var(--surface) }
+.sc-tab-btn.active { color:var(--accent); border-bottom-color:var(--accent); font-weight:600 }
+
+/* ── PANELS ── */
+.sc-panel { display:none; padding:1.4rem 1.5rem 2rem }
+.sc-panel.active { display:block }
+@media(max-width:960px){ .sc-panel { padding:1rem 1rem 1.5rem } }
+
+/* ── INPUT SECTION HEADERS ── */
+.sc-inp-sec {
+  font-size:.59rem; font-weight:700; color:var(--text-dim);
+  letter-spacing:.08em; text-transform:uppercase;
+  margin:1.3rem 0 .75rem; padding-bottom:.3rem;
+  border-bottom:1px solid var(--border-subtle);
+}
+.sc-inp-sec:first-child { margin-top:0 }
+
+.sc-range-row { display:flex; align-items:center; gap:.7rem; margin-bottom:.55rem }
+.sc-range-lbl { font-size:.7rem; color:var(--text-muted); flex:1; min-width:0 }
+.sc-range-disp {
+  font-family:var(--mono); font-size:.71rem; font-weight:600;
+  color:var(--accent); min-width:4rem; text-align:right; flex-shrink:0;
+}
+.sc-inp-select {
+  width:100%; font-size:.73rem; padding:.38rem .6rem;
+  border:1px solid var(--border-subtle); border-radius:7px;
+  background:var(--bg); color:var(--text);
+  font-family:var(--sans); cursor:pointer;
+}
+.sc-range-inp {
+  --pct: 0%;
+  -webkit-appearance:none; appearance:none;
+  height:4px; border-radius:2px; cursor:pointer; outline:none; width:100%;
+  background:linear-gradient(to right, var(--accent) var(--pct), rgba(0,0,0,.1) var(--pct));
+}
+.sc-range-inp::-webkit-slider-thumb {
+  -webkit-appearance:none;
+  width:16px; height:16px; border-radius:50%;
+  background:var(--accent); border:2.5px solid white;
+  box-shadow:0 1px 5px rgba(0,0,0,.22); cursor:pointer;
+  transition:transform .12s;
+}
+.sc-range-inp::-webkit-slider-thumb:hover { transform:scale(1.12) }
+.sc-range-inp::-moz-range-thumb {
+  width:14px; height:14px; border-radius:50%;
+  background:var(--accent); border:2.5px solid white;
+  box-shadow:0 1px 5px rgba(0,0,0,.22); cursor:pointer;
+}
+.sc-range-inp::-webkit-slider-runnable-track { background:transparent }
+.sc-range-inp::-moz-range-track { background:transparent; height:4px; border-radius:2px }
+
+/* ── KPI GRID ── */
+.sc-kpi-row { display:grid; gap:.7rem; margin-bottom:1rem }
+.sc-kpi-3 { grid-template-columns:repeat(3,1fr) }
+.sc-kpi-2 { grid-template-columns:repeat(2,1fr) }
+.sc-kpi-4 { grid-template-columns:repeat(4,1fr) }
+@media(max-width:700px){ .sc-kpi-3,.sc-kpi-4 { grid-template-columns:1fr 1fr } }
+@media(max-width:450px){ .sc-kpi-3 { grid-template-columns:1fr } }
+
+.sc-kpi {
+  background:var(--surface-2); border:1.5px solid var(--border-subtle);
+  border-radius:var(--r-sm); padding:.9rem 1rem .8rem;
+  transition:box-shadow .2s;
+}
+.sc-kpi:hover { box-shadow:0 4px 16px rgba(0,0,0,.06) }
+.sc-kpi.accent  { border-top:2.5px solid var(--accent) }
+.sc-kpi.amber   { border-top:2.5px solid var(--amber) }
+.sc-kpi.success { border-top:2.5px solid var(--success) }
+.sc-kpi.danger  { border-top:2.5px solid var(--danger) }
+.sc-kpi.slate   { border-top:2.5px solid var(--slate,#6E7F8B) }
+
+.sc-kpi-label {
+  font-size:.57rem; font-weight:700; color:var(--text-dim);
+  letter-spacing:.08em; text-transform:uppercase; margin-bottom:.35rem;
+}
+.sc-kpi-val {
+  font-family:var(--sans); font-size:1.05rem; font-weight:700;
+  color:var(--text); letter-spacing:-.03em; line-height:1.1;
+}
+.sc-kpi-val.lg     { font-size:1.22rem }
+.sc-kpi-val.accent { color:var(--accent) }
+.sc-kpi-val.amber  { color:var(--amber) }
+.sc-kpi-val.green  { color:var(--success) }
+.sc-kpi-val.red    { color:var(--danger) }
+.sc-kpi-sub { font-size:.62rem; color:var(--text-dim); margin-top:.2rem }
+
+/* ── RENTE BLOCK — cœur émotionnel du simulateur ── */
+.sc-rente-block {
+  background:linear-gradient(135deg, var(--accent-dim) 0%, var(--surface-2) 100%);
+  border:1.5px solid rgba(79,138,120,.22);
+  border-radius:var(--r); padding:1.35rem 1.45rem 1.2rem;
+  margin-bottom:1rem; position:relative; overflow:hidden;
+}
+.sc-rente-block::after {
+  content:''; position:absolute;
+  top:-30px; right:-30px;
+  width:130px; height:130px;
+  background:radial-gradient(circle, rgba(79,138,120,.12) 0%, transparent 70%);
+  border-radius:50%; pointer-events:none;
+}
+.sc-rente-eyebrow {
+  font-size:.58rem; font-weight:700; color:var(--accent);
+  letter-spacing:.08em; text-transform:uppercase; margin-bottom:.65rem;
+}
+.sc-rente-row {
+  display:flex; align-items:baseline; gap:.5rem; margin-bottom:.35rem;
+}
+.sc-rente-amount {
+  font-family:var(--sans); font-size:2.3rem; font-weight:700;
+  color:var(--accent); letter-spacing:-.04em; line-height:1;
+}
+.sc-rente-unit {
+  font-size:.78rem; color:var(--text-muted); font-weight:500;
+}
+.sc-rente-annual {
+  font-family:var(--mono); font-size:.78rem; color:var(--text-muted);
+  margin-bottom:.8rem;
+}
+.sc-rente-proj-row {
+  display:grid; grid-template-columns:repeat(3,1fr); gap:.5rem;
+  border-top:1px solid rgba(79,138,120,.15); padding-top:.75rem; margin-top:.1rem;
+}
+.sc-rente-proj {
+  text-align:center; padding:.4rem .5rem;
+  background:rgba(255,255,255,.5); border-radius:6px;
+}
+.sc-rente-proj-val {
+  display:block; font-family:var(--mono); font-size:.78rem;
+  font-weight:700; color:var(--accent); letter-spacing:-.01em;
+}
+.sc-rente-proj-lbl {
+  display:block; font-size:.6rem; color:var(--text-dim); margin-top:.12rem;
+}
+
+/* ── CHART WRAP ── */
+.sc-chart-wrap {
+  background:var(--surface-2); border:1px solid var(--border-subtle);
+  border-radius:var(--r); padding:.95rem .95rem .7rem; margin-bottom:1rem;
+}
+.sc-chart-hdr {
+  display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:.75rem;
+}
+.sc-chart-title {
+  font-size:.58rem; font-weight:700; color:var(--text-dim);
+  letter-spacing:.07em; text-transform:uppercase;
+}
+.sc-chart-sub { font-size:.62rem; color:var(--text-dim); margin-top:.1rem }
+.sc-chart-badge {
+  font-size:.57rem; font-weight:700; padding:.1rem .45rem;
+  border-radius:100px; background:var(--accent-dim); color:var(--accent); flex-shrink:0;
+}
+canvas.sc-canvas { width:100%; display:block }
+.sc-canvas-260 { height:260px }
+.sc-canvas-200 { height:200px }
+.sc-canvas-180 { height:180px }
+.sc-canvas-160 { height:160px }
+
+.sc-legend {
+  display:flex; flex-wrap:wrap; gap:.5rem .9rem; margin-top:.6rem;
+}
+.sc-legend-item { display:flex; align-items:center; gap:.3rem; font-size:.66rem; color:var(--text-muted) }
+.sc-legend-line { width:18px; height:2.5px; border-radius:2px; flex-shrink:0 }
+
+/* ── AVANT / APRÈS ── */
+.sc-avap-strip {
+  display:grid; grid-template-columns:1fr 22px 1fr; gap:.5rem;
+  background:var(--surface-2); border:1px solid var(--border-subtle);
+  border-radius:var(--r-sm); padding:.85rem; margin-bottom:1rem; align-items:center;
+}
+.sc-avap-badge {
+  font-size:.57rem; font-weight:700; letter-spacing:.07em; text-transform:uppercase;
+  padding:.1rem .4rem; border-radius:100px; display:inline-block; margin-bottom:.45rem;
+}
+.sc-avap-comptant .sc-avap-badge { background:var(--accent-dim); color:var(--accent) }
+.sc-avap-credit .sc-avap-badge   { background:var(--amber-dim); color:var(--amber) }
+.sc-avap-row {
+  display:flex; justify-content:space-between; align-items:baseline;
+  font-size:.69rem; color:var(--text-muted); padding:.2rem 0;
+  border-bottom:1px solid var(--border-subtle);
+}
+.sc-avap-row:last-child { border-bottom:none }
+.sc-avap-v { font-family:var(--mono); font-weight:600; font-size:.7rem; color:var(--text) }
+.sc-avap-v.eco { color:var(--accent); font-weight:700 }
+.sc-avap-v.amber { color:var(--amber); font-weight:700 }
+.sc-avap-arrow { text-align:center; font-size:1rem; color:var(--accent); opacity:.45 }
+
+/* ── WATERFALL FISCAL ── */
+.sc-wf-row {
+  display:grid; grid-template-columns:180px 1fr 100px;
+  align-items:center; gap:.7rem; padding:.38rem 0;
+  border-bottom:1px solid var(--border-subtle);
+}
+.sc-wf-row:last-child { border-bottom:none; border-top:2px solid var(--border); padding-top:.5rem; margin-top:.2rem }
+.sc-wf-lbl { font-size:.71rem; color:var(--text-muted) }
+.sc-wf-lbl.total { font-size:.73rem; font-weight:600; color:var(--text) }
+.sc-wf-bar-wrap { height:10px; background:var(--border-subtle); border-radius:3px; overflow:hidden }
+.sc-wf-bar { height:100%; border-radius:3px; width:0; transition:width .4s ease }
+.sc-wf-val { font-family:var(--mono); font-size:.71rem; font-weight:600; text-align:right; color:var(--text-muted) }
+.sc-wf-val.accent { color:var(--accent) }
+.sc-wf-val.amber  { color:var(--amber) }
+.sc-wf-val.neg    { color:var(--danger) }
+
+/* ── SYNTHÈSE LEFT PANEL ── */
+.sc-rente-sum {
+  margin-top:1.2rem;
+  background:var(--accent-dim);
+  border:1px solid rgba(79,138,120,.18); border-radius:var(--r-sm); padding:.75rem .9rem;
+}
+.sc-rente-sum-title {
+  font-size:.57rem; font-weight:700; color:var(--accent);
+  letter-spacing:.07em; text-transform:uppercase; margin-bottom:.5rem;
+}
+.sc-proj-row {
+  display:flex; justify-content:space-between; align-items:baseline;
+  font-size:.7rem; color:var(--text-muted); padding:.22rem 0;
+  border-bottom:1px solid rgba(79,138,120,.12);
+}
+.sc-proj-row:last-child { border-bottom:none }
+.sc-proj-v { font-family:var(--mono); font-weight:600; font-size:.7rem; color:var(--text) }
+.sc-proj-v.accent { color:var(--accent) }
+.sc-proj-v.amber  { color:var(--amber) }
+
+/* ── DÉMEMBREMENT TIMELINE ── */
+.sc-demo-wrap {
+  background:var(--surface-2); border:1px solid var(--border-subtle);
+  border-radius:var(--r); padding:1rem 1.1rem 1.1rem; margin-bottom:1rem;
+}
+.sc-demo-title {
+  font-size:.58rem; font-weight:700; color:var(--text-dim);
+  letter-spacing:.07em; text-transform:uppercase; margin-bottom:1rem;
+}
+.sc-demo-track { position:relative; padding-left:20px }
+.sc-demo-track::before {
+  content:''; position:absolute; left:6px; top:8px; bottom:8px;
+  width:1.5px; background:var(--border-subtle);
+}
+.sc-demo-step { position:relative; margin-bottom:14px; display:flex; gap:10px; align-items:flex-start }
+.sc-demo-step:last-child { margin-bottom:0 }
+.sc-demo-dot {
+  position:absolute; left:-16px; top:4px;
+  width:12px; height:12px; border-radius:50%;
+  background:var(--border); border:2px solid var(--surface-2);
+  box-shadow:0 0 0 1.5px var(--border);
+  flex-shrink:0; z-index:1;
+}
+.sc-demo-step.done .sc-demo-dot  { background:var(--accent); box-shadow:0 0 0 1.5px var(--accent) }
+.sc-demo-step.active .sc-demo-dot{ background:var(--amber); box-shadow:0 0 0 3px rgba(184,134,11,.2) }
+.sc-demo-name { font-size:.76rem; font-weight:600; color:var(--text); letter-spacing:-.01em }
+.sc-demo-step.done .sc-demo-name  { color:var(--text-muted) }
+.sc-demo-step.active .sc-demo-name{ color:var(--amber) }
+.sc-demo-date { font-size:.67rem; color:var(--text-dim); margin-top:1px }
+.sc-demo-detail { font-size:.68rem; color:var(--text-dim); margin-top:4px; line-height:1.45 }
+
+/* ── COMPARAISON TABLE ── */
+.sc-comp-wrap { overflow-x:auto; margin-bottom:1rem }
+.sc-comp-grid {
+  min-width:560px;
+  display:grid; grid-template-columns:140px repeat(5,1fr);
+  border:1px solid var(--border-subtle); border-radius:var(--r-sm); overflow:hidden;
+}
+.sc-comp-hdr {
+  padding:.6rem .65rem;
+  background:var(--surface-2); border-bottom:2px solid var(--border);
+  font-size:.58rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+  color:var(--text-dim); text-align:center;
+}
+.sc-comp-hdr.lbl { text-align:left }
+.sc-comp-hdr.win { background:var(--accent-dim); color:var(--accent); border-bottom-color:rgba(79,138,120,.3) }
+.sc-comp-cell {
+  padding:.45rem .65rem; border-bottom:1px solid var(--border-subtle);
+  border-left:1px solid var(--border-subtle); text-align:center;
+  font-size:.71rem; font-family:var(--mono); color:var(--text-muted);
+}
+.sc-comp-cell.lbl {
+  text-align:left; font-family:var(--sans); font-size:.71rem;
+  font-weight:500; color:var(--text); border-left:none;
+  background:var(--surface-2);
+}
+.sc-comp-cell.best    { background:var(--accent-dim); color:var(--accent); font-weight:700 }
+.sc-comp-cell.good    { color:var(--success) }
+.sc-comp-cell.bad     { color:var(--danger) }
+.sc-comp-cell.neutral { color:var(--text-dim); font-size:.66rem; font-family:var(--sans) }
+
+/* ── PÉDAGOGIE CARDS ── */
+.sc-peda-grid {
+  display:grid; grid-template-columns:repeat(3,1fr); gap:.85rem; margin-bottom:1.2rem;
+}
+@media(max-width:760px){ .sc-peda-grid { grid-template-columns:1fr 1fr } }
+@media(max-width:460px){ .sc-peda-grid { grid-template-columns:1fr } }
+
+.sc-peda-card {
+  background:var(--surface-2); border:1.5px solid var(--border-subtle);
+  border-radius:var(--r-sm); padding:1.1rem;
+  transition:box-shadow .2s, transform .2s;
+}
+.sc-peda-card:hover { box-shadow:0 6px 22px rgba(0,0,0,.07); transform:translateY(-2px) }
+.sc-peda-icon {
+  width:34px; height:34px; border-radius:9px; margin-bottom:.7rem;
+  background:var(--accent-dim); display:flex; align-items:center;
+  justify-content:center; color:var(--accent);
+}
+.sc-peda-icon svg { width:17px; height:17px }
+.sc-peda-title { font-size:.82rem; font-weight:700; color:var(--text); letter-spacing:-.02em; margin-bottom:.45rem }
+.sc-peda-body  { font-size:.69rem; color:var(--text-muted); line-height:1.6 }
+.sc-peda-tag {
+  display:inline-block; margin-top:.55rem;
+  font-size:.56rem; font-weight:700; letter-spacing:.05em; text-transform:uppercase;
+  padding:.1rem .42rem; border-radius:100px;
+  background:var(--accent-dim); color:var(--accent);
+}
+
+/* ── MISC ── */
+.sc-info-box {
+  background:var(--accent-dim); border:1px solid rgba(79,138,120,.18);
+  border-radius:var(--r-sm); padding:.75rem 1rem; margin-bottom:1rem;
+  font-size:.69rem; color:var(--accent); line-height:1.55;
+}
+.sc-warn-box {
+  background:var(--danger-dim); border:1px solid var(--danger-mid);
+  border-radius:var(--r-sm); padding:.75rem 1rem; margin-bottom:1rem;
+  font-size:.69rem; color:var(--danger); line-height:1.55;
+}
+.sc-amber-box {
+  background:var(--amber-dim); border:1px solid rgba(184,134,11,.18);
+  border-radius:var(--r-sm); padding:.75rem 1rem; margin-bottom:1rem;
+  font-size:.69rem; color:var(--amber); line-height:1.55;
+}
+.sc-two-col { display:grid; grid-template-columns:1fr 1fr; gap:1rem }
+@media(max-width:640px){ .sc-two-col { grid-template-columns:1fr } }
+
+/* ── FISCAL SCENARIO CARDS ── */
+.sc-fisc-grid {
+  display:grid; grid-template-columns:repeat(2,1fr); gap:.75rem; margin-bottom:1rem;
+}
+@media(max-width:640px){ .sc-fisc-grid { grid-template-columns:1fr } }
+
+.sc-fisc-card {
+  background:var(--surface-2); border:1.5px solid var(--border-subtle);
+  border-radius:var(--r-sm); padding:.9rem 1rem;
+}
+.sc-fisc-card.best { border-top:2.5px solid var(--accent) }
+.sc-fisc-card-title {
+  font-size:.7rem; font-weight:700; color:var(--text);
+  letter-spacing:-.01em; margin-bottom:.5rem;
+}
+.sc-fisc-card-row {
+  display:flex; justify-content:space-between; align-items:baseline;
+  font-size:.68rem; color:var(--text-muted); padding:.18rem 0;
+  border-bottom:1px solid var(--border-subtle);
+}
+.sc-fisc-card-row:last-child { border-bottom:none }
+.sc-fisc-v { font-family:var(--mono); font-size:.69rem; font-weight:600; color:var(--text) }
+.sc-fisc-v.eco { color:var(--accent); font-weight:700 }
+.sc-fisc-v.neg { color:var(--danger) }
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="index.html" class="nav-logo"><img src="logo.png?v=3" alt="Patrimonia.ai" class="nav-logo-img"></a>
+  <div class="nav-right">
+    <a href="index.html" class="nav-back">
+      <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7.5 1.5L3 6l4.5 4.5"/></svg>
+      Accueil
+    </a>
+    <div class="nav-dropdown" id="mainDropdown">
+      <button class="nav-dropdown-btn" aria-expanded="false" aria-haspopup="true">
+        Simulateurs <svg class="nav-chevron" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.8" style="width:13px;height:8px;flex-shrink:0"><path d="M1 1l4 4 4-4"/></svg>
+      </button>
+      <div class="nav-dropdown-menu" id="navMenu" role="menu"></div>
+    </div>
+  </div>
+</nav>
+
+<div class="sim-page">
+
+  <div class="sim-page-header">
+    <span class="sim-num-badge"></span>
+    <div>
+      <div class="sim-eyebrow">Immobilier Indirect &amp; Revenus Passifs</div>
+      <h1>SCPI — <em class="gradient-text">Rente Patrimoniale</em></h1>
+      <p>Construisez une rente immobilière passive : simulation complète des revenus réguliers, de l'effet levier crédit, de la fiscalité multi-enveloppes, du démembrement et de la valorisation long terme.</p>
+    </div>
+  </div>
+
+  <!-- Hero props -->
+  <div class="sc-hero-props">
+    <div class="sc-hero-prop">
+      <div class="sc-hero-icon">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+          <path d="M3 12L6 9l2 2 5-7"/><path d="M1 8.5h3M1 11.5h3"/>
+        </svg>
+      </div>
+      <div>
+        <div class="sc-hero-prop-title">Revenus mensuels</div>
+        <div class="sc-hero-prop-desc">Rente passives régulières et prévisibles</div>
+      </div>
+    </div>
+    <div class="sc-hero-prop">
+      <div class="sc-hero-icon">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+          <path d="M2 12V6l5-3.5L12 6v6M5.5 12V8.5h3V12"/>
+        </svg>
+      </div>
+      <div>
+        <div class="sc-hero-prop-title">Immobilier indirect</div>
+        <div class="sc-hero-prop-desc">Zéro gestion locative, diversification</div>
+      </div>
+    </div>
+    <div class="sc-hero-prop">
+      <div class="sc-hero-icon">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+          <path d="M2 11.5h10M3 9l2.5-3 2 2L11 4M9.5 4H11v1.5"/>
+        </svg>
+      </div>
+      <div>
+        <div class="sc-hero-prop-title">Levier bancaire</div>
+        <div class="sc-hero-prop-desc">Amplifiez le patrimoine via le crédit</div>
+      </div>
+    </div>
+    <div class="sc-hero-prop">
+      <div class="sc-hero-icon">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+          <path d="M7 2v3M7 5L4 8M7 5l3 3M3 8h2v4H3zM6 8h2v4H6zM9 8h2v4H9z"/>
+        </svg>
+      </div>
+      <div>
+        <div class="sc-hero-prop-title">Démembrement</div>
+        <div class="sc-hero-prop-desc">NP / Usufruit — ingénierie patrimoniale</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sim-card-wrap">
+    <div class="sc-layout">
+
+      <!-- ══════════════════ LEFT PANEL — INPUTS ══════════════════ -->
+      <div class="sc-inp">
+
+        <div class="sc-inp-sec">Investissement SCPI</div>
+
+        <div class="sc-range-row">
+          <label class="sc-range-lbl" for="sc-montant">Capital investi</label>
+          <span class="sc-range-disp" id="sc-disp-montant">100 000 €</span>
+        </div>
+        <input type="range" id="sc-montant" class="sc-range-inp" min="10000" max="500000" step="5000" value="100000">
+
+        <div class="sc-range-row" style="margin-top:.6rem">
+          <label class="sc-range-lbl" for="sc-rendement">Rendement SCPI (taux de distribution)</label>
+          <span class="sc-range-disp" id="sc-disp-rendement">5,0 %</span>
+        </div>
+        <input type="range" id="sc-rendement" class="sc-range-inp" min="2" max="9" step="0.25" value="5">
+
+        <div class="sc-range-row" style="margin-top:.6rem">
+          <label class="sc-range-lbl" for="sc-revalo">Revalorisation annuelle des parts</label>
+          <span class="sc-range-disp" id="sc-disp-revalo">1,0 %</span>
+        </div>
+        <input type="range" id="sc-revalo" class="sc-range-inp" min="0" max="3" step="0.25" value="1">
+
+        <div class="sc-range-row" style="margin-top:.75rem">
+          <label class="sc-range-lbl" for="sc-type">Type de SCPI</label>
+        </div>
+        <select id="sc-type" class="sc-inp-select">
+          <option value="fr">Française (revenus fonciers)</option>
+          <option value="eu" selected>Européenne (fiscalité source)</option>
+          <option value="sante">Santé / Social</option>
+          <option value="bureau">Bureaux &amp; Mixte</option>
+          <option value="commerce">Commerce &amp; Logistique</option>
+          <option value="diver">Diversifiée</option>
+        </select>
+
+        <div class="sc-range-row" style="margin-top:.75rem">
+          <label class="sc-range-lbl" for="sc-frais">Frais de souscription</label>
+          <span class="sc-range-disp" id="sc-disp-frais">8,0 %</span>
+        </div>
+        <input type="range" id="sc-frais" class="sc-range-inp" min="0" max="12" step="0.5" value="8">
+
+        <div class="sc-range-row" style="margin-top:.6rem">
+          <label class="sc-range-lbl" for="sc-horizon">Horizon de détention</label>
+          <span class="sc-range-disp" id="sc-disp-horizon">20 ans</span>
+        </div>
+        <input type="range" id="sc-horizon" class="sc-range-inp" min="5" max="30" step="1" value="20">
+
+        <div class="sc-inp-sec">Financement</div>
+
+        <div class="sc-range-row">
+          <label class="sc-range-lbl" for="sc-mode">Mode de financement</label>
+        </div>
+        <select id="sc-mode" class="sc-inp-select">
+          <option value="cash">Comptant</option>
+          <option value="credit" selected>Crédit</option>
+        </select>
+
+        <div class="sc-range-row" style="margin-top:.75rem">
+          <label class="sc-range-lbl" for="sc-apport">Apport personnel</label>
+          <span class="sc-range-disp" id="sc-disp-apport">20 000 €</span>
+        </div>
+        <input type="range" id="sc-apport" class="sc-range-inp" min="0" max="200000" step="2500" value="20000">
+
+        <div class="sc-range-row" style="margin-top:.6rem">
+          <label class="sc-range-lbl" for="sc-taux-cred">Taux crédit</label>
+          <span class="sc-range-disp" id="sc-disp-taux-cred">3,5 %</span>
+        </div>
+        <input type="range" id="sc-taux-cred" class="sc-range-inp" min="1" max="6" step="0.1" value="3.5">
+
+        <div class="sc-range-row" style="margin-top:.6rem">
+          <label class="sc-range-lbl" for="sc-duree-cred">Durée crédit</label>
+          <span class="sc-range-disp" id="sc-disp-duree-cred">20 ans</span>
+        </div>
+        <input type="range" id="sc-duree-cred" class="sc-range-inp" min="5" max="25" step="1" value="20">
+
+        <div class="sc-range-row" style="margin-top:.6rem">
+          <label class="sc-range-lbl" for="sc-assurance">Assurance emprunteur</label>
+          <span class="sc-range-disp" id="sc-disp-assurance">0,10 %</span>
+        </div>
+        <input type="range" id="sc-assurance" class="sc-range-inp" min="0" max="0.5" step="0.05" value="0.1">
+
+        <div class="sc-inp-sec">Fiscalité &amp; détention</div>
+
+        <div class="sc-range-row">
+          <label class="sc-range-lbl" for="sc-tmi">Tranche marginale d'imposition</label>
+        </div>
+        <select id="sc-tmi" class="sc-inp-select">
+          <option value="0">0 % — Non imposable</option>
+          <option value="11">11 % — TMI 11</option>
+          <option value="30" selected>30 % — TMI 30</option>
+          <option value="41">41 % — TMI 41</option>
+          <option value="45">45 % — TMI 45</option>
+        </select>
+
+        <div class="sc-range-row" style="margin-top:.75rem">
+          <label class="sc-range-lbl" for="sc-detention">Enveloppe de détention</label>
+        </div>
+        <select id="sc-detention" class="sc-inp-select">
+          <option value="nom_propre" selected>Nom propre</option>
+          <option value="av">Assurance-vie</option>
+          <option value="sci_is">SCI à l'IS</option>
+        </select>
+
+        <div class="sc-inp-sec">Démembrement</div>
+
+        <div class="sc-range-row">
+          <label class="sc-range-lbl" for="sc-demo-type">Type de démembrement</label>
+        </div>
+        <select id="sc-demo-type" class="sc-inp-select">
+          <option value="temporaire" selected>Temporaire (durée fixe)</option>
+          <option value="viager">Viager (âge usufruitier)</option>
+        </select>
+
+        <div class="sc-range-row" style="margin-top:.75rem">
+          <label class="sc-range-lbl" for="sc-demo-duree">Durée démembrement</label>
+          <span class="sc-range-disp" id="sc-disp-demo-duree">10 ans</span>
+        </div>
+        <input type="range" id="sc-demo-duree" class="sc-range-inp" min="5" max="20" step="5" value="10">
+
+        <div class="sc-rente-sum">
+          <div class="sc-rente-sum-title">Rente estimée</div>
+          <div class="sc-proj-row">
+            <span>Revenu mensuel net</span>
+            <span class="sc-proj-v accent" id="sc-proj-mensuel">—</span>
+          </div>
+          <div class="sc-proj-row">
+            <span>Revenu annuel net</span>
+            <span class="sc-proj-v accent" id="sc-proj-annuel">—</span>
+          </div>
+          <div class="sc-proj-row">
+            <span>Effort mensuel</span>
+            <span class="sc-proj-v" id="sc-proj-effort">—</span>
+          </div>
+          <div class="sc-proj-row">
+            <span>Patrimoine à l'horizon</span>
+            <span class="sc-proj-v" id="sc-proj-valo">—</span>
+          </div>
+        </div>
+
+      </div><!-- /sc-inp -->
+
+      <!-- ══════════════════ RIGHT PANEL ══════════════════ -->
+      <div class="sc-main">
+
+        <nav class="sc-tabs-nav">
+          <button class="sc-tab-btn active" data-tab="revenus">Revenus passifs</button>
+          <button class="sc-tab-btn" data-tab="credit">Crédit vs Comptant</button>
+          <button class="sc-tab-btn" data-tab="fiscalite">Fiscalité</button>
+          <button class="sc-tab-btn" data-tab="demembrement">Démembrement</button>
+          <button class="sc-tab-btn" data-tab="comparaison">Comparaison</button>
+          <button class="sc-tab-btn" data-tab="pedagogie">Pédagogie</button>
+        </nav>
+
+        <!-- ─────── TAB 1 : REVENUS PASSIFS ─────── -->
+        <div class="sc-panel active" data-tab="revenus">
+
+          <!-- RENTE BLOCK — cœur émotionnel -->
+          <div class="sc-rente-block">
+            <div class="sc-rente-eyebrow">Rente passive estimée</div>
+            <div class="sc-rente-row">
+              <span class="sc-rente-amount" id="r-mensuel-brut">—</span>
+              <span class="sc-rente-unit">/mois bruts</span>
+            </div>
+            <div class="sc-rente-annual" id="r-annual-net">—</div>
+            <div class="sc-rente-proj-row">
+              <div class="sc-rente-proj">
+                <strong class="sc-rente-proj-val" id="r-proj-5">—</strong>
+                <span class="sc-rente-proj-lbl">Dans 5 ans</span>
+              </div>
+              <div class="sc-rente-proj">
+                <strong class="sc-rente-proj-val" id="r-proj-10">—</strong>
+                <span class="sc-rente-proj-lbl">Dans 10 ans</span>
+              </div>
+              <div class="sc-rente-proj">
+                <strong class="sc-rente-proj-val" id="r-proj-20">—</strong>
+                <span class="sc-rente-proj-lbl">Dans 20 ans</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="sc-kpi-row sc-kpi-3">
+            <div class="sc-kpi accent">
+              <div class="sc-kpi-label">Rendement net de fiscalité</div>
+              <div class="sc-kpi-val lg accent" id="r-rend-net">—</div>
+              <div class="sc-kpi-sub" id="r-rend-sub">Après IR + PS</div>
+            </div>
+            <div class="sc-kpi success">
+              <div class="sc-kpi-label">Revenu mensuel net</div>
+              <div class="sc-kpi-val lg green" id="r-mensuel-net">—</div>
+              <div class="sc-kpi-sub">Disponible après impôts</div>
+            </div>
+            <div class="sc-kpi">
+              <div class="sc-kpi-label">Patrimoine final</div>
+              <div class="sc-kpi-val" id="r-patrimoine">—</div>
+              <div class="sc-kpi-sub" id="r-patri-sub">À — ans</div>
+            </div>
+          </div>
+
+          <div class="sc-kpi-row sc-kpi-3">
+            <div class="sc-kpi">
+              <div class="sc-kpi-label">Capital net investi</div>
+              <div class="sc-kpi-val" id="r-capital-net">—</div>
+              <div class="sc-kpi-sub">Après frais de souscription</div>
+            </div>
+            <div class="sc-kpi amber">
+              <div class="sc-kpi-label">Effort mensuel</div>
+              <div class="sc-kpi-val amber" id="r-effort">—</div>
+              <div class="sc-kpi-sub" id="r-effort-sub">Mode crédit</div>
+            </div>
+            <div class="sc-kpi accent">
+              <div class="sc-kpi-label">Revenus cumulés (horizon)</div>
+              <div class="sc-kpi-val accent" id="r-revenus-cum">—</div>
+              <div class="sc-kpi-sub" id="r-cum-sub">Nets sur — ans</div>
+            </div>
+          </div>
+
+          <div class="sc-chart-wrap">
+            <div class="sc-chart-hdr">
+              <div>
+                <div class="sc-chart-title">Projection de la rente annuelle nette</div>
+                <div class="sc-chart-sub">Évolution des revenus avec revalorisation des parts</div>
+              </div>
+              <span class="sc-chart-badge" id="r-badge-final">—</span>
+            </div>
+            <canvas id="cv-revenus" class="sc-canvas sc-canvas-200"></canvas>
+            <div class="sc-legend">
+              <div class="sc-legend-item"><div class="sc-legend-line" style="background:var(--accent)"></div>Revenus annuels nets</div>
+              <div class="sc-legend-item"><div class="sc-legend-line" style="background:rgba(79,138,120,.3)"></div>Revenus cumulés</div>
+            </div>
+          </div>
+
+          <div class="sc-chart-wrap">
+            <div class="sc-chart-hdr">
+              <div>
+                <div class="sc-chart-title">Évolution du capital investi</div>
+                <div class="sc-chart-sub">Valeur des parts sur la durée de détention</div>
+              </div>
+              <span class="sc-chart-badge" id="r-badge-capital">—</span>
+            </div>
+            <canvas id="cv-capital" class="sc-canvas sc-canvas-180"></canvas>
+          </div>
+
+          <div class="sc-info-box">
+            <strong>Immobilier passif :</strong> contrairement à l'investissement locatif direct, la SCPI génère des revenus réguliers sans contrainte de gestion (aucun locataire à gérer, aucun travaux, aucune vacance à trouver). Les revenus sont distribués trimestriellement ou mensuellement. Ticket d'entrée accessible dès 1 000 €.
+          </div>
+
+        </div><!-- /revenus -->
+
+        <!-- ─────── TAB 2 : CRÉDIT VS COMPTANT ─────── -->
+        <div class="sc-panel" data-tab="credit">
+
+          <div class="sc-avap-strip">
+            <div class="sc-avap-col sc-avap-comptant">
+              <span class="sc-avap-badge">Achat comptant</span>
+              <div class="sc-avap-row"><span>Capital investi</span><span class="sc-avap-v" id="cv-capital-cash">—</span></div>
+              <div class="sc-avap-row"><span>Revenu mensuel net</span><span class="sc-avap-v eco" id="cv-rev-cash">—</span></div>
+              <div class="sc-avap-row"><span>Effort mensuel</span><span class="sc-avap-v" id="cv-effort-cash">0 €</span></div>
+              <div class="sc-avap-row"><span>Patrimoine à l'horizon</span><span class="sc-avap-v eco" id="cv-patri-cash">—</span></div>
+            </div>
+            <div class="sc-avap-arrow">⇌</div>
+            <div class="sc-avap-col sc-avap-credit">
+              <span class="sc-avap-badge">Achat à crédit</span>
+              <div class="sc-avap-row"><span>Apport mobilisé</span><span class="sc-avap-v" id="cv-capital-cred">—</span></div>
+              <div class="sc-avap-row"><span>Revenu mensuel net</span><span class="sc-avap-v amber" id="cv-rev-cred">—</span></div>
+              <div class="sc-avap-row"><span>Effort mensuel</span><span class="sc-avap-v" id="cv-effort-cred">—</span></div>
+              <div class="sc-avap-row"><span>Patrimoine à l'horizon</span><span class="sc-avap-v amber" id="cv-patri-cred">—</span></div>
+            </div>
+          </div>
+
+          <div class="sc-kpi-row sc-kpi-4">
+            <div class="sc-kpi accent">
+              <div class="sc-kpi-label">TRI comptant</div>
+              <div class="sc-kpi-val accent" id="cv-tri-cash">—</div>
+              <div class="sc-kpi-sub">Rendement total annualisé</div>
+            </div>
+            <div class="sc-kpi amber">
+              <div class="sc-kpi-label">TRI crédit (sur apport)</div>
+              <div class="sc-kpi-val amber" id="cv-tri-cred">—</div>
+              <div class="sc-kpi-sub">Effet levier sur l'apport</div>
+            </div>
+            <div class="sc-kpi">
+              <div class="sc-kpi-label">Levier bancaire</div>
+              <div class="sc-kpi-val" id="cv-levier">—</div>
+              <div class="sc-kpi-sub">Capital / Apport</div>
+            </div>
+            <div class="sc-kpi success">
+              <div class="sc-kpi-label">Cash-flow mensuel net (crédit)</div>
+              <div class="sc-kpi-val lg" id="cv-cf-net">—</div>
+              <div class="sc-kpi-sub">Revenus nets − mensualité</div>
+            </div>
+          </div>
+
+          <div class="sc-chart-wrap">
+            <div class="sc-chart-hdr">
+              <div>
+                <div class="sc-chart-title">Comparaison patrimoine net — Comptant vs Crédit</div>
+                <div class="sc-chart-sub">Évolution sur l'horizon de détention (capital net de dette)</div>
+              </div>
+              <span class="sc-chart-badge" id="cv-badge">—</span>
+            </div>
+            <canvas id="cv-comparaison-credit" class="sc-canvas sc-canvas-260"></canvas>
+            <div class="sc-legend">
+              <div class="sc-legend-item"><div class="sc-legend-line" style="background:var(--accent)"></div>Comptant</div>
+              <div class="sc-legend-item"><div class="sc-legend-line" style="background:var(--amber);"></div>Crédit (capital net)</div>
+            </div>
+          </div>
+
+          <div class="sc-amber-box">
+            <strong>Levier & spread :</strong> le crédit SCPI est intéressant quand le rendement net (après frais de gestion) est supérieur au taux d'emprunt. Avec un rendement SCPI de 5% et un crédit à 3,5%, le spread positif (~1,5%) s'applique sur l'emprunt total. Les intérêts du crédit sont déductibles des revenus fonciers.
+          </div>
+
+          <div class="sc-info-box">
+            <strong>Déductibilité des intérêts :</strong> en régime réel foncier, les intérêts d'emprunt sont déductibles des revenus SCPI. Cela réduit la base imposable et améliore le rendement net réel — particulièrement avantageux pour les TMI 41-45%.
+          </div>
+
+        </div><!-- /credit -->
+
+        <!-- ─────── TAB 3 : FISCALITÉ ─────── -->
+        <div class="sc-panel" data-tab="fiscalite">
+
+          <div class="sc-kpi-row sc-kpi-4">
+            <div class="sc-kpi">
+              <div class="sc-kpi-label">Revenus bruts annuels</div>
+              <div class="sc-kpi-val" id="f-bruts">—</div>
+              <div class="sc-kpi-sub">Taux de distribution × capital</div>
+            </div>
+            <div class="sc-kpi amber">
+              <div class="sc-kpi-label">IR (foncier)</div>
+              <div class="sc-kpi-val amber" id="f-ir">—</div>
+              <div class="sc-kpi-sub" id="f-tmi-sub">TMI — %</div>
+            </div>
+            <div class="sc-kpi amber">
+              <div class="sc-kpi-label">Prélèvements sociaux</div>
+              <div class="sc-kpi-val amber" id="f-ps">—</div>
+              <div class="sc-kpi-sub">17,2 % (SCPI FR)</div>
+            </div>
+            <div class="sc-kpi accent">
+              <div class="sc-kpi-label">Revenus nets après fiscalité</div>
+              <div class="sc-kpi-val accent" id="f-nets">—</div>
+              <div class="sc-kpi-sub" id="f-rend-net-sub">Rendement net — %</div>
+            </div>
+          </div>
+
+          <!-- Waterfall fiscal -->
+          <div class="sc-chart-wrap">
+            <div class="sc-chart-hdr">
+              <div>
+                <div class="sc-chart-title">Décomposition fiscale de votre rente</div>
+                <div class="sc-chart-sub">Du revenu brut au revenu disponible</div>
+              </div>
+            </div>
+            <div class="sc-wf-row">
+              <div class="sc-wf-lbl">Revenus bruts</div>
+              <div class="sc-wf-bar-wrap"><div class="sc-wf-bar" id="wf-bruts" style="background:var(--accent)"></div></div>
+              <div class="sc-wf-val accent" id="wf-v-bruts">—</div>
+            </div>
+            <div class="sc-wf-row">
+              <div class="sc-wf-lbl">− Frais de gestion SCPI</div>
+              <div class="sc-wf-bar-wrap"><div class="sc-wf-bar" id="wf-frais-gest" style="background:var(--text-dim)"></div></div>
+              <div class="sc-wf-val neg" id="wf-v-frais-gest">—</div>
+            </div>
+            <div class="sc-wf-row">
+              <div class="sc-wf-lbl">− Impôt sur le revenu</div>
+              <div class="sc-wf-bar-wrap"><div class="sc-wf-bar" id="wf-ir" style="background:var(--amber)"></div></div>
+              <div class="sc-wf-val neg" id="wf-v-ir">—</div>
+            </div>
+            <div class="sc-wf-row">
+              <div class="sc-wf-lbl">− Prélèvements sociaux</div>
+              <div class="sc-wf-bar-wrap"><div class="sc-wf-bar" id="wf-ps" style="background:var(--amber)"></div></div>
+              <div class="sc-wf-val neg" id="wf-v-ps">—</div>
+            </div>
+            <div class="sc-wf-row">
+              <div class="sc-wf-lbl total">= Revenu disponible net</div>
+              <div class="sc-wf-bar-wrap"><div class="sc-wf-bar" id="wf-net" style="background:var(--accent)"></div></div>
+              <div class="sc-wf-val accent" id="wf-v-net">—</div>
+            </div>
+          </div>
+
+          <!-- Comparaison 4 modes détention -->
+          <div class="sc-fisc-grid">
+            <div class="sc-fisc-card">
+              <div class="sc-fisc-card-title">Nom propre — SCPI Française</div>
+              <div class="sc-fisc-card-row"><span>Revenus bruts</span><span class="sc-fisc-v" id="fc-fr-bruts">—</span></div>
+              <div class="sc-fisc-card-row"><span>IR + PS</span><span class="sc-fisc-v neg" id="fc-fr-fiscal">—</span></div>
+              <div class="sc-fisc-card-row"><span>Revenu net annuel</span><span class="sc-fisc-v eco" id="fc-fr-net">—</span></div>
+              <div class="sc-fisc-card-row"><span>Rendement net</span><span class="sc-fisc-v eco" id="fc-fr-rend">—</span></div>
+            </div>
+            <div class="sc-fisc-card best">
+              <div class="sc-fisc-card-title">SCPI Européenne (pas de PS)</div>
+              <div class="sc-fisc-card-row"><span>Revenus bruts</span><span class="sc-fisc-v" id="fc-eu-bruts">—</span></div>
+              <div class="sc-fisc-card-row"><span>IR source (≈TMI × 80%)</span><span class="sc-fisc-v neg" id="fc-eu-fiscal">—</span></div>
+              <div class="sc-fisc-card-row"><span>Revenu net annuel</span><span class="sc-fisc-v eco" id="fc-eu-net">—</span></div>
+              <div class="sc-fisc-card-row"><span>Rendement net</span><span class="sc-fisc-v eco" id="fc-eu-rend">—</span></div>
+            </div>
+            <div class="sc-fisc-card">
+              <div class="sc-fisc-card-title">Via Assurance-vie</div>
+              <div class="sc-fisc-card-row"><span>Revenus bruts</span><span class="sc-fisc-v" id="fc-av-bruts">—</span></div>
+              <div class="sc-fisc-card-row"><span>Fiscalité AV (après 8 ans)</span><span class="sc-fisc-v neg" id="fc-av-fiscal">—</span></div>
+              <div class="sc-fisc-card-row"><span>Revenu net annuel</span><span class="sc-fisc-v eco" id="fc-av-net">—</span></div>
+              <div class="sc-fisc-card-row"><span>Rendement net</span><span class="sc-fisc-v eco" id="fc-av-rend">—</span></div>
+            </div>
+            <div class="sc-fisc-card">
+              <div class="sc-fisc-card-title">Via SCI à l'IS</div>
+              <div class="sc-fisc-card-row"><span>Revenus bruts</span><span class="sc-fisc-v" id="fc-is-bruts">—</span></div>
+              <div class="sc-fisc-card-row"><span>IS + PFU sortie</span><span class="sc-fisc-v neg" id="fc-is-fiscal">—</span></div>
+              <div class="sc-fisc-card-row"><span>Revenu net annuel</span><span class="sc-fisc-v eco" id="fc-is-net">—</span></div>
+              <div class="sc-fisc-card-row"><span>Rendement net</span><span class="sc-fisc-v eco" id="fc-is-rend">—</span></div>
+            </div>
+          </div>
+
+          <div class="sc-chart-wrap">
+            <div class="sc-chart-hdr">
+              <div>
+                <div class="sc-chart-title">Rendement net par mode de détention</div>
+                <div class="sc-chart-sub">Comparaison sur vos paramètres</div>
+              </div>
+            </div>
+            <canvas id="cv-fisc-comp" class="sc-canvas sc-canvas-180"></canvas>
+          </div>
+
+          <div class="sc-info-box">
+            <strong>SCPI Européennes :</strong> les SCPI investies en Europe (Allemagne, Pays-Bas, Italie, etc.) bénéficient souvent d'une fiscalité plus avantageuse en France : les revenus de source étrangère ne sont pas soumis aux prélèvements sociaux (17,2%). La méthode d'élimination de la double imposition (crédit d'impôt ou exonération) réduit le poids fiscal total.
+          </div>
+
+        </div><!-- /fiscalite -->
+
+        <!-- ─────── TAB 4 : DÉMEMBREMENT ─────── -->
+        <div class="sc-panel" data-tab="demembrement">
+
+          <div class="sc-kpi-row sc-kpi-4">
+            <div class="sc-kpi accent">
+              <div class="sc-kpi-label">Valeur Nue-Propriété</div>
+              <div class="sc-kpi-val lg accent" id="d-np-val">—</div>
+              <div class="sc-kpi-sub" id="d-np-coeff">— % du plein</div>
+            </div>
+            <div class="sc-kpi amber">
+              <div class="sc-kpi-label">Économie à l'achat NP</div>
+              <div class="sc-kpi-val amber" id="d-eco-achat">—</div>
+              <div class="sc-kpi-sub">vs pleine propriété</div>
+            </div>
+            <div class="sc-kpi success">
+              <div class="sc-kpi-label">Rendement implicite NP</div>
+              <div class="sc-kpi-val green" id="d-rend-impl">—</div>
+              <div class="sc-kpi-sub">Annualisé sur la durée</div>
+            </div>
+            <div class="sc-kpi">
+              <div class="sc-kpi-label">Valeur reconstituée</div>
+              <div class="sc-kpi-val" id="d-val-reconst">—</div>
+              <div class="sc-kpi-sub" id="d-reconst-sub">À remembrement</div>
+            </div>
+          </div>
+
+          <!-- Timeline remembrement -->
+          <div class="sc-demo-wrap">
+            <div class="sc-demo-title">Timeline du démembrement &amp; remembrement</div>
+            <div class="sc-demo-track">
+              <div class="sc-demo-step done">
+                <div class="sc-demo-dot"></div>
+                <div>
+                  <div class="sc-demo-name">Acquisition en nue-propriété</div>
+                  <div class="sc-demo-date" id="d-tl-achat">Année N</div>
+                  <div class="sc-demo-detail" id="d-tl-achat-det">Achat de la NP avec décote — zéro revenu, zéro fiscalité pendant toute la durée.</div>
+                </div>
+              </div>
+              <div class="sc-demo-step active">
+                <div class="sc-demo-dot"></div>
+                <div>
+                  <div class="sc-demo-name">Période d'usufruit (revenus à l'usufruitier)</div>
+                  <div class="sc-demo-date" id="d-tl-periode">N → N+10</div>
+                  <div class="sc-demo-detail">L'usufruitier perçoit l'intégralité des revenus. Le nue-propriétaire constitue un capital sans fiscalité.</div>
+                </div>
+              </div>
+              <div class="sc-demo-step">
+                <div class="sc-demo-dot"></div>
+                <div>
+                  <div class="sc-demo-name">Remembrement automatique</div>
+                  <div class="sc-demo-date" id="d-tl-remember">N+10</div>
+                  <div class="sc-demo-detail" id="d-tl-remember-det">Réunion automatique de la pleine propriété sans droits de succession, sans fiscalité.</div>
+                </div>
+              </div>
+              <div class="sc-demo-step">
+                <div class="sc-demo-dot"></div>
+                <div>
+                  <div class="sc-demo-name">Pleine propriété — revenus complets</div>
+                  <div class="sc-demo-date" id="d-tl-fin">N+10 et au-delà</div>
+                  <div class="sc-demo-detail">Perception de l'intégralité des revenus + liberté de revendre ou transmettre.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="sc-chart-wrap">
+            <div class="sc-chart-hdr">
+              <div>
+                <div class="sc-chart-title">Nue-propriété vs Pleine propriété — projection valeur</div>
+                <div class="sc-chart-sub">Capital investi et valeur reconstituée à l'issue</div>
+              </div>
+              <span class="sc-chart-badge" id="d-badge">—</span>
+            </div>
+            <canvas id="cv-demembrement" class="sc-canvas sc-canvas-200"></canvas>
+            <div class="sc-legend">
+              <div class="sc-legend-item"><div class="sc-legend-line" style="background:var(--accent)"></div>Valeur NP (croissance implicite)</div>
+              <div class="sc-legend-item"><div class="sc-legend-line" style="background:rgba(79,138,120,.3)"></div>Pleine propriété investie au même prix</div>
+            </div>
+          </div>
+
+          <div class="sc-info-box">
+            <strong>Stratégie NP :</strong> acquérir la nue-propriété de parts SCPI permet d'investir avec une décote (souvent 35-50% selon la durée), sans percevoir de revenus pendant la période, et donc sans fiscalité. Au remembrement, la pleine propriété est reconstituée automatiquement — sans droits de mutation. Idéal pour préparer une retraite ou une transmission.
+          </div>
+
+          <div class="sc-amber-box">
+            <strong>Transmission optimisée :</strong> si l'usufruitier est un parent et le nue-propriétaire un enfant, la valeur de la nue-propriété est calculée sur le barème fiscal de l'article 669 CGI (usufruit viager). Le bien reconstitué intègre le patrimoine de l'enfant sans droits supplémentaires au décès du parent.
+          </div>
+
+        </div><!-- /demembrement -->
+
+        <!-- ─────── TAB 5 : COMPARAISON PATRIMONIALE ─────── -->
+        <div class="sc-panel" data-tab="comparaison">
+
+          <p style="font-size:.73rem;color:var(--text-dim);margin-bottom:1rem;line-height:1.6">
+            Comparaison des grandes classes d'actifs pour construire une rente patrimoniale. Les rendements indicatifs sont des moyennes observées sur 5 ans — ils ne préjugent pas des performances futures.
+          </p>
+
+          <div class="sc-comp-wrap">
+            <div class="sc-comp-grid">
+              <div class="sc-comp-hdr lbl">Critère</div>
+              <div class="sc-comp-hdr win">SCPI</div>
+              <div class="sc-comp-hdr">Locatif direct</div>
+              <div class="sc-comp-hdr">Fonds euros</div>
+              <div class="sc-comp-hdr">ETF dividendes</div>
+              <div class="sc-comp-hdr">Livret A</div>
+
+              <div class="sc-comp-cell lbl">Rendement brut estimé</div>
+              <div class="sc-comp-cell best" id="comp-rend-scpi">—</div>
+              <div class="sc-comp-cell" id="comp-rend-loc">~4 %</div>
+              <div class="sc-comp-cell">~2,5 %</div>
+              <div class="sc-comp-cell">~4 %</div>
+              <div class="sc-comp-cell">3,0 %</div>
+
+              <div class="sc-comp-cell lbl">Rendement net estimé</div>
+              <div class="sc-comp-cell best" id="comp-net-scpi">—</div>
+              <div class="sc-comp-cell" id="comp-net-loc">—</div>
+              <div class="sc-comp-cell">~2,5 %</div>
+              <div class="sc-comp-cell" id="comp-net-etf">—</div>
+              <div class="sc-comp-cell">3,0 %</div>
+
+              <div class="sc-comp-cell lbl">Revenu mensuel / 100 k€</div>
+              <div class="sc-comp-cell best" id="comp-rev-scpi">—</div>
+              <div class="sc-comp-cell" id="comp-rev-loc">—</div>
+              <div class="sc-comp-cell">~175 €</div>
+              <div class="sc-comp-cell">~280 €</div>
+              <div class="sc-comp-cell">250 €</div>
+
+              <div class="sc-comp-cell lbl">Gestion locataire</div>
+              <div class="sc-comp-cell best">Aucune ✓</div>
+              <div class="sc-comp-cell bad">Active</div>
+              <div class="sc-comp-cell best">Aucune</div>
+              <div class="sc-comp-cell best">Aucune</div>
+              <div class="sc-comp-cell best">Aucune</div>
+
+              <div class="sc-comp-cell lbl">Liquidité</div>
+              <div class="sc-comp-cell neutral">Faible (2-3 mois)</div>
+              <div class="sc-comp-cell bad">Très faible</div>
+              <div class="sc-comp-cell best">Haute</div>
+              <div class="sc-comp-cell best">Haute</div>
+              <div class="sc-comp-cell best">Immédiate</div>
+
+              <div class="sc-comp-cell lbl">Ticket minimum</div>
+              <div class="sc-comp-cell best">~1 000 €</div>
+              <div class="sc-comp-cell bad">~50 000 €+</div>
+              <div class="sc-comp-cell best">500 €</div>
+              <div class="sc-comp-cell best">Quelques €</div>
+              <div class="sc-comp-cell best">1 €</div>
+
+              <div class="sc-comp-cell lbl">Levier crédit</div>
+              <div class="sc-comp-cell best">Possible ✓</div>
+              <div class="sc-comp-cell best">Possible ✓</div>
+              <div class="sc-comp-cell bad">Non</div>
+              <div class="sc-comp-cell bad">Non</div>
+              <div class="sc-comp-cell bad">Non</div>
+
+              <div class="sc-comp-cell lbl">Diversification</div>
+              <div class="sc-comp-cell best">Multi-actifs ✓</div>
+              <div class="sc-comp-cell neutral">1 bien</div>
+              <div class="sc-comp-cell neutral">Obligataire</div>
+              <div class="sc-comp-cell neutral">Actions</div>
+              <div class="sc-comp-cell neutral">Livret</div>
+
+              <div class="sc-comp-cell lbl">Rente prévisible</div>
+              <div class="sc-comp-cell best">Oui, régulière</div>
+              <div class="sc-comp-cell neutral">Variable</div>
+              <div class="sc-comp-cell neutral">Non (rachat)</div>
+              <div class="sc-comp-cell neutral">Variable</div>
+              <div class="sc-comp-cell neutral">Oui</div>
+            </div>
+          </div>
+
+          <div class="sc-chart-wrap">
+            <div class="sc-chart-hdr">
+              <div>
+                <div class="sc-chart-title">Revenu passif mensuel net pour 100 000 € investis</div>
+                <div class="sc-chart-sub">Comparaison indicative après fiscalité TMI courante</div>
+              </div>
+            </div>
+            <canvas id="cv-comp-classes" class="sc-canvas sc-canvas-180"></canvas>
+          </div>
+
+          <div class="sc-info-box">
+            <strong>Position SCPI :</strong> la SCPI se positionne comme l'actif idéal pour la rente immobilière passive : rendement immobilier (4-6%) sans contrainte de gestion, avec possibilité de levier bancaire. La contrepartie principale est la liquidité réduite (pas de marché secondaire instantané) et des frais d'entrée élevés (8-12%).
+          </div>
+
+        </div><!-- /comparaison -->
+
+        <!-- ─────── TAB 6 : PÉDAGOGIE ─────── -->
+        <div class="sc-panel" data-tab="pedagogie">
+
+          <div class="sc-peda-grid">
+
+            <div class="sc-peda-card">
+              <div class="sc-peda-icon">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M2 12V6l5-3.5L12 6v6M5.5 12V8.5h3V12"/>
+                </svg>
+              </div>
+              <div class="sc-peda-title">Qu'est-ce qu'une SCPI ?</div>
+              <div class="sc-peda-body">Une Société Civile de Placement Immobilier collecte des fonds auprès d'épargnants pour investir dans l'immobilier (bureaux, commerces, santé, logements). L'investisseur perçoit une quote-part des loyers — <strong>sans gérer de bien</strong>, sans locataire, sans travaux.</div>
+              <span class="sc-peda-tag">Immobilier indirect</span>
+            </div>
+
+            <div class="sc-peda-card">
+              <div class="sc-peda-icon">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M2 11.5h10M3 9l2.5-3 2 2L11 4M9.5 4H11v1.5"/>
+                </svg>
+              </div>
+              <div class="sc-peda-title">Crédit vs Comptant</div>
+              <div class="sc-peda-body">Acheter des parts SCPI à crédit permet d'amplifier le patrimoine constitué grâce au <strong>levier bancaire</strong>. Si le rendement SCPI &gt; taux crédit, le différentiel (spread positif) profite à l'investisseur. Les intérêts sont déductibles des revenus fonciers.</div>
+              <span class="sc-peda-tag">Levier bancaire</span>
+            </div>
+
+            <div class="sc-peda-card">
+              <div class="sc-peda-icon">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <rect x="2" y="3" width="12" height="10" rx="1.5"/><path d="M5 3V2M11 3V2M2 7h12M6 9h4"/>
+                </svg>
+              </div>
+              <div class="sc-peda-title">Fiscalité des SCPI</div>
+              <div class="sc-peda-body">Les revenus SCPI françaises sont imposés comme des <strong>revenus fonciers</strong> (TMI + 17,2% PS). Les SCPI européennes peuvent être plus avantageuses — pas de PS en France pour les revenus de source étrangère. Via assurance-vie ou SCI IS, la fiscalité peut être optimisée.</div>
+              <span class="sc-peda-tag">Revenus fonciers</span>
+            </div>
+
+            <div class="sc-peda-card">
+              <div class="sc-peda-icon">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <circle cx="8" cy="8" r="5.5"/><path d="M5.5 8a2.5 2.5 0 0 0 5 0"/><path d="M5.5 6V5M10.5 6V5"/>
+                </svg>
+              </div>
+              <div class="sc-peda-title">SCPI Européennes</div>
+              <div class="sc-peda-body">Investies principalement hors France, ces SCPI peuvent offrir un avantage fiscal significatif : <strong>pas de prélèvements sociaux</strong> (17,2%) sur les revenus de source étrangère. La convention fiscale du pays source peut aussi réduire l'imposition globale de 10 à 20%.</div>
+              <span class="sc-peda-tag">Sans PS (source étrangère)</span>
+            </div>
+
+            <div class="sc-peda-card">
+              <div class="sc-peda-icon">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M7 2v3M7 5L4 8M7 5l3 3M3 8h2v4H3zM6 8h2v4H6zM9 8h2v4H9z"/>
+                </svg>
+              </div>
+              <div class="sc-peda-title">Démembrement SCPI</div>
+              <div class="sc-peda-body">En achetant la <strong>nue-propriété</strong> à prix décoté (35-50% selon durée), l'investisseur ne perçoit aucun revenu — donc aucune fiscalité — pendant la durée. Au remembrement automatique, il récupère la pleine propriété valorisée. Stratégie retraite ou transmission idéale.</div>
+              <span class="sc-peda-tag">Nue-propriété</span>
+            </div>
+
+            <div class="sc-peda-card">
+              <div class="sc-peda-icon">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M8 2a6 6 0 1 0 0 12A6 6 0 0 0 8 2z"/><path d="M8 6v4M8 5v.5"/>
+                </svg>
+              </div>
+              <div class="sc-peda-title">Risques &amp; vigilance</div>
+              <div class="sc-peda-body"><strong>Risques principaux :</strong> liquidité limitée (délai de revente 2-4 mois), variation du taux de distribution, risque locatif sur les actifs sous-jacents, possible baisse de la valeur des parts. <strong>Pas de garantie en capital.</strong> Horizon recommandé : 8 ans minimum.</div>
+              <span class="sc-peda-tag">Risque immobilier</span>
+            </div>
+
+          </div>
+
+          <div class="sc-warn-box">
+            <strong>Frais d'entrée élevés :</strong> les SCPI supportent des frais de souscription de 8 à 12%, prélevés à l'achat. Ces frais impactent le seuil de rentabilité — il faut en général 2 à 3 ans pour les amortir. Ils font partie du calcul du rendement réel sur longue durée.
+          </div>
+
+        </div><!-- /pedagogie -->
+
+      </div><!-- /sc-main -->
+    </div><!-- /sc-layout -->
+  </div><!-- /sim-card-wrap -->
+
+  <p style="font-size:.67rem;color:var(--text-dim);text-align:center;padding:1.5rem 0 .5rem;line-height:1.5">
+    Simulation indicative — PATRIMONIA.AI — Performances passées ne préjugent pas des résultats futurs. Pas de garantie en capital.
+  </p>
+
+</div><!-- /sim-page -->
+
+<script>
+(function () {
+  'use strict';
+
+  const PS_RATE = 0.172;
+  const FRAIS_GEST_RATE = 0.10; /* frais gestion SCPI déduits du rendement brut affiché — déjà intégrés dans le taux de distribution */
+  const YEAR_NOW = 2026;
+
+  const $  = id => document.getElementById(id);
+  const ST = (id, v) => { const el = $(id); if (el) el.textContent = v; };
+  const eur = v => SP.fmtEur(v);
+  const pct = (v, d) => SP.fmtNum(v, d == null ? 1 : d) + ' %';
+
+  function calcMens(capital, tauxPct, duree) {
+    if (capital <= 0 || duree <= 0) return 0;
+    if (tauxPct <= 0) return capital / (duree * 12);
+    const r = tauxPct / 100 / 12, n = duree * 12;
+    return capital * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1);
+  }
+
+  /* Fiscalité selon mode de détention et type SCPI */
+  function calcFiscalite(revenus, tmi, detention, typeScpi) {
+    const t = tmi / 100;
+    if (detention === 'av') {
+      /* AV: seulement sur les gains, abattement 4600€ — simplifié: taux effectif ~6% sur tout après 8 ans */
+      return revenus * 0.06;
+    }
+    if (detention === 'sci_is') {
+      /* SCI IS: IS 15% jusqu'à 38120€ puis 25%, puis PFU 30% sur distribution */
+      const is = revenus <= 38120 ? revenus * 0.15 : 38120 * 0.15 + (revenus - 38120) * 0.25;
+      const distribApreIs = revenus - is;
+      const pfu = distribApreIs * 0.30;
+      return is + pfu;
+    }
+    /* Nom propre */
+    if (typeScpi === 'eu') {
+      /* Européenne: pas de PS, crédit impôt ≈ TMI × 80% */
+      return revenus * t * 0.80;
+    }
+    /* Française: TMI + PS */
+    return revenus * (t + PS_RATE);
+  }
+
+  function readInp() {
+    return {
+      montant:   +$('sc-montant').value,
+      rendement: +$('sc-rendement').value,
+      revalo:    +$('sc-revalo').value,
+      type:      $('sc-type').value,
+      frais:     +$('sc-frais').value,
+      horizon:   +$('sc-horizon').value,
+      mode:      $('sc-mode').value,
+      apport:    +$('sc-apport').value,
+      tauxCred:  +$('sc-taux-cred').value,
+      dureeCred: +$('sc-duree-cred').value,
+      assurance: +$('sc-assurance').value,
+      tmi:       +$('sc-tmi').value,
+      detention: $('sc-detention').value,
+      demoType:  $('sc-demo-type').value,
+      demoDuree: +$('sc-demo-duree').value,
+    };
+  }
+
+  /* Type SCPI simplifié pour fiscal */
+  function typeScpiBase(type) {
+    if (type === 'eu') return 'eu';
+    return 'fr'; /* fr / sante / bureau / commerce / diver all use FR fiscalité */
+  }
+
+  function calcBase(p) {
+    const typeBase    = typeScpiBase(p.type);
+    const fraisMontant= p.montant * (p.frais / 100);
+    const capitalNet  = p.montant - fraisMontant;
+
+    const revenusBruts= capitalNet * (p.rendement / 100);
+    const fiscalite   = calcFiscalite(revenusBruts, p.tmi, p.detention, typeBase);
+    const revenusNets = revenusBruts - fiscalite;
+    const rendNet     = capitalNet > 0 ? revenusNets / capitalNet * 100 : 0;
+
+    /* Crédit */
+    const emprunt  = Math.max(0, p.montant - p.apport);
+    const mensual  = p.mode === 'credit' ? calcMens(emprunt, p.tauxCred, p.dureeCred) : 0;
+    const assurMens= p.mode === 'credit' ? emprunt * (p.assurance / 100) / 12 : 0;
+    const mensTotal= mensual + assurMens;
+    const cfMensNet= revenusNets / 12 - mensTotal;
+    const effort   = p.mode === 'credit' ? Math.max(0, mensTotal - revenusBruts / 12) : 0;
+
+    /* Levier */
+    const levierFactor = p.apport > 0 ? p.montant / p.apport : 1;
+
+    /* Valo */
+    const valoFin = capitalNet * Math.pow(1 + p.revalo / 100, p.horizon);
+    const pvBrute = valoFin - capitalNet;
+
+    /* Revenus cumulés */
+    let revCum = 0;
+    for (let y = 1; y <= p.horizon; y++) {
+      revCum += capitalNet * (p.rendement / 100) * Math.pow(1 + p.revalo / 100, y - 1);
+    }
+    const revCumNets = revCum * (revenusNets / (revenusBruts || 1));
+
+    /* Projections rente */
+    const rente5  = (capitalNet * (p.rendement / 100) * Math.pow(1 + p.revalo / 100, 5) * (revenusNets / (revenusBruts || 1))) / 12;
+    const rente10 = (capitalNet * (p.rendement / 100) * Math.pow(1 + p.revalo / 100, 10) * (revenusNets / (revenusBruts || 1))) / 12;
+    const rente20 = (capitalNet * (p.rendement / 100) * Math.pow(1 + p.revalo / 100, 20) * (revenusNets / (revenusBruts || 1))) / 12;
+
+    /* TRI simplifié */
+    const triCash = capitalNet > 0 ? (revenusNets + pvBrute / p.horizon) / capitalNet * 100 : 0;
+    const triCred = p.apport > 0 ? ((revenusNets - mensTotal * 12) + (valoFin - emprunt * Math.max(0, 1 - p.horizon / p.dureeCred)) - capitalNet) / p.apport / p.horizon * 100 : 0;
+
+    /* Comptant vs Crédit pour tab 2 */
+    const patriCash = capitalNet * Math.pow(1 + p.revalo / 100, p.horizon);
+    const encCred   = emprunt * Math.max(0, 1 - p.horizon / p.dureeCred);
+    const patriCred = capitalNet * Math.pow(1 + p.revalo / 100, p.horizon) - encCred;
+
+    /* Démembrement */
+    const totalReturn = (p.rendement + p.revalo) / 100;
+    const npCoeff     = 1 / Math.pow(1 + totalReturn, p.demoDuree);
+    const npVal       = capitalNet * npCoeff;
+    const usVal       = capitalNet - npVal;
+    const reconst     = capitalNet * Math.pow(1 + p.revalo / 100, p.demoDuree);
+    const rendImpl    = npVal > 0 ? (Math.pow(reconst / npVal, 1 / p.demoDuree) - 1) * 100 : 0;
+
+    /* Fiscal 4 modes */
+    const rb = revenusBruts;
+    const c  = capitalNet;
+    const fc = {
+      fr:  { bruts: rb, fisc: calcFiscalite(rb, p.tmi, 'nom_propre', 'fr') },
+      eu:  { bruts: rb, fisc: calcFiscalite(rb, p.tmi, 'nom_propre', 'eu') },
+      av:  { bruts: rb, fisc: calcFiscalite(rb, p.tmi, 'av', 'fr') },
+      is:  { bruts: rb, fisc: calcFiscalite(rb, p.tmi, 'sci_is', 'fr') },
+    };
+    Object.keys(fc).forEach(k => {
+      fc[k].net  = fc[k].bruts - fc[k].fisc;
+      fc[k].rend = c > 0 ? fc[k].net / c * 100 : 0;
+    });
+
+    return {
+      fraisMontant, capitalNet,
+      revenusBruts, fiscalite, revenusNets, rendNet,
+      mensual, assurMens, mensTotal, cfMensNet, effort,
+      levierFactor, valoFin, pvBrute, revCumNets,
+      rente5, rente10, rente20,
+      triCash, triCred,
+      patriCash, patriCred, emprunt, encCred,
+      npCoeff, npVal, usVal, reconst, rendImpl,
+      fc,
+    };
+  }
+
+  function syncSlider(el) {
+    const min = +el.min || 0, max = +el.max || 100, val = +el.value;
+    const p = max > min ? ((val - min) / (max - min)) * 100 : 0;
+    el.style.setProperty('--pct', p.toFixed(2) + '%');
+  }
+
+  function setupCV(id, h) {
+    const c = $(id); if (!c) return null;
+    const w = c.offsetWidth; if (!w) return null;
+    const r = window.devicePixelRatio || 1;
+    c.width = w * r; c.height = h * r;
+    c.style.height = h + 'px';
+    const ctx = c.getContext('2d');
+    ctx.scale(r, r);
+    ctx.clearRect(0, 0, w, h);
+    return { ctx, w, h };
+  }
+
+  function drawBars(id, labels, datasets, opts) {
+    const cv = setupCV(id, opts.h || 180); if (!cv) return;
+    const { ctx, w, h } = cv;
+    const PAD = { t:18, r:14, b:32, l:56 };
+    const cW = w - PAD.l - PAD.r, cH = h - PAD.t - PAD.b;
+    const n = labels.length;
+    const allV = datasets.flatMap(d => d.data);
+    const maxV = Math.max(...allV, 1), minV = Math.min(0, ...allV);
+    const range = maxV - minV || 1;
+    ctx.strokeStyle = 'rgba(0,0,0,.06)'; ctx.lineWidth = 1;
+    for (let i = 0; i <= 4; i++) {
+      const y = PAD.t + cH - i / 4 * cH;
+      ctx.beginPath(); ctx.moveTo(PAD.l, y); ctx.lineTo(PAD.l + cW, y); ctx.stroke();
+      const v = minV + i / 4 * range;
+      ctx.fillStyle = '#98989D'; ctx.font = '9px system-ui'; ctx.textAlign = 'right';
+      ctx.fillText(opts.fmtY ? opts.fmtY(v) : Math.round(v), PAD.l - 4, y + 3);
+    }
+    const perDs = datasets.length;
+    const bwTotal = (cW / n) * 0.7;
+    const bw = bwTotal / perDs;
+    const gp = (cW / n) * 0.3;
+    datasets.forEach((ds, di) => {
+      ds.data.forEach((val, i) => {
+        const bh = Math.abs(val - minV) / range * cH;
+        const x = PAD.l + i / n * cW + gp / 2 + di * bw;
+        const y = PAD.t + cH - (Math.max(val, minV) - minV) / range * cH;
+        ctx.fillStyle = ds.color || '#4F8A78';
+        ctx.beginPath();
+        ctx.roundRect ? ctx.roundRect(x, y, bw - 1, bh, [3,3,0,0]) : ctx.rect(x, y, bw - 1, bh);
+        ctx.fill();
+      });
+    });
+    ctx.fillStyle = '#6E6E73'; ctx.font = '9px system-ui'; ctx.textAlign = 'center';
+    labels.forEach((lbl, i) => ctx.fillText(lbl, PAD.l + (i + 0.5) / n * cW, h - PAD.b + 14));
+  }
+
+  function drawLines(id, labels, datasets, opts) {
+    const cv = setupCV(id, opts.h || 260); if (!cv) return;
+    const { ctx, w, h } = cv;
+    const PAD = { t:18, r:14, b:32, l:66 };
+    const cW = w - PAD.l - PAD.r, cH = h - PAD.t - PAD.b;
+    const allV = datasets.flatMap(d => d.data);
+    const maxV = Math.max(...allV, 1), minV = Math.min(0, ...allV);
+    const range = maxV - minV || 1;
+    ctx.strokeStyle = 'rgba(0,0,0,.06)'; ctx.lineWidth = 1;
+    for (let i = 0; i <= 4; i++) {
+      const y = PAD.t + cH - i / 4 * cH;
+      ctx.beginPath(); ctx.moveTo(PAD.l, y); ctx.lineTo(PAD.l + cW, y); ctx.stroke();
+      const v = minV + i / 4 * range;
+      ctx.fillStyle = '#98989D'; ctx.font = '9px system-ui'; ctx.textAlign = 'right';
+      ctx.fillText(opts.fmtY ? opts.fmtY(v) : Math.round(v), PAD.l - 4, y + 3);
+    }
+    datasets.forEach(ds => {
+      ctx.beginPath(); ctx.strokeStyle = ds.color; ctx.lineWidth = 2.5;
+      if (ds.dash) ctx.setLineDash(ds.dash); else ctx.setLineDash([]);
+      if (ds.fill) {
+        ctx.globalAlpha = 0.12;
+        ctx.fillStyle = ds.color;
+        const pts = ds.data.map((v, i) => ({ x: PAD.l + i / (labels.length - 1) * cW, y: PAD.t + cH - (v - minV) / range * cH }));
+        ctx.beginPath();
+        pts.forEach((pt, i) => i === 0 ? ctx.moveTo(pt.x, pt.y) : ctx.lineTo(pt.x, pt.y));
+        ctx.lineTo(pts[pts.length - 1].x, PAD.t + cH);
+        ctx.lineTo(pts[0].x, PAD.t + cH);
+        ctx.closePath(); ctx.fill();
+        ctx.globalAlpha = 1;
+      }
+      ctx.beginPath(); ctx.lineJoin = 'round';
+      ds.data.forEach((val, i) => {
+        const x = PAD.l + i / (labels.length - 1) * cW;
+        const y = PAD.t + cH - (val - minV) / range * cH;
+        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      });
+      ctx.stroke(); ctx.setLineDash([]);
+    });
+    ctx.fillStyle = '#6E6E73'; ctx.font = '9px system-ui'; ctx.textAlign = 'center';
+    const step = Math.max(1, Math.floor(labels.length / 6));
+    labels.forEach((lbl, i) => {
+      if (i % step !== 0 && i !== labels.length - 1) return;
+      const x = PAD.l + i / (labels.length - 1) * cW;
+      ctx.fillText(lbl, x, h - PAD.b + 14);
+    });
+  }
+
+  function renderRevenus(p, res) {
+    /* Rente block */
+    ST('r-mensuel-brut', eur(res.revenusBruts / 12) + '/mois');
+    ST('r-annual-net', eur(res.revenusNets) + '/an nets · ' + pct(res.rendNet) + ' rendement net');
+    ST('r-proj-5',  eur(res.rente5)  + '/mois');
+    ST('r-proj-10', eur(res.rente10) + '/mois');
+    ST('r-proj-20', eur(res.rente20) + '/mois');
+
+    ST('r-rend-net', pct(res.rendNet));
+    ST('r-rend-sub', 'Après ' + (p.detention === 'nom_propre' ? 'IR + PS' : p.detention === 'av' ? 'Fisc. AV' : 'IS + PFU'));
+    ST('r-mensuel-net', eur(res.revenusNets / 12) + '/mois');
+    ST('r-patrimoine', eur(res.valoFin));
+    ST('r-patri-sub', 'À ' + p.horizon + ' ans (+' + p.revalo.toFixed(1) + '%/an)');
+    ST('r-capital-net', eur(res.capitalNet));
+    if (p.mode === 'credit') {
+      ST('r-effort', eur(res.effort) + '/mois');
+      ST('r-effort-sub', 'Mensualité − revenus bruts');
+    } else {
+      ST('r-effort', '0 €');
+      ST('r-effort-sub', 'Achat comptant');
+    }
+    ST('r-revenus-cum', eur(res.revCumNets));
+    ST('r-cum-sub', 'Nets sur ' + p.horizon + ' ans');
+    ST('r-badge-final', eur(res.revenusBruts / 12) + '/mois bruts');
+    ST('r-badge-capital', eur(res.valoFin));
+
+    /* Left panel */
+    ST('sc-proj-mensuel', eur(res.revenusNets / 12) + '/mois');
+    ST('sc-proj-annuel', eur(res.revenusNets) + '/an');
+    ST('sc-proj-effort', p.mode === 'credit' ? eur(res.effort) + '/mois' : '—');
+    ST('sc-proj-valo', eur(res.valoFin));
+  }
+
+  function renderCredit(p, res) {
+    ST('cv-capital-cash', eur(p.montant));
+    ST('cv-rev-cash', eur(res.revenusNets / 12) + '/mois');
+    ST('cv-effort-cash', '0 €');
+    ST('cv-patri-cash', eur(res.patriCash));
+    ST('cv-capital-cred', eur(p.apport));
+    ST('cv-rev-cred', eur(res.revenusNets / 12) + '/mois');
+    ST('cv-effort-cred', eur(res.effort) + '/mois');
+    ST('cv-patri-cred', eur(res.patriCred));
+    ST('cv-tri-cash', pct(res.triCash));
+    ST('cv-tri-cred', pct(Math.max(0, res.triCred)));
+    ST('cv-levier', 'x' + SP.fmtNum(res.levierFactor, 1));
+    const cf = res.cfMensNet;
+    ST('cv-cf-net', (cf >= 0 ? '+' : '−') + eur(Math.abs(cf)) + '/mois');
+    ST('cv-badge', eur(res.patriCash) + ' vs ' + eur(res.patriCred));
+  }
+
+  function renderFiscalite(p, res) {
+    ST('f-bruts', eur(res.revenusBruts) + '/an');
+    ST('f-ir', eur(res.fiscalite * 0.65) + '/an'); /* approximation IR seul */
+    ST('f-tmi-sub', 'TMI ' + p.tmi + ' %');
+    ST('f-ps', p.detention === 'nom_propre' && typeScpiBase(p.type) === 'fr' ? eur(res.revenusBruts * PS_RATE) + '/an' : 'N/A');
+    ST('f-nets', eur(res.revenusNets) + '/an');
+    ST('f-rend-net-sub', 'Rendement net : ' + pct(res.rendNet));
+
+    /* Waterfall */
+    const maxRef = Math.max(res.revenusBruts, 1);
+    const setBar = (id, val) => { const el = $(id); if (el) el.style.width = Math.min(100, Math.abs(val) / maxRef * 100).toFixed(1) + '%'; };
+    ST('wf-v-bruts', eur(res.revenusBruts));   setBar('wf-bruts', res.revenusBruts);
+    const fraisGest = res.revenusBruts * 0.06; /* frais gestion inclus dans taux net réel */
+    ST('wf-v-frais-gest', '~incl. tds');       setBar('wf-frais-gest', fraisGest * 0.3);
+    const irPart = res.fiscalite * 0.65;
+    const psPart = res.fiscalite * 0.35;
+    ST('wf-v-ir', '−' + eur(irPart));     setBar('wf-ir', irPart);
+    ST('wf-v-ps', '−' + eur(psPart));     setBar('wf-ps', psPart);
+    ST('wf-v-net', eur(res.revenusNets)); setBar('wf-net', res.revenusNets);
+
+    /* 4 scenarios fiscaux */
+    const fc = res.fc;
+    const c  = res.capitalNet;
+    ST('fc-fr-bruts', eur(fc.fr.bruts)); ST('fc-fr-fiscal', '−' + eur(fc.fr.fisc)); ST('fc-fr-net', eur(fc.fr.net)); ST('fc-fr-rend', pct(fc.fr.rend));
+    ST('fc-eu-bruts', eur(fc.eu.bruts)); ST('fc-eu-fiscal', '−' + eur(fc.eu.fisc)); ST('fc-eu-net', eur(fc.eu.net)); ST('fc-eu-rend', pct(fc.eu.rend));
+    ST('fc-av-bruts', eur(fc.av.bruts)); ST('fc-av-fiscal', '−' + eur(fc.av.fisc)); ST('fc-av-net', eur(fc.av.net)); ST('fc-av-rend', pct(fc.av.rend));
+    ST('fc-is-bruts', eur(fc.is.bruts)); ST('fc-is-fiscal', '−' + eur(fc.is.fisc)); ST('fc-is-net', eur(fc.is.net)); ST('fc-is-rend', pct(fc.is.rend));
+  }
+
+  function renderDemembrement(p, res) {
+    ST('d-np-val', eur(res.npVal));
+    ST('d-np-coeff', (res.npCoeff * 100).toFixed(0) + ' % du plein');
+    ST('d-eco-achat', eur(res.usVal));
+    ST('d-rend-impl', pct(res.rendImpl));
+    ST('d-val-reconst', eur(res.reconst));
+    ST('d-reconst-sub', 'À N+' + p.demoDuree);
+    ST('d-badge', '+' + eur(res.reconst - res.npVal));
+
+    const fin = YEAR_NOW + p.demoDuree;
+    ST('d-tl-achat', 'Année ' + YEAR_NOW);
+    ST('d-tl-achat-det', 'Achat NP : ' + eur(res.npVal) + ' au lieu de ' + eur(res.capitalNet) + ' (pleine propriété).');
+    ST('d-tl-periode', YEAR_NOW + ' → ' + fin);
+    ST('d-tl-remember', '' + fin);
+    ST('d-tl-remember-det', 'Reconstitution de la pleine propriété : ' + eur(res.reconst) + ' estimé.');
+    ST('d-tl-fin', fin + ' et au-delà');
+  }
+
+  function renderComparaison(p, res) {
+    ST('comp-rend-scpi', pct(p.rendement));
+    ST('comp-net-scpi', pct(res.rendNet));
+    ST('comp-rev-scpi', eur(res.revenusNets / 12 / res.capitalNet * 100000));
+    ST('comp-rend-loc', '~4,0 %');
+    ST('comp-net-loc', pct(4 * (1 - (p.tmi / 100 + PS_RATE)), 1));
+    ST('comp-net-etf', pct(4 * (1 - 0.30)));
+    ST('comp-rev-loc', eur(4000 * (1 - (p.tmi / 100 + PS_RATE)) / 12));
+  }
+
+  function drawCharts(p, res) {
+    /* Tab 1 — revenus annuels + cumulés */
+    const yrs = [], rVals = [], cumVals = [];
+    let cum = 0;
+    for (let y = 1; y <= Math.min(p.horizon, 25); y++) {
+      yrs.push(y === 1 ? 'An 1' : y % 5 === 0 ? 'An ' + y : '');
+      const rv = res.capitalNet * (p.rendement / 100) * Math.pow(1 + p.revalo / 100, y - 1) * (res.revenusNets / (res.revenusBruts || 1));
+      cum += rv;
+      rVals.push(rv);
+      cumVals.push(cum);
+    }
+    drawLines('cv-revenus', yrs,
+      [{ data: rVals, color: '#4F8A78', fill: true },
+       { data: cumVals, color: 'rgba(79,138,120,.5)', dash: [5,3] }],
+      { h: 200, fmtY: v => (v / 1000).toFixed(0) + 'k' });
+
+    /* Tab 1 — capital */
+    const cYrs = [], cVals = [];
+    for (let y = 0; y <= Math.min(p.horizon, 25); y++) {
+      cYrs.push(y === 0 ? 'N' : 'N+' + y);
+      cVals.push(res.capitalNet * Math.pow(1 + p.revalo / 100, y));
+    }
+    drawLines('cv-capital', cYrs,
+      [{ data: cVals, color: '#4F8A78', fill: true }],
+      { h: 180, fmtY: v => (v / 1000).toFixed(0) + 'k' });
+
+    /* Tab 2 — comptant vs crédit */
+    const cv2Yrs = [], vCash = [], vCred = [];
+    for (let y = 0; y <= Math.min(p.horizon, 25); y++) {
+      cv2Yrs.push(y === 0 ? 'N' : 'N+' + y);
+      vCash.push(res.capitalNet * Math.pow(1 + p.revalo / 100, y));
+      const enc = res.emprunt * Math.max(0, 1 - y / p.dureeCred);
+      vCred.push(res.capitalNet * Math.pow(1 + p.revalo / 100, y) - enc);
+    }
+    drawLines('cv-comparaison-credit', cv2Yrs,
+      [{ data: vCash, color: '#4F8A78' },
+       { data: vCred, color: '#B8860B', dash: [5,3] }],
+      { h: 260, fmtY: v => (v / 1000).toFixed(0) + 'k' });
+
+    /* Tab 3 — comparaison 4 modes */
+    const fc = res.fc;
+    drawBars('cv-fisc-comp',
+      ['FR nom propre', 'Européenne', 'Via AV', 'Via SCI IS'],
+      [{ data: [fc.fr.net, fc.eu.net, fc.av.net, fc.is.net], color: '#4F8A78' }],
+      { h: 180, fmtY: v => (v / 1000).toFixed(0) + 'k' });
+
+    /* Tab 4 — démembrement */
+    const dYrs = [], npGrowth = [], ppEquiv = [];
+    for (let y = 0; y <= p.demoDuree; y++) {
+      dYrs.push(y === 0 ? 'N' : 'N+' + y);
+      npGrowth.push(res.npVal * Math.pow(1 + p.revalo / 100, y));
+      ppEquiv.push(res.capitalNet * Math.pow(1 + p.revalo / 100, y));
+    }
+    drawLines('cv-demembrement', dYrs,
+      [{ data: npGrowth, color: '#4F8A78', fill: true },
+       { data: ppEquiv,  color: 'rgba(79,138,120,.35)', dash: [4,3] }],
+      { h: 200, fmtY: v => (v / 1000).toFixed(0) + 'k' });
+
+    /* Tab 5 — comparaison classes */
+    const rendNets5 = [
+      res.revenusNets / res.capitalNet * 100000 / 12,
+      4000 * (1 - (p.tmi / 100 + PS_RATE)) / 12,
+      208, 280, 250
+    ];
+    drawBars('cv-comp-classes',
+      ['SCPI', 'Locatif direct', 'Fonds euros', 'ETF div.', 'Livret A'],
+      [{ data: rendNets5, color: '#4F8A78' }],
+      { h: 180, fmtY: v => v.toFixed(0) + ' €' });
+  }
+
+  function update() {
+    const p   = readInp();
+    const res = calcBase(p);
+    renderRevenus(p, res);
+    renderCredit(p, res);
+    renderFiscalite(p, res);
+    renderDemembrement(p, res);
+    renderComparaison(p, res);
+    drawCharts(p, res);
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    SP.nav.init();
+    SP.initFmt();
+
+    /* Tabs */
+    document.querySelectorAll('.sc-tab-btn').forEach(btn => {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('.sc-tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.sc-panel').forEach(c => c.classList.remove('active'));
+        this.classList.add('active');
+        const panel = document.querySelector('.sc-panel[data-tab="' + this.dataset.tab + '"]');
+        if (panel) panel.classList.add('active');
+        const p = readInp(), res = calcBase(p);
+        drawCharts(p, res);
+      });
+    });
+
+    /* Sliders */
+    const sliders = [
+      { id: 'sc-montant',      disp: 'sc-disp-montant',      fmt: v => SP.fmtEur(+v) },
+      { id: 'sc-rendement',    disp: 'sc-disp-rendement',    fmt: v => SP.fmtNum(+v,1) + ' %' },
+      { id: 'sc-revalo',       disp: 'sc-disp-revalo',       fmt: v => SP.fmtNum(+v,1) + ' %' },
+      { id: 'sc-frais',        disp: 'sc-disp-frais',        fmt: v => SP.fmtNum(+v,1) + ' %' },
+      { id: 'sc-horizon',      disp: 'sc-disp-horizon',      fmt: v => v + ' ans' },
+      { id: 'sc-apport',       disp: 'sc-disp-apport',       fmt: v => SP.fmtEur(+v) },
+      { id: 'sc-taux-cred',    disp: 'sc-disp-taux-cred',    fmt: v => SP.fmtNum(+v,1) + ' %' },
+      { id: 'sc-duree-cred',   disp: 'sc-disp-duree-cred',   fmt: v => v + ' ans' },
+      { id: 'sc-assurance',    disp: 'sc-disp-assurance',    fmt: v => SP.fmtNum(+v,2) + ' %' },
+      { id: 'sc-demo-duree',   disp: 'sc-disp-demo-duree',   fmt: v => v + ' ans' },
+    ];
+    sliders.forEach(s => {
+      const el = $(s.id); if (!el) return;
+      const disp = $(s.disp);
+      function upd() {
+        if (disp) disp.textContent = s.fmt(el.value);
+        syncSlider(el);
+        update();
+      }
+      el.addEventListener('input', upd);
+      upd();
+    });
+
+    ['sc-type','sc-mode','sc-tmi','sc-detention','sc-demo-type'].forEach(id => {
+      const el = $(id); if (el) el.addEventListener('change', update);
+    });
+
+    update();
+  });
+
+})();
+</script>
+</body>
+</html>

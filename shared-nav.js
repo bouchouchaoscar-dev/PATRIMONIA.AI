@@ -122,7 +122,11 @@
     { id: 'mh',           num: 20, label: 'Monument Historique',               href: 'simulator-20.html',
       cats: ['fiscalite', 'immobilier', 'transmission'],
       desc: 'Déficit imputable sans plafond sur le revenu global, conservation 15 ans, exonération succession — simulation complète du régime Monument Historique.',
-      keywords: ['monument', 'historique', 'mh', 'ismh', 'classe', 'inscrit', 'drac', 'deficit', 'deduction', 'revenu global', 'conservation', 'succession', 'exoneration', 'travaux', 'tmi', 'acmh'],
+      keywords: ['monument', 'historique', 'mh', 'ismh', 'classe', 'inscrit', 'drac', 'deficit', 'deduction', 'revenu global', 'conservation', 'succession', 'exoneration', 'travaux', 'tmi', 'acmh'] },
+    { id: 'scpi',         num: 21, label: 'SCPI — Revenus Passifs',             href: 'simulator-21.html',
+      cats: ['immobilier', 'finance'],
+      desc: 'Rente passive, crédit vs comptant, fiscalité FR/EU/AV/IS, démembrement NP/US et comparaison patrimoniale SCPI vs locatif vs ETF.',
+      keywords: ['scpi', 'rente', 'revenus passifs', 'immobilier indirect', 'parts', 'rendement', 'demembrement', 'nue propriete', 'usufruit', 'credit', 'comptant', 'tmi', 'prelevement social', 'europeenne', 'assurance vie', 'sci is', 'locatif', 'etf', 'fonds euros', 'livret a', 'patrimoine'],
       isNew: true }
   ];
 
