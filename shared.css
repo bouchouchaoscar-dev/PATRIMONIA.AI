@@ -94,6 +94,7 @@ body {
   width: auto;
   object-fit: contain;
   object-position: left center;
+  mix-blend-mode: multiply;
   /* alt text styling if image fails to load */
   font-family: var(--sans);
   font-size: .85rem;
