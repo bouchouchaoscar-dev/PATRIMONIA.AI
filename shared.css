@@ -90,7 +90,7 @@ body {
 }
 .nav-logo-img {
   display: block;
-  height: 74px;
+  height: 88px;
   width: auto;
   object-fit: contain;
   object-position: left center;
@@ -335,7 +335,7 @@ body {
 @media (max-width: 480px) {
   /* Top-nav compacte pour éviter overflow horizontal sur mobile (≤390px) */
   .top-nav { padding: 0 1rem; gap: .5rem; height: 64px }
-  .nav-logo-img { height: 48px }
+  .nav-logo-img { height: 56px }
   .nav-right { gap: .35rem }
   .nav-back {
     padding: .35rem .55rem;
