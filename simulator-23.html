@@ -77,14 +77,39 @@
 }
 
 /* Tabs */
+.pn-tabs-wrap {
+  position:relative; display:flex; align-items:stretch;
+  background:var(--surface-2); flex-shrink:0;
+}
+.pn-tabs-wrap::before, .pn-tabs-wrap::after {
+  content:''; position:absolute; top:0; bottom:1px; width:36px;
+  pointer-events:none; z-index:2; transition:opacity .2s;
+}
+.pn-tabs-wrap::before { left:28px; background:linear-gradient(to right, var(--surface-2) 0%, transparent 100%) }
+.pn-tabs-wrap::after  { right:28px; background:linear-gradient(to left, var(--surface-2) 0%, transparent 100%) }
+.pn-tabs-wrap.tabs-at-start::before { opacity:0 }
+.pn-tabs-wrap.tabs-at-end::after   { opacity:0 }
+
+.pn-tabs-arrow {
+  flex-shrink:0; width:28px; padding:0;
+  background:var(--surface-2); border:none;
+  border-bottom:1px solid var(--border-subtle);
+  color:var(--text-muted); cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  font-size:1rem; line-height:1; z-index:3;
+  transition:color .18s, background .18s;
+}
+.pn-tabs-arrow:hover:not(:disabled) { color:var(--text); background:var(--surface) }
+.pn-tabs-arrow:disabled { opacity:.25; cursor:default }
+
 .pn-tabs-nav {
   display:flex; border-bottom:1px solid var(--border-subtle);
-  background:var(--surface-2); overflow-x:auto; flex-shrink:0;
+  background:var(--surface-2); overflow-x:auto; flex-shrink:0; flex:1;
   scrollbar-width:none;
 }
 .pn-tabs-nav::-webkit-scrollbar { display:none }
 .pn-tab-btn {
-  flex-shrink:0; padding:.8rem 1.05rem;
+  flex-shrink:0; padding:.8rem 1rem;
   font-family:var(--sans); font-size:.73rem; font-weight:500;
   color:var(--text-muted); background:none;
   border:none; border-bottom:2px solid transparent;
@@ -214,15 +239,18 @@
 .pn-vs-row-val.amber { color:var(--amber) }
 
 /* ── Tableau comparaison patrimoniale ── */
-.pn-cmp-table { width:100%; border-collapse:collapse; font-size:.68rem; margin-bottom:1.1rem }
+.pn-cmp-scroll { overflow-x:auto; margin-bottom:1.1rem; border-radius:var(--r-sm); border:1px solid var(--border-subtle) }
+.pn-cmp-table { width:100%; min-width:520px; border-collapse:collapse; font-size:.66rem }
 .pn-cmp-table th {
-  text-align:left; padding:.5rem .7rem; background:var(--surface-2);
-  color:var(--text-dim); font-weight:700; letter-spacing:.05em; font-size:.6rem;
+  text-align:left; padding:.48rem .65rem; background:var(--surface-2);
+  color:var(--text-dim); font-weight:700; letter-spacing:.05em; font-size:.58rem;
   border-bottom:1px solid var(--border-subtle); text-transform:uppercase;
+  white-space:nowrap;
 }
-.pn-cmp-table td { padding:.55rem .7rem; border-bottom:1px solid var(--border-subtle); color:var(--text-muted) }
-.pn-cmp-table tr:hover td { background:var(--surface-2) }
-.pn-cmp-table .pn-cmp-name { font-weight:600; color:var(--text) }
+.pn-cmp-table td { padding:.52rem .65rem; border-bottom:1px solid var(--border-subtle); color:var(--text-muted); white-space:nowrap }
+.pn-cmp-table tr:last-child td { border-bottom:none }
+.pn-cmp-table tr:hover td { background:rgba(79,138,120,.04) }
+.pn-cmp-table .pn-cmp-name { font-weight:600; color:var(--text); white-space:nowrap }
 .pn-dot { display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:.35rem }
 .pn-dot-green { background:var(--accent) }
 .pn-dot-amber { background:var(--amber) }
@@ -478,14 +506,18 @@ input[type=range].pn-slider.amber-slider::-webkit-slider-thumb { background:var(
 <main class="pn-main">
 
   <!-- TABS NAV -->
-  <nav class="pn-tabs-nav" role="tablist">
-    <button class="pn-tab-btn active" data-tab="0">Projet immobilier</button>
-    <button class="pn-tab-btn" data-tab="1">Réduction fiscale</button>
-    <button class="pn-tab-btn" data-tab="2">Cash-flow & rentabilité</button>
-    <button class="pn-tab-btn" data-tab="3">Pinel vs Denormandie</button>
-    <button class="pn-tab-btn" data-tab="4">Comparaison patrimoniale</button>
-    <button class="pn-tab-btn" data-tab="5">Pédagogie</button>
-  </nav>
+  <div class="pn-tabs-wrap" id="tabsWrap">
+    <button class="pn-tabs-arrow" id="tabArrowL" aria-label="Onglets précédents" disabled>&#8249;</button>
+    <nav class="pn-tabs-nav" role="tablist" id="tabsNav">
+      <button class="pn-tab-btn active" data-tab="0">Projet immobilier</button>
+      <button class="pn-tab-btn" data-tab="1">Réduction fiscale</button>
+      <button class="pn-tab-btn" data-tab="2">Cash-flow &amp; rentabilité</button>
+      <button class="pn-tab-btn" data-tab="3">Pinel vs Denormandie</button>
+      <button class="pn-tab-btn" data-tab="4">Comparaison patrimoniale</button>
+      <button class="pn-tab-btn" data-tab="5">Pédagogie</button>
+    </nav>
+    <button class="pn-tabs-arrow" id="tabArrowR" aria-label="Onglets suivants">&#8250;</button>
+  </div>
 
   <!-- ═══ TAB 0 — PROJET IMMOBILIER ═══ -->
   <div class="pn-panel active" data-panel="0">
@@ -773,23 +805,25 @@ input[type=range].pn-slider.amber-slider::-webkit-slider-thumb { background:var(
 
     <p class="pn-section-title">Pinel / Denormandie vs alternatives patrimoniales</p>
 
-    <table class="pn-cmp-table">
-      <thead>
-        <tr>
-          <th>Dispositif</th>
-          <th>Rend. brut</th>
-          <th>Avantage fiscal</th>
-          <th>Cash-flow</th>
-          <th>Gestion</th>
-          <th>Horizon idéal</th>
-        </tr>
-      </thead>
-      <tbody id="cmp-tbody"></tbody>
-    </table>
+    <div class="pn-cmp-scroll">
+      <table class="pn-cmp-table">
+        <thead>
+          <tr>
+            <th>Dispositif</th>
+            <th>Rend. brut</th>
+            <th>Avantage fiscal</th>
+            <th>Cash-flow</th>
+            <th>Gestion</th>
+            <th>Horizon idéal</th>
+          </tr>
+        </thead>
+        <tbody id="cmp-tbody"></tbody>
+      </table>
+    </div>
 
     <div class="pn-chart-wrap">
       <div class="pn-chart-title">Patrimoine final comparé (à l'horizon de détention)</div>
-      <canvas id="cv-cmp" height="200"></canvas>
+      <canvas id="cv-cmp" height="215"></canvas>
     </div>
 
     <div class="pn-kpi-grid">
@@ -1180,24 +1214,36 @@ function drawLine(cv, pts, col, pad, maxV, dash, fill, fillCol){
   ctx.setLineDash([]);
 }
 
-function drawBarsH(cv, items, pad, colFn){
+function drawHBars(cv, items){
   var ctx=cv.ctx, w=cv.w, h=cv.h;
+  var n=items.length;
+  var LBL=115, VAL=58, PAD=10;
+  var barZoneW = w - LBL - VAL - PAD;
+  var rowH=Math.floor((h-PAD*2)/n);
+  var barH=Math.max(12, Math.floor(rowH*0.52));
   var max=0; items.forEach(function(it){ if(it.v>max) max=it.v; });
-  var barH=Math.floor((h-2*pad)/items.length*0.6);
-  var gap=Math.floor((h-2*pad)/items.length);
+  if(max<=0) return;
   items.forEach(function(it,i){
-    var y=pad+i*gap;
-    var bw=(it.v/max)*(w-pad*3.5);
-    ctx.fillStyle=colFn?colFn(it,i):(it.col||'#4F8A78');
+    var bw = Math.max(3, (it.v/max)*barZoneW);
+    var y  = PAD + i*rowH + Math.floor((rowH-barH)/2);
+    /* label gauche */
+    ctx.font='10px system-ui'; ctx.textAlign='right';
+    ctx.fillStyle='rgba(180,180,180,.85)';
+    ctx.fillText(it.lbl, LBL-6, y+Math.floor(barH/2)+3);
+    /* barre */
+    ctx.fillStyle=it.col||'#4F8A78';
     ctx.beginPath();
-    roundRect(ctx, pad*2, y, Math.max(bw,4), barH, 4);
+    roundRect(ctx, LBL, y, bw, barH, 3);
     ctx.fill();
-    ctx.fillStyle=ctx.fillStyle; ctx.font='bold 9px system-ui';
-    ctx.textAlign='left'; ctx.fillStyle='rgba(200,200,200,.7)';
-    ctx.fillText(it.lbl, pad*2, y-3);
-    ctx.fillStyle=ctx.fillStyle; ctx.font='bold 9px system-ui';
-    ctx.textAlign='left'; ctx.fillStyle='rgba(220,220,220,.9)';
-    ctx.fillText(fmtK(it.v), pad*2+bw+5, y+barH/2+3);
+    /* fond barre (track) */
+    ctx.fillStyle='rgba(255,255,255,.04)';
+    ctx.beginPath();
+    roundRect(ctx, LBL+bw, y, barZoneW-bw, barH, 3);
+    ctx.fill();
+    /* valeur droite */
+    ctx.font='bold 9px system-ui'; ctx.textAlign='left';
+    ctx.fillStyle='rgba(220,220,220,.9)';
+    ctx.fillText(fmtK(it.v)+'€', LBL+bw+6, y+Math.floor(barH/2)+3);
   });
 }
 
@@ -1436,25 +1482,28 @@ function renderTab3(r){
 function renderTab4(r){
   var col = getColors();
   var capital = S.apport;
-  // Estimations comparatives (même capital investi)
-  var scpiRendement = 4.5; // % brut
-  var scpiGain = capital * Math.pow(1+scpiRendement/100, S.horizon) - capital;
-  var lmnpRend = r.rendBrut * 1.2; // LMNP amortissement ~ +20% rendement net
-  var lmnpPatri = S.prix * Math.pow(1+S.revalo/100, S.horizon) - r.detteRestante;
+  /* Comparatifs avec le même apport (pas le prix total)
+     pour montrer l'effet levier de l'immobilier vs placement liquide */
+  var scpiRend = 4.5;
+  var lmnpPatri  = S.prix * Math.pow(1+S.revalo/100, S.horizon) - r.detteRestante;
+  var scpiPatri  = capital * Math.pow(1+scpiRend/100, S.horizon);
+  var defFonPatri= S.prix * Math.pow(1+(S.revalo+0.3)/100, S.horizon) - r.detteRestante;
+  var etfPatri   = capital * Math.pow(1.062, S.horizon);
 
-  set('t4-pn-patri', fmtEur(Math.round(r.patrimoineNet)));
+  set('t4-pn-patri',   fmtEur(Math.round(r.patrimoineNet)));
   set('t4-lmnp-patri', fmtEur(Math.round(lmnpPatri)));
-  set('t4-scpi-patri', fmtEur(Math.round(capital + scpiGain)));
+  set('t4-scpi-patri', fmtEur(Math.round(scpiPatri))+'*');
 
   // Tableau
   var tbody = el('cmp-tbody');
   if(tbody){
+    var lmnpRend = r.rendBrut * 1.2;
     var rows = [
-      { dot:'green', nom:'Pinel / Denormandie', rend:fmtPct(r.rendBrut), fiscal:'Réduction IR directe', cf:r.cfNet>=0?'Positif':'Légèrement négatif', gestion:'Active', horizon:'6–12 ans min' },
-      { dot:'blue',  nom:'LMNP',                rend:fmtPct(lmnpRend),   fiscal:'Amortissement (BIC)', cf:'Souvent positif', gestion:'Active', horizon:'8–15 ans' },
-      { dot:'amber', nom:'SCPI',                 rend:fmtPct(scpiRendement), fiscal:'PFU ou barème', cf:'Distribué mensuel', gestion:'Aucune', horizon:'8+ ans' },
-      { dot:'purple',nom:'Déficit Foncier',       rend:fmtPct(r.rendBrut*1.1), fiscal:'Déduction RG 10 700€', cf:'Variable', gestion:'Active', horizon:'10+ ans' },
-      { dot:'muted', nom:'Assurance-vie (ETF)',   rend:'5–7%',            fiscal:'Fiscalité sortie', cf:'Non', gestion:'Pilotée', horizon:'8+ ans' }
+      { dot:'green',  nom:'Pinel / Denormandie', rend:fmtPct(r.rendBrut),     fiscal:'Réduction IR directe', cf:r.cfNet>=0?'Positif':'Légèrement −', gestion:'Active', horizon:'6–12 ans' },
+      { dot:'blue',   nom:'LMNP',                rend:fmtPct(lmnpRend),        fiscal:'Amortissement BIC',    cf:'Souvent positif',  gestion:'Active', horizon:'8–15 ans' },
+      { dot:'amber',  nom:'SCPI',                rend:fmtPct(scpiRend),         fiscal:'PFU ou barème IR',     cf:'Distribué mens.', gestion:'Aucune', horizon:'8+ ans' },
+      { dot:'purple', nom:'Déficit Foncier',     rend:fmtPct(r.rendBrut*1.1),  fiscal:'Déduction RG 10 700€', cf:'Variable',         gestion:'Active', horizon:'10+ ans' },
+      { dot:'muted',  nom:'AV / ETF',            rend:'5–7%',                  fiscal:'Fiscalité sortie',     cf:'Non',              gestion:'Pilotée', horizon:'8+ ans' }
     ];
     tbody.innerHTML = rows.map(function(row){
       return '<tr>'
@@ -1468,17 +1517,22 @@ function renderTab4(r){
     }).join('');
   }
 
-  // Canvas comparaison barres
+  // Canvas — barres horizontales avec drawHBars
   var cv = setupCV('cv-cmp');
   if(!cv) return;
-  var items=[
-    { lbl:'Pinel/Denormandie', v:r.patrimoineNet, col:col.accent },
-    { lbl:'LMNP (estimé)',     v:lmnpPatri,        col:col.blue },
-    { lbl:'SCPI',              v:capital+scpiGain, col:col.amber },
-    { lbl:'Livret A (2%)',     v:capital*Math.pow(1.02,S.horizon), col:col.dim }
-  ];
   cv.ctx.clearRect(0,0,cv.w,cv.h);
-  drawBarsH(cv, items, 24, null);
+  var items = [
+    { lbl:'Pinel / Denormandie', v: Math.max(0, r.patrimoineNet), col:col.accent },
+    { lbl:'LMNP (estimé)',       v: Math.max(0, lmnpPatri),       col:col.blue   },
+    { lbl:'Déficit Foncier',     v: Math.max(0, defFonPatri),     col:col.purple },
+    { lbl:'SCPI (apport seul)*', v: Math.max(0, scpiPatri),       col:col.amber  },
+    { lbl:'AV / ETF (apport)*',  v: Math.max(0, etfPatri),        col:col.dim    }
+  ];
+  drawHBars(cv, items);
+  // Note de bas de canvas
+  cv.ctx.font='8px system-ui'; cv.ctx.textAlign='left';
+  cv.ctx.fillStyle='rgba(150,150,150,.6)';
+  cv.ctx.fillText('* sans effet levier — même apport de '+fmtK(capital)+'€', 10, cv.h-4);
 }
 
 function calcAndRender(){
@@ -1530,9 +1584,33 @@ document.querySelectorAll('.pn-dur-badge[data-dur]').forEach(function(b){
   });
 });
 
+/* ─── TABS SCROLL ARROWS ─── */
+function initTabScroll(){
+  var wrap = el('tabsWrap');
+  var nav  = el('tabsNav');
+  var btnL = el('tabArrowL');
+  var btnR = el('tabArrowR');
+  if(!wrap || !nav || !btnL || !btnR) return;
+  function upd(){
+    var sl=nav.scrollLeft, sw=nav.scrollWidth, cw=nav.clientWidth;
+    var atStart = sl <= 2;
+    var atEnd   = sl >= sw - cw - 2;
+    btnL.disabled = atStart;
+    btnR.disabled = atEnd;
+    wrap.classList.toggle('tabs-at-start', atStart);
+    wrap.classList.toggle('tabs-at-end',   atEnd);
+  }
+  btnL.addEventListener('click', function(){ nav.scrollBy({ left:-140, behavior:'smooth' }); });
+  btnR.addEventListener('click', function(){ nav.scrollBy({ left:140,  behavior:'smooth' }); });
+  nav.addEventListener('scroll', upd, { passive:true });
+  window.addEventListener('resize', upd);
+  setTimeout(upd, 80);
+}
+
 /* ─── INIT ─── */
 SP.nav.init();
 if(typeof SP.initFmt === 'function') SP.initFmt();
+initTabScroll();
 calcAndRender();
 window.addEventListener('resize', function(){ setTimeout(calcAndRender,60); });
 
