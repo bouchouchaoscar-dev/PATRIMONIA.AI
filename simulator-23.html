@@ -287,6 +287,52 @@
 }
 .pn-chart-wrap canvas { border-radius:var(--r-sm) }
 
+/* ── Ranking patrimonial premium ── */
+.pn-rank-block {
+  background:var(--surface-2); border:1px solid var(--border-subtle);
+  border-radius:var(--r); padding:.3rem 1.1rem .5rem;
+  margin-bottom:1rem;
+}
+.pn-rank-title {
+  font-size:.59rem; font-weight:700; color:var(--text-dim);
+  letter-spacing:.07em; text-transform:uppercase;
+  padding:.75rem 0 .55rem; border-bottom:1px solid var(--border-subtle);
+  margin-bottom:.1rem;
+}
+.pn-rank-row {
+  display:flex; align-items:center; gap:.7rem;
+  padding:.52rem 0; border-bottom:1px solid var(--border-subtle);
+}
+.pn-rank-row:last-child { border-bottom:none }
+.pn-rank-name {
+  display:flex; align-items:center; gap:.38rem;
+  flex:0 0 160px; font-size:.69rem; font-weight:600; color:var(--text);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+@media(max-width:600px){ .pn-rank-name { flex:0 0 120px; font-size:.63rem } }
+.pn-rank-best {
+  flex-shrink:0; font-size:.5rem; padding:.1rem .32rem; border-radius:3px;
+  background:var(--accent); color:#fff; font-weight:700; letter-spacing:.03em;
+}
+.pn-rank-bar-wrap {
+  flex:1; height:7px; background:var(--border-subtle);
+  border-radius:4px; overflow:hidden; min-width:40px;
+}
+.pn-rank-bar {
+  height:100%; border-radius:4px;
+  transition:width .5s cubic-bezier(.4,0,.2,1);
+}
+.pn-rank-val {
+  flex:0 0 80px; text-align:right;
+  font-family:var(--mono); font-size:.7rem; font-weight:700;
+  color:var(--text); white-space:nowrap;
+}
+@media(max-width:600px){ .pn-rank-val { flex:0 0 65px; font-size:.64rem } }
+.pn-rank-note {
+  font-size:.57rem; color:var(--text-dim); padding:.55rem 0 .2rem;
+  border-top:1px solid var(--border-subtle); margin-top:.15rem;
+}
+
 /* ── Section title ── */
 .pn-section-title {
   font-size:.8rem; font-weight:700; color:var(--text);
@@ -821,9 +867,9 @@ input[type=range].pn-slider.amber-slider::-webkit-slider-thumb { background:var(
       </table>
     </div>
 
-    <div class="pn-chart-wrap">
-      <div class="pn-chart-title">Patrimoine final comparé (à l'horizon de détention)</div>
-      <canvas id="cv-cmp" height="215"></canvas>
+    <div class="pn-rank-block" id="rank-patri">
+      <div class="pn-rank-title">Patrimoine final comparé — à l'horizon de détention</div>
+      <!-- Rows générées par JS -->
     </div>
 
     <div class="pn-kpi-grid">
@@ -1480,30 +1526,28 @@ function renderTab3(r){
 }
 
 function renderTab4(r){
-  var col = getColors();
   var capital = S.apport;
-  /* Comparatifs avec le même apport (pas le prix total)
-     pour montrer l'effet levier de l'immobilier vs placement liquide */
-  var scpiRend = 4.5;
-  var lmnpPatri  = S.prix * Math.pow(1+S.revalo/100, S.horizon) - r.detteRestante;
-  var scpiPatri  = capital * Math.pow(1+scpiRend/100, S.horizon);
-  var defFonPatri= S.prix * Math.pow(1+(S.revalo+0.3)/100, S.horizon) - r.detteRestante;
-  var etfPatri   = capital * Math.pow(1.062, S.horizon);
+  var scpiRend   = 4.5;
+  var lmnpPatri  = Math.max(0, S.prix * Math.pow(1+S.revalo/100, S.horizon) - r.detteRestante);
+  var scpiPatri  = Math.max(0, capital * Math.pow(1+scpiRend/100, S.horizon));
+  var defFonPatri= Math.max(0, S.prix * Math.pow(1+(S.revalo+0.3)/100, S.horizon) - r.detteRestante);
+  var etfPatri   = Math.max(0, capital * Math.pow(1.062, S.horizon));
+  var pnPatri    = Math.max(0, r.patrimoineNet);
 
-  set('t4-pn-patri',   fmtEur(Math.round(r.patrimoineNet)));
+  set('t4-pn-patri',   fmtEur(Math.round(pnPatri)));
   set('t4-lmnp-patri', fmtEur(Math.round(lmnpPatri)));
   set('t4-scpi-patri', fmtEur(Math.round(scpiPatri))+'*');
 
-  // Tableau
+  // ── Tableau ──
   var tbody = el('cmp-tbody');
   if(tbody){
     var lmnpRend = r.rendBrut * 1.2;
     var rows = [
-      { dot:'green',  nom:'Pinel / Denormandie', rend:fmtPct(r.rendBrut),     fiscal:'Réduction IR directe', cf:r.cfNet>=0?'Positif':'Légèrement −', gestion:'Active', horizon:'6–12 ans' },
-      { dot:'blue',   nom:'LMNP',                rend:fmtPct(lmnpRend),        fiscal:'Amortissement BIC',    cf:'Souvent positif',  gestion:'Active', horizon:'8–15 ans' },
-      { dot:'amber',  nom:'SCPI',                rend:fmtPct(scpiRend),         fiscal:'PFU ou barème IR',     cf:'Distribué mens.', gestion:'Aucune', horizon:'8+ ans' },
-      { dot:'purple', nom:'Déficit Foncier',     rend:fmtPct(r.rendBrut*1.1),  fiscal:'Déduction RG 10 700€', cf:'Variable',         gestion:'Active', horizon:'10+ ans' },
-      { dot:'muted',  nom:'AV / ETF',            rend:'5–7%',                  fiscal:'Fiscalité sortie',     cf:'Non',              gestion:'Pilotée', horizon:'8+ ans' }
+      { dot:'green',  nom:'Pinel / Denormandie', rend:fmtPct(r.rendBrut),    fiscal:'Réduction IR directe', cf:r.cfNet>=0?'Positif':'Légèrement −', gestion:'Active', horizon:'6–12 ans' },
+      { dot:'blue',   nom:'LMNP',               rend:fmtPct(lmnpRend),       fiscal:'Amortissement BIC',    cf:'Souvent positif',  gestion:'Active', horizon:'8–15 ans' },
+      { dot:'amber',  nom:'SCPI',               rend:fmtPct(scpiRend),        fiscal:'PFU ou barème IR',     cf:'Distribué mens.', gestion:'Aucune', horizon:'8+ ans' },
+      { dot:'purple', nom:'Déficit Foncier',    rend:fmtPct(r.rendBrut*1.1), fiscal:'Déduction RG 10 700€', cf:'Variable',         gestion:'Active', horizon:'10+ ans' },
+      { dot:'muted',  nom:'AV / ETF',           rend:'5–7%',                 fiscal:'Fiscalité sortie',     cf:'Non',              gestion:'Pilotée', horizon:'8+ ans' }
     ];
     tbody.innerHTML = rows.map(function(row){
       return '<tr>'
@@ -1517,22 +1561,45 @@ function renderTab4(r){
     }).join('');
   }
 
-  // Canvas — barres horizontales avec drawHBars
-  var cv = setupCV('cv-cmp');
-  if(!cv) return;
-  cv.ctx.clearRect(0,0,cv.w,cv.h);
+  // ── Ranking HTML premium ──
+  var rank = el('rank-patri');
+  if(!rank) return;
+
   var items = [
-    { lbl:'Pinel / Denormandie', v: Math.max(0, r.patrimoineNet), col:col.accent },
-    { lbl:'LMNP (estimé)',       v: Math.max(0, lmnpPatri),       col:col.blue   },
-    { lbl:'Déficit Foncier',     v: Math.max(0, defFonPatri),     col:col.purple },
-    { lbl:'SCPI (apport seul)*', v: Math.max(0, scpiPatri),       col:col.amber  },
-    { lbl:'AV / ETF (apport)*',  v: Math.max(0, etfPatri),        col:col.dim    }
+    { nom:'Pinel / Denormandie', v:pnPatri,     dot:'green',  col:'var(--accent)', levier:true },
+    { nom:'LMNP (estimé)',       v:lmnpPatri,   dot:'blue',   col:'#5B8FBF',       levier:true },
+    { nom:'Déficit Foncier',     v:defFonPatri, dot:'purple', col:'#8B73C4',       levier:true },
+    { nom:'SCPI (même apport)',  v:scpiPatri,   dot:'amber',  col:'var(--amber)',  levier:false },
+    { nom:'AV / ETF (apport)',   v:etfPatri,    dot:'muted',  col:'var(--text-dim)', levier:false }
   ];
-  drawHBars(cv, items);
-  // Note de bas de canvas
-  cv.ctx.font='8px system-ui'; cv.ctx.textAlign='left';
-  cv.ctx.fillStyle='rgba(150,150,150,.6)';
-  cv.ctx.fillText('* sans effet levier — même apport de '+fmtK(capital)+'€', 10, cv.h-4);
+  var maxV = 0;
+  items.forEach(function(it){ if(it.v > maxV) maxV = it.v; });
+  var best = items.reduce(function(a,b){ return a.v >= b.v ? a : b; });
+
+  var rowsHtml = items.map(function(it){
+    var pct = maxV > 0 ? Math.max(3, Math.round(it.v / maxV * 100)) : 3;
+    var isBest = it === best;
+    var bestBadge = isBest ? '<span class="pn-rank-best">Meilleur</span>' : '';
+    return '<div class="pn-rank-row">'
+      + '<div class="pn-rank-name">'
+      +   '<span class="pn-dot pn-dot-'+it.dot+'" style="flex-shrink:0"></span>'
+      +   it.nom
+      +   bestBadge
+      + '</div>'
+      + '<div class="pn-rank-bar-wrap">'
+      +   '<div class="pn-rank-bar" style="width:'+pct+'%;background:'+it.col+';opacity:'+(it.levier?'.75':'.45')+'"></div>'
+      + '</div>'
+      + '<div class="pn-rank-val" style="color:'+(isBest?'var(--accent)':'var(--text)')+'">'+fmtEur(Math.round(it.v))+'</div>'
+      + '</div>';
+  }).join('');
+
+  // Conserver le titre existant, injecter après lui
+  var titleEl = rank.querySelector('.pn-rank-title');
+  var titleHtml = titleEl ? titleEl.outerHTML : '<div class="pn-rank-title">Patrimoine final comparé — à l\'horizon de détention</div>';
+  rank.innerHTML = titleHtml + rowsHtml
+    + '<div class="pn-rank-note">* Sans effet levier — même apport de '
+    + fmtEur(capital)+'. Pinel / LMNP / Déficit Foncier utilisent un crédit de '
+    + fmtEur(Math.round(r.montantCredit))+'.</div>';
 }
 
 function calcAndRender(){
